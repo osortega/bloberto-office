@@ -3,9 +3,9 @@ import './App.css'
 import Office from './Office.jsx'
 
 const GITHUB_API_URL =
-  'https://api.github.com/repos/osortega/bloberto-office/contents/data/workers.json'
+  'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json'
 const ACTIVITY_API_URL =
-  'https://api.github.com/repos/osortega/bloberto-office/contents/data/activity.json'
+  'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/activity.json'
 const POLL_INTERVAL_MS = 10_000
 
 const ROLE_EMOJIS = {
@@ -35,23 +35,15 @@ const STATUS_EMOJIS = {
 }
 
 async function fetchWorkersFromGitHub() {
-  const res = await fetch(GITHUB_API_URL, {
-    headers: { Accept: 'application/vnd.github+json' },
-  })
-  if (!res.ok) throw new Error(`GitHub API ${res.status}`)
-  const meta = await res.json()
-  const json = JSON.parse(atob(meta.content.replace(/\n/g, '')))
-  return json
+  const res = await fetch(GITHUB_API_URL + '?t=' + Date.now())
+  if (!res.ok) throw new Error(`Fetch error ${res.status}`)
+  return res.json()
 }
 
 async function fetchActivityFromGitHub() {
-  const res = await fetch(ACTIVITY_API_URL, {
-    headers: { Accept: 'application/vnd.github+json' },
-  })
-  if (!res.ok) throw new Error(`GitHub API ${res.status}`)
-  const meta = await res.json()
-  const json = JSON.parse(atob(meta.content.replace(/\n/g, '')))
-  return json
+  const res = await fetch(ACTIVITY_API_URL + '?t=' + Date.now())
+  if (!res.ok) throw new Error(`Fetch error ${res.status}`)
+  return res.json()
 }
 
 function getRelativeTime(timestamp) {
