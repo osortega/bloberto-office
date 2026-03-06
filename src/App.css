@@ -577,7 +577,51 @@ select option { background: var(--surface2); }
   font-size: 0.9rem;
 }
 
-/* ── Loading Skeleton ── */
+/* ---- Error Banner ---- */
+.fetch-error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: rgba(248, 113, 113, 0.1);
+  border-left: 3px solid var(--red);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+/* ---- Activity Filter Bar ---- */
+.activity-filter-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.activity-filter-bar button {
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.activity-filter-bar button:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.activity-filter-bar button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+
 .skeleton {
   background: var(--surface2);
   border-radius: var(--radius);

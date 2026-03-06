@@ -6,7 +6,7 @@ const GITHUB_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json'
 const ACTIVITY_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/activity.json'
-const POLL_INTERVAL_ACTIVE = 10_000
+const POLL_INTERVAL_ACTIVE = 30_000
 const POLL_INTERVAL_HIDDEN = 60_000
 
 const ROLE_EMOJIS = {
@@ -234,6 +234,8 @@ export default function App() {
   const [roster, setRoster] = useState([])
   const [activityLog, setActivityLog] = useState([])
   const [activityError, setActivityError] = useState(null)
+  const [fetchError, setFetchError] = useState(null)
+  const [activityFilter, setActivityFilter] = useState('all')
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -269,6 +271,7 @@ export default function App() {
       setAllWorkers(data.workers ?? [])
       setRoster(data.roster ?? [])
       setIsLive(true)
+      setFetchError(null)
     } else {
       setIsLive(false)
     }
@@ -279,6 +282,10 @@ export default function App() {
       setActivityError(null)
     } else {
       setActivityError('Could not load activity log. Check your connection and try again.')
+    }
+
+    if (workersResult.status === 'rejected' && activityResult.status === 'rejected') {
+      setFetchError('Having trouble connecting to HQ. Data may be stale.')
     }
 
     setLastSynced(new Date())
@@ -345,6 +352,12 @@ export default function App() {
       </header>
 
       <main id="main-content" className="main">
+        {fetchError && (
+          <div className="fetch-error-banner" role="alert">
+            <span>⚠️ {fetchError}</span>
+            <button className="btn btn-sm btn-ghost" onClick={syncFromGitHub}>↺ Retry</button>
+          </div>
+        )}
         <div className="tab-toggle" role="tablist">
           <button
             role="tab"
@@ -405,7 +418,32 @@ export default function App() {
                 Last {Math.min(activityLog.length, 20)} events
               </span>
             </div>
-            <ActivityLog entries={activityLog} error={activityError} />
+            <div className="activity-filter-bar" role="group" aria-label="Filter activity log">
+              {[
+                { key: 'all', label: 'All' },
+                { key: 'hires', label: '🟢 Hires' },
+                { key: 'completions', label: '✅ Completions' },
+                { key: 'errors', label: '❌ Errors' },
+              ].map(({ key, label }) => (
+                <button
+                  key={key}
+                  className={activityFilter === key ? 'active' : ''}
+                  onClick={() => setActivityFilter(key)}
+                  aria-pressed={activityFilter === key}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <ActivityLog
+              entries={activityLog.filter(e => {
+                if (activityFilter === 'hires') return e.type === 'hire'
+                if (activityFilter === 'completions') return e.type === 'complete'
+                if (activityFilter === 'errors') return e.type === 'error'
+                return true
+              })}
+              error={activityError}
+            />
           </div>
         )}
       </main>

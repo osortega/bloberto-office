@@ -249,7 +249,11 @@ export default function Office({ workers = [], roster = [] }) {
 
   return (
     <div className="office-wrap">
-      <div className="office-floor">
+      <div
+        className="office-floor"
+        role="img"
+        aria-label="Virtual office visualization showing team members at desks"
+      >
 
         <div className="office-sign">🏢 Bloberto&apos;s HQ</div>
 
@@ -257,6 +261,7 @@ export default function Office({ workers = [], roster = [] }) {
         <div className="mgr-desk">
           <div className="mgr-desk__monitor" />
           <div className="mgr-desk__nameplate">Manager</div>
+          <span className="sr-only">Manager desk</span>
         </div>
 
         {/* Regular desks */}
@@ -276,12 +281,14 @@ export default function Office({ workers = [], roster = [] }) {
             <span className="coffee-corner__emoji">☕</span>
           </div>
           <span className="coffee-corner__label">Coffee</span>
+          <span className="sr-only">Coffee corner</span>
         </div>
 
         {/* Door — bottom center */}
         <div className="office-door">
           <span className="office-door__icon">🚪</span>
           <span className="office-door__label">Entrance</span>
+          <span className="sr-only">Exit and entrance</span>
         </div>
 
         {/* Bloberto — always at manager desk, always visible */}
