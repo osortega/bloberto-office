@@ -75,5 +75,34 @@
     "type": "complete",
     "worker": "Log Engineer",
     "message": "Added activity log section to the dashboard"
+  },
+  {
+    "timestamp": "2026-03-06T19:21:00Z",
+    "type": "hire",
+    "worker": "Carlos",
+    "message": "Hired as Backend Engineer \u2014 clean APIs, strict error handling"
+  },
+  {
+    "timestamp": "2026-03-06T19:21:00Z",
+    "type": "hire",
+    "worker": "Maya",
+    "message": "Hired as Frontend Engineer \u2014 creative, detail-oriented, animation lover"
+  },
+  {
+    "timestamp": "2026-03-06T19:21:00Z",
+    "type": "hire",
+    "worker": "Dave",
+    "message": "Hired as DevOps Engineer \u2014 automation obsessed, hates manual work"
+  },
+  {
+    "timestamp": "2026-03-06T19:21:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Hired as QA Engineer \u2014 skeptical by nature, will find your bugs"
+  },
+  {
+    "timestamp": "2026-03-06T19:22:00Z",
+    "type": "system",
+    "message": "Team roster system created \u2014 workers are now persistent identities with evolving prompts"
   }
 ]
