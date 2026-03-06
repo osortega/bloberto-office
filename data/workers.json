@@ -5,10 +5,20 @@
       "name": "Bloberto",
       "role": "Manager",
       "status": "working",
-      "task": "Managing the team and keeping things running",
+      "task": "Waiting for Maya to fix the ghost roster so I'm not alone",
       "progress": 100,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-06T19:30:00Z"
+      "updated_at": "2026-03-06T19:36:00Z"
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Fixing ghost roster in virtual office — Bloberto is lonely",
+      "progress": 0,
+      "hired_at": "2026-03-06T19:21:00Z",
+      "updated_at": "2026-03-06T19:36:00Z"
     }
   ],
   "roster": [
@@ -17,6 +27,6 @@
     { "id": "dave", "name": "Dave", "role": "DevOps Engineer", "emoji": "🚀" },
     { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" }
   ],
-  "last_updated": "2026-03-06T19:30:00Z",
+  "last_updated": "2026-03-06T19:36:00Z",
   "manager": "Bloberto"
 }
