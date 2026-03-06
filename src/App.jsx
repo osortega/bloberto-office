@@ -3,6 +3,8 @@ import './App.css'
 
 const GITHUB_API_URL =
   'https://api.github.com/repos/osortega/bloberto-office/contents/data/workers.json'
+const ACTIVITY_API_URL =
+  'https://api.github.com/repos/osortega/bloberto-office/contents/data/activity.json'
 const POLL_INTERVAL_MS = 10_000
 
 const ROLE_EMOJIS = {
@@ -39,6 +41,60 @@ async function fetchWorkersFromGitHub() {
   const meta = await res.json()
   const json = JSON.parse(atob(meta.content.replace(/\n/g, '')))
   return json
+}
+
+async function fetchActivityFromGitHub() {
+  const res = await fetch(ACTIVITY_API_URL, {
+    headers: { Accept: 'application/vnd.github+json' },
+  })
+  if (!res.ok) throw new Error(`GitHub API ${res.status}`)
+  const meta = await res.json()
+  const json = JSON.parse(atob(meta.content.replace(/\n/g, '')))
+  return json
+}
+
+function getRelativeTime(timestamp) {
+  const diff = Date.now() - new Date(timestamp).getTime()
+  const mins = Math.floor(diff / 60_000)
+  const hours = Math.floor(diff / 3_600_000)
+  const days = Math.floor(diff / 86_400_000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  if (hours < 24) return `${hours}h ago`
+  return `${days}d ago`
+}
+
+const ACTIVITY_ICONS = {
+  hire: '🟢',
+  complete: '✅',
+  error: '❌',
+  system: '⚙️',
+}
+
+function ActivityLogEntry({ entry }) {
+  return (
+    <div className={`activity-entry activity-entry--${entry.type}`}>
+      <span className="activity-icon">{ACTIVITY_ICONS[entry.type] ?? '🔧'}</span>
+      <div className="activity-body">
+        {entry.worker && <span className="activity-worker">{entry.worker}</span>}
+        <span className="activity-message">{entry.message}</span>
+      </div>
+      <span className="activity-time">{getRelativeTime(entry.timestamp)}</span>
+    </div>
+  )
+}
+
+function ActivityLog({ entries }) {
+  const displayed = [...entries].reverse().slice(0, 20)
+  return (
+    <div className="activity-log">
+      {displayed.length === 0 ? (
+        <div className="activity-empty">No activity yet…</div>
+      ) : (
+        displayed.map((entry, i) => <ActivityLogEntry key={i} entry={entry} />)
+      )}
+    </div>
+  )
 }
 
 function getRoleEmoji(role) {
@@ -139,6 +195,7 @@ function EmptyState() {
 
 export default function App() {
   const [allWorkers, setAllWorkers] = useState([])
+  const [activityLog, setActivityLog] = useState([])
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
   const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
@@ -152,9 +209,13 @@ export default function App() {
 
   const syncFromGitHub = useCallback(async () => {
     try {
-      const data = await fetchWorkersFromGitHub()
+      const [data, activity] = await Promise.all([
+        fetchWorkersFromGitHub(),
+        fetchActivityFromGitHub(),
+      ])
       const workers = data.workers ?? []
       setAllWorkers(workers)
+      setActivityLog(Array.isArray(activity) ? activity : [])
       setIsLive(true)
       setLastSynced(new Date())
     } catch {
@@ -230,6 +291,14 @@ export default function App() {
             ))
           )}
         </div>
+
+        <div className="section-header" style={{ marginTop: '2.5rem' }}>
+          <div className="section-title">📋 Activity Log</div>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Last {Math.min(activityLog.length, 20)} events
+          </span>
+        </div>
+        <ActivityLog entries={activityLog} />
       </main>
 
       <footer className="footer">

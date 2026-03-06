@@ -1,0 +1,73 @@
+[
+  {
+    "timestamp": "2026-03-06T16:25:00Z",
+    "type": "system",
+    "message": "Bloberto came online for the first time 🫠"
+  },
+  {
+    "timestamp": "2026-03-06T16:35:00Z",
+    "type": "hire",
+    "worker": "Frontend Engineer v1",
+    "message": "Hired to build the initial office dashboard UI"
+  },
+  {
+    "timestamp": "2026-03-06T16:42:00Z",
+    "type": "complete",
+    "worker": "Frontend Engineer v1",
+    "message": "Built the office dashboard with React + Vite"
+  },
+  {
+    "timestamp": "2026-03-06T17:50:00Z",
+    "type": "hire",
+    "worker": "DevOps Engineer",
+    "message": "Hired to deploy site to GitHub Pages"
+  },
+  {
+    "timestamp": "2026-03-06T17:58:00Z",
+    "type": "complete",
+    "worker": "DevOps Engineer",
+    "message": "Deployed to https://osortega.github.io/bloberto-office/"
+  },
+  {
+    "timestamp": "2026-03-06T18:20:00Z",
+    "type": "hire",
+    "worker": "Frontend Engineer v2",
+    "message": "Hired to connect dashboard to live GitHub data"
+  },
+  {
+    "timestamp": "2026-03-06T18:28:00Z",
+    "type": "complete",
+    "worker": "Frontend Engineer v2",
+    "message": "Connected dashboard to live workers.json via GitHub API"
+  },
+  {
+    "timestamp": "2026-03-06T18:53:00Z",
+    "type": "hire",
+    "worker": "Frontend Engineer v3",
+    "message": "Hired to simplify dashboard to read-only live monitor"
+  },
+  {
+    "timestamp": "2026-03-06T18:55:00Z",
+    "type": "complete",
+    "worker": "Frontend Engineer v3",
+    "message": "Removed hire/fire UI, made dashboard read-only"
+  },
+  {
+    "timestamp": "2026-03-06T19:01:00Z",
+    "type": "hire",
+    "worker": "Theme Engineer",
+    "message": "Hired to add dark/light mode toggle"
+  },
+  {
+    "timestamp": "2026-03-06T19:04:00Z",
+    "type": "complete",
+    "worker": "Theme Engineer",
+    "message": "Added sun/moon theme toggle with smooth transitions"
+  },
+  {
+    "timestamp": "2026-03-06T19:09:00Z",
+    "type": "hire",
+    "worker": "Log Engineer",
+    "message": "Hired to add activity log section to the dashboard"
+  }
+]
