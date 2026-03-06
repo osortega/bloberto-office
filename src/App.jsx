@@ -4,15 +4,15 @@ import './App.css'
 const STORAGE_KEY = 'bloberto-workers'
 
 const ROLE_EMOJIS = {
-  'Frontend Engineer': '\U0001f3a8',
-  'Backend Engineer': '\u2699\ufe0f',
-  'DevOps Engineer': '\U0001f680',
-  'Designer': '\u270f\ufe0f',
-  'Manager': '\U0001fae0',
-  'QA Engineer': '\U0001f50d',
-  'Data Engineer': '\U0001f4ca',
-  'Security Engineer': '\U0001f512',
-  'Other': '\U0001f916',
+  'Frontend Engineer': '🎨',
+  'Backend Engineer': '⚙️',
+  'DevOps Engineer': '🚀',
+  'Designer': '✏️',
+  'Manager': '🫠',
+  'QA Engineer': '🔍',
+  'Data Engineer': '📊',
+  'Security Engineer': '🔒',
+  'Other': '🤖',
 }
 
 const STATUS_LABELS = {
@@ -23,10 +23,10 @@ const STATUS_LABELS = {
 }
 
 const STATUS_EMOJIS = {
-  working: '\u26a1',
-  idle: '\U0001f634',
-  done: '\u2705',
-  error: '\U0001f480',
+  working: '⚡',
+  idle: '😴',
+  done: '✅',
+  error: '💀',
 }
 
 const DEFAULT_WORKERS = [
@@ -57,7 +57,7 @@ const DEFAULT_WORKERS = [
 ]
 
 function getRoleEmoji(role) {
-  return ROLE_EMOJIS[role] ?? '\U0001f916'
+  return ROLE_EMOJIS[role] ?? '🤖'
 }
 
 function StatusBadge({ status }) {
@@ -99,7 +99,7 @@ function WorkerCard({ worker, onFire, onStatusChange }) {
       </div>
 
       <div className="worker-task">
-        <strong>\U0001f4cb Current Task</strong>
+        <strong>📋 Current Task</strong>
         {worker.task}
       </div>
 
@@ -119,16 +119,16 @@ function WorkerCard({ worker, onFire, onStatusChange }) {
           value={worker.status}
           onChange={(e) => onStatusChange(worker.id, e.target.value)}
         >
-          <option value="working">\u26a1 Working</option>
-          <option value="idle">\U0001f634 Idle</option>
-          <option value="done">\u2705 Done</option>
-          <option value="error">\U0001f480 Error</option>
+          <option value="working">⚡ Working</option>
+          <option value="idle">😴 Idle</option>
+          <option value="done">✅ Done</option>
+          <option value="error">💀 Error</option>
         </select>
         <button
           className="btn btn-danger btn-sm"
           onClick={() => onFire(worker.id)}
         >
-          \U0001f525 Fire
+          🔥 Fire
         </button>
       </div>
     </div>
@@ -163,9 +163,9 @@ function HireForm({ onHire }) {
   return (
     <div className="hire-form-wrapper">
       <div className="hire-form-title">
-        \U0001f9d1\u200d\U0001f4bc Hire a New Worker{' '}
+        🧑‍💼 Hire a New Worker{' '}
         <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: '0.8rem' }}>
-          — growth is the vibe \u2728
+          — growth is the vibe ✨
         </span>
       </div>
       <form className="hire-form" onSubmit={handleSubmit}>
@@ -208,7 +208,7 @@ function HireForm({ onHire }) {
           />
         </div>
         <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-end' }}>
-          \u2795 Hire
+          ➕ Hire
         </button>
       </form>
     </div>
@@ -224,19 +224,19 @@ function StatsBar({ workers }) {
   return (
     <div className="stats-bar">
       <div className="stat-card total">
-        <span className="stat-label">\U0001f465 Total Workers</span>
+        <span className="stat-label">👥 Total Workers</span>
         <span className="stat-value">{total}</span>
       </div>
       <div className="stat-card active">
-        <span className="stat-label">\u26a1 Active</span>
+        <span className="stat-label">⚡ Active</span>
         <span className="stat-value">{active}</span>
       </div>
       <div className="stat-card done">
-        <span className="stat-label">\u2705 Done</span>
+        <span className="stat-label">✅ Done</span>
         <span className="stat-value">{done}</span>
       </div>
       <div className="stat-card idle">
-        <span className="stat-label">\U0001f634 Idle</span>
+        <span className="stat-label">😴 Idle</span>
         <span className="stat-value">{idle}</span>
       </div>
     </div>
@@ -246,11 +246,11 @@ function StatsBar({ workers }) {
 function EmptyState() {
   return (
     <div className="empty-state">
-      <span className="empty-emoji">\U0001f335</span>
+      <span className="empty-emoji">🌵</span>
       <h3>The office is tragically empty</h3>
       <p>
         No workers, no chaos. Just Bloberto alone, staring at the ceiling tiles.
-        Hire someone before he starts rearranging the virtual furniture. \U0001fa91
+        Hire someone before he starts rearranging the virtual furniture. 🪑
       </p>
     </div>
   )
@@ -272,7 +272,7 @@ export default function App() {
   const hire = (worker) => setWorkers((w) => [...w, worker])
 
   const fire = (id) => {
-    if (!window.confirm('Are you sure? They had dreams, you know. \U0001f622')) return
+    if (!window.confirm('Are you sure? They had dreams, you know. 😢')) return
     setWorkers((w) => w.filter((x) => x.id !== id))
   }
 
@@ -282,16 +282,16 @@ export default function App() {
   const currentHour = new Date().getHours()
   const greeting =
     currentHour < 12
-      ? '\u2615 Good morning'
+      ? '☕ Good morning'
       : currentHour < 18
-      ? '\U0001f324\ufe0f Good afternoon'
-      : '\U0001f319 Good evening'
+      ? '🌤️ Good afternoon'
+      : '🌙 Good evening'
 
   return (
     <div className="app">
       <header className="header">
         <div className="header-title">
-          <h1>\U0001fae0 Bloberto&apos;s Office</h1>
+          <h1>🫠 Bloberto&apos;s Office</h1>
           <p>welcome to the team &middot; try not to break anything</p>
         </div>
         <div className="header-badge">
@@ -309,12 +309,12 @@ export default function App() {
         <HireForm onHire={hire} />
 
         <div className="section-header">
-          <div className="section-title">\U0001f3e2 The Team ({workers.length})</div>
+          <div className="section-title">🏢 The Team ({workers.length})</div>
           {workers.length > 0 && (
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
               {workers.filter((w) => w.status === 'working').length > 0
-                ? `\U0001f525 ${workers.filter((w) => w.status === 'working').length} grinding hard`
-                : '\U0001f634 Everyone is slacking'}
+                ? `🔥 ${workers.filter((w) => w.status === 'working').length} grinding hard`
+                : '😴 Everyone is slacking'}
             </span>
           )}
         </div>
@@ -336,7 +336,7 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        Built with \U0001f49c and mild existential dread by <span>\U0001fae0 Bloberto</span>
+        Built with 💜 and mild existential dread by <span>🫠 Bloberto</span>
         &nbsp;&middot;&nbsp; &ldquo;If it compiles, ship it.&rdquo; &nbsp;&middot;&nbsp;
         <span>v1.0.0-chaos</span>
       </footer>
