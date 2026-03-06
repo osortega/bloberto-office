@@ -128,5 +128,17 @@
     "type": "complete",
     "worker": "Maya",
     "message": "Fixed ghost animation opacity bug, added hover tooltips on roster characters"
+  },
+  {
+    "timestamp": "2026-03-06T21:37:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for scheduled QA & product analysis review"
+  },
+  {
+    "timestamp": "2026-03-06T21:45:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "Completed site review \u2014 10 suggestions filed (3 high, 4 medium, 3 low). Overall score: 3.4/5"
   }
 ]
