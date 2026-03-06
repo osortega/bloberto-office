@@ -6,7 +6,8 @@ const GITHUB_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json'
 const ACTIVITY_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/activity.json'
-const POLL_INTERVAL_MS = 10_000
+const POLL_INTERVAL_ACTIVE = 10_000
+const POLL_INTERVAL_HIDDEN = 60_000
 
 const ROLE_EMOJIS = {
   'Frontend Engineer': '🎨',
@@ -77,14 +78,16 @@ function ActivityLogEntry({ entry }) {
   )
 }
 
-function ActivityLog({ entries }) {
+function ActivityLog({ entries, error }) {
   const displayed = [...entries].reverse().slice(0, 20)
   return (
     <div className="activity-log">
-      {displayed.length === 0 ? (
+      {error ? (
+        <div className="activity-error">⚠️ Could not load activity log. Check your connection and try again.</div>
+      ) : displayed.length === 0 ? (
         <div className="activity-empty">No activity yet…</div>
       ) : (
-        displayed.map((entry) => <ActivityLogEntry key={entry.timestamp + entry.worker} entry={entry} />)
+        displayed.map((entry, i) => <ActivityLogEntry key={entry.timestamp + entry.worker + i} entry={entry} />)
       )}
     </div>
   )
@@ -120,6 +123,17 @@ function ProgressBar({ progress }) {
   )
 }
 
+function formatDuration(updatedAt) {
+  if (!updatedAt) return null
+  const diffMs = Date.now() - new Date(updatedAt).getTime()
+  const mins = Math.floor(diffMs / 60_000)
+  const hours = Math.floor(mins / 60)
+  if (mins < 1) return 'Working for <1m'
+  if (hours < 1) return `Working for ${mins}m`
+  const rem = mins % 60
+  return rem > 0 ? `Working for ${hours}h ${rem}m` : `Working for ${hours}h`
+}
+
 function WorkerCard({ worker }) {
   return (
     <div className={`worker-card ${worker.status}`}>
@@ -136,6 +150,10 @@ function WorkerCard({ worker }) {
         <strong>📋 Current Task</strong>
         {worker.task}
       </div>
+
+      {worker.status === 'working' && worker.updated_at && (
+        <div className="worker-duration">⏱️ {formatDuration(worker.updated_at)}</div>
+      )}
 
       <ProgressBar progress={worker.progress} />
     </div>
@@ -215,6 +233,7 @@ export default function App() {
   const [allWorkers, setAllWorkers] = useState([])
   const [roster, setRoster] = useState([])
   const [activityLog, setActivityLog] = useState([])
+  const [activityError, setActivityError] = useState(null)
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -240,28 +259,49 @@ export default function App() {
   }
 
   const syncFromGitHub = useCallback(async () => {
-    try {
-      const [data, activity] = await Promise.all([
-        fetchWorkersFromGitHub(),
-        fetchActivityFromGitHub(),
-      ])
-      const workers = data.workers ?? []
-      setAllWorkers(workers)
+    const [workersResult, activityResult] = await Promise.allSettled([
+      fetchWorkersFromGitHub(),
+      fetchActivityFromGitHub(),
+    ])
+
+    if (workersResult.status === 'fulfilled') {
+      const data = workersResult.value
+      setAllWorkers(data.workers ?? [])
       setRoster(data.roster ?? [])
-      setActivityLog(Array.isArray(activity) ? activity : [])
       setIsLive(true)
-      setLastSynced(new Date())
-      setIsLoading(false)
-    } catch {
+    } else {
       setIsLive(false)
-      setIsLoading(false)
     }
+
+    if (activityResult.status === 'fulfilled') {
+      const activity = activityResult.value
+      setActivityLog(Array.isArray(activity) ? activity : [])
+      setActivityError(null)
+    } else {
+      setActivityError('Could not load activity log. Check your connection and try again.')
+    }
+
+    setLastSynced(new Date())
+    setIsLoading(false)
   }, [])
 
   useEffect(() => {
     syncFromGitHub()
-    const timer = setInterval(syncFromGitHub, POLL_INTERVAL_MS)
-    return () => clearInterval(timer)
+    const getInterval = () =>
+      document.visibilityState === 'hidden' ? POLL_INTERVAL_HIDDEN : POLL_INTERVAL_ACTIVE
+
+    let timer = setInterval(syncFromGitHub, getInterval())
+
+    const handleVisibilityChange = () => {
+      clearInterval(timer)
+      timer = setInterval(syncFromGitHub, getInterval())
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [syncFromGitHub])
 
   const activeWorkers = allWorkers.filter(
@@ -278,6 +318,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <a href="#main-content" className="skip-link">Skip to content</a>
       <header className="header">
         <div className="header-title">
           <h1>🫠 Bloberto&apos;s Office</h1>
@@ -303,7 +344,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="main">
+      <main id="main-content" className="main">
         <div className="tab-toggle" role="tablist">
           <button
             role="tab"
@@ -364,7 +405,7 @@ export default function App() {
                 Last {Math.min(activityLog.length, 20)} events
               </span>
             </div>
-            <ActivityLog entries={activityLog} />
+            <ActivityLog entries={activityLog} error={activityError} />
           </div>
         )}
       </main>

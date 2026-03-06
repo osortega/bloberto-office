@@ -1,6 +1,23 @@
 /* ---- Layout ---- */
 .app { display: flex; flex-direction: column; min-height: 100vh; }
 
+/* ---- Skip link ---- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 9999;
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 16px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.skip-link:focus {
+  top: 0;
+}
+
 /* ---- Header ---- */
 .header {
   background: var(--header-bg);
@@ -342,6 +359,13 @@ select option { background: var(--surface2); }
 
 .worker-task strong { color: var(--text); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 3px; }
 
+.worker-duration {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-top: -0.25rem;
+}
+
 /* Progress */
 .progress-wrapper {}
 .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
@@ -543,6 +567,13 @@ select option { background: var(--surface2); }
   text-align: center;
   color: var(--text-muted);
   padding: 2rem;
+  font-size: 0.9rem;
+}
+
+.activity-error {
+  text-align: center;
+  color: var(--red);
+  padding: 1rem;
   font-size: 0.9rem;
 }
 

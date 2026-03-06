@@ -384,6 +384,37 @@
   100% { left: 53%; top: 85%; }
 }
 
+@media (max-width: 600px) {
+  .office-floor {
+    min-height: 320px;
+  }
+  .char__avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 0.85rem;
+  }
+  .char__name {
+    font-size: 0.44rem;
+  }
+  /* Tighten desk positions to prevent overlap */
+  .desk {
+    width: 13%;
+    height: 7%;
+  }
+  .mgr-desk {
+    width: 20%;
+    height: 11%;
+    left: 38%;
+  }
+  .coffee-corner__body {
+    width: 36px;
+    height: 40px;
+  }
+  .coffee-corner__emoji {
+    font-size: 1.1rem;
+  }
+}
+
 /* ── Mobile responsive ── */
 
 @media (max-width: 768px) {
