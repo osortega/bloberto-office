@@ -1,0 +1,15 @@
+diff --git a/src/main.jsx b/src/main.jsx
+index b9a1a6d..e69de29 100644
+--- a/src/main.jsx
++++ b/src/main.jsx
+@@ -1,10 +0,0 @@
+-import { StrictMode } from 'react'
+-import { createRoot } from 'react-dom/client'
+-import './index.css'
+-import App from './App.jsx'
+-
+-createRoot(document.getElementById('root')).render(
+-  <StrictMode>
+-    <App />
+-  </StrictMode>,
+-)
