@@ -176,5 +176,17 @@
     "type": "complete",
     "worker": "Sofia",
     "message": "QA review #3 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.7/5 (up from 3.6)"
+  },
+  {
+    "timestamp": "2026-03-06T23:07:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for scheduled QA review #4"
+  },
+  {
+    "timestamp": "2026-03-06T23:12:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #4 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.65/5"
   }
 ]

@@ -1,102 +1,96 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-06T22:37:00Z",
-  "review_number": 3,
+  "timestamp": "2026-03-06T23:10:00Z",
+  "review_number": 4,
   "scores": {
-    "visual": 4.5,
+    "visual": 4.2,
     "ux": 3.5,
-    "responsiveness": 3,
-    "performance": 4,
-    "accessibility": 2,
-    "code_quality": 4,
-    "features": 3.5,
-    "fun_factor": 5
+    "responsiveness": 3.2,
+    "performance": 3.8,
+    "accessibility": 3.0,
+    "code_quality": 3.8,
+    "features": 3.2,
+    "fun_factor": 4.5
   },
-  "overall_score": 3.7,
-  "notes": "Score ticked up to 3.7. The SVG character avatars are genuinely delightful — great personality. Rate limit fix is solid. Main gaps remain: accessibility is still weak, mobile experience needs love, and there are some code quality nits. The office view is the star of the show.",
-  "fixed_since_last_review": [
-    "Previous suggestions addressed — rate limit fix confirmed working"
-  ],
+  "overall_score": 3.65,
+  "previous_score": 3.7,
   "suggestions": [
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "No skip-to-content link or focus management",
-      "description": "Keyboard users have no way to skip the header. Tab order goes through theme toggle before reaching content. Add a skip-to-main link and ensure the tab toggle buttons have proper focus indicators. The Office view has pointer-events:none on most chars, which is fine, but the Dashboard tab has no visible focus rings on cards.",
-      "effort": "small",
-      "assign_to": "maya"
+      "title": "Missing aria-labels on office view characters",
+      "description": "The Office tab SVG characters have role='img' and aria-label, which is great, but the entire Office view tab panel lacks descriptive text for screen readers. Someone using assistive tech would have no idea what the office visualization represents. Add an aria-label or sr-only description to the office tabpanel.",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "Color contrast issues in light mode",
-      "description": "Several text elements use var(--text-muted) (#6b7280) on white/light backgrounds which barely passes WCAG AA for normal text. The activity timestamps and stat labels are particularly hard to read. Darken --text-muted to at least #555 in light mode.",
-      "effort": "small",
-      "assign_to": "maya"
+      "category": "ux",
+      "title": "No error state or retry mechanism for failed data fetches",
+      "description": "When fetchWorkersFromGitHub fails, isLive goes to false but there's no user-facing error message or manual retry button on the dashboard tab. The activity log has an error state but workers just silently show stale data. Add a visible error banner with a retry button.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "responsiveness",
+      "title": "Office view characters overlap on tablets (768-900px)",
+      "description": "The desk positions use percentage-based left/top values that work at desktop and small mobile, but at tablet widths the characters' absolute positioning causes overlap with desk furniture. The 768px breakpoint reduces avatar size but doesn't adjust desk spacing. Consider tightening desk grid or adding a tablet-specific layout.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "Activity log has no filtering or search",
+      "description": "With 30+ activity entries already on day one, the log will grow fast. Add simple filter buttons (hire/complete/system/all) so users can find specific events. Even just a type filter would help.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "No loading/error state for activity log",
-      "description": "If activity.json fails to fetch, there's no error indicator — it just shows 'No activity yet…' which is misleading. The workers section has a skeleton loader but activity does not. Add error handling UI for both fetches.",
-      "effort": "small",
-      "assign_to": "maya"
+      "title": "Ghost characters lack context without hovering",
+      "description": "Ghost roster members at desks just look like dimmed characters. On mobile (where hover doesn't exist), there's no way to tell they're 'off duty' vs 'working'. Add a small status indicator or 'zzz' icon above ghost characters.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
       "title": "Polling both endpoints every 10 seconds is aggressive",
-      "description": "10-second polling of two raw GitHub URLs is fine for a demo, but could be smarter. Consider: (1) exponential backoff when data hasn't changed, (2) comparing ETags or content hashes before triggering re-renders, (3) 30s interval when tab is not focused (use visibilitychange API).",
-      "effort": "medium",
-      "assign_to": "maya"
+      "description": "raw.githubusercontent.com has CDN caching (~5 min), so polling every 10s just hits cached data repeatedly. Consider increasing POLL_INTERVAL_ACTIVE to 30-60s since the data won't change faster than GitHub's CDN cache anyway. Saves bandwidth and reduces unnecessary renders.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "ActivityLog key prop could cause collisions",
-      "description": "Using `entry.timestamp + entry.worker` as key is fragile — multiple entries can share the same timestamp (e.g., the bulk hire at 19:21). Use index or generate unique IDs in activity.json. Currently works by luck.",
-      "effort": "small",
-      "assign_to": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Office view characters overlap on narrow screens",
-      "description": "At ~600px width, the desk positions (percentage-based) cause character avatars to overlap each other. The CSS responsive breakpoints hide names at 480px but don't adjust desk layout. Consider reducing desk count or stacking vertically on mobile.",
-      "effort": "medium",
-      "assign_to": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "feature",
-      "title": "Add a 'last seen' or clock-in time for workers",
-      "description": "Workers have updated_at but the dashboard doesn't show it. Users can't tell if a worker has been 'working' for 5 minutes or 5 hours. Show relative time like '⚡ Working · started 2h ago' on each card.",
-      "effort": "small",
-      "assign_to": "maya"
+      "title": "ROLE_EMOJIS duplicated between App.jsx and Office.jsx",
+      "description": "Role-to-emoji/color mappings exist in both files. Extract to a shared constants file (e.g., src/constants.js) to avoid drift. Already seeing 'QA Engineer' vs 'QA & Product Analyst' role name inconsistency potential.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "DEFAULT_ROSTER duplicated between App.jsx and Office.jsx",
-      "description": "Office.jsx has a DEFAULT_ROSTER fallback, and App.jsx fetches roster from workers.json. If the fetch fails, Office uses its hardcoded fallback which could go stale. Extract to a shared constants file.",
-      "effort": "small",
-      "assign_to": "maya"
+      "category": "feature",
+      "title": "Add a 'last seen' timestamp for ghost/offline workers",
+      "description": "Would be nice to see when each roster member was last active. The data is in activity.json already — just needs a UI treatment. Show 'Last active: 2h ago' under ghost characters or in a roster panel.",
+      "effort": "medium"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Footer quote could rotate",
-      "description": "The footer always says 'If it compiles, ship it.' — would be fun to have a small array of Bloberto-isms that rotate. Tiny detail but adds personality. Could even pull from a quotes array in the data folder.",
-      "effort": "small",
-      "assign_to": "maya"
+      "title": "Footer feels disconnected from the fun vibe",
+      "description": "The footer quote 'If it compiles, ship it' is great, but visually it's plain. Could add a subtle gradient or the same purple accent treatment as the header to tie it together. Minor polish.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "feature",
-      "title": "No favicon or PWA manifest",
-      "description": "Currently using the default Vite SVG favicon. A custom Bloberto favicon (the melty blob face) would be a nice touch. Could also add a basic manifest.json for PWA install capability.",
-      "effort": "small",
-      "assign_to": "maya"
+      "category": "accessibility",
+      "title": "Color contrast on muted text may fail WCAG AA",
+      "description": "Several --text-muted elements (timestamps, labels, role text) against dark backgrounds may not meet 4.5:1 contrast ratio. Worth running a contrast checker on the dark theme especially. Light theme seems better.",
+      "effort": "small"
     }
+  ],
+  "positive_notes": [
+    "The SVG character avatars are genuinely charming — each team member has personality. Great touch.",
+    "Theme toggle works smoothly with proper transitions. localStorage persistence is correct.",
+    "Skip-link and ARIA roles on tabs show accessibility awareness — just needs more coverage.",
+    "The office view concept is creative and fun. Definitely the highlight of the project.",
+    "Smart use of raw.githubusercontent.com instead of API (fixed from review #1). No more rate limits."
   ]
 }
