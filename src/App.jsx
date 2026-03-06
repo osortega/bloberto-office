@@ -141,6 +141,14 @@ export default function App() {
   const [allWorkers, setAllWorkers] = useState([])
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
+  const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('bloberto-theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   const syncFromGitHub = useCallback(async () => {
     try {
@@ -179,13 +187,23 @@ export default function App() {
           <h1>🫠 Bloberto&apos;s Office</h1>
           <p>live monitor &middot; read-only view</p>
         </div>
-        <div className="header-badge">
-          {greeting}, <span>boss</span> &nbsp;&middot;&nbsp;{' '}
-          {new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'short',
-            day: 'numeric',
-          })}
+        <div className="header-right">
+          <div className="header-badge">
+            {greeting}, <span>boss</span> &nbsp;&middot;&nbsp;{' '}
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </div>
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
         </div>
       </header>
 
