@@ -13,6 +13,13 @@ const ROLE_EMOJIS = {
   'Other': '🤖',
 }
 
+const DEFAULT_ROSTER = [
+  { id: 'carlos', name: 'Carlos', role: 'Backend Engineer', emoji: '⚙️' },
+  { id: 'maya', name: 'Maya', role: 'Frontend Engineer', emoji: '🎨' },
+  { id: 'dave', name: 'Dave', role: 'DevOps Engineer', emoji: '🚀' },
+  { id: 'sofia', name: 'Sofia', role: 'QA Engineer', emoji: '🔍' },
+]
+
 // Desk slot positions — (left%, top%) relative to office floor
 const DESKS = [
   { id: 0, left: 7,  top: 28 },
@@ -67,9 +74,11 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
 }
 
 export default function Office({ workers = [], roster = [] }) {
+  const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
+
   const bloberto = useMemo(
-    () => [...workers, ...roster].find(w => w.id === 'bloberto') ?? DEFAULT_BLOBERTO,
-    [workers, roster],
+    () => [...workers, ...effectiveRoster].find(w => w.id === 'bloberto') ?? DEFAULT_BLOBERTO,
+    [workers, effectiveRoster],
   )
 
   const nonMgr        = workers.filter(w => w.id !== 'bloberto')
@@ -78,7 +87,7 @@ export default function Office({ workers = [], roster = [] }) {
 
   // Roster members not currently active → ghost at empty desk
   const activeIds   = useMemo(() => new Set(workers.map(w => w.id)), [workers])
-  const ghostRoster = roster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id))
+  const ghostRoster = effectiveRoster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id))
 
   // Assign working workers first, then ghosts, to desk slots
   const deskOccupants = useMemo(() => {

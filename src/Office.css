@@ -241,6 +241,7 @@
 .char--ghost .char__avatar {
   border-style: dashed;
   border-color: var(--text-muted);
+  font-size: 44px;
 }
 
 /* Tooltip shown on ghost hover */
