@@ -186,6 +186,8 @@ function EmptyState() {
   )
 }
 
+const TABS = ['office', 'dashboard']
+
 export default function App() {
   const [allWorkers, setAllWorkers] = useState([])
   const [roster, setRoster] = useState([])
@@ -201,6 +203,17 @@ export default function App() {
   }, [theme])
 
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+
+  const handleTabKeyDown = (e) => {
+    const currentIdx = TABS.indexOf(tab)
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault()
+      setTab(TABS[(currentIdx + 1) % TABS.length])
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault()
+      setTab(TABS[(currentIdx - 1 + TABS.length) % TABS.length])
+    }
+  }
 
   const syncFromGitHub = useCallback(async () => {
     try {
@@ -256,7 +269,7 @@ export default function App() {
           <button
             className="theme-toggle"
             onClick={toggleTheme}
-            aria-label="Toggle theme"
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {theme === 'dark' ? '☀️' : '🌙'}
@@ -265,25 +278,35 @@ export default function App() {
       </header>
 
       <main className="main">
-        <div className="tab-toggle">
+        <div className="tab-toggle" role="tablist">
           <button
+            role="tab"
+            aria-selected={tab === 'office'}
+            tabIndex={tab === 'office' ? 0 : -1}
             className={tab === 'office' ? 'active' : ''}
             onClick={() => setTab('office')}
+            onKeyDown={handleTabKeyDown}
           >
             🏢 Office
           </button>
           <button
+            role="tab"
+            aria-selected={tab === 'dashboard'}
+            tabIndex={tab === 'dashboard' ? 0 : -1}
             className={tab === 'dashboard' ? 'active' : ''}
             onClick={() => setTab('dashboard')}
+            onKeyDown={handleTabKeyDown}
           >
             📊 Dashboard
           </button>
         </div>
 
         {tab === 'office' ? (
-          <Office workers={activeWorkers} roster={roster} />
+          <div role="tabpanel">
+            <Office workers={activeWorkers} roster={roster} />
+          </div>
         ) : (
-          <>
+          <div role="tabpanel">
             <StatsBar workers={activeWorkers} lastSynced={lastSynced} isLive={isLive} />
 
             <div className="section-header">
@@ -297,7 +320,7 @@ export default function App() {
               )}
             </div>
 
-            <div className="workers-grid">
+            <div className="workers-grid" aria-live="polite">
               {activeWorkers.length === 0 ? (
                 <EmptyState />
               ) : (
@@ -314,7 +337,7 @@ export default function App() {
               </span>
             </div>
             <ActivityLog entries={activityLog} />
-          </>
+          </div>
         )}
       </main>
 

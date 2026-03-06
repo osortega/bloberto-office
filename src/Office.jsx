@@ -34,12 +34,13 @@ const DEFAULT_BLOBERTO = {
   id: 'bloberto', name: 'Bloberto', role: 'Manager', status: 'working',
 }
 
-function CharacterAvatar({ workerId, role, size = 40 }) {
+function CharacterAvatar({ workerId, role, name, size = 40 }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
+  const ariaLabel = name ? `${name}, ${role}` : role
 
   if (workerId === 'bloberto') {
     return (
-      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         {/* Crown */}
         <polygon points="13,15 15,9 18,12 20,8 22,12 25,9 27,15" fill="#fbbf24" />
         {/* Blob body */}
@@ -59,7 +60,7 @@ function CharacterAvatar({ workerId, role, size = 40 }) {
 
   if (workerId === 'carlos') {
     return (
-      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         {/* Dark hair top */}
         <ellipse cx="20" cy="9" rx="9" ry="5" fill="#1c1917" />
         {/* Head */}
@@ -84,7 +85,7 @@ function CharacterAvatar({ workerId, role, size = 40 }) {
 
   if (workerId === 'maya') {
     return (
-      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         {/* Long hair strands — left pink, right purple */}
         <path d="M 12 14 Q 9 24 10 36" stroke="#ec4899" strokeWidth="5" fill="none" strokeLinecap="round" />
         <path d="M 28 14 Q 31 24 30 36" stroke="#a855f7" strokeWidth="5" fill="none" strokeLinecap="round" />
@@ -108,7 +109,7 @@ function CharacterAvatar({ workerId, role, size = 40 }) {
 
   if (workerId === 'dave') {
     return (
-      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         {/* Headphone band */}
         <path d="M 12 14 Q 20 5 28 14" stroke="#374151" strokeWidth="3" fill="none" />
         {/* Headphone cups */}
@@ -136,7 +137,7 @@ function CharacterAvatar({ workerId, role, size = 40 }) {
 
   if (workerId === 'sofia') {
     return (
-      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         {/* Hair bun */}
         <circle cx="20" cy="5" r="4.5" fill="#7c2d12" />
         {/* Hair connector */}
@@ -162,7 +163,7 @@ function CharacterAvatar({ workerId, role, size = 40 }) {
 
   // Generic fallback — color based on role
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
       {/* Head */}
       <circle cx="20" cy="14" r="8" fill="#9ca3af" />
       {/* Hair */}
@@ -210,7 +211,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   return (
     <div className={classes.join(' ')} style={style} {...extraProps}>
       <div className="char__avatar">
-        <CharacterAvatar workerId={worker.id} role={worker.role} size={avatarSize} />
+        <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} />
       </div>
       <div className="char__name">{firstName}</div>
     </div>

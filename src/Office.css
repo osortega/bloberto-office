@@ -374,3 +374,46 @@
   75%  { left: 35%; top: 83%; }
   100% { left: 53%; top: 85%; }
 }
+
+/* ── Mobile responsive ── */
+
+@media (max-width: 768px) {
+  .office-floor {
+    min-height: 400px;
+    aspect-ratio: auto;
+  }
+  .char__avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+  .char__name {
+    font-size: 0.5rem;
+  }
+  .mgr-desk {
+    height: 10%;
+  }
+  .desk {
+    width: 16%;
+    height: 8%;
+  }
+}
+
+@media (max-width: 480px) {
+  .office-floor {
+    min-height: 350px;
+  }
+  .char__avatar {
+    width: 24px;
+    height: 24px;
+  }
+  .char__name {
+    display: none;
+  }
+  .coffee-corner__emoji {
+    font-size: 1rem;
+  }
+  .office-door__icon {
+    font-size: 1.2rem;
+  }
+}
