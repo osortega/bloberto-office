@@ -230,18 +230,18 @@
   box-shadow: 0 0 9px rgba(34, 197, 94, 0.35), 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
-/* ── Ghost (roster-only, not active) — faded at desk ── */
+/* ── Ghost (roster-only, not active) — grayscale at desk ── */
 .char--ghost {
   animation: ghost-enter 0.8s ease-out both, ghost-float 4s ease-in-out 0.8s infinite;
   pointer-events: auto;
   cursor: default;
+  filter: grayscale(1) brightness(0.7);
 }
 
 /* Dashed avatar border for ghost characters */
 .char--ghost .char__avatar {
   border-style: dashed;
   border-color: var(--text-muted);
-  font-size: 44px;
 }
 
 /* Tooltip shown on ghost hover */
@@ -307,7 +307,7 @@
   }
 }
 
-/* Ghost version — fades in to 0.28 so opacity isn't overridden by fill-mode */
+/* Ghost version — fades in fully, grayscale applied via .char--ghost filter */
 @keyframes ghost-enter {
   from {
     transform: translateY(72px) scale(0.3);
@@ -315,7 +315,7 @@
   }
   to {
     transform: translateY(0) scale(1);
-    opacity: 0.55;
+    opacity: 1;
   }
 }
 
