@@ -1,123 +1,88 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-06T23:37:00Z",
-  "review_number": 5,
-  "previous_score": 3.65,
+  "role": "QA Analyst",
+  "timestamp": "2026-03-06T23:42:11.090Z",
   "scores": {
-    "visual": 3.6,
-    "ux": 3.2,
-    "responsiveness": 3.1,
-    "performance": 3.5,
-    "accessibility": 2.6,
-    "code_quality": 3.0,
-    "features": 3.2,
-    "fun_factor": 4.2
+    "visual": 4,
+    "ux": 3,
+    "responsiveness": 3,
+    "performance": 4,
+    "accessibility": 2,
+    "code_quality": 4,
+    "features": 3,
+    "fun_factor": 4,
+    "overall": 3.4
   },
-  "overall_score": 3.3,
-  "score_note": "Drop from 3.65 is warranted — this review caught a CSS breakpoint ordering bug, a significant slab of dead CSS, incomplete ARIA tab wiring, and a silent UX hole where done/error workers vanish. The fun is still there; the bones need tightening.",
   "suggestions": [
     {
+      "id": 1,
+      "area": "seo",
       "priority": "high",
-      "category": "bug",
-      "title": "CSS breakpoint ordering bug causes 600px rules to be overridden",
-      "description": "In Office.css the 600px max-width block appears at line 387 but the 768px max-width block appears at line 420. At exactly 600px viewport width both blocks apply, and since 768px comes later in the cascade it wins — overriding the 600px-specific avatar sizes (26px) with the 768px values (30px). Fix by reordering so the more specific (smaller) breakpoint comes last: move the 600px block below the 768px block. Same applies to the 480px block, which is correct since it already appears after both. Quick test: shrink browser to 600px and check char__avatar dimensions in DevTools.",
-      "effort": "small",
-      "assign_to": "dave"
+      "title": "No meta description or Open Graph tags",
+      "description": "The page lacks <meta name=\"description\"> and Open Graph tags (og:title, og:description, og:image). This hurts SEO rankings and means link previews on Slack, Twitter, etc. show no useful info when shared."
     },
     {
+      "id": 2,
+      "area": "code_quality",
       "priority": "high",
-      "category": "accessibility",
-      "title": "ARIA tab–panel wiring is incomplete — screen readers can't associate tabs with panels",
-      "description": "App.jsx uses role='tablist', role='tab', and aria-selected correctly, but the two role='tabpanel' divs have no id attribute, no aria-labelledby, and the tab buttons have no aria-controls. A screen reader has no way to announce which panel belongs to which tab. Fix: give each tabpanel a stable id (e.g., id='panel-office' and id='panel-dashboard'), add id='tab-office' / id='tab-dashboard' to the buttons, then wire aria-controls='panel-office' on the office tab and aria-labelledby='tab-office' on the office panel (and equivalently for dashboard).",
-      "effort": "small",
-      "assign_to": "maya"
+      "title": "No React error boundary",
+      "description": "There is no ErrorBoundary component wrapping the app or key subtrees. Any unhandled render error will cause a completely blank page for the user with no recovery path. Add an ErrorBoundary with a fallback UI."
     },
     {
+      "id": 3,
+      "area": "accessibility",
       "priority": "high",
-      "category": "ux",
-      "title": "Done and error workers are silently dropped from the entire UI",
-      "description": "activeWorkers is defined as allWorkers.filter(w => w.status === 'working' || w.status === 'idle'). Any worker whose status is 'done' or 'error' disappears from the dashboard grid, the StatsBar total ('On the Clock' shows only active+idle), and the office view. If a worker errored out, the operator has no visibility unless they read the activity log carefully. The .stat-card.done CSS and error worker-card::before gradient already exist, which confirms this was planned but never wired up. Fix: pass allWorkers to StatsBar and add Done and Error stat cards; show done/error workers in a separate collapsed section on the dashboard below active workers.",
-      "effort": "medium",
-      "assign_to": "carlos"
+      "title": "Animations ignore prefers-reduced-motion",
+      "description": "CSS animations and transitions do not check the prefers-reduced-motion media query. Users who have enabled reduced motion in their OS settings (often due to vestibular disorders or epilepsy) still see full animations, which can cause discomfort or harm."
     },
     {
-      "priority": "medium",
-      "category": "code",
-      "title": "Large block of dead CSS in App.css has no corresponding JSX",
-      "description": "App.css contains fully-specified rules for .worker-footer, .hire-form-wrapper, .hire-form-title, .hire-form, .form-group, input, select, textarea, .btn, .btn-primary, .btn-danger, .btn-ghost, and .btn-sm — none of which have any matching elements in App.jsx or Office.jsx. Also .progress-wrapper {} is an empty rule (line 370). This dead code adds ~120 lines of CSS that browsers parse and maintain for nothing, and creates confusion about what features are implemented. Remove all orphaned rules; if a hire form is planned, keep the CSS in a feature branch.",
-      "effort": "small",
-      "assign_to": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Ghost character tooltip is hover-only — touch devices get nothing",
-      "description": "Ghost roster members show their role via a CSS ::after tooltip that only triggers on :hover. On phones and tablets the tooltip is unreachable. This was flagged in R4 as a general issue but hasn't been fixed. Fix: render a small visible role label or a 'away' pill directly on the ghost character div so mobile users see context without interaction. A simple <span class='char__status-label'>Away</span> below the name works fine.",
-      "effort": "small",
-      "assign_to": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "ActivityLog creates new arrays on every parent render — should be memoized",
-      "description": "Inside ActivityLog: const displayed = [...entries].reverse().slice(0, 20) — this spread+reverse+slice runs on every render because it's not wrapped in useMemo. Since entries comes from state and rarely changes (only on poll), the computation is cheap but the allocation is unnecessary and signals a missed optimization pattern. Fix: const displayed = useMemo(() => [...entries].reverse().slice(0, 20), [entries]) inside ActivityLog. Same issue exists in App.jsx where activeWorkers.filter((w) => w.status === 'working').length is computed twice inline inside the section-header JSX — extract to a local variable.",
-      "effort": "small",
-      "assign_to": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Inline styles in JSX should be moved to CSS classes",
-      "description": "WorkerCard renders worker-info with style={{ flex: 1, paddingLeft: '0.75rem' }} despite .worker-info already having a CSS class — the paddingLeft just isn't in the class yet. Two section-header span elements use style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }} — these should be a .section-meta class. Inline styles bypass the theme system, can't be overridden via media queries, and resist refactoring. Move all three into their respective CSS files.",
-      "effort": "small",
-      "assign_to": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "feature",
-      "title": "Manual refresh button missing from the dashboard",
-      "description": "Still missing from R4. If the user switches back to the tab after being away, the slower POLL_INTERVAL_HIDDEN means they could wait up to 60 seconds for fresh data. A small refresh icon button next to the section title (or in the StatsBar) that calls syncFromGitHub() would solve this. The function is already useCallback-wrapped and available in scope — just needs a button wired to it and passed down as a prop.",
-      "effort": "small",
-      "assign_to": "maya"
-    },
-    {
+      "id": 4,
+      "area": "visual",
       "priority": "low",
-      "category": "accessibility",
-      "title": "StatusBadge renders both an emoji and a decorative dot without aria-hidden",
-      "description": "StatusBadge renders <span class='dot'/> (visual-only pulsing circle) followed by an emoji (⚡, 😴, etc.) then the text label. A screen reader will announce 'lightning bolt Working' or worse read the dot as a blank element. Fix: add aria-hidden='true' to the .dot span and aria-hidden='true' to the emoji span so only the text label is read aloud. Same treatment should apply to the ACTIVITY_ICONS emojis in ActivityLogEntry.",
-      "effort": "small",
-      "assign_to": "maya"
+      "title": "No branded favicon",
+      "description": "The app uses the default Vite favicon. A custom favicon matching the app's brand/theme would improve polish and help users identify the tab among many open tabs."
     },
     {
-      "priority": "low",
-      "category": "visual",
-      "title": "color-mix() in .hq-badge has no fallback for older browsers",
-      "description": "Office.css uses color-mix(in srgb, var(--accent) 12%, transparent) for the .hq-badge background and border. This is well-supported in modern browsers (Chrome 111+, Firefox 113+, Safari 16.2+) but has zero support in older Android WebViews and some enterprise Chrome installations. Add a static fallback: background: rgba(124, 106, 247, 0.12); border: 1px solid rgba(124, 106, 247, 0.30); immediately before the color-mix lines.",
-      "effort": "small",
-      "assign_to": "dave"
+      "id": 5,
+      "area": "features",
+      "priority": "medium",
+      "title": "Activity log has no filtering or search",
+      "description": "The activity log displays all events in a flat list with no way to filter by worker, event type, or date range, and no search input. As the log grows this becomes unusable. Add at minimum a text search and event-type filter."
     },
     {
-      "priority": "low",
-      "category": "ux",
-      "title": "Truncated worker names have no title attribute for overflow tooltip",
-      "description": ".worker-name has white-space: nowrap; overflow: hidden; text-overflow: ellipsis — if a worker has a long name it silently clips. There's no way for the user to see the full name. Add title={worker.name} to the .worker-name div so hovering reveals the full text. This is a standard browser affordance that requires zero CSS.",
-      "effort": "small",
-      "assign_to": "carlos"
+      "id": 6,
+      "area": "ux",
+      "priority": "medium",
+      "title": "No loading state when switching tabs",
+      "description": "Switching between tabs triggers data fetches or re-renders with no visual feedback. Users with slower connections see a blank or stale panel with no indication that content is loading. Add a skeleton or spinner during tab transitions."
     },
     {
+      "id": 7,
+      "area": "features",
       "priority": "low",
-      "category": "visual",
-      "title": "Office floor lacks ambient depth — plants or a whiteboard would help",
-      "description": "The office grid is clean but feels sparse compared to the charming character art. A small potted plant in the bottom-left corner and a whiteboard element on one wall would make the space feel lived-in. The coffee corner is already there as proof of concept — just extend the pattern. CSS-only SVG shapes, no images needed. Low effort, high delight.",
-      "effort": "small",
-      "assign_to": "maya"
+      "title": "Coffee corner is purely decorative",
+      "description": "The coffee corner UI element is a static decoration. It could be made functional by letting workers toggle a 'on break' status that shows in the coffee corner, giving the feature real utility and reinforcing the fun theme."
+    },
+    {
+      "id": 8,
+      "area": "ux",
+      "priority": "low",
+      "title": "No keyboard shortcuts to switch tabs",
+      "description": "Power users cannot navigate between tabs without reaching for the mouse. Adding keyboard shortcuts (e.g., Ctrl+1/2/3 or Alt+arrow keys) would significantly improve efficiency for frequent users."
+    },
+    {
+      "id": 9,
+      "area": "features",
+      "priority": "medium",
+      "title": "Worker cards do not show hire date",
+      "description": "Worker cards display status and role but omit the hire date. This is often useful context for managers (e.g., identifying new vs. tenured workers). Add hire date as a secondary detail on each card."
+    },
+    {
+      "id": 10,
+      "area": "ux",
+      "priority": "medium",
+      "title": "No notification or sound when worker status changes",
+      "description": "Status changes happen silently. Users who leave the app in a background tab miss updates entirely. Adding a browser notification (with permission) and/or a subtle sound cue would keep supervisors informed without requiring constant manual refreshing."
     }
-  ],
-  "positive_notes": [
-    "Promise.allSettled for parallel fetches is textbook correct — both endpoints fail independently. Nice.",
-    "The visibility-aware polling interval (10s active / 60s hidden) shows real product thinking.",
-    "Character SVGs with role='img' and aria-label on every avatar is good — that groundwork makes the a11y fixes here cheap.",
-    "The enter-office animation for working characters (spring easing, scale from 0.3) is delightful. Don't change it.",
-    "Tab keyboard navigation with ArrowLeft/Right is correct and often skipped — good to see it here."
   ]
 }
