@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 
 const STORAGE_KEY = 'bloberto-workers'
+const GITHUB_API_URL =
+  'https://api.github.com/repos/osortega/bloberto-office/contents/data/workers.json'
+const POLL_INTERVAL_MS = 15_000
 
 const ROLE_EMOJIS = {
   'Frontend Engineer': '🎨',
@@ -56,6 +59,16 @@ const DEFAULT_WORKERS = [
   },
 ]
 
+async function fetchWorkersFromGitHub() {
+  const res = await fetch(GITHUB_API_URL, {
+    headers: { Accept: 'application/vnd.github+json' },
+  })
+  if (!res.ok) throw new Error(`GitHub API ${res.status}`)
+  const meta = await res.json()
+  const json = JSON.parse(atob(meta.content.replace(/\n/g, '')))
+  return json
+}
+
 function getRoleEmoji(role) {
   return ROLE_EMOJIS[role] ?? '🤖'
 }
@@ -87,6 +100,8 @@ function ProgressBar({ progress }) {
 }
 
 function WorkerCard({ worker, onFire, onStatusChange }) {
+  const isFromHQ = !!worker.hired_at
+
   return (
     <div className={`worker-card ${worker.status}`}>
       <div className="worker-header">
@@ -97,6 +112,10 @@ function WorkerCard({ worker, onFire, onStatusChange }) {
         </div>
         <StatusBadge status={worker.status} />
       </div>
+
+      {isFromHQ && (
+        <div className="hq-badge">🛰️ synced from HQ</div>
+      )}
 
       <div className="worker-task">
         <strong>📋 Current Task</strong>
@@ -215,11 +234,15 @@ function HireForm({ onHire }) {
   )
 }
 
-function StatsBar({ workers }) {
+function StatsBar({ workers, lastSynced, isLive }) {
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
   const done = workers.filter((w) => w.status === 'done').length
   const idle = workers.filter((w) => w.status === 'idle').length
+
+  const syncLabel = lastSynced
+    ? lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    : 'never'
 
   return (
     <div className="stats-bar">
@@ -238,6 +261,13 @@ function StatsBar({ workers }) {
       <div className="stat-card idle">
         <span className="stat-label">😴 Idle</span>
         <span className="stat-value">{idle}</span>
+      </div>
+      <div className="stat-card sync-status">
+        <span className="stat-label">
+          <span className={`live-dot ${isLive ? 'live' : 'offline'}`} />
+          {isLive ? 'Live' : 'Offline'}
+        </span>
+        <span className="stat-value sync-time">{syncLabel}</span>
       </div>
     </div>
   )
@@ -264,7 +294,37 @@ export default function App() {
     } catch {}
     return DEFAULT_WORKERS
   })
+  const [isLive, setIsLive] = useState(false)
+  const [lastSynced, setLastSynced] = useState(null)
+  // Track IDs that came from GitHub so local hire/fire still works
+  const [hqWorkerIds, setHqWorkerIds] = useState(new Set())
 
+  const syncFromGitHub = useCallback(async () => {
+    try {
+      const data = await fetchWorkersFromGitHub()
+      const hqWorkers = data.workers ?? []
+      const hqIds = new Set(hqWorkers.map((w) => w.id))
+      setHqWorkerIds(hqIds)
+      setWorkers((prev) => {
+        // Keep locally-hired workers (not from HQ), merge with HQ data
+        const localOnly = prev.filter((w) => !hqIds.has(w.id))
+        return [...hqWorkers, ...localOnly]
+      })
+      setIsLive(true)
+      setLastSynced(new Date())
+    } catch {
+      setIsLive(false)
+    }
+  }, [])
+
+  // Initial fetch + polling
+  useEffect(() => {
+    syncFromGitHub()
+    const timer = setInterval(syncFromGitHub, POLL_INTERVAL_MS)
+    return () => clearInterval(timer)
+  }, [syncFromGitHub])
+
+  // Persist local changes to localStorage as fallback
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(workers))
   }, [workers])
@@ -305,7 +365,7 @@ export default function App() {
       </header>
 
       <main className="main">
-        <StatsBar workers={workers} />
+        <StatsBar workers={workers} lastSynced={lastSynced} isLive={isLive} />
         <HireForm onHire={hire} />
 
         <div className="section-header">
