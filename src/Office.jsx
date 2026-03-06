@@ -1,15 +1,5 @@
+import { useMemo } from 'react'
 import './Office.css'
-
-const DESK_POSITIONS = [
-  { id: 'desk1', x: 150, y: 80 },
-  { id: 'desk2', x: 350, y: 80 },
-  { id: 'desk3', x: 150, y: 250 },
-  { id: 'desk4', x: 350, y: 250 },
-  { id: 'desk5', x: 550, y: 80 },
-  { id: 'desk6', x: 550, y: 250 },
-]
-
-const MANAGER_DESK = { x: 350, y: 400 }
 
 const ROLE_EMOJIS = {
   'Frontend Engineer': '🎨',
@@ -23,129 +13,152 @@ const ROLE_EMOJIS = {
   'Other': '🤖',
 }
 
-function getRoleEmoji(role) {
-  return ROLE_EMOJIS[role] ?? '🤖'
+// Desk slot positions — (left%, top%) relative to office floor
+const DESKS = [
+  { id: 0, left: 7,  top: 28 },
+  { id: 1, left: 32, top: 28 },
+  { id: 2, left: 57, top: 28 },
+  { id: 3, left: 7,  top: 50 },
+  { id: 4, left: 32, top: 50 },
+  { id: 5, left: 57, top: 50 },
+]
+
+const DEFAULT_BLOBERTO = {
+  id: 'bloberto', name: 'Bloberto', role: 'Manager', status: 'working',
 }
 
-function Character({ emoji, name, className, style }) {
+function getEmoji(worker) {
+  if (worker.id === 'bloberto') return '🫠'
+  return ROLE_EMOJIS[worker.role] ?? '🤖'
+}
+
+function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0 }) {
+  const emoji = getEmoji(worker)
+  const firstName = worker.name.split(' ')[0]
+
+  const style = {}
+  if (left !== undefined) style.left = `${left}%`
+  if (top  !== undefined) style.top  = `${top}%`
+
+  // Stagger animation delays for multi-animation variants
+  if (delay > 0) {
+    if (variant === 'working') {
+      // enter-office delay, then bob starts after enter finishes (+ 0.6s)
+      style.animationDelay = `${delay}s, ${(delay + 0.6).toFixed(2)}s`
+    } else if (variant === 'idle') {
+      // fade-in-char delay, wander starts after fade finishes (+ 0.5s)
+      style.animationDelay = `${delay}s, ${(delay + 0.5).toFixed(2)}s`
+    } else {
+      style.animationDelay = `${delay}s`
+    }
+  }
+
+  const classes = ['char', `char--${variant}`]
+  if (variant === 'idle' && wanderIdx) classes.push(`char--wander-${wanderIdx}`)
+
   return (
-    <div className={`character ${className}`} style={style}>
-      <span className="emoji">{emoji}</span>
-      <span className="name-label">{name}</span>
+    <div className={classes.join(' ')} style={style}>
+      <div className="char__avatar">{emoji}</div>
+      <div className="char__name">{firstName}</div>
     </div>
   )
 }
 
 export default function Office({ workers = [], roster = [] }) {
-  const workingWorkers = workers.filter((w) => w.status === 'working')
-  const idleWorkers = workers.filter((w) => w.status === 'idle')
+  const bloberto = useMemo(
+    () => [...workers, ...roster].find(w => w.id === 'bloberto') ?? DEFAULT_BLOBERTO,
+    [workers, roster],
+  )
 
-  // Assign working workers to desks
-  const occupiedDeskIds = new Set()
-  const workingAssignments = workingWorkers.map((worker, i) => {
-    const desk = DESK_POSITIONS[i] ?? DESK_POSITIONS[i % DESK_POSITIONS.length]
-    occupiedDeskIds.add(desk.id)
-    return { worker, desk }
-  })
+  const nonMgr        = workers.filter(w => w.id !== 'bloberto')
+  const workingWorkers = nonMgr.filter(w => w.status === 'working')
+  const idleWorkers    = nonMgr.filter(w => w.status !== 'working')
 
-  // Idle workers float around randomly (fixed offsets per index so they don't jump)
-  const IDLE_SPOTS = [
-    { x: 240, y: 170 },
-    { x: 460, y: 170 },
-    { x: 120, y: 340 },
-    { x: 460, y: 340 },
-    { x: 300, y: 330 },
-    { x: 600, y: 330 },
-  ]
-  const idleAssignments = idleWorkers.map((worker, i) => ({
-    worker,
-    pos: IDLE_SPOTS[i % IDLE_SPOTS.length],
-  }))
+  // Roster members not currently active → ghost at empty desk
+  const activeIds   = useMemo(() => new Set(workers.map(w => w.id)), [workers])
+  const ghostRoster = roster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id))
 
-  // Ghost roster members sit at remaining desks
-  const activeIds = new Set(workers.map((w) => w.id))
-  const ghostRoster = roster.filter((r) => !activeIds.has(r.id))
-  const remainingDesks = DESK_POSITIONS.filter((d) => !occupiedDeskIds.has(d.id))
-  const ghostAssignments = ghostRoster.map((r, i) => ({
-    worker: r,
-    desk: remainingDesks[i % (remainingDesks.length || 1)] ?? DESK_POSITIONS[0],
-  }))
+  // Assign working workers first, then ghosts, to desk slots
+  const deskOccupants = useMemo(() => {
+    const map = {}
+    let i = 0
+    for (const w of workingWorkers) {
+      if (i < DESKS.length) map[DESKS[i++].id] = { worker: w, ghost: false }
+    }
+    for (const w of ghostRoster) {
+      if (i < DESKS.length) map[DESKS[i++].id] = { worker: w, ghost: true }
+    }
+    return map
+  }, [workingWorkers, ghostRoster])
 
   return (
-    <div className="office-container">
-      {/* Door */}
-      <div className="door">
-        <span className="door-label">EXIT</span>
-      </div>
+    <div className="office-wrap">
+      <div className="office-floor">
 
-      {/* Regular desks */}
-      {DESK_POSITIONS.map((d) => (
-        <div
-          key={d.id}
-          className="desk"
-          style={{ left: d.x, top: d.y }}
-        >
-          <div className="monitor" />
+        <div className="office-sign">🏢 Bloberto&apos;s HQ</div>
+
+        {/* Manager desk — top center */}
+        <div className="mgr-desk">
+          <div className="mgr-desk__monitor" />
+          <div className="mgr-desk__nameplate">Manager</div>
         </div>
-      ))}
 
-      {/* Manager desk */}
-      <div
-        className="manager-desk"
-        style={{ left: MANAGER_DESK.x, top: MANAGER_DESK.y }}
-      >
-        <div className="monitor" />
+        {/* Regular desks */}
+        {DESKS.map(desk => (
+          <div
+            key={desk.id}
+            className="desk"
+            style={{ left: `${desk.left}%`, top: `${desk.top}%` }}
+          >
+            <div className="desk__monitor" />
+          </div>
+        ))}
+
+        {/* Coffee corner — top right */}
+        <div className="coffee-corner">
+          <div className="coffee-corner__body">
+            <span className="coffee-corner__emoji">☕</span>
+          </div>
+          <span className="coffee-corner__label">Coffee</span>
+        </div>
+
+        {/* Door — bottom center */}
+        <div className="office-door">
+          <span className="office-door__icon">🚪</span>
+          <span className="office-door__label">Entrance</span>
+        </div>
+
+        {/* Bloberto — always at manager desk, always visible */}
+        <Character worker={bloberto} left={46} top={4} variant="manager" />
+
+        {/* Active workers at desks (working) or as ghosts (roster-only) */}
+        {DESKS.map((desk, i) => {
+          const occ = deskOccupants[desk.id]
+          if (!occ) return null
+          return (
+            <Character
+              key={occ.worker.id}
+              worker={occ.worker}
+              left={desk.left + 7}
+              top={desk.top - 4}
+              variant={occ.ghost ? 'ghost' : 'working'}
+              delay={i * 0.12}
+            />
+          )
+        })}
+
+        {/* Idle workers wandering the lower floor */}
+        {idleWorkers.map((w, i) => (
+          <Character
+            key={w.id}
+            worker={w}
+            variant="idle"
+            wanderIdx={(i % 4) + 1}
+            delay={i * 0.2}
+          />
+        ))}
+
       </div>
-
-      {/* Coffee area */}
-      <div className="coffee-area">
-        ☕
-        <span>coffee</span>
-      </div>
-
-      {/* Bloberto — always at manager desk */}
-      <Character
-        emoji="🫠"
-        name="Bloberto"
-        className="manager"
-        style={{
-          left: MANAGER_DESK.x + 30,
-          top: MANAGER_DESK.y - 50,
-        }}
-      />
-
-      {/* Working workers at desks */}
-      {workingAssignments.map(({ worker, desk }) => (
-        <Character
-          key={worker.id}
-          emoji={getRoleEmoji(worker.role)}
-          name={worker.name}
-          className="working"
-          style={{ left: desk.x + 20, top: desk.y - 50 }}
-        />
-      ))}
-
-      {/* Idle workers floating */}
-      {idleAssignments.map(({ worker, pos }) => (
-        <Character
-          key={worker.id}
-          emoji={getRoleEmoji(worker.role)}
-          name={worker.name}
-          className="idle"
-          style={{ left: pos.x, top: pos.y }}
-        />
-      ))}
-
-      {/* Ghost roster members */}
-      {ghostAssignments.map(({ worker, desk }) => (
-        <Character
-          key={worker.id}
-          emoji={getRoleEmoji(worker.role)}
-          name={worker.name}
-          className="ghost"
-          style={{ left: desk.x + 20, top: desk.y - 50 }}
-        />
-      ))}
     </div>
   )
 }
