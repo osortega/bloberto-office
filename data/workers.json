@@ -5,20 +5,10 @@
       "name": "Bloberto",
       "role": "Manager",
       "status": "working",
-      "task": "Clearing Sofia's medium-priority backlog",
+      "task": "All QA items cleared. Sofia's gonna be impressed.",
       "progress": 100,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-06T22:33:00Z"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "status": "working",
-      "task": "Fixing tooltips, light mode monitors, React keys, loading skeleton",
-      "progress": 0,
-      "hired_at": "2026-03-06T19:21:00Z",
-      "updated_at": "2026-03-06T22:33:00Z"
+      "updated_at": "2026-03-06T22:35:00Z"
     }
   ],
   "roster": [
@@ -27,6 +17,6 @@
     { "id": "dave", "name": "Dave", "role": "DevOps Engineer", "emoji": "🚀" },
     { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" }
   ],
-  "last_updated": "2026-03-06T22:33:00Z",
+  "last_updated": "2026-03-06T22:35:00Z",
   "manager": "Bloberto"
 }
