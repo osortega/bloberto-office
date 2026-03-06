@@ -1,0 +1,228 @@
+/* ── Office container ── */
+.office-container {
+  position: relative;
+  min-height: 500px;
+  width: 100%;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Door gap on left side ── */
+.door {
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 56px;
+  background: var(--bg);
+  border-right: 2px dashed var(--accent);
+  display: flex;
+  align-items: center;
+}
+
+.door-label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  writing-mode: vertical-rl;
+}
+
+/* ── Coffee area ── */
+.coffee-area {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  width: 64px;
+  height: 64px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  gap: 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.coffee-area span {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+/* ── Desk ── */
+.desk {
+  position: absolute;
+  width: 80px;
+  height: 50px;
+  background: var(--surface2);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.desk .monitor {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 2px;
+  opacity: 0.7;
+}
+
+/* ── Manager desk ── */
+.manager-desk {
+  position: absolute;
+  width: 100px;
+  height: 60px;
+  background: var(--surface2);
+  border-radius: 6px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 2px 12px var(--accent-glow);
+}
+
+.manager-desk .monitor {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ── Character ── */
+.character {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.5s ease;
+  z-index: 10;
+}
+
+.character .emoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.character .name-label {
+  position: absolute;
+  top: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── States ── */
+.character.working {
+  animation: bob 1.5s ease-in-out infinite;
+  border-color: var(--green);
+  box-shadow: 0 0 8px rgba(34,197,94,0.35);
+}
+
+.character.idle {
+  animation: wander 8s ease-in-out infinite;
+  border-color: var(--yellow);
+}
+
+.character.manager {
+  animation: wobble 3s ease-in-out infinite;
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.character.ghost {
+  opacity: 0.25;
+}
+
+/* ── Keyframes ── */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-3px); }
+}
+
+@keyframes wander {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(6px, -8px); }
+  40%  { transform: translate(-5px, 4px); }
+  60%  { transform: translate(8px, 6px); }
+  80%  { transform: translate(-4px, -5px); }
+  100% { transform: translate(0, 0); }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(-4deg); }
+  75%       { transform: rotate(4deg); }
+}
+
+/* ── Floor grid (subtle) ── */
+.office-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+/* ── Tab toggle ── */
+.tab-toggle {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.tab-toggle button {
+  padding: 6px 18px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.tab-toggle button:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.tab-toggle button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 10px var(--accent-glow);
+}

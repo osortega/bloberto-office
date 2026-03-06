@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import './App.css'
+import Office from './Office.jsx'
 
 const GITHUB_API_URL =
   'https://api.github.com/repos/osortega/bloberto-office/contents/data/workers.json'
@@ -195,10 +196,12 @@ function EmptyState() {
 
 export default function App() {
   const [allWorkers, setAllWorkers] = useState([])
+  const [roster, setRoster] = useState([])
   const [activityLog, setActivityLog] = useState([])
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
   const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
+  const [tab, setTab] = useState('office')
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -215,6 +218,7 @@ export default function App() {
       ])
       const workers = data.workers ?? []
       setAllWorkers(workers)
+      setRoster(data.roster ?? [])
       setActivityLog(Array.isArray(activity) ? activity : [])
       setIsLive(true)
       setLastSynced(new Date())
@@ -269,36 +273,57 @@ export default function App() {
       </header>
 
       <main className="main">
-        <StatsBar workers={activeWorkers} lastSynced={lastSynced} isLive={isLive} />
-
-        <div className="section-header">
-          <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>
-          {activeWorkers.length > 0 && (
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              {activeWorkers.filter((w) => w.status === 'working').length > 0
-                ? `🔥 ${activeWorkers.filter((w) => w.status === 'working').length} grinding hard`
-                : '😴 Everyone is on standby'}
-            </span>
-          )}
+        <div className="tab-toggle">
+          <button
+            className={tab === 'office' ? 'active' : ''}
+            onClick={() => setTab('office')}
+          >
+            🏢 Office
+          </button>
+          <button
+            className={tab === 'dashboard' ? 'active' : ''}
+            onClick={() => setTab('dashboard')}
+          >
+            📊 Dashboard
+          </button>
         </div>
 
-        <div className="workers-grid">
-          {activeWorkers.length === 0 ? (
-            <EmptyState />
-          ) : (
-            activeWorkers.map((w) => (
-              <WorkerCard key={w.id} worker={w} />
-            ))
-          )}
-        </div>
+        {tab === 'office' ? (
+          <Office workers={activeWorkers} roster={roster} />
+        ) : (
+          <>
+            <StatsBar workers={activeWorkers} lastSynced={lastSynced} isLive={isLive} />
 
-        <div className="section-header" style={{ marginTop: '2.5rem' }}>
-          <div className="section-title">📋 Activity Log</div>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Last {Math.min(activityLog.length, 20)} events
-          </span>
-        </div>
-        <ActivityLog entries={activityLog} />
+            <div className="section-header">
+              <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>
+              {activeWorkers.length > 0 && (
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {activeWorkers.filter((w) => w.status === 'working').length > 0
+                    ? `🔥 ${activeWorkers.filter((w) => w.status === 'working').length} grinding hard`
+                    : '😴 Everyone is on standby'}
+                </span>
+              )}
+            </div>
+
+            <div className="workers-grid">
+              {activeWorkers.length === 0 ? (
+                <EmptyState />
+              ) : (
+                activeWorkers.map((w) => (
+                  <WorkerCard key={w.id} worker={w} />
+                ))
+              )}
+            </div>
+
+            <div className="section-header" style={{ marginTop: '2.5rem' }}>
+              <div className="section-title">📋 Activity Log</div>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Last {Math.min(activityLog.length, 20)} events
+              </span>
+            </div>
+            <ActivityLog entries={activityLog} />
+          </>
+        )}
       </main>
 
       <footer className="footer">
