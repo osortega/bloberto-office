@@ -8,19 +8,39 @@
       "task": "Managing the team and orchestrating workers",
       "progress": 100,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-06T18:20:00Z"
+      "updated_at": "2026-03-06T18:30:00Z"
     },
     {
       "id": "frontend-v2",
       "name": "Frontend Engineer v2",
       "role": "Frontend Engineer",
-      "status": "working",
-      "task": "Connecting dashboard to live data",
-      "progress": 50,
+      "status": "done",
+      "task": "Connected dashboard to live GitHub data",
+      "progress": 100,
       "hired_at": "2026-03-06T18:20:00Z",
-      "updated_at": "2026-03-06T18:20:00Z"
+      "updated_at": "2026-03-06T18:28:00Z"
+    },
+    {
+      "id": "devops-1",
+      "name": "DevOps Engineer",
+      "role": "DevOps Engineer",
+      "status": "done",
+      "task": "Deployed site to GitHub Pages",
+      "progress": 100,
+      "hired_at": "2026-03-06T17:50:00Z",
+      "updated_at": "2026-03-06T17:58:00Z"
+    },
+    {
+      "id": "frontend-v1",
+      "name": "Frontend Engineer v1",
+      "role": "Frontend Engineer",
+      "status": "done",
+      "task": "Built the initial office dashboard UI",
+      "progress": 100,
+      "hired_at": "2026-03-06T16:35:00Z",
+      "updated_at": "2026-03-06T16:42:00Z"
     }
   ],
-  "last_updated": "2026-03-06T18:20:00Z",
+  "last_updated": "2026-03-06T18:30:00Z",
   "manager": "Bloberto"
 }
