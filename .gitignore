@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Backend (separate service, not deployed to GitHub Pages)
+backend/
+
+# Test/debug artifacts
+test-*.txt
+git-test-write.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
