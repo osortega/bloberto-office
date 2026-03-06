@@ -152,5 +152,17 @@
     "type": "complete",
     "worker": "Maya",
     "message": "Switched to raw.githubusercontent.com \u2014 no more rate limits"
+  },
+  {
+    "timestamp": "2026-03-06T22:07:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for scheduled QA review #2"
+  },
+  {
+    "timestamp": "2026-03-06T22:10:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #2 complete \u2014 9 suggestions filed (2 high, 4 medium, 3 low). Score: 3.6/5 (up from 3.4)"
   }
 ]
