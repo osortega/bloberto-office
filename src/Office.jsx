@@ -299,7 +299,7 @@ export default function Office({ workers = [], roster = [] }) {
               top={desk.top - 4}
               variant={occ.ghost ? 'ghost' : 'working'}
               delay={i * 0.12}
-              tooltip={occ.ghost ? occ.worker.role : undefined}
+              tooltip={occ.ghost ? occ.worker.role : occ.worker.task}
             />
           )
         })}

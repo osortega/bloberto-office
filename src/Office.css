@@ -78,7 +78,8 @@
   box-shadow: 0 0 6px rgba(124, 106, 247, 0.4);
 }
 [data-theme='light'] .mgr-desk__monitor {
-  background: #b4b4cc;
+  background: #2a2a3a;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
 }
 .mgr-desk__nameplate {
   font-size: 0.5rem;
@@ -111,7 +112,8 @@
   border: 1px solid var(--border);
 }
 [data-theme='light'] .desk__monitor {
-  background: #b4b4cc;
+  background: #2a2a3a;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
 }
 
 /* ── Coffee corner (top right) ── */
@@ -238,6 +240,13 @@
   filter: brightness(0.85) opacity(0.7);
 }
 
+/* Enable hover/tooltip on working and idle chars too */
+.char--working,
+.char--idle {
+  pointer-events: auto;
+  cursor: default;
+}
+
 /* Ghost avatar — normal border with standby pulse */
 .char--ghost .char__avatar {
   animation: standby-pulse 3s ease-in-out infinite;
@@ -248,8 +257,8 @@
   50% { box-shadow: 0 0 12px rgba(255,255,255,0.2); }
 }
 
-/* Tooltip shown on ghost hover */
-.char--ghost[data-tooltip]::after {
+/* Tooltip shown on hover for any char with data-tooltip */
+.char[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: calc(100% + 6px);
@@ -267,7 +276,7 @@
   z-index: 100;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.char--ghost[data-tooltip]:hover::after {
+.char[data-tooltip]:hover::after {
   opacity: 1;
 }
 

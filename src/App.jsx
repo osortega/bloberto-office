@@ -84,7 +84,7 @@ function ActivityLog({ entries }) {
       {displayed.length === 0 ? (
         <div className="activity-empty">No activity yet…</div>
       ) : (
-        displayed.map((entry, i) => <ActivityLogEntry key={i} entry={entry} />)
+        displayed.map((entry) => <ActivityLogEntry key={entry.timestamp + entry.worker} entry={entry} />)
       )}
     </div>
   )
@@ -186,6 +186,29 @@ function EmptyState() {
   )
 }
 
+function LoadingSkeleton() {
+  return (
+    <>
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="worker-card">
+          <div className="worker-header">
+            <div className="skeleton" style={{ width: 44, height: 44, borderRadius: 10 }} />
+            <div style={{ flex: 1, paddingLeft: '0.75rem', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="skeleton" style={{ width: '55%', height: 14 }} />
+              <div className="skeleton" style={{ width: '38%', height: 11 }} />
+            </div>
+            <div className="skeleton" style={{ width: 72, height: 22, borderRadius: 20 }} />
+          </div>
+          <div className="skeleton" style={{ width: '100%', height: 46 }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="skeleton" style={{ width: '100%', height: 8, borderRadius: 99 }} />
+          </div>
+        </div>
+      ))}
+    </>
+  )
+}
+
 const TABS = ['office', 'dashboard']
 
 export default function App() {
@@ -194,6 +217,7 @@ export default function App() {
   const [activityLog, setActivityLog] = useState([])
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
   const [tab, setTab] = useState('office')
 
@@ -227,8 +251,10 @@ export default function App() {
       setActivityLog(Array.isArray(activity) ? activity : [])
       setIsLive(true)
       setLastSynced(new Date())
+      setIsLoading(false)
     } catch {
       setIsLive(false)
+      setIsLoading(false)
     }
   }, [])
 
@@ -321,7 +347,9 @@ export default function App() {
             </div>
 
             <div className="workers-grid" aria-live="polite">
-              {activeWorkers.length === 0 ? (
+              {isLoading ? (
+                <LoadingSkeleton />
+              ) : activeWorkers.length === 0 ? (
                 <EmptyState />
               ) : (
                 activeWorkers.map((w) => (

@@ -546,6 +546,18 @@ select option { background: var(--surface2); }
   font-size: 0.9rem;
 }
 
+/* ── Loading Skeleton ── */
+.skeleton {
+  background: var(--surface2);
+  border-radius: var(--radius);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
 /* ── Tab toggle (Dashboard / Office) ── */
 .tab-toggle {
   display: flex;
