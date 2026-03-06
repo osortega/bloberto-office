@@ -232,10 +232,15 @@
 
 /* ── Ghost (roster-only, not active) — faded at desk ── */
 .char--ghost {
-  animation: ghost-enter 0.8s ease-out both;
-  filter: saturate(0.3);
+  animation: ghost-enter 0.8s ease-out both, ghost-float 4s ease-in-out 0.8s infinite;
   pointer-events: auto;
   cursor: default;
+}
+
+/* Dashed avatar border for ghost characters */
+.char--ghost .char__avatar {
+  border-style: dashed;
+  border-color: var(--text-muted);
 }
 
 /* Tooltip shown on ghost hover */
@@ -309,8 +314,13 @@
   }
   to {
     transform: translateY(0) scale(1);
-    opacity: 0.28;
+    opacity: 0.55;
   }
+}
+
+@keyframes ghost-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
 }
 
 /* Gentle typing bob */
