@@ -32,7 +32,7 @@ function getEmoji(worker) {
   return ROLE_EMOJIS[worker.role] ?? '🤖'
 }
 
-function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0 }) {
+function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip }) {
   const emoji = getEmoji(worker)
   const firstName = worker.name.split(' ')[0]
 
@@ -56,8 +56,10 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0 }) {
   const classes = ['char', `char--${variant}`]
   if (variant === 'idle' && wanderIdx) classes.push(`char--wander-${wanderIdx}`)
 
+  const extraProps = tooltip ? { 'data-tooltip': tooltip } : {}
+
   return (
-    <div className={classes.join(' ')} style={style}>
+    <div className={classes.join(' ')} style={style} {...extraProps}>
       <div className="char__avatar">{emoji}</div>
       <div className="char__name">{firstName}</div>
     </div>
@@ -143,6 +145,7 @@ export default function Office({ workers = [], roster = [] }) {
               top={desk.top - 4}
               variant={occ.ghost ? 'ghost' : 'working'}
               delay={i * 0.12}
+              tooltip={occ.ghost ? occ.worker.role : undefined}
             />
           )
         })}
