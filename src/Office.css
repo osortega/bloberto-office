@@ -235,13 +235,17 @@
   animation: ghost-enter 0.8s ease-out both, ghost-float 4s ease-in-out 0.8s infinite;
   pointer-events: auto;
   cursor: default;
-  filter: grayscale(1) brightness(0.7);
+  filter: brightness(0.85) opacity(0.7);
 }
 
-/* Dashed avatar border for ghost characters */
+/* Ghost avatar — normal border with standby pulse */
 .char--ghost .char__avatar {
-  border-style: dashed;
-  border-color: var(--text-muted);
+  animation: standby-pulse 3s ease-in-out infinite;
+}
+
+@keyframes standby-pulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.1); }
+  50% { box-shadow: 0 0 12px rgba(255,255,255,0.2); }
 }
 
 /* Tooltip shown on ghost hover */
