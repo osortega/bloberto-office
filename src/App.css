@@ -411,6 +411,24 @@
   100% { background-position: 200% 50%; }
 }
 
+/* ── Progress Milestones ── */
+.progress-milestone-25, .progress-milestone-50, .progress-milestone-75 {
+  animation: milestone-ring 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes milestone-ring {
+  0% { box-shadow: 0 0 0 0 rgba(139,92,246,0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(139,92,246,0); }
+  100% { box-shadow: 0 0 0 0 rgba(139,92,246,0); }
+}
+.progress-milestone-100 {
+  animation: milestone-ring-complete 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes milestone-ring-complete {
+  0% { box-shadow: 0 0 0 0 rgba(251,191,36,0.7); }
+  50% { box-shadow: 0 0 0 8px rgba(251,191,36,0); }
+  100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+}
+
 .worker-card.error .worker-avatar { animation: char-glitch 3s infinite; }
 
 /* ---- Card flip ---- */
@@ -532,6 +550,8 @@
 }
 
 .footer span { color: var(--accent2); }
+.footer-tagline { animation: footer-tag-in 0.5s ease both; }
+@keyframes footer-tag-in { from { opacity: 0; } to { opacity: 1; } }
 
 /* ---- Responsive ---- */
 @media (max-width: 900px) {
@@ -904,3 +924,26 @@
 .workers-grid--solo-card .worker-card { box-shadow: 0 0 0 2px var(--accent), 0 0 18px 4px color-mix(in srgb, var(--accent) 35%, transparent); }
 .solo-spotlight-msg { font-style: italic; color: var(--text-muted); text-align: center; font-size: 0.9rem; animation: solo-fade-in 0.8s ease both; }
 @keyframes solo-fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ── Ambient Particles ── */
+.ambient-particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.ambient-particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 1px;
+  opacity: 0.15;
+  background: #60a5fa;
+  animation: ambient-drift calc(8s + var(--i) * 1.3s) ease-in-out infinite alternate;
+  left: calc(var(--i) * 8.3%);
+  top: calc(40% + var(--i) * 4%);
+}
+@keyframes ambient-drift {
+  from { transform: translateY(-40px) rotate(0deg); }
+  to { transform: translateY(40px) rotate(90deg); }
+}
+[data-vibe='crushing'] .ambient-particle { background: #4ade80; animation-duration: calc(4s + var(--i) * 0.8s); }
+[data-vibe='on-fire'] .ambient-particle { background: #f87171; opacity: 0.22; animation-timing-function: steps(3); }
+[data-vibe='slow-day'] .ambient-particle { background: #9ca3af; animation-duration: calc(14s + var(--i) * 2s); }
+[data-vibe='after-hours'] .ambient-particle { background: #8b5cf6; opacity: 0.1; }
+[data-vibe='in-flow'] .ambient-particle { background: #60a5fa; }
+@media (prefers-reduced-motion: reduce) { .ambient-particle { animation: none; } }

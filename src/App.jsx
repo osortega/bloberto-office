@@ -124,6 +124,21 @@ function StatusBadge({ status }) {
 }
 
 function ProgressBar({ progress }) {
+  const milestonesRef = useRef(new Set())
+  const [flashClass, setFlashClass] = useState('')
+
+  useEffect(() => {
+    const MILESTONES = [25, 50, 75, 100]
+    for (const m of MILESTONES) {
+      if (progress >= m && !milestonesRef.current.has(m)) {
+        milestonesRef.current.add(m)
+        setFlashClass(`progress-milestone-${m}`)
+        const t = setTimeout(() => setFlashClass(''), 600)
+        return () => clearTimeout(t)
+      }
+    }
+  }, [progress])
+
   return (
     <div className="progress-wrapper">
       <div className="progress-header">
@@ -139,7 +154,7 @@ function ProgressBar({ progress }) {
         aria-label={`Progress: ${progress}%`}
       >
         <div
-          className={`progress-bar-fill${progress >= 100 ? ' progress-bar-fill--overflow' : ''}`}
+          className={`progress-bar-fill${progress >= 100 ? ' progress-bar-fill--overflow' : ''} ${flashClass}`}
           style={{ width: `${Math.min(progress, 100)}%` }}
         />
       </div>
@@ -617,6 +632,11 @@ export default function App() {
 
   return (
     <div className="app">
+      <div className="ambient-particles" data-vibe={teamVibe.key} aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => (
+          <span key={i} className="ambient-particle" style={{ '--i': i }} />
+        ))}
+      </div>
       {confettiActive && (
         <div className="confetti-layer" aria-hidden="true">
           {Array.from({ length: 30 }, (_, i) => (
@@ -698,7 +718,7 @@ export default function App() {
 
         {tab === 'office' ? (
           <div role="tabpanel" id="tabpanel-office">
-            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} />
+            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} />
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard">
@@ -798,7 +818,13 @@ export default function App() {
 
       <footer className="footer">
         Built with 💜 and mild existential dread by <span>🫠 Bloberto</span>
-        &nbsp;&middot;&nbsp; &ldquo;If it compiles, ship it.&rdquo; &nbsp;&middot;&nbsp;
+        &nbsp;&middot;&nbsp; <span key={teamVibe.key} className="footer-tagline">&ldquo;{({
+          crushing: 'productivity charts are going vertical. don\'t look down.',
+          'on-fire': 'if it deploys, that\'s someone else\'s problem.',
+          'in-flow': 'if it compiles, ship it.',
+          'slow-day': 'maybe it works? nobody knows.',
+          'after-hours': 'the servers are watching. go home.',
+        })[teamVibe.key] ?? 'if it compiles, ship it.'}&rdquo;</span> &nbsp;&middot;&nbsp;
         <span>v1.0.0-chaos</span>
       </footer>
     </div>

@@ -268,7 +268,7 @@ function formatIdleDuration(updatedAt) {
   return rem > 0 ? `${hours}h ${rem}m` : `${hours}h`
 }
 
-const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false }) {
+const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [] }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
   const isManager = worker.id === 'bloberto'
@@ -372,9 +372,22 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
           {bubble.quote}
         </div>
       )}
-      {variant === 'ghost' && ghostBubble && (
-        <div className='ghost-ooo-bubble'>📵 OOO<br/><span className='ghost-ooo-role'>{worker.role}</span></div>
-      )}
+      {variant === 'ghost' && ghostBubble && (() => {
+        const lastEvent = activityEntries.filter(e => e.worker === worker.name).at(-1)
+        const relTime = lastEvent ? (() => {
+          const diff = Date.now() - new Date(lastEvent.timestamp).getTime()
+          const mins = Math.floor(diff / 60_000)
+          const hours = Math.floor(diff / 3_600_000)
+          const days = Math.floor(diff / 86_400_000)
+          if (mins < 1) return 'just now'
+          if (mins < 60) return `${mins}m ago`
+          if (hours < 24) return `${hours}h ago`
+          return `${days}d ago`
+        })() : null
+        return (
+          <div className='ghost-ooo-bubble'>📵 OOO<br/><span className='ghost-ooo-role'>{worker.role}</span>{relTime && <span className='ghost-last-seen'>Last seen: {relTime}</span>}</div>
+        )
+      })()}
       <div className={`char__avatar${isError ? ' char__avatar--error' : ''}`}>
         <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} vibeKey={vibeKey} />
         {isError && (
@@ -444,7 +457,7 @@ function WindowElement() {
   )
 }
 
-export default function Office({ workers = [], roster = [], isSyncing = false }) {
+export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [] }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
 
@@ -568,6 +581,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false })
               variant={occ.ghost ? 'ghost' : 'working'}
               delay={i * 0.12}
               tooltip={occ.ghost ? occ.worker.role : occ.worker.task}
+              activityEntries={occ.ghost ? activityEntries : []}
             />
           )
         })}

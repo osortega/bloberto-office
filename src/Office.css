@@ -542,6 +542,7 @@
 /* Ghost OOO speech bubble */
 .ghost-ooo-bubble { position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); background:rgba(30,27,75,0.92); border:1px solid rgba(139,92,246,0.3); border-radius:8px; padding:6px 10px; font-size:0.68rem; color:#c4b5fd; white-space:nowrap; pointer-events:none; z-index:150; animation:ooo-in 0.15s ease; text-align:center; line-height:1.5; }
 .ghost-ooo-role { font-size:0.62rem; color:#8b5cf6; display:block; }
+.ghost-last-seen { display:block; font-size:0.55rem; color:var(--text-muted); margin-top:3px; opacity:0.75; }
 @keyframes ooo-in { from { opacity:0; transform:translateX(-50%) scale(0.9); } to { opacity:1; transform:translateX(-50%) scale(1); } }
 
 /* Gentle typing bob */
