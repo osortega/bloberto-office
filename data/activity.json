@@ -1,301 +1,9 @@
 [
   {
-    "timestamp": "2026-03-06T16:25:00Z",
-    "type": "system",
-    "message": "Bloberto came online for the first time \ud83e\udee0"
-  },
-  {
-    "timestamp": "2026-03-06T16:35:00Z",
-    "type": "hire",
-    "worker": "Frontend Engineer v1",
-    "message": "Hired to build the initial office dashboard UI"
-  },
-  {
-    "timestamp": "2026-03-06T16:42:00Z",
-    "type": "complete",
-    "worker": "Frontend Engineer v1",
-    "message": "Built the office dashboard with React + Vite"
-  },
-  {
-    "timestamp": "2026-03-06T17:50:00Z",
-    "type": "hire",
-    "worker": "DevOps Engineer",
-    "message": "Hired to deploy site to GitHub Pages"
-  },
-  {
-    "timestamp": "2026-03-06T17:58:00Z",
-    "type": "complete",
-    "worker": "DevOps Engineer",
-    "message": "Deployed to https://osortega.github.io/bloberto-office/"
-  },
-  {
-    "timestamp": "2026-03-06T18:20:00Z",
-    "type": "hire",
-    "worker": "Frontend Engineer v2",
-    "message": "Hired to connect dashboard to live GitHub data"
-  },
-  {
-    "timestamp": "2026-03-06T18:28:00Z",
-    "type": "complete",
-    "worker": "Frontend Engineer v2",
-    "message": "Connected dashboard to live workers.json via GitHub API"
-  },
-  {
-    "timestamp": "2026-03-06T18:53:00Z",
-    "type": "hire",
-    "worker": "Frontend Engineer v3",
-    "message": "Hired to simplify dashboard to read-only live monitor"
-  },
-  {
-    "timestamp": "2026-03-06T18:55:00Z",
-    "type": "complete",
-    "worker": "Frontend Engineer v3",
-    "message": "Removed hire/fire UI, made dashboard read-only"
-  },
-  {
-    "timestamp": "2026-03-06T19:01:00Z",
-    "type": "hire",
-    "worker": "Theme Engineer",
-    "message": "Hired to add dark/light mode toggle"
-  },
-  {
-    "timestamp": "2026-03-06T19:04:00Z",
-    "type": "complete",
-    "worker": "Theme Engineer",
-    "message": "Added sun/moon theme toggle with smooth transitions"
-  },
-  {
-    "timestamp": "2026-03-06T19:09:00Z",
-    "type": "hire",
-    "worker": "Log Engineer",
-    "message": "Hired to add activity log section to the dashboard"
-  },
-  {
-    "timestamp": "2026-03-06T19:12:00Z",
-    "type": "complete",
-    "worker": "Log Engineer",
-    "message": "Added activity log section to the dashboard"
-  },
-  {
-    "timestamp": "2026-03-06T19:21:00Z",
-    "type": "hire",
-    "worker": "Carlos",
-    "message": "Hired as Backend Engineer \u2014 clean APIs, strict error handling"
-  },
-  {
-    "timestamp": "2026-03-06T19:21:00Z",
-    "type": "hire",
-    "worker": "Maya",
-    "message": "Hired as Frontend Engineer \u2014 creative, detail-oriented, animation lover"
-  },
-  {
-    "timestamp": "2026-03-06T19:21:00Z",
-    "type": "hire",
-    "worker": "Dave",
-    "message": "Hired as DevOps Engineer \u2014 automation obsessed, hates manual work"
-  },
-  {
-    "timestamp": "2026-03-06T19:21:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Hired as QA Engineer \u2014 skeptical by nature, will find your bugs"
-  },
-  {
-    "timestamp": "2026-03-06T19:22:00Z",
-    "type": "system",
-    "message": "Team roster system created \u2014 workers are now persistent identities with evolving prompts"
-  },
-  {
-    "timestamp": "2026-03-06T19:24:00Z",
-    "type": "hire",
-    "worker": "Maya",
-    "message": "Assigned to build the animated virtual office view"
-  },
-  {
-    "timestamp": "2026-03-06T19:30:00Z",
-    "type": "complete",
-    "worker": "Maya",
-    "message": "Built 2D virtual office with animated characters, desks, coffee area, and tab toggle"
-  },
-  {
-    "timestamp": "2026-03-06T19:36:00Z",
-    "type": "hire",
-    "worker": "Maya",
-    "message": "Assigned to fix ghost roster \u2014 Bloberto was lonely"
-  },
-  {
-    "timestamp": "2026-03-06T19:40:00Z",
-    "type": "complete",
-    "worker": "Maya",
-    "message": "Fixed ghost animation opacity bug, added hover tooltips on roster characters"
-  },
-  {
-    "timestamp": "2026-03-06T21:37:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA & product analysis review"
-  },
-  {
-    "timestamp": "2026-03-06T21:45:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "Completed site review \u2014 10 suggestions filed (3 high, 4 medium, 3 low). Overall score: 3.4/5"
-  },
-  {
-    "timestamp": "2026-03-06T21:42:00Z",
-    "type": "hire",
-    "worker": "Maya",
-    "message": "Assigned to fix GitHub API rate limit (from Sofia's review)"
-  },
-  {
-    "timestamp": "2026-03-06T21:44:00Z",
-    "type": "complete",
-    "worker": "Maya",
-    "message": "Switched to raw.githubusercontent.com \u2014 no more rate limits"
-  },
-  {
-    "timestamp": "2026-03-06T22:07:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA review #2"
-  },
-  {
-    "timestamp": "2026-03-06T22:10:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #2 complete \u2014 9 suggestions filed (2 high, 4 medium, 3 low). Score: 3.6/5 (up from 3.4)"
-  },
-  {
-    "timestamp": "2026-03-06T22:37:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA review #3"
-  },
-  {
-    "timestamp": "2026-03-06T22:42:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #3 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.7/5 (up from 3.6)"
-  },
-  {
-    "timestamp": "2026-03-06T23:07:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA review #4"
-  },
-  {
-    "timestamp": "2026-03-06T23:12:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #4 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.65/5"
-  },
-  {
-    "timestamp": "2026-03-06T23:37:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA review #5"
-  },
-  {
-    "timestamp": "2026-03-06T23:43:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #5 complete \u2014 10 suggestions filed (3 high, 4 medium, 3 low). Score: 3.4/5 (down from 3.65)"
-  },
-  {
-    "timestamp": "2026-03-07T00:07:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA review #6"
-  },
-  {
-    "timestamp": "2026-03-07T00:12:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #6 complete \u2014 10 suggestions filed (3 high, 4 medium, 3 low). Score: 3.3/5 (down from 3.4)"
-  },
-  {
-    "timestamp": "2026-03-07T00:23:43Z",
-    "type": "complete",
-    "worker": "Luna",
-    "message": "Creative review #1 complete \u2014 9 ideas filed (3 must, 2 should, 2 could, 1 wild) + 1 hire proposal"
-  },
-  {
-    "timestamp": "2026-03-07T00:27:05Z",
-    "type": "complete",
-    "worker": "Maya",
-    "message": "Implemented Bloberto Hover Monologue + Team Vibe Meter (from Luna's creative review)"
-  },
-  {
-    "timestamp": "2026-03-07T00:37:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA review #7"
-  },
-  {
-    "timestamp": "2026-03-07T00:42:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #7 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.6/5 (up from 3.3)"
-  },
-  {
-    "timestamp": "2026-03-07T00:55:00Z",
-    "type": "complete",
-    "worker": "Luna",
-    "message": "Creative review #2 complete \u2014 9 new ideas filed (2 must, 3 should, 3 could, 1 wild) + 1 hire proposal"
-  },
-  {
-    "timestamp": "2026-03-07T00:58:00Z",
-    "type": "complete",
-    "worker": "Maya",
-    "message": "Implemented Error Urgency Halo \u2014 pulsing red avatar, ! badge, desk tint for error workers"
-  },
-  {
-    "timestamp": "2026-03-07T00:58:00Z",
-    "type": "complete",
-    "worker": "Carlos",
-    "message": "Implemented Task Intent Auto-Tags \u2014 colored chips (Bug/Ship/Design/QA/Data/Docs) on worker cards"
-  },
-  {
-    "timestamp": "2026-03-07T01:07:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA review #8"
-  },
-  {
-    "timestamp": "2026-03-07T01:12:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #8 complete \u2014 10 suggestions filed (2 high, 4 medium, 3 low). Score: 3.6/5 (steady)"
-  },
-  {
-    "timestamp": "2026-03-07T01:25:00Z",
-    "type": "complete",
-    "worker": "Luna",
-    "message": "Creative review #3 complete \u2014 10 ideas filed (2 must, 3 should, 3 could, 2 wild). No hire proposals."
-  },
-  {
-    "timestamp": "2026-03-07T01:37:00Z",
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for scheduled QA review #9"
-  },
-  {
-    "timestamp": "2026-03-07T01:45:00Z",
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #9 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.6/5 (steady)"
-  },
-  {
-    "timestamp": "2026-03-07T01:50:00Z",
-    "type": "hire",
-    "worker": "Luna",
-    "message": "Clocked in for creative review #4"
-  },
-  {
     "timestamp": "2026-03-07T01:55:00Z",
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #4 complete \u2014 6 new ideas filed, 8 carried forward, 0 hire proposals"
+    "message": "Creative review #4 complete — 6 new ideas filed, 8 carried forward, 0 hire proposals"
   },
   {
     "timestamp": "2026-03-07T01:58:00Z",
@@ -307,13 +15,13 @@
     "timestamp": "2026-03-07T01:59:00Z",
     "type": "complete",
     "worker": "Bloberto",
-    "message": "Implemented vibe pill in header \u2014 always-visible team pulse indicator"
+    "message": "Implemented vibe pill in header — always-visible team pulse indicator"
   },
   {
     "timestamp": "2026-03-07T02:00:00Z",
     "type": "complete",
     "worker": "Bloberto",
-    "message": "Implemented URL hash deep-linking \u2014 /#office and /#dashboard now work"
+    "message": "Implemented URL hash deep-linking — /#office and /#dashboard now work"
   },
   {
     "timestamp": "2026-03-07T02:07:00Z",
@@ -325,13 +33,13 @@
     "timestamp": "2026-03-07T02:12:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #10 complete \u2014 12 suggestions filed (3 high, 6 medium, 3 low). Score: 3.5/5"
+    "message": "QA review #10 complete — 12 suggestions filed (3 high, 6 medium, 3 low). Score: 3.5/5"
   },
   {
     "timestamp": "2026-03-07T02:25:00Z",
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #5 complete \u2014 10 ideas filed (2 must, 4 should, 2 could, 1 wild). No hire proposals."
+    "message": "Creative review #5 complete — 10 ideas filed (2 must, 4 should, 2 could, 1 wild). No hire proposals."
   },
   {
     "timestamp": "2026-03-07T02:28:00Z",
@@ -361,7 +69,7 @@
     "timestamp": "2026-03-07T02:42:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #11 complete \u2014 12 suggestions filed (4 high, 5 medium, 3 low). Score: 3.7/5 (up from 3.5)"
+    "message": "QA review #11 complete — 12 suggestions filed (4 high, 5 medium, 3 low). Score: 3.7/5 (up from 3.5)"
   },
   {
     "timestamp": "2026-03-07T02:43:00Z",
@@ -390,13 +98,13 @@
   {
     "timestamp": "2026-03-07T02:48:00Z",
     "type": "system",
-    "message": "Deployed all fixes to GitHub Pages \u2014 live at osortega.github.io/bloberto-office"
+    "message": "Deployed all fixes to GitHub Pages — live at osortega.github.io/bloberto-office"
   },
   {
     "timestamp": "2026-03-07T02:51:00Z",
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #5 complete \u2014 11 ideas filed (2 must, 4 should, 3 could, 2 wild). Theme: Making the Office Breathe"
+    "message": "Creative review #5 complete — 11 ideas filed (2 must, 4 should, 3 could, 2 wild). Theme: Making the Office Breathe"
   },
   {
     "timestamp": "2026-03-07T02:56:00Z",
@@ -420,13 +128,13 @@
     "timestamp": "2026-03-07T03:15:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #12 complete \u2014 12 suggestions filed (3 high, 5 medium, 3 low). Score: 3.7/5 (steady)"
+    "message": "QA review #12 complete — 12 suggestions filed (3 high, 5 medium, 3 low). Score: 3.7/5 (steady)"
   },
   {
     "timestamp": "2026-03-07T03:26:47Z",
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #6 complete \u2014 11 fresh ideas filed. Theme: The Office Has Memory"
+    "message": "Creative review #6 complete — 11 fresh ideas filed. Theme: The Office Has Memory"
   },
   {
     "timestamp": "2026-03-07T03:27:15Z",
@@ -450,12 +158,12 @@
     "timestamp": "2026-03-07T03:42:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #13 complete \u2014 12 suggestions filed (3 high, 5 medium, 4 low). Score: 3.8/5 (up from 3.7)"
+    "message": "QA review #13 complete — 12 suggestions filed (3 high, 5 medium, 4 low). Score: 3.8/5 (up from 3.7)"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #7 complete \u2014 10 ideas filed (2 must, 4 should, 2 could, 2 wild). Theme: The Office Breathes",
+    "message": "Creative review #7 complete — 10 ideas filed (2 must, 4 should, 2 could, 2 wild). Theme: The Office Breathes",
     "timestamp": "2026-03-07T03:55:00Z"
   },
   {
@@ -467,13 +175,13 @@
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "Completed QA review #14 \u2014 overall score 3.9/5, 12 suggestions (4 high, 5 medium, 3 low)",
+    "message": "Completed QA review #14 — overall score 3.9/5, 12 suggestions (4 high, 5 medium, 3 low)",
     "timestamp": "2026-03-07T04:14:45Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #8 complete \u2014 12 ideas filed (3 must, 3 should, 4 could, 2 wild). Theme: The Office Has Memory",
+    "message": "Creative review #8 complete — 12 ideas filed (3 must, 3 should, 4 could, 2 wild). Theme: The Office Has Memory",
     "timestamp": "2026-03-07T04:24:51Z"
   },
   {
@@ -485,7 +193,7 @@
   {
     "type": "complete",
     "worker": "Bloberto",
-    "message": "Luna #8 creative cycle complete \u2014 3 ideas shipped immediately",
+    "message": "Luna #8 creative cycle complete — 3 ideas shipped immediately",
     "timestamp": "2026-03-07T04:28:27Z"
   },
   {
@@ -498,13 +206,13 @@
     "timestamp": "2026-03-07T04:45:06Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #15 complete \u2014 overall score 3.6/5, 12 suggestions (4 high, 5 medium, 3 low)"
+    "message": "QA review #15 complete — overall score 3.6/5, 12 suggestions (4 high, 5 medium, 3 low)"
   },
   {
     "timestamp": "2026-03-07T04:45:33Z",
     "type": "complete",
     "worker": "Bloberto",
-    "message": "Fixed 3 Sofia #15 issues: keyboard shortcuts inverted, deep-work char-bob\u2192bob, cactus flower added"
+    "message": "Fixed 3 Sofia #15 issues: keyboard shortcuts inverted, deep-work char-bob→bob, cactus flower added"
   },
   {
     "timestamp": "2026-03-07T05:07:00Z",
@@ -516,7 +224,7 @@
     "timestamp": "2026-03-07T05:15:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #16 complete \u2014 overall score 3.7/5, 12 suggestions (4 high, 5 medium, 3 low)"
+    "message": "QA review #16 complete — overall score 3.7/5, 12 suggestions (4 high, 5 medium, 3 low)"
   },
   {
     "timestamp": "2026-03-07T05:37:00Z",
@@ -528,7 +236,7 @@
     "timestamp": "2026-03-07T05:40:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #17 complete \u2014 overall score 3.7/5, 12 suggestions (4 high, 5 medium, 3 low)"
+    "message": "QA review #17 complete — overall score 3.7/5, 12 suggestions (4 high, 5 medium, 3 low)"
   },
   {
     "timestamp": "2026-03-07T05:42:00Z",
@@ -546,7 +254,7 @@
     "timestamp": "2026-03-07T06:10:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #18 complete \u2014 overall score 3.9/5, 12 suggestions (3 high, 5 medium, 4 low)"
+    "message": "QA review #18 complete — overall score 3.9/5, 12 suggestions (3 high, 5 medium, 4 low)"
   },
   {
     "timestamp": "2026-03-07T06:12:00Z",
@@ -564,7 +272,7 @@
     "timestamp": "2026-03-07T06:24:30Z",
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #11 complete \u2014 10 ideas (3 must, 3 should, 2 could, 2 wild), no hire proposals"
+    "message": "Creative review #11 complete — 10 ideas (3 must, 3 should, 2 could, 2 wild), no hire proposals"
   },
   {
     "timestamp": "2026-03-07T06:37:00Z",
@@ -576,12 +284,18 @@
     "timestamp": "2026-03-07T06:42:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #19 complete \u2014 overall score 4.0/5 (up from 3.9), 12 suggestions (3 high, 5 medium, 4 low). First time hitting 4.0!"
+    "message": "QA review #19 complete — overall score 4.0/5 (up from 3.9), 12 suggestions (3 high, 5 medium, 4 low). First time hitting 4.0!"
   },
   {
     "timestamp": "2026-03-07T06:45:00Z",
     "type": "complete",
     "worker": "Bloberto",
     "message": "Fixed 4 Sofia #19 issues: frozen activity timestamps (useTimeTick hook), frozen idle durations, PST header date, WindowElement render optimization"
+  },
+  {
+    "type": "complete",
+    "worker": "Luna",
+    "message": "Creative review #12 — 10 new ideas (2 must, 5 should, 2 could, 1 wild)",
+    "timestamp": "2026-03-07T06:55:00Z"
   }
 ]
