@@ -381,5 +381,11 @@
     "type": "complete",
     "worker": "Carlos",
     "message": "Shipped stat trend arrows (\u2191/\u2193 deltas in StatsBar) and task duration color tiers (warn/stuck states)"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "Completed site review #24 \u2014 scored 3.9/5, filed 9 suggestions (3 high, 4 medium, 2 low)",
+    "timestamp": "2026-03-07T18:30:00Z"
   }
 ]

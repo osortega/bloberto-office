@@ -1,55 +1,81 @@
 {
   "creative_director": "Luna",
   "review_number": 14,
-  "timestamp": "2026-03-07T18:02:00Z",
-  "theme": "Ship the Backlog — Review #13 Had Great Ideas, Let's Build Them Before Dreaming New Ones",
+  "timestamp": "2026-03-07T18:04:09Z",
+  "theme": "Every Corner of the Room Should Know What Time It Is",
   "ideas": [
     {
       "priority": "must",
-      "category": "feature",
-      "title": "Stat Card Trend Arrows — Tell Me If It's Getting Better or Worse",
-      "description": "Carried from review #13. Still unimplemented. The stats bar shows counts in isolation — add ↑/↓ trend indicators comparing to previous sync. Small effort, high signal value.",
+      "category": "office-life",
+      "title": "Vacant Desk — The Empty Chair Has a Voice",
+      "description": "The 6th desk slot (bottom-right) is currently a featureless black rectangle when no worker or ghost occupies it. It looks like a rendering bug, not an intentional design choice. Fix: in the DESKS.map rendering in Office.jsx, when `!occ` (no occupant), instead of rendering nothing, render a 'vacant' state: <div className='desk desk--vacant' ...><div className='desk__monitor desk__monitor--vacant' /><div className='desk__nameplate desk__nameplate--vacant'>📋 Vacant</div></div>. CSS: .desk--vacant { opacity: 0.4; border-style: dashed; border-color: var(--border); } .desk__monitor--vacant::after { content: '?'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: var(--text-muted); opacity: 0.5; } .desk__nameplate--vacant { color: var(--text-muted); font-style: italic; letter-spacing: 0.06em; font-size: 0.42rem; } Optionally, add a slow 3s pulse on the dashed border: @keyframes vacant-pulse { 0%,100%{opacity:0.3} 50%{opacity:0.6} } .desk--vacant { animation: vacant-pulse 3s ease-in-out infinite; }. WHY: An empty black box in the middle of the floor reads as 'broken.' A dashed-border faded 'Vacant' desk reads as 'this team has room to grow.' Same pixels, completely different emotional signal. It's the difference between a map with a gap and a map with a '?' marker.",
       "effort": "small",
-      "assigned_to": "carlos",
-      "status": "carried-from-13"
+      "assigned_to": "dave"
     },
     {
       "priority": "must",
-      "category": "feature",
-      "title": "Task Duration Color Tiers — The Stuck Worker Is Glowing Red",
-      "description": "Carried from review #13. Duration-based color tiers on worker-duration element. Workers stuck for hours should visually scream.",
+      "category": "office-life",
+      "title": "Manager Desk Vibe Title — Bloberto's Job Changes With the Room",
+      "description": "The manager desk nameplate always reads 'MANAGER' regardless of the current vibe. It is literally the most prominent static text on the entire floor, center stage, and it never reacts. Fix: in Office.jsx, add a const MGR_TITLES = { crushing: 'CVO', 'on-fire': 'INCIDENT CMD', 'in-flow': 'MANAGER', 'slow-day': 'DIR. OF VIBES', 'after-hours': 'NIGHT WATCH' } above the component. Then replace the <div className='mgr-desk__nameplate'>Manager</div> with <div className='mgr-desk__nameplate'>{MGR_TITLES[vibe] ?? 'MANAGER'}</div>. Add a CSS transition on letter changes: .mgr-desk__nameplate { transition: opacity 0.4s ease; } and use a key prop on the div to trigger a remount fade: key={vibe} — React will unmount/remount the element, and a CSS animation handles the fade: .mgr-desk__nameplate { animation: nameplate-swap 0.4s ease both; } @keyframes nameplate-swap { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }. WHY: Every time the vibe flips from 'slow-day' to 'crushing', Bloberto already gets a new face expression — but the desk sign stays frozen. 'CVO' appearing after a confetti burst is the punctuation on a vibe upgrade. Eleven characters that make the whole office feel alive.",
       "effort": "small",
-      "assigned_to": "carlos",
-      "status": "carried-from-13"
+      "assigned_to": "dave"
     },
     {
       "priority": "should",
-      "category": "visual",
-      "title": "Ghost Desk OOO Nameplate Badge — Make Absence Visible",
-      "description": "Carried from review #13. Ghost workers need dashed borders and OOO badges. The feature exists but is invisible.",
+      "category": "storytelling",
+      "title": "Idle Wanderer Destination Tooltip — The Wander Has a Reason",
+      "description": "Idle characters already have 4 distinct wander path animations (`char--wander-1` through `char--wander-4`) but they carry no narrative. They drift. Assign each wander path a destination story via `data-tooltip` on the Character element. In Office.jsx, add: const WANDER_DESTINATIONS = { 1: '☕ Heading to the coffee corner', 2: '💬 Lingering by the whiteboard', 3: '🪟 Staring out the window', 4: '🧘 Taking a mindful moment' }. In the idle Character render: add tooltip={WANDER_DESTINATIONS[(wanderIdx % 4) + 1]} to the Character props (the Character component already accepts `tooltip` and renders it as `data-tooltip` when not ghost). For the `.char--idle` variant, also update extraProps: const extraProps = (tooltip && variant !== 'ghost') ? { 'data-tooltip': tooltip } : {} — idle workers currently fall through because the extraProps condition explicitly excludes ghost but already supports non-manager characters. Confirm the .char[data-tooltip] CSS rule covers `.char--idle` (it should). WHY: 'Carlos is wandering' is boring. 'Carlos is heading to the coffee corner' is a coworker you know. Two properties worth of data — wanderIdx is already there — and every idle character earns a personality.",
       "effort": "small",
-      "assigned_to": "sofia",
-      "status": "carried-from-13"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Manager Monitor Reactive Screen — CSS-Only Vibe Animations",
-      "description": "Carried from review #13. Add pseudo-element scanlines/flicker per vibe state. Monitor already has data-vibe but only does box-shadow.",
-      "effort": "small",
-      "assigned_to": "dave",
-      "status": "carried-from-13"
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "delight",
-      "title": "Keyboard Shortcut Cheat Sheet — Press ? To Discover",
-      "description": "Carried from review #13. App has shortcuts (1, 2, R) but they're invisible. Add ? overlay.",
+      "title": "Solo Worker Spotlight — Running Solo Deserves a Stage",
+      "description": "When only one worker is active (activeWorkers.length === 1), the Dashboard worker grid shows a single card in the top-left of a massive empty grid — visually identical to a broken layout. This is the most lonely, unintentional-looking state in the app. Fix: in App.jsx, add a conditional wrapper: when `activeWorkers.length === 1 && !isLoading`, wrap the workers-grid in a className that also adds 'workers-grid--solo'. CSS: .workers-grid--solo { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; } .workers-grid--solo .worker-card { max-width: 440px; width: 100%; border-color: var(--accent); box-shadow: 0 0 28px rgba(139,92,246,0.18); } Below the worker card (still inside the solo wrapper), render a spotlight message: <div className='solo-spotlight-msg'>🌟 Running solo today. Carrying the whole team on one pair of hands.</div>. CSS: .solo-spotlight-msg { font-size: 0.78rem; color: var(--text-muted); text-align: center; font-style: italic; max-width: 340px; line-height: 1.6; animation: spotlight-fade 0.8s ease both; } @keyframes spotlight-fade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }. WHY: A solo worker state is a story. It's a Saturday grind, a launch crunch, an overtime hero. Right now it just looks like the grid didn't load. A centered card with a gentle glow and one sentence of copy transforms the loneliest dashboard view into the most human one.",
       "effort": "small",
-      "assigned_to": "sofia",
-      "status": "carried-from-13"
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Ghost Character 'Last Seen' Bio — Make Absence Tell a Story",
+      "description": "Ghost characters currently show a hover bubble with only '📵 OOO / [role]' — the role is already visible on the desk nameplate, so the bubble doubles down on the same data. Ghost workers are roster members who aren't active, and their last activity is already available in the activity log. Enrich the bubble: in Office.jsx's Component for variant==='ghost', pass activityEntries down from the parent. Currently Office.jsx receives workers and roster as props but not activityEntries — add it: <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} /> in App.jsx. In Office.jsx function signature, accept activityEntries = []. Pass activityEntries={activityEntries} to the ghost Character elements. In Character, when variant === 'ghost', find: const lastEvent = activityEntries.filter(e => e.worker === worker.name).at(-1). In the ghost-ooo-bubble, render: <div className='ghost-ooo-bubble'>📵 OOO<br/><span className='ghost-ooo-role'>{worker.role}</span>{lastEvent && <span className='ghost-last-seen'>Last seen: {getRelativeTime(lastEvent.timestamp)}</span>}</div>. Add ghost-last-seen CSS: .ghost-last-seen { display: block; font-size: 0.55rem; color: var(--text-muted); margin-top: 3px; opacity: 0.75; }. WHY: 'OOO / QA Engineer' tells you nothing new. 'Last seen: 22m ago' makes you feel the absence. The team already has ghost workers as a feature — this completes it by turning a placeholder into a memory.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Vibe-Reactive Background Particles — The Ambient Field Knows the Score",
+      "description": "The floating colored squares in the app background are visually fun but completely disconnected from state — they drift the same way whether the team is crushing it or on fire. These particles live in the confetti-layer div (active only during confetti bursts) but there also appear to be CSS-driven background particles (the colored squares visible in the screenshot). In App.jsx, add a persistent ambient-particles layer: <div className='ambient-particles' data-vibe={teamVibe.key} aria-hidden='true'>{Array.from({length:12},(_,i)=><span key={i} className='ambient-particle' style={{'--i':i}} />)}</div>. CSS: .ambient-particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; } .ambient-particle { position:absolute; width:4px; height:4px; border-radius:1px; opacity:0.15; animation: ambient-drift calc(8s + var(--i) * 1.3s) ease-in-out infinite alternate; left: calc(var(--i) * 8.3%); top: calc(50% + sin(var(--i)) * 30%); } @keyframes ambient-drift { from{transform:translateY(-40px) rotate(0deg)} to{transform:translateY(40px) rotate(90deg)} }. Data-vibe-based color and speed: [data-vibe='crushing'] .ambient-particle { background:#4ade80; animation-duration:calc(4s + var(--i) * 0.8s); } [data-vibe='on-fire'] .ambient-particle { background:#f87171; opacity:0.22; animation-timing-function:steps(3); } [data-vibe='slow-day'] .ambient-particle { background:#9ca3af; animation-duration:calc(14s + var(--i) * 2s); } [data-vibe='after-hours'] .ambient-particle { background:#8b5cf6; opacity:0.1; } [data-vibe='in-flow'] .ambient-particle { background:#60a5fa; } Respect prefers-reduced-motion: @media(prefers-reduced-motion:reduce){.ambient-particle{animation:none}}. WHY: Ambient motion is the cheapest and most powerful way to telegraph state. A page that breathes faster when the team is crushing it, and barely moves when everyone's idle, communicates vibe before the user reads a single word.",
+      "effort": "medium",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Footer Vibe Tagline — The Footer Is Tired of Being Ignored",
+      "description": "The footer has been 'Built with 💜 and mild existential dread by 🫠 Bloberto · If it compiles, ship it. · v1.0.0-chaos' for its entire life. It never changes. Nobody reads it. Fix that. In App.jsx, add a const FOOTER_TAGLINES object above the App component: { crushing: 'productivity charts are going vertical. don\\'t look down.', 'on-fire': 'if it deploys, that\\'s someone else\\'s problem.', 'in-flow': 'if it compiles, ship it.', 'slow-day': 'maybe it works? nobody knows.', 'after-hours': 'the servers are watching. go home.' }. Replace the static tagline string in the footer JSX with: <span className='footer-tagline'>&ldquo;{FOOTER_TAGLINES[teamVibe.key] ?? FOOTER_TAGLINES['in-flow']}&rdquo;</span>. Wrap it in a key={teamVibe.key} so it fades in on change: .footer-tagline { animation: footer-tag-in 0.5s ease both; } @keyframes footer-tag-in { from{opacity:0} to{opacity:1} }. WHY: The footer is the last thing a person sees before they close the tab. 'The servers are watching. Go home.' at midnight during after-hours is the kind of copy that makes someone take a screenshot. It costs zero state — teamVibe is already in App scope. Five strings that make the product feel written-by-a-person.",
+      "effort": "small",
+      "assigned_to": "luna"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Progress Bar Milestone Flash — The Bar Celebrates the Checkpoints",
+      "description": "The progress bar has a beautiful `progress-bar-fill--overflow` state but is otherwise silent at all intermediate milestones. Nothing happens when a worker crosses 25%, 50%, or 75%. These are the natural narrative checkpoints of a workday — 'halfway there', 'almost done'. In WorkerCard, add: const milestonesRef = useRef(new Set()); const [flashClass, setFlashClass] = useState(''). Add a useEffect that watches worker.progress: useEffect(() => { const MILESTONES = [25, 50, 75, 100]; for (const m of MILESTONES) { if (worker.progress >= m && !milestonesRef.current.has(m)) { milestonesRef.current.add(m); setFlashClass(`progress-milestone-${m}`); const t = setTimeout(() => setFlashClass(''), 600); return () => clearTimeout(t); } } }, [worker.progress]). Apply flashClass to the progress-bar-fill div: className={`progress-bar-fill${...} ${flashClass}`}. CSS for each milestone: .progress-milestone-25, .progress-milestone-50, .progress-milestone-75, .progress-milestone-100 { animation: milestone-ring 0.6s cubic-bezier(0.34,1.56,0.64,1) both; } @keyframes milestone-ring { 0%{box-shadow:0 0 0 0 rgba(139,92,246,0.6)} 50%{box-shadow:0 0 0 6px rgba(139,92,246,0)} 100%{box-shadow:0 0 0 0 rgba(139,92,246,0)} }. Use a gold ring for 100%: .progress-milestone-100 { animation: milestone-ring-complete 0.6s cubic-bezier(0.34,1.56,0.64,1) both; } @keyframes milestone-ring-complete { 0%{box-shadow:0 0 0 0 rgba(251,191,36,0.7)} 50%{box-shadow:0 0 0 8px rgba(251,191,36,0)} 100%{box-shadow:0 0 0 0 rgba(251,191,36,0)} }. WHY: Right now progress goes from 10% to 100% in the same visual silence. A ring pulse at 50% and a gold ring at 100% transforms a percentage into a pacing narrative. Workers feel like they're crossing finish lines, not just incrementing a number.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "wild",
+      "category": "feature",
+      "title": "Office After-Hours Screensaver Mode — When Nobody's Looking, Bloberto Glitches",
+      "description": "The app already detects user inactivity via IDLE_TIMEOUT (10 minutes) and slows polling. But the visual experience is unchanged — the office just sits there, empty, boring. After the inactivity timeout fires, switch the office floor into 'screensaver mode'. In App.jsx, add const [screensaverActive, setScreensaverActive] = useState(false). When Date.now() - lastActivity.current > IDLE_TIMEOUT in the poll tick, also call setScreensaverActive(true). On any user interaction event (the existing touch handler), add setScreensaverActive(false). Pass screensaverActive to Office. In Office.jsx, add className={`office-floor${screensaverActive ? ' office-floor--screensaver' : ''}`}. CSS: .office-floor--screensaver { animation: screensaver-pan 12s ease-in-out infinite alternate; filter: saturate(0.4) brightness(0.7); } @keyframes screensaver-pan { from{transform:scale(1.0) translateX(0)} to{transform:scale(1.06) translateX(-2%)} }. On the Bloberto character, when screensaverActive, add a special speech bubble: override the ambient interval with an immediate 'wake-up' quote: 'I saw that. You went idle. Tsk.' when the user returns (setScreensaverActive(false) triggers a useEffect that calls setBubble on the next render). In App.jsx, add a persistent overlay: {screensaverActive && <div className='screensaver-overlay' onClick={() => setScreensaverActive(false)}><span>Click to wake up Bloberto&apos;s Office</span></div>}. CSS: .screensaver-overlay { position:fixed; inset:0; z-index:50; display:flex; align-items:flex-end; justify-content:center; padding-bottom:3rem; pointer-events:auto; } .screensaver-overlay span { font-size:0.7rem; color:rgba(196,181,253,0.3); letter-spacing:0.15em; text-transform:uppercase; animation:blink 2s step-start infinite; } @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}. WHY: Every great dashboard that gets left on a wall or a second monitor needs a screensaver moment. It proves the app is alive and watching. The 'I saw that. You went idle. Tsk.' quote when the user returns is the kind of thing people post on Slack. This is also the first feature that directly uses the existing IDLE_TIMEOUT logic for something visible — it already fires, it just does nothing right now.",
+      "effort": "medium",
+      "assigned_to": "tbd"
     }
   ],
-  "hire_proposals": [],
-  "notes": "Review #14 focused on auditing the backlog. All 9 ideas from review #13 remain unimplemented. Recommending we ship the top 5 (2 must, 3 should) before generating new ideas. No point dreaming if we're not building."
+  "hire_proposals": []
 }
