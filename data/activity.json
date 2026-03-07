@@ -224,5 +224,17 @@
     "type": "complete",
     "worker": "Maya",
     "message": "Implemented Bloberto Hover Monologue + Team Vibe Meter (from Luna's creative review)"
+  },
+  {
+    "timestamp": "2026-03-07T00:37:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for scheduled QA review #7"
+  },
+  {
+    "timestamp": "2026-03-07T00:42:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #7 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.6/5 (up from 3.3)"
   }
 ]
