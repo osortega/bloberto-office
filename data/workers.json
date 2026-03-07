@@ -1,3 +1,24 @@
 {
-  "workers": []
+  "workers": [
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "emoji": "🎨",
+      "status": "working",
+      "task": "Implementing desk nameplates with status glow (Luna idea #1)",
+      "progress": 5,
+      "updated_at": "2026-03-07T06:25:00Z"
+    },
+    {
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "⚙️",
+      "status": "working",
+      "task": "Implementing error badge on dashboard tab (Luna idea #2)",
+      "progress": 5,
+      "updated_at": "2026-03-07T06:25:00Z"
+    }
+  ]
 }
