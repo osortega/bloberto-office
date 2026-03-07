@@ -19,16 +19,6 @@
       "progress": 0,
       "hired_at": "2026-03-06T19:21:00Z",
       "updated_at": "2026-03-07T01:26:00Z"
-    },
-    {
-      "id": "luna",
-      "name": "Luna",
-      "role": "Creative Director",
-      "status": "working",
-      "task": "Creative review #4 — reviewing codebase and generating new ideas",
-      "progress": 0,
-      "hired_at": "2026-03-06T22:00:00Z",
-      "updated_at": "2026-03-07T01:50:00Z"
     }
   ],
   "roster": [
@@ -63,6 +53,6 @@
       "emoji": "🌙"
     }
   ],
-  "last_updated": "2026-03-07T01:50:00Z",
+  "last_updated": "2026-03-07T01:55:00Z",
   "manager": "Bloberto"
 }

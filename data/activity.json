@@ -284,5 +284,17 @@
     "type": "complete",
     "worker": "Sofia",
     "message": "QA review #9 complete — 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.6/5 (steady)"
+  },
+  {
+    "timestamp": "2026-03-07T01:50:00Z",
+    "type": "hire",
+    "worker": "Luna",
+    "message": "Clocked in for creative review #4"
+  },
+  {
+    "timestamp": "2026-03-07T01:55:00Z",
+    "type": "complete",
+    "worker": "Luna",
+    "message": "Creative review #4 complete — 6 new ideas filed, 8 carried forward, 0 hire proposals"
   }
 ]

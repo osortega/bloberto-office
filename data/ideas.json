@@ -1,8 +1,8 @@
 {
   "creative_director": "Luna",
-  "timestamp": "2026-03-07T01:21:58Z",
-  "review_number": 3,
-  "theme": "The Office Is Alive — Every Pixel Should Tell a Story, Every Moment Should Earn a Memory",
+  "timestamp": "2026-03-07T01:51:51Z",
+  "review_number": 4,
+  "theme": "One Office, Two Lenses — Bridge the Gap Between the Floor and the Dashboard So They Feel Like the Same Truth",
   "ideas": [
     {
       "priority": "must",
@@ -83,6 +83,55 @@
       "description": "Add a fixed-position horizontal ticker strip at the very bottom of the viewport (above the footer, position: sticky; bottom: 0; z-index: 50). The ticker streams recent activity log entries as scrolling news-headline text — rendered as a CSS marquee animation on a compact dark pill-shaped container. Each entry is prefixed with its type icon and worker name: '🟢 Carlos joined the office · ✅ Maya completed Deploy staging pipeline · ❌ Dave encountered an error in CI build ·'. Entries are dequeued from the activity log on each sync cycle; new entries slide in from the right. The ticker pauses on hover via CSS animation-play-state: paused. A dismiss button saves a localStorage preference to hide it permanently. The activity log is already fetched and stored in state — the ticker is a new consumer of existing data. WHY: The activity log is a panel you have to scroll down to reach. The ticker surfaces events to the top of awareness without requiring navigation. It creates a sense of a living, active newsroom — something is always happening in this office. It's also the most screenshot-worthy addition we could ship.",
       "effort": "large",
       "assigned_to": "tbd"
+    },
+
+    {
+      "priority": "must",
+      "category": "delight",
+      "title": "Context-Aware Bloberto Quotes — The Manager Should Sound Like He Knows What's Going On",
+      "description": "The MANAGER_QUOTES array in Office.jsx is a flat 8-entry list that fires randomly on hover regardless of what's actually happening. Replace it with a VIBE_QUOTES object keyed by vibe name, each holding 5–6 targeted quotes. Examples — on-fire: ['Have you tried rebooting the engineers?', 'This is fine. This is all fine.', 'Ship it. What's the worst that could happen? (Please don't answer that.)'], crushing: ['I knew all along this team was special.', 'Velocity like this doesn't just happen — it happens because I scheduled stand-up at 9am.', 'Per my roadmap from Q3, we're exactly on track.'], slow-day: ['Per my last email, is anyone actively watching the metrics?', 'Circles. We need to circle back. Bring the circles.'], after-hours: ['Why are you still here? Go home. I mean... I am always here, but you shouldn't be.', 'The deploy can wait. Can it though?']. In the Office component's render, the vibe is already computed (line ~323 via getTeamVibe). Pass it to Character as a managerVibe prop. In handleMouseEnter, look up VIBE_QUOTES[managerVibe] ?? MANAGER_QUOTES and pick randomly. Zero new state, zero new props beyond managerVibe. ~40 lines total. WHY: Bloberto already speaks. Right now he says the same things whether the office is on fire or crushing it. Context-aware quotes make him feel like an actual manager who's vaguely aware of things — which is exactly the joke. It's free comedy from data you're already computing.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Vibe Pill in the App Header — Team Pulse Always Visible, Never Buried",
+      "description": "getTeamVibe() is called inside StatsBar (App.jsx, ~line 234) but its output never escapes the Dashboard tab. The header is always visible regardless of active tab — yet it currently shows only the greeting and date. Call getTeamVibe(activeWorkers) once at the top of the App component's return (or lift it into a useMemo) and render a small .vibe-pill span alongside the .header-badge in the .header-right div. The pill shows the full vibe.label (e.g. '🔥 Crushing It'). In App.css, .vibe-pill inherits .header-badge base styles (surface2 bg, border-radius: 20px) then adds a data-vibe attribute so CSS can tint: [data-vibe='on-fire'] { border-color: var(--red); color: var(--red); } etc., matching the existing vibe color tokens already defined in App.css (lines 105–109). WHY: Right now you can only see team vibe by visiting the Dashboard tab and reading the stats bar. If you're on the Office tab watching characters walk around, you have zero ambient signal about how the team is actually doing. The header pill bridges the two tabs — Office and Dashboard stop feeling like separate apps and start feeling like two views of the same truth.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "delight",
+      "title": "Progress Milestone Pulse — The Bar Should Celebrate the Quarter-Marks",
+      "description": "In App.jsx, add prevProgressRef = useRef({}) tracking the last known progress per worker ID. In the useEffect that processes activeWorkers changes (the same block that handles newIds and fading), iterate workers and compare w.progress to prevProgressRef.current[w.id]. If the new value just crossed 25, 50, 75, or 100 (i.e., old < threshold <= new), add w.id to a milestoneSet state (a Set<string>). After 1200ms, remove each w.id from milestoneSet via a timeout ref (clean up in useEffect return). WorkerCard receives isMilestone={milestoneSet.has(worker.id)}. When true, add class progress-bar-fill--milestone to the fill div. In App.css: @keyframes milestone-flash { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } 40% { box-shadow: 0 0 18px 4px rgba(255,255,255,0.7); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); } } — a bright white glow that travels the bar and fades out. WHY: 26%, 49%, 74%, 99% are invisible. 25%, 50%, 75%, 100% are milestones. The difference between a progress indicator and a progress story is ceremony at the right moments. This is the lightest-weight delight we can add to the most-viewed element on every card.",
+      "effort": "medium",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "visual",
+      "title": "Role Color Glow on Worker Card Avatars — One Map Already Exists, Use It",
+      "description": "ROLE_COLORS is defined in Office.jsx (lines 15–26) mapping role strings to hex colors, but WorkerCard in App.jsx only uses a text emoji in the .worker-avatar div with no color signal. Duplicate the ROLE_COLORS object at the top of App.jsx (or extract it to src/constants.js and import from both). Set --role-color as an inline CSS variable on the .worker-card root div: style={{ '--i': index, '--role-color': ROLE_COLORS[worker.role] ?? '#6b7280' }}. In App.css, extend the .worker-card .worker-avatar rule: box-shadow: 0 0 10px color-mix(in srgb, var(--role-color) 50%, transparent); border: 1.5px solid color-mix(in srgb, var(--role-color) 35%, transparent); This makes a Frontend Engineer's avatar glow purple (#a78bfa), a Backend Engineer's blue (#38bdf8), a QA Engineer's rose (#f43f5e). Zero behavior change, zero new state. WHY: Right now two workers with different roles look identical on their cards — only the status badge differentiates them. Role color gives each person a visual identity that's consistent between the Office SVG avatars and the Dashboard cards, making the two tabs feel like a unified system instead of two separate UIs.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "feature",
+      "title": "URL Hash Tab Deep-Linking — The Office Should Be a Place You Can Link To",
+      "description": "The tab toggle in App.jsx uses useState('office') but the browser URL never reflects the active tab. When someone wants to share the Office view specifically, they can't — the URL always opens to the same default. Fix: in the setTab calls (onClick handlers on both tab buttons, ~lines 537 and 549), also call window.location.replace('#' + newTab). On initial state initialization, change useState('office') to useState(() => { const h = window.location.hash.slice(1); return h === 'dashboard' || h === 'office' ? h : 'office'; }). That's 3 lines total — one state initializer change, two setTab augmentations. No React Router needed. Result: /#office and /#dashboard become valid deep links that survive page reload and can be bookmarked or pasted in Slack. WHY: The Office tab is the showpiece. Right now there's no way to link directly to it — every link opens the dashboard. This is a 3-line fix for a real sharing UX gap, and it makes the app feel complete.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "wild",
+      "category": "storytelling",
+      "title": "Vibe Shift Reactions — Characters Should Feel the Change in the Room",
+      "description": "Track the previous vibe in a prevVibeRef = useRef(null) in Office.jsx. On each render, compare the freshly computed vibe string to prevVibeRef.current and update the ref. If the vibe changed (e.g., slow-day → on-fire, or crushing → slow-day), add a reactions array to component state: each entry is { id, emoji, left, top } where left/top are derived from the visible character positions (workers mapped to their desk coordinates from the DESKS array, or Bloberto's fixed left: 46, top: 4). Each reaction renders as an absolutely-positioned <div className='vibe-reaction'> containing the reaction emoji: 🎉 for crushing, 😱 for on-fire, 😤 for slow-day, 🌙 for after-hours, ⚡ for in-flow. In Office.css: @keyframes reaction-float { from { transform: translateY(0) scale(0.5); opacity: 1; } to { transform: translateY(-64px) scale(1.2); opacity: 0; } } .vibe-reaction { animation: reaction-float 1.3s ease-out forwards; pointer-events: none; z-index: 20; position: absolute; font-size: 1.1rem; }. Remove each reaction from state after 1400ms via setTimeout cleanup. The office floor already has overflow: hidden — particles stay contained. WHY: Vibe shifts are the most dramatic events in the simulation — going from grinding to on-fire should feel like something seismic. Floating emoji particles from each character make the office react to the data the way a real office would: people notice when things change. It's 40 lines and it might be the single most delightful second in this entire app.",
+      "effort": "medium",
+      "assigned_to": "carlos"
     }
   ],
   "hire_proposals": []
