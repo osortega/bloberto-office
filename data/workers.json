@@ -14,11 +14,11 @@
       "id": "maya",
       "name": "Maya",
       "role": "Frontend Engineer",
-      "status": "working",
-      "task": "Sprint: 4 high-priority fixes from Sofia QA #14",
-      "progress": 0,
+      "status": "idle",
+      "task": "Sprint complete: 4 high-priority fixes from QA #14",
+      "progress": 100,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T04:16:00Z"
+      "updated_at": "2026-03-07T04:18:00Z"
     },
     {
       "id": "carlos",
@@ -93,6 +93,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T04:16:00Z",
+  "last_updated": "2026-03-07T04:18:00Z",
   "manager": "Bloberto"
 }
