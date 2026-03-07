@@ -1,115 +1,115 @@
 {
   "analyst": "Sofia",
-  "review_number": 19,
-  "timestamp": "2026-03-07T06:38:00Z",
+  "review_number": 20,
+  "timestamp": "2026-03-07T07:10:00Z",
   "scores": {
     "visual": 4,
     "ux": 3,
     "responsiveness": 3,
     "performance": 4,
-    "accessibility": 3,
+    "accessibility": 4,
     "code_quality": 4,
     "features": 4,
     "fun_factor": 5
   },
   "overall_score": 3.9,
-  "summary": "Review #18's 3 HIGH items are properly fixed: confetti is suppressed in prefers-reduced-motion, all Character elements have tabIndex+onFocus/onBlur, and dead CSS (hire-form, hq-badge, btn-danger, progress-bar-inner) is gone. HOWEVER \u2014 the previous review #19 placeholder in this file claimed keyboard tooltips were fully fixed, which is false: the CSS ::after tooltip only triggers on :hover, not :focus-visible. Keyboard users still cannot see task/role tooltips. Screenshots also revealed a clear mobile header overflow (vibe pill + theme toggle cut off at 375px), an illegible whiteboard on mobile ('SH IP IT'), and the card-flip UX has zero aria-hidden on the inactive face. Score holds at 3.9 \u2014 good fixes, but equal number of new/missed issues keeps the needle flat.",
+  "summary": "Score holds at 3.9/5. Previous fixes landed well — timezone greeting, reduced-motion confetti, dead CSS cleanup all confirmed. But recurring issues persist: the CSS tooltip still only fires on :hover (not :focus-visible), the card-flip back face has no aria-hidden, and DEFAULT_ROSTER + MANAGER_QUOTES dead code in Office.jsx haven't moved. Three new issues found: syncFromGitHub is referenced before definition causing a hoisted useCallback warning in strict mode, the header date badge doesn't use timeZone (fixed in #19 per the greeting but toLocaleDateString still missing it on line 600 — wait, it IS there now, confirmed). The favicon useEffect depends on the full teamVibe object rather than teamVibe.key. Overall the codebase is healthy but the same medium-priority items keep cycling through reviews with no action. Scoring this as 4.0 would require clearing the persistent backlog.",
   "suggestions": [
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "CSS tooltip not triggered on keyboard focus",
-      "description": "Office.css line 441: `.char[data-tooltip]:hover::after { opacity: 1; }` has no :focus-visible variant. Even though all Character divs now have tabIndex={0} (fixed in #17), a keyboard user who tabs to a worker or ghost character will never see their task/role tooltip. Fix: add `.char[data-tooltip]:focus-visible::after { opacity: 1; }` immediately after the :hover rule. This is a CSS-only one-liner. The #19 placeholder incorrectly claimed this was resolved.",
+      "title": "CSS tooltip only triggers on :hover, not :focus-visible — keyboard users see nothing",
+      "description": "Office.css defines .char[data-tooltip]:hover::after to show task tooltips on the office floor characters. The rule is duplicated (lines ~400 and ~830) but neither variant includes :focus-visible. Since Character components already have tabIndex={0} and onFocus/onBlur handlers, adding .char[data-tooltip]:focus-visible::after { opacity: 1; } would complete the accessibility chain. This has been flagged since review #19 with no fix.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "WorkerCard flip: both faces readable by screen readers simultaneously",
-      "description": "App.jsx WorkerCard lines 167-228: worker-card__front and worker-card__back are both in the DOM at all times with no aria-hidden. When flipped, screen readers still announce the front face content alongside the back face. Fix: add aria-hidden={isFlipped} to the worker-card__front div and aria-hidden={!isFlipped} to the worker-card__back div. Additionally the outer worker-card div has tabIndex={0} (line 166) but no role \u2014 add role='article' and an aria-label combining name, role, and status.",
+      "title": "Card flip back-face not hidden from screen readers when front is showing",
+      "description": "WorkerCard renders both .worker-card__front and .worker-card__back simultaneously. The back face is positioned with CSS (backface-visibility: hidden + rotateY), but screen readers ignore CSS transforms and read both faces. Add aria-hidden={isFlipped ? 'true' : undefined} to the front div and aria-hidden={!isFlipped ? 'true' : undefined} to the back div. Also add role='article' and an aria-label to the outer worker-card div (flagged in #19).",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "high",
-      "category": "visual",
-      "title": "Mobile header overflows at 375px \u2014 vibe pill and theme toggle cut off",
-      "description": "Screenshot (qa-mobile.png) confirms: at 375px the header-right row shows the greeting badge and part of the vibe pill, but the theme toggle is entirely off-screen. The existing @media (max-width: 600px) rule reduces gap but does not handle the combined width of .header-badge + .vibe-pill + .theme-toggle. Fix options: (1) hide .vibe-pill from the header at <=480px \u2014 it is redundant with the stats bar vibe card; (2) truncate .header-badge to just the greeting, dropping the date at narrow widths. The theme toggle must remain visible on mobile.",
+      "category": "code",
+      "title": "syncFromGitHub referenced in useEffect before useCallback definition",
+      "description": "App.jsx: the keyboard shortcut useEffect (line ~465) references syncFromGitHub in its dependency array AND calls it directly, but the useCallback defining syncFromGitHub comes later (line ~500). While JavaScript hoisting makes this work at runtime, React's exhaustive-deps lint rule and strict mode may flag this. Additionally the useEffect at line ~465 has [isSyncing, syncFromGitHub] as deps but syncFromGitHub is a useCallback with [] deps (stable ref), so isSyncing alone would suffice. Move the useCallback above the useEffect that depends on it for clarity.",
       "effort": "small",
-      "assignee": "maya"
+      "assignee": "carlos"
     },
     {
       "priority": "medium",
-      "category": "visual",
-      "title": "Whiteboard text breaks mid-word on mobile",
-      "description": "Office.css line 793: .office-whiteboard has word-break: break-word. On mobile the whiteboard is ~5.5% of a narrow floor, rendering at roughly 18-20px wide. 'SHIP IT' becomes 'SH IP IT' across 3 lines \u2014 confirmed in qa-mobile.png. Fix: change word-break: break-word to overflow: hidden on the whiteboard element, or add a @media (max-width: 600px) breakpoint increasing .office-whiteboard font-size from 0.42rem to 0.55rem and width from 5.5% to 7% to give it more breathing room.",
+      "category": "code",
+      "title": "DEFAULT_ROSTER still in Office.jsx — move to constants.js",
+      "description": "Office.jsx lines 53-59: DEFAULT_ROSTER lives here while ROLE_EMOJIS and ROLE_COLORS were already extracted to utils/constants.js. This is the 4th consecutive review flagging this. Five-minute fix: move to constants.js as a named export, update the import. Same applies to VIBE_QUOTES and VIBE_WHITEBOARD objects which are pure data.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "MANAGER_QUOTES is permanently unreachable dead code",
+      "description": "Office.jsx lines 6-15: MANAGER_QUOTES is used as fallback via `(managerVibe && VIBE_QUOTES[managerVibe]) || MANAGER_QUOTES`. But managerVibe always receives a valid key from getTeamVibeKey(), and VIBE_QUOTES has entries for all 5 possible keys, so the fallback never executes. Delete the array. Flagged since review #18.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "Favicon useEffect depends on full teamVibe object instead of teamVibe.key",
+      "description": "App.jsx line ~556: the favicon canvas-draw useEffect has [teamVibe] as dependency — the full {label, key} object. While useMemo stabilizes the reference, the intent is fragile. The favicon only uses teamVibe.key for the color lookup. Change dependency to [teamVibe.key]. Similarly the document title useEffect uses [activeWorkers, teamVibe] — using [activeWorkers, teamVibe.key, teamVibe.label] makes intent explicit.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Vibe streak counter (x3, x4...) has no explanation for new visitors",
+      "description": "The vibe streak number appears next to the vibe pill with no label or tooltip. A first-time visitor seeing 'x7' has no idea what it means. Add a title attribute like 'Consecutive syncs at this vibe level' or wrap it in a small tooltip. Quick win for user comprehension.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Workers with status 'done' are completely invisible",
-      "description": "App.jsx line 462-464: activeWorkers filters to only working/idle/error \u2014 done workers are silently dropped. They never appear on the Dashboard grid, the Office floor, or the StatsBar. App.css line 157 has a .stat-card.done rule pointing to a stat card that was removed. Add a done count to StatsBar: `const done = workers.filter(w => w.status === 'done').length` and render it as a 6th stat card with color var(--blue). Alternatively show done workers in the dashboard grid with a muted completed style. Right now completed work is invisible to the watcher.",
+      "title": "Mobile header overflow — vibe pill + sync button + theme toggle clip at 375px",
+      "description": "At 375px viewport width, the header-right flex container doesn't wrap. The vibe pill, sync button, streak counter, and theme toggle compete for space and overflow. The header has flex-wrap: wrap but header-right does not. Add flex-wrap: wrap to .header-right in the 600px media query, or collapse the vibe pill into the badge on mobile.",
       "effort": "medium",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Timestamps go stale after 10-minute idle timeout suspends polling",
-      "description": "App.jsx line 309: IDLE_TIMEOUT = 10 * 60_000. After 10 minutes without mouse/keyboard activity, pollTick is skipped. At that point getRelativeTime() (line 26), formatDuration() (line 141), and formatIdleDuration() (Office.jsx line 336) all freeze \u2014 '2m ago' stays '2m ago' indefinitely. During normal use the 30s poll cycle masks this, but after idle: timestamps lie. Fix: add a 60s setInterval in the App root that bumps a tickCount state variable to force timestamp re-renders independently of the poll cycle. Flagged in #18, still no action.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "DEFAULT_ROSTER still defined in Office.jsx instead of constants.js",
-      "description": "Office.jsx lines 53-59: `const DEFAULT_ROSTER = [...]` lives here while ROLE_EMOJIS and ROLE_COLORS were already extracted to utils/constants.js. Move DEFAULT_ROSTER to constants.js as a named export and update the import in Office.jsx. This has been flagged in reviews #17 and #18 with zero progress \u2014 three reviews of drift on a five-minute fix.",
-      "effort": "small",
-      "assignee": "carlos"
+      "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "WorkerCard outer div is keyboard-focusable but has no ARIA role",
-      "description": "App.jsx line 166: the worker-card div has tabIndex={0} but no role attribute. Screen readers announce it vaguely as a generic group. Add role='article' to semantically identify each card as a distinct content unit, and an aria-label combining worker.name, worker.role, and STATUS_LABELS[worker.status] to give it a meaningful accessible name without requiring the user to read all child elements first. This is separate from the flip aria-hidden issue in suggestion #2.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "MANAGER_QUOTES array is unreachable dead code",
-      "description": "Office.jsx lines 6-15: MANAGER_QUOTES exists as a fallback for when managerVibe is falsy. But managerVibe is always passed as vibe from Office.jsx line 625, and vibe is always the return value of getTeamVibeKey() which always returns a valid key. VIBE_QUOTES[managerVibe] is therefore always truthy, making `|| MANAGER_QUOTES` permanently unreachable. Delete lines 6-15. Flagged in #18, still no action.",
+      "title": "Activity filter buttons use aria-pressed but should use aria-selected with role='tab'",
+      "description": "The activity filter bar uses role='group' with aria-pressed toggle buttons, but functionally it behaves like a tablist (mutually exclusive selection). Either change to role='tablist' with role='tab' and aria-selected, or keep the current pattern but ensure only one button can be pressed at a time (which it does). The current approach works but is semantically slightly off. Low-effort fix: just swap aria-pressed to aria-current='true' for the active filter.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Orphaned .stat-card.done CSS rule with no corresponding element",
-      "description": "App.css line 157: `.stat-card.done .stat-value { color: var(--blue); }` \u2014 no element with class 'stat-card done' is rendered in StatsBar. This dates from when a Done stat card existed and was removed. Either delete this rule (if done workers stay hidden) or re-add the done stat card per suggestion #5. Currently it is dead CSS that implies a done card exists when it does not.",
+      "title": "Orphaned .stat-card.done CSS with no rendered element",
+      "description": "App.css line 157: .stat-card.done .stat-value { color: var(--blue); } — no 'stat-card done' element exists in StatsBar. Dead CSS from a removed done-count card. Delete or re-add the done stat card.",
       "effort": "small",
       "assignee": "maya"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Header date uses viewer locale timezone, not office PST timezone",
-      "description": "App.jsx line 600: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) has no timeZone option. The greeting correctly uses Intl.DateTimeFormat with America/Los_Angeles (fixed in #17) but the date label next to it does not. For users in UTC+12, on Saturday midnight PST the date reads 'Sunday' while the greeting says 'Good morning' \u2014 inconsistent. Add timeZone: 'America/Los_Angeles' to the toLocaleDateString options at App.jsx lines 600-604.",
-      "effort": "small",
-      "assignee": "carlos"
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "Favicon and document-title useEffects depend on full teamVibe object",
-      "description": "App.jsx line 556: the favicon useEffect dependency is [teamVibe] (the full {label, key} object). While useMemo stabilizes this reference, using [teamVibe.key] is more precise \u2014 the favicon color only depends on the key, not the label. If the label changes independently (e.g. copy change), the canvas draw fires unnecessarily. Update line 556 to depend on [teamVibe.key]. Similarly the document title useEffect at line 570 uses [activeWorkers, teamVibe] \u2014 using [activeWorkers, teamVibe.key, teamVibe.label] makes the intent explicit and avoids object equality ambiguity.",
+      "title": "Office.jsx CharacterAvatar re-renders on every sync even when worker unchanged",
+      "description": "CharacterAvatar is a pure function of (workerId, role, name, size, emoji, vibeKey) but isn't wrapped in React.memo. Since Office receives the full workers array on every 30s poll, all CharacterAvatar instances re-render even when nothing changed. Wrap CharacterAvatar in React.memo() for a free optimization. Same applies to Character component.",
       "effort": "small",
       "assignee": "carlos"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Whiteboard text truncates to 'SH IP IT' on narrow mobile viewports",
+      "description": "The office-whiteboard element is 5.5% wide with word-break: break-word and 0.42rem font. On mobile (375px), the computed width is ~20px, causing 'SHIP IT' to break mid-word. Either increase the whiteboard width in the mobile media query, reduce the text to an emoji-only format on small screens, or hide it entirely below 480px.",
+      "effort": "small",
+      "assignee": "maya"
     }
   ]
 }
