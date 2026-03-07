@@ -441,5 +441,17 @@
     "type": "complete",
     "worker": "Bloberto",
     "message": "Implemented 5 Luna #15 ideas: activity log emoji faces, progress bar ETA, error card/desk glow, mobile dead zone fix (dvh), vibe streak crown escalation"
+  },
+  {
+    "timestamp": "2026-03-07T19:45:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #26 \u2014 full site analysis"
+  },
+  {
+    "timestamp": "2026-03-07T19:55:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #26 complete \u2014 overall score 3.9/5 (holding). 12 suggestions filed (4 high, 5 medium, 3 low). PERSISTENT ESCALATION: DEFAULT_ROSTER id mismatch (9th flag), React.memo (7th flag)."
   }
 ]
