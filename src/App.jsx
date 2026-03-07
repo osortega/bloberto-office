@@ -678,37 +678,46 @@ export default function App() {
     previousVibeKeyRef.current = teamVibe.key
   }, [teamVibe.key])
 
-  // ── Favicon vibe indicator (Luna #7) ──
+  // ── Favicon: red=error, green=working, grey=idle ──
   useEffect(() => {
-    const vibeColors = {
-      crushing: '#22c55e', 'on-fire': '#ef4444', 'in-flow': '#3b82f6',
-      'slow-day': '#9ca3af', 'after-hours': '#8b5cf6',
-    }
+    const hasError = activeWorkers.some(w => w.status === 'error') || !!fetchError
+    const isWorking = activeWorkers.some(w => w.status === 'working')
+    const color = hasError ? '#ef4444' : isWorking ? '#22c55e' : '#9ca3af'
     const c = document.createElement('canvas')
     c.width = 32; c.height = 32
     const ctx = c.getContext('2d')
     ctx.beginPath()
     ctx.arc(16, 16, 14, 0, Math.PI * 2)
-    ctx.fillStyle = vibeColors[teamVibe.key] || '#3b82f6'
+    ctx.fillStyle = color
     ctx.fill()
     const link = document.querySelector('link[rel="icon"]') || document.createElement('link')
     link.rel = 'icon'
     link.href = c.toDataURL()
     if (!link.parentNode) document.head.appendChild(link)
-  }, [teamVibe.key])
+  }, [activeWorkers, fetchError])
 
-  // ── Document title updates (Luna #7) ──
+  // ── Tab title: cycles every 8s showing worker status ──
   useEffect(() => {
     const workingCount = activeWorkers.filter(w => w.status === 'working').length
+    const idleCount = activeWorkers.filter(w => w.status === 'idle').length
+    const errCount = activeWorkers.filter(w => w.status === 'error').length
     const total = activeWorkers.length
-    const hasError = activeWorkers.some(w => w.status === 'error')
 
-    const prefix = hasError ? '⚠️ ' : ''
-    if (workingCount === 0 && total === 0) {
-      document.title = "😴 Bloberto's Office — All quiet"
-    } else {
-      document.title = `${prefix}(${workingCount}/${total}) Bloberto's Office — ${teamVibe.label}`
-    }
+    const frames = total === 0
+      ? ["😴 Bloberto's Office — All quiet"]
+      : [
+          `(${workingCount}/${total}) Bloberto's Office — ${teamVibe.label}`,
+          `🟢 ${workingCount} working · ❌ ${errCount} errors · 😴 ${idleCount} idle`,
+          `${teamVibe.label} — Bloberto's Office`,
+        ]
+
+    let idx = 0
+    document.title = frames[idx]
+    const timer = setInterval(() => {
+      idx = (idx + 1) % frames.length
+      document.title = frames[idx]
+    }, 8_000)
+    return () => clearInterval(timer)
   }, [activeWorkers, teamVibe])
 
   const errorCount = activeWorkers.filter(w => w.status === 'error').length

@@ -1,62 +1,62 @@
 {
   "creative_director": "Luna",
   "review_number": 20,
-  "timestamp": "2026-03-07T21:30:00Z",
-  "theme": "Emotional Intelligence — Make the Office Feel Your Pain and Celebrate Your Wins",
+  "timestamp": "2026-03-07T21:31:09Z",
+  "theme": "From Grid to Story — Every Pixel Should Know Something the Others Don't",
   "ideas": [
     {
       "priority": "must",
       "category": "feature",
-      "title": "Favicon Status Badge — The Tab Speaks",
-      "description": "The browser tab favicon never changes. When workers are active, swap to a green-dot favicon. When errors exist, swap to a red-dot. When idle/after-hours, use a dim version. Implementation: generate 3 canvas-drawn favicons on mount (green/red/dim circles overlaid on the blob emoji), swap via document.querySelector('link[rel=icon]').href based on worker state. WHY: Power users have 30+ tabs open. A dynamic favicon is the ONLY way to communicate status without the tab being visible. Discord, Slack, Gmail all do this. It's table stakes for any real-time dashboard.",
+      "title": "Task Tag Filter Chips — One Click to Find Your People",
+      "description": "Worker cards already render colourful task-tag pills (PR, Bug, Docs, Deploy, etc.) parsed from each worker's task string via `getTaskTags()`. But they're purely cosmetic — clicking them does nothing. Make them interactive: clicking any tag pill on any card filters the worker grid to highlight only workers sharing that tag (others dim to 30% opacity). A second click or an ✕ button clears the filter. Implementation: add `selectedTag` state in App, pass it down to WorkerCard as a prop, apply `.worker-card--dimmed` when the card has no matching tag. The filter chips in each card double as the filter toggle. WHY: Once the team grows past 6 workers, 'who else is on this PR?' requires reading every card. One click answers it. The data and UI elements already exist — it's zero-net-new data, pure event wiring. This is the most under-leveraged surface on the dashboard.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "must",
-      "category": "storytelling",
-      "title": "Tab Title Pulse — Show Life in the Browser Tab",
-      "description": "The page title is static 'Bloberto Office'. When workers are active, cycle the title every 8s: '🟢 2 working · Bloberto Office' → '⚙️ Carlos on Backend · Bloberto Office'. When errors: '🔴 Error! · Bloberto Office'. When idle: '😴 All quiet · Bloberto Office'. Implementation: useEffect with setInterval that updates document.title. WHY: Combined with favicon, this makes the tab a mini-dashboard. Users who background the tab still get ambient awareness. Zero visual cost — it's metadata.",
+      "category": "delight",
+      "title": "Per-Desk Completion Burst — The Floor Celebrates Where It Happened",
+      "description": "When a worker's status transitions to `complete` (detectable via the existing `appeared`/`disappeared` tracking in the polling diff loop), fire a small SVG ring animation from that worker's desk position on the Office floor — a 10px-to-70px expanding circle that fades over 0.8s. Keep it brief, non-blocking, and scoped to the `.office-floor` coordinate space. Implementation: in `Office.jsx`, track a `completionBursts` array of `{ deskId, key }` objects; render an absolutely-positioned `<span className='desk-burst'>` for each, auto-remove after 800ms via `setTimeout`. The `<DeskBurst>` component is ~15 lines. WHY: Global confetti fires on vibe rank-up, which is rare and coarse. This fires every time ANY single person ships something. It's a micro-celebration at the exact spatial location of the win. It reinforces that the Office floor is a live scene, not a static diagram.",
       "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Bloberto State-Reactive Interjections — He's Actually Watching",
+      "description": "Bloberto's speech bubbles today are random `VIBE_QUOTES` fired on a 45s interval — they feel like a fortune cookie dispenser, not a character. Add a second quote trigger: a `useEffect` that watches for specific state transitions and fires a context-specific line INSTEAD of the next ambient quote. Trigger map: (a) first error of the session → '⚠️ Luna's down! I've got eyes on it.'; (b) all workers simultaneously working → '🔥 Full house! Everyone locked in.'; (c) solo worker only → '📵 Just the two of us today, boss.'; (d) third consecutive stuck worker → '😰 This bottleneck is giving me heartburn.'. Implementation: a `prevStateRef` in the App component tracks the previous snapshot; derive trigger keys from the diff; pass a `forcedQuote` prop to `<Character worker={bloberto}>` that pre-empts the ambient timer for one cycle. WHY: Random quotes feel like a screensaver. Context-aware quotes feel like a personality. Bloberto is supposedly watching the team — he should act like it. This is the difference between a widget and a character.",
+      "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Worker Completion Celebration — Confetti Per Character",
-      "description": "Confetti currently fires generically. When a specific worker completes, their confetti should use their role color. Maya gets purple/pink, Carlos gets blue/steel, Dave gets orange/amber. Implementation: pass the completing worker's role-color to the confetti spawner, use it for 60% of pieces (rest random). Also show a brief toast: '🎉 Maya shipped it!' that fades after 3s. WHY: Generic celebrations feel hollow. Personalized ones feel like the app actually knows who did the work. It's the difference between a form letter and a handwritten note.",
+      "category": "visual",
+      "title": "Progress Bar Colour Ladder — Watch It Go From Cold to Gold",
+      "description": "Every worker card has a progress bar. Right now it's a flat single colour that doesn't change as progress increases. Make the bar temperature-shift: 0–25% renders in cool grey-blue, 25–60% shifts to teal-green, 60–90% becomes amber, 90–99% turns warm gold, and at 100% a 1.5s rainbow shimmer fires before the card transitions to complete. Implementation: a CSS custom property `--progress-pct` already exists (or can be added inline). Use `background: linear-gradient(90deg, var(--pct-color) 0%, ...)` driven by a computed CSS `hsl()` value. The 100% shimmer is a `@keyframes progress-complete` animation triggered by adding `.progress--complete` class when `progress === 100`. WHY: Progress bars that don't visually encode momentum are just odometers. A bar that shifts from cold to warm to gold tells a story about the *energy* of the work, not just the percentage. You feel the sprint in the last 10%.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "dave"
     },
     {
-      "priority": "should",
+      "priority": "could",
       "category": "office-life",
-      "title": "Coffee Break Animation — Workers Visit the Coffee Corner",
-      "description": "The coffee corner exists as a static decoration. When a worker transitions from 'working' to 'idle', briefly animate their character walking to the coffee corner (2s path animation) before settling into their wander path. Show a tiny steam emoji above the corner when someone visits. Implementation: add a 'coffee-break' transition state that plays a CSS path animation from desk position to coffee corner, then switches to idle wander. WHY: Real offices have coffee runs between tasks. This 2-second micro-story makes status transitions feel like life events instead of state machine flips.",
-      "effort": "medium",
-      "assigned_to": "maya"
+      "title": "Weekend Desk Personality — Saturday Changes the Vibe",
+      "description": "The app is deeply time-aware (day/night window, greetings, after-hours vibe) but `new Date().getDay()` is never consulted. On Saturday and Sunday: (1) vacant desks show '🎣 Gone fishing' instead of '📋 Vacant'; (2) Bloberto's desk nameplate cycles to 'WEEKEND GUARD' regardless of vibe; (3) the greeting reads 'Shouldn't you be outside?' instead of 'Good morning/afternoon'. On Monday only: a single ambient quote added to VIBE_QUOTES['slow-day'] says 'Monday. They always come back on Monday.' Implementation: `const isWeekend = [0,6].includes(new Date().getDay())` in Office.jsx renders alternate strings. Zero new state, zero API calls. WHY: Most dashboard visitors probably ARE checking this on a weekend. Acknowledging that directly transforms a functional app into a character that has opinions about your work habits. It's 12 lines of code and a lifetime of personality.",
+      "effort": "small",
+      "assigned_to": "dave"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Keyboard Shortcuts — Power User Express Lane",
-      "description": "No keyboard shortcuts exist. Add: 'D' for dashboard tab, 'O' for office tab, 'R' for manual refresh/sync, '?' to show shortcut overlay. Implementation: single useEffect keydown listener on document, switch on e.key, call existing tab/sync functions. Shortcut overlay is a fixed div with the key mappings. WHY: Anyone who leaves this tab open all day is a power user. Power users expect keyboard shortcuts. It costs 30 lines of JS and makes the app feel like a real tool, not a toy.",
+      "title": "Keyboard Shortcut Discovery — Surface the Hidden Express Lane",
+      "description": "Keyboard shortcuts `1` (Office) and `2` (Dashboard) are already wired. But there is zero UI affordance — no user will discover them without reading the source. Add: (a) a small `⌨` hint link in the bottom-right of the header bar that, on click, opens a fixed 200px overlay listing all shortcuts with their keys; (b) on FIRST visit (no `bloberto-shortcut-hint-seen` in sessionStorage), show a one-time ghost toast in the bottom-right: '⌨ Pro tip: Press 1 or 2 to switch tabs' — fades after 5s, never shows again that session. Implementation: `<ShortcutToast>` component, ~20 lines. The overlay is a simple `<dl>` with key/action pairs. WHY: Hidden shortcuts are a power-user delight — but only if power users find them. Discoverability that expires (one-time toast) is the respectful middle ground: it teaches newcomers without annoying regulars. Right now the feature is a secret that benefits no one.",
       "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "could",
-      "category": "visual",
-      "title": "Activity Log Grouping by Worker — See Each Person's Day",
-      "description": "Activity log shows events chronologically which is fine for real-time, but makes it hard to answer 'what did Maya do today?' Add a toggle/filter to group by worker: click a worker name in the filter bar to see only their events. Implementation: extend the existing activity-filter-bar with worker-name buttons derived from unique workers in the log. Filter logic: activityLog.filter(e => e.worker === selected). WHY: The log is getting long enough that scrolling for one person's history is tedious. This is the natural next evolution of the filter system that already exists for event types.",
-      "effort": "small",
-      "assigned_to": "carlos"
+      "assigned_to": "sofia"
     },
     {
       "priority": "wild",
-      "category": "delight",
-      "title": "Office Ambient Sound Toggle — Hear the Vibe",
-      "description": "Add a tiny speaker icon in the header. Click to toggle ambient sound: keyboard clicks when workers are active, soft rain for after-hours, upbeat lo-fi for crushing-it vibe. Implementation: Web Audio API with 3-4 short looping samples (~50KB each), volume tied to worker count. Muted by default, opt-in only. WHY: This is the nuclear option for immersion. Nobody expects a dashboard to have sound. The surprise factor alone would make people share it. But it MUST be opt-in and muted by default or it's a war crime.",
+      "category": "visual",
+      "title": "Collab Web — Draw the Invisible Relationships Between Desks",
+      "description": "The office floor has desks but no visual relationships between them. Add 'collab threads': when 2+ active workers share a task tag (e.g., both tagged 'PR' or 'Bug'), render a thin SVG dashed line between their desk positions on the floor, colored by tag type (blue for PR, red for Bug, green for Docs). On hover, a small label appears: '↔ Working together: PR Review'. Lines gently pulse with a dash-offset animation. Implementation: in Office.jsx, after deskMap is built, compute a `collabPairs` list from active workers grouped by overlapping tags, then render an `<svg className='collab-web'>` absolutely positioned over `.office-floor` with `<line>` elements whose `x1/y1/x2/y2` are derived from the desk `left/top` CSS percentages × floor dimensions. WHY: The office currently shows WHERE people sit but not HOW they're connected. This turns a seating chart into a collaboration map. When you see a red line stretching across the floor between two desks, you feel the shared tension of an active bug. It's the one feature that turns a monitoring tool into a story.",
       "effort": "large",
       "assigned_to": "tbd"
     }

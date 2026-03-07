@@ -1,12 +1,12 @@
 [
   {
-    "name": "Carlos",
-    "role": "Backend Engineer",
-    "emoji": "⚙️",
+    "name": "Maya",
+    "role": "Frontend Engineer",
+    "emoji": "🎨",
     "status": "working",
-    "task": "Favicon Status Badge + Tab Title Pulse (Luna ideas #1 & #2)",
+    "task": "Personalized completion confetti + coffee break animation (Luna ideas #3 & #4)",
     "progress": 10,
-    "started": "2026-03-07T21:36:00Z"
+    "started": "2026-03-07T21:40:00Z"
   },
   {
     "name": "Dave",
