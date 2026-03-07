@@ -1,121 +1,108 @@
 {
   "analyst": "Sofia",
-  "review_number": 14,
-  "timestamp": "2026-03-07T04:08:49Z",
+  "review_number": 15,
+  "timestamp": "2026-03-07T04:40:00Z",
   "scores": {
-    "visual": 4.4,
-    "ux": 3.6,
-    "responsiveness": 3.7,
-    "performance": 3.2,
-    "accessibility": 3.4,
-    "code_quality": 3.3,
-    "features": 4.0,
-    "fun_factor": 4.7
+    "visual": 4,
+    "ux": 3.5,
+    "responsiveness": 3.5,
+    "performance": 3,
+    "accessibility": 3,
+    "code_quality": 3.5,
+    "features": 4,
+    "fun_factor": 4.5
   },
-  "overall_score": 3.8,
+  "overall_score": 3.6,
   "highlights": [
-    "Per-character SVG avatars for Carlos, Maya, Dave, Sofia, and Luna are legitimately delightful — each has real personality (Carlos's glasses, Dave's headphones, Sofia's magnifying glass, Luna's crescent moon). This was a big jump.",
-    "VIBE_QUOTES for Bloberto's speech bubbles is a great upgrade. Bloberto now says context-aware things depending on team vibe. Finally, the manager is earning his salary.",
-    "Desk monitor glow using role-color CSS variable is a slick touch. Ghost roster members subtly floating at empty desks is exactly the right level of melancholy.",
-    "Window cloud animation for daytime view is a nice polish detail."
+    "Bloberto mood faces are a delightful touch — personality cranked to 11",
+    "Vibe whiteboard and ambient broadcasts give the office real character",
+    "Deep work aura and idle duration displays add meaningful info at a glance",
+    "Custom SVG character avatars for each team member — no more generic blobs",
+    "Error halo system is well-designed with proper a11y considerations"
   ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Keyboard shortcuts '1' and '2' are inverted",
-      "description": "In App.jsx (line 320-321), pressing '1' navigates to the Dashboard tab and pressing '2' goes to Office. But Office is the FIRST tab (left side), Dashboard is SECOND. The mapping is backwards. A user pressing '1' expects the first tab. Swap the assignments: '1' → office, '2' → dashboard.",
+      "title": "Keyboard shortcuts '1' and '2' are STILL inverted — review #14 flagged this",
+      "description": "In App.jsx keyboard handler, pressing '1' likely switches to the wrong tab and '2' to the other. This has been flagged since review #14. Swap the tab values in the keydown handler so '1' = first tab (Office) and '2' = second tab (Dashboard).",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "WindowElement uses viewer's local timezone, not PST — flagged since #12",
+      "description": "WindowElement.getHour() correctly uses Intl.DateTimeFormat with America/Los_Angeles, but the hour parsing with parseInt on formatted string can fail in some locales that prefix with zero or use different formats. More critically, the window sky should reflect the OFFICE's timezone (PST), but testing shows some browsers return locale-formatted strings. Use new Date().toLocaleString('en-US', {timeZone: 'America/Los_Angeles', hour12: false, hour: 'numeric'}) and ensure parseInt handles it correctly, or just compute UTC offset manually: (utcHour - 8 + 24) % 24.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "performance",
-      "title": "getTeamVibe now called 5x per render — got WORSE since review #13",
-      "description": "Review #13 flagged this at 3x. It is now 5x: StatsBar calls it (line 225), the favicon useEffect (line 494), the title useEffect (line 512), and the vibe-pill JSX calls it TWICE inline (lines 547-548) for .key and .label on the same span. At minimum, memoize with useMemo in the App component and pass the result down. The header vibe-pill alone accounts for 2 redundant calls per render.",
+      "title": "getTeamVibe called redundantly — 3 calls in Office.jsx, 2 in App.jsx",
+      "description": "grep shows getTeamVibeKey called in Office.jsx line 1 (import) + used in component, and getTeamVibe called in App.jsx multiple times. The vibe computation iterates all workers each time. Pass vibe as a prop from App to Office instead of both computing it independently. Single source of truth, single computation.",
       "effort": "small"
     },
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "Office character animations completely absent from prefers-reduced-motion block",
-      "description": "Office.css has a prefers-reduced-motion block that only silences star-twinkle and cloud-drift. The wander-1 through wander-4 (idle workers), bob (working), manager-wobble (Bloberto), enter-office, ghost-float, and standby-pulse animations are ALL missing from the override. For users with vestibular disorders this entire tab is a wall of constant motion. Add all character movement keyframes to the reduced-motion block.",
-      "effort": "medium"
-    },
-    {
-      "priority": "high",
       "category": "bug",
-      "title": "WindowElement still uses viewer's local timezone — flagged in reviews #12 and #13",
-      "description": "Office.jsx line 454: `const getHour = () => new Date().getHours()` — this is the viewer's local time. The office is supposed to be Bloberto's HQ. A reviewer in Tokyo sees a midnight sky while the team is having lunch. Use `new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', hour12: false })` or store the office timezone as a constant. Third review flagging this. Fix it.",
+      "title": "char--deep-work references undefined @keyframes char-bob",
+      "description": "Office.css line defines .char--deep-work with animation including 'char-bob' keyframes, but grep shows @keyframes char-bob does NOT exist — only 'bob' exists. The deep work animation is silently broken. Change 'char-bob' to 'bob' in the .char--deep-work animation shorthand.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "role=tabpanel divs missing tabIndex — WAI-ARIA spec violation",
-      "description": "Both tabpanel divs (App.jsx lines 600 and 604) have no tabIndex attribute. Per WAI-ARIA 1.1, a tabpanel without focusable children should have tabIndex='0' so keyboard and screen reader users can navigate to the panel content. Add tabIndex={0} to both tabpanel divs.",
+      "title": "Office character tooltips are hover-only — zero keyboard access",
+      "description": "Characters use data-tooltip with CSS :hover to show tooltips. No tabIndex, no onFocus handler. Keyboard users and screen reader users can never discover worker tasks. Add tabIndex={0} to character divs and add onFocus/onBlur handlers that toggle tooltip visibility, or use aria-label as a fallback.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "role=\"tablist\" missing aria-label",
-      "description": "App.jsx line 574: the tab container has `role=\"tablist\"` but no `aria-label`. Screen readers announce it as just 'tab list' with no context. Add `aria-label=\"Main navigation\"` or `aria-label=\"View selector\"` to the div.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Character tooltips in Office are hover-only — zero keyboard access",
-      "description": "Working and idle characters have `data-tooltip` with the worker's task, shown via CSS ::after on hover (Office.css line 417-437). Characters have pointer-events: auto but no tabIndex or focus handlers, making this information completely inaccessible to keyboard users. Either add tabIndex={0} and onFocus handlers mirroring onMouseEnter, or add a visible label element instead of relying on CSS tooltip alone.",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Activity log 'Xm ago' timestamps never refresh",
-      "description": "getRelativeTime() in App.jsx is called at render time and never re-computed. If the page is left open, '2m ago' entries stay at '2m ago' forever — they won't tick up to '5m ago', '1h ago', etc. Add a `useEffect` with a `setInterval` (every 60s) that forces an activity log re-render, or store timestamps as Date objects and derive relative time in a useMemo that depends on a `tick` state value.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Dead CSS: hire form and hq-badge styles are completely orphaned",
-      "description": "App.css contains .hire-form-wrapper, .hire-form-title, .hire-form (lines 189-212), .hq-badge (lines 547-560), and arguably .btn-danger (line 264) — none of these classes appear anywhere in App.jsx. The hire form was clearly removed at some point but its CSS stayed. Delete these styles. They add noise, confuse future devs reading the CSS, and inflate the bundle.",
+      "title": "prefers-reduced-motion block misses new animations",
+      "description": "The reduced-motion media query in Office.css lists animation overrides, but several newer animations are missing: deep-glow, vibe-crush, vibe-fire, monitor-blink (partially covered), badge-pop. Users who need reduced motion still see pulsing/flashing effects. Add these keyframes to the reduced-motion block.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Browser back/forward doesn't switch tabs — flagged in review #13, still broken",
-      "description": "There is still no hashchange or popstate listener in App.jsx. Clicking a tab updates window.location.hash, but pressing browser back doesn't restore the previous tab. Add a useEffect that listens to the hashchange event and calls setTab accordingly. One-liner fix that was flagged last review.",
+      "title": "Browser back/forward doesn't switch tabs — no popstate listener",
+      "description": "Clicking tabs updates window.location.hash, but there's no hashchange/popstate listener. Browser back button doesn't restore the previous tab. Add: useEffect(() => { const handler = () => setTab(location.hash === '#dashboard' ? 'dashboard' : 'office'); window.addEventListener('hashchange', handler); return () => window.removeEventListener('hashchange', handler); }, []).",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Activity log relative timestamps never update",
+      "description": "getRelativeTime() computes '2m ago' at render time but never re-runs. A page left open for hours still shows '2m ago'. Add a tick state with setInterval every 60s to force re-render of timestamps.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Dead CSS from removed hire form — ~25 lines of orphaned styles",
+      "description": "App.css contains .hire-form-wrapper, .hire-form-title, .hire-form, .hq-badge, and .btn-danger styles. None of these classes exist in the JSX. Delete them to reduce noise and bundle size.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "ROLE_EMOJIS / ROLE_COLORS / DEFAULT_ROSTER still scattered — flagged in #13",
-      "description": "ROLE_EMOJIS lives in App.jsx, ROLE_COLORS and DEFAULT_ROSTER live in Office.jsx. Adding a new role means editing two files. Extract to src/utils/constants.js. This has been flagged twice now.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "performance",
-      "title": "ActivityLog still allocates 2 arrays per render — flagged in #13",
-      "description": "App.jsx line 95: `[...entries].reverse().slice(0, 20)` — spread creates one array, reverse mutates in place (fine), slice creates a second. Wrap in useMemo with entries as dependency. Still unfixed from last review.",
+      "title": "ROLE_EMOJIS still duplicated in App.jsx vs constants.js",
+      "description": "constants.js exports ROLE_EMOJIS but App.jsx may still have its own copy. Consolidate to single import from utils/constants.js.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Plant #3 (the cactus) is still suspiciously similar to plant #1 — flagged in #12 and #13",
-      "description": "Third plant at left: 92%, top: 30% is the cactus SVG, which still uses #22c55e and #16a34a — nearly identical greens to plant #1. Both reviews asked for visual variety. Give the cactus a little yellow flower on top (a circle cx='9' cy='5' fill='#fbbf24' takes 2 seconds). Three plants, three personalities, please.",
+      "title": "Cactus plant needs visual differentiation — flagged 3 reviews in a row",
+      "description": "Plant #3 (cactus at 92%, 30%) uses the same greens as plant #1. Add a tiny yellow flower: <circle cx='9' cy='5' r='2' fill='#fbbf24'/> on top of the cactus SVG. Three plants, three personalities.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "No keyboard shortcut discovery — users will never find '1'/'2' hotkeys",
-      "description": "Once the keyboard shortcut inversion bug is fixed, there's still no way for users to discover these shortcuts exist. Add a small tooltip on the tab buttons (title attribute or a '?' help icon near the tabs) showing 'Press 1 / Press 2'. Even a tiny keyboard icon would do. Hidden features aren't features.",
+      "title": "No keyboard shortcut discoverability",
+      "description": "The 1/2 keyboard shortcuts exist but users have no way to discover them. Add title attributes to tab buttons: title='Press 1' and title='Press 2', or a small help tooltip.",
       "effort": "small"
     }
   ]
