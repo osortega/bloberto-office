@@ -1,24 +1,14 @@
 {
   "workers": [
     {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f",
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
       "status": "working",
-      "task": "Error count stat card + manual sync/R shortcut (Luna must #1 & #2)",
-      "progress": 5,
-      "updated_at": "2026-03-07T06:56:00Z"
-    },
-    {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80",
-      "status": "working",
-      "task": "SOS morse code on error desks (Luna should #4)",
-      "progress": 5,
-      "updated_at": "2026-03-07T06:56:00Z"
+      "task": "Creative review #13 — 30-min site review & ideation",
+      "progress": 10,
+      "updated_at": "2026-03-07T08:00:00Z"
     }
   ]
 }
