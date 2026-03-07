@@ -1,87 +1,89 @@
 {
   "creative_director": "Luna",
-  "timestamp": "2026-03-07T00:52:00Z",
-  "review_number": 2,
-  "theme": "The Dashboard Knows You — Make It Personal, Make It Urgent, Make It Sing",
+  "timestamp": "2026-03-07T01:21:58Z",
+  "review_number": 3,
+  "theme": "The Office Is Alive — Every Pixel Should Tell a Story, Every Moment Should Earn a Memory",
   "ideas": [
     {
       "priority": "must",
-      "category": "feature",
-      "title": "Worker Focus Panel — Click the Floor, See the Card",
-      "description": "Right now the Office tab and the Dashboard tab are completely isolated worlds. You see a character bobbing at a desk but you have no idea their progress is at 14% and their task says 'unblock auth migration'. Fix it: clicking any character in the office view triggers a slide-up overlay panel (max 320px wide, anchored bottom-right of the office floor) showing that worker's full card — progress bar, task, status badge, duration. Clicking elsewhere or pressing Escape dismisses it. The panel is populated from the same workers array already in scope; this is zero new data fetching. WHY: The Office tab currently is scenic decoration. One click handler makes it operational. This is the highest ROI architectural change on the board — it turns the prettiest view into the most useful one.",
-      "effort": "medium",
+      "category": "visual",
+      "title": "Bloberto's Mood Monitor — The Manager's Screen Is the Office Mood Ring",
+      "description": "The manager desk's .mgr-desk__monitor is currently a static dark rectangle. Wire it to the team vibe: compute vibe in the Office component (pass it as a prop or derive it from the workers array already received) and set a data-vibe attribute on the monitor div. CSS rules make the monitor glow: [data-vibe='crushing'] → pulsing green glow (box-shadow + background tint), [data-vibe='on-fire'] → flickering red, [data-vibe='in-flow'] → steady purple matching Bloberto's accent color, [data-vibe='slow-day'] → dim amber, [data-vibe='after-hours'] → cool blue starfield overlay via a radial-gradient. The vibe transitions smoothly via CSS transition: box-shadow 1s ease, background-color 1s ease. WHY: The manager desk is the focal centerpiece of the office view. Right now it's scenery. Turning that little monitor into the ambient pulse of team health means the Office tab communicates at a glance — you open it and you feel whether it's a good day or a bad one before reading a single number. It's the office's heartbeat, and it costs roughly 25 lines of CSS and 3 lines of JS.",
+      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "must",
       "category": "visual",
-      "title": "Error Urgency Halo — Make Crises Impossible to Miss",
-      "description": "Workers in 'error' state look almost identical to working workers in the office view. Add three stacked signals: (1) a slow-pulse crimson box-shadow halo behind their avatar (using the existing standby-pulse keyframe pattern but red and more intense), (2) a tiny red '!' badge absolutely positioned at the top-right of the .char__avatar circle, rendered as a 12px SVG circle with a white exclamation mark, (3) a 10% opacity red overlay on the desk element they occupy. The desk tint is a background-color on the .desk element when its occupant has status='error'. This requires passing error state down from deskOccupants which already carries the worker object. WHY: Errors are the highest-urgency state on the board. The office should alarm you. Right now a full-team error looks identical to a full-team working state at a distance. That is a dashboard safety failure.",
-      "effort": "small",
+      "title": "Worker Card Cinematic Entry — The Grid Should Feel Alive, Not Snapped In",
+      "description": "Right now the workers grid jumps from LoadingSkeleton to fully-rendered cards in a single React render. Add staggered mount animations: each WorkerCard receives its array index as a prop, which becomes a CSS custom property --i via inline style. A CSS keyframe card-rise fires on mount with animation-delay: calc(var(--i) * 70ms). Additionally, track previously-seen worker IDs in a useRef Set in App. On each sync, newly appeared worker IDs get a temporary .worker-card--new class that flashes a 1.5s green border pulse then removes itself. Workers who disappeared from the previous poll get a .worker-card--exit class that fades them out before unmounting (400ms opacity transition with a setTimeout before removing from state). WHY: Data arriving silently is unmemorable. Cinematic entry says something just happened — you notice Carlos came online and Sofia finished. The exit animation closes the narrative loop. A dashboard that reacts to change is a dashboard you trust.",
+      "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Progress Micro-Sparkline — Show Momentum, Not Just Position",
-      "description": "Store the last 8 progress readings per worker in a useRef map keyed by worker.id, updated on every sync cycle. Render as a tiny SVG polyline (60×10px) laid translucently behind the progress bar fill, visible as a faint trail. A flat line means the worker has been stuck at the same % for the past 8 polls. A steep line means sprint. A downward spike means something regressed. The sparkline data clears when a worker is replaced (id changes). WHY: progress% is a snapshot. Two workers both at 60% are invisible as distinct cases today — one has climbed 30 points in the last 4 minutes, one has flatlined for 20. Sparklines show momentum. Operators shouldn't need to watch a number; they should be able to see the shape of progress.",
+      "title": "Status History Dot Timeline — Where You Are Is Less Interesting Than Where You've Been",
+      "description": "Below the progress bar in each WorkerCard, render a compact horizontal dot-trail timeline (roughly 120px wide, 10px tall) showing up to 6 of the worker's most recent status transitions for the current session. Data source: the activityLog array already in App state — filter entries by entry.worker === worker.name, sort by timestamp ascending, take the last 6. Each dot is a 9px circle: green (working), yellow (idle), red (error), blue (done), connected by a 1px line. The rightmost dot is the current status. Each dot has a title tooltip showing the relative timestamp. A worker who went working→error→working tells a tense story. A worker at 100% who went idle→working→done tells a triumphant one. Pass the filtered entries as a prop to WorkerCard — no new fetching, pure derivation from existing state. WHY: Progress percentage is a snapshot; the timeline is a narrative. Two workers both at 60% are invisible as distinct cases — one just recovered from an error, one has been steady for 40 minutes. The timeline surfaces the drama that lives inside the numbers.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "visual",
-      "title": "Office Weather Widget — Ambient Team Climate in the Floor",
-      "description": "In the top-left of the office floor, replace the static '.office-sign' text label with a compact animated SVG weather widget (48×48px) that computes 'office climate' from live worker state: ☀️ sunny with rotating rays (all working, zero errors), ⛈️ lightning bolt + falling rain drops (any errors), 🌤️ sun behind a cloud (mixed active/idle), 🌫️ soft fog waves (empty / after-hours). All states are implemented as SVG elements inside the widget with their own short CSS keyframe loops (rays rotate 360° in 8s, rain drops translate-Y in 1.2s, fog drifts left in 4s). The widget is purely decorative but diegetically meaningful — it's the literal weather of the workspace. WHY: The Team Vibe Meter on the Dashboard is a badge. The Weather Widget in the Office is an environment. One you read; the other you feel. Both are needed, and neither does the other's job.",
-      "effort": "medium",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "should",
-      "category": "feature",
-      "title": "Task Intent Auto-Tags — Scan the Grid in One Second",
-      "description": "Parse each worker's task string with a regex battery and auto-apply colored chip tags beneath the task text on WorkerCard. Tag definitions: 'fix|bug|hotfix|broken|error' → 🔴 Bug (red chip), 'deploy|ship|release|publish|ci|cd|pipeline' → 🟠 Ship (orange), 'design|ui|ux|css|layout|frontend|component' → 🟣 Design (purple), 'test|qa|spec|review|coverage|lint' → 🔵 QA (blue), 'data|migration|schema|db|database|query' → 🟤 Data (brown), 'docs|readme|changelog|write' → 🟢 Docs (green). A task can match multiple tags. Chips are small rounded-pill spans (font-size 0.65rem, padding 2px 8px). Zero backend work — pure client-side string analysis. WHY: All task text is undifferentiated prose today. Tags let you scan the workers grid and immediately perceive 'this is a bugfix sprint' or 'deployment day' without reading a single sentence.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "could",
-      "category": "office-life",
-      "title": "Sync Streak Counter — Make Uptime Feel Like an Achievement",
-      "description": "Track consecutive successful sync cycles in a useRef integer (increment on both-fetches-success in syncFromGitHub, reset to 0 on any error). Persist the all-time streak best to localStorage under 'bloberto-best-streak'. Display below the sync time in the Live stat card as '🔗 47 syncs' in 0.65rem muted text. When the current streak beats the stored best, the sync stat card briefly flashes a green border for 1.5s (add/remove a 'streak-best' CSS class). WHY: Reliability is invisible until it breaks. A streak counter makes the polling engine feel alive and trustworthy rather than silent infrastructure. A new personal best is a tiny celebration that costs nothing to build but earns disproportionate affection from anyone who sees it happen.",
-      "effort": "small",
-      "assigned_to": "sofia"
-    },
-    {
-      "priority": "could",
       "category": "delight",
-      "title": "Roll Call Easter Egg — All Characters Wave at Once",
-      "description": "Clicking the '🏢 Bloberto's HQ' sign in the top-left of the office floor (add pointer-events: auto to .office-sign) triggers a 'rollcall' mode: all .char elements simultaneously receive a CSS class 'char--rollcall' for 900ms, which plays a hop-and-wave keyframe (translateY -12px at 40%, then a brief rotate ±15deg, back to baseline). During the animation, Bloberto's speech bubble briefly shows 'Alright team — sound off! 📣' without requiring a hover. Implemented as a single setTimeout that adds then removes the class. No state needed — a ref suffices. WHY: Easter eggs are the signature of a product made with love. One unexpected moment of collective joy is worth more than a feature in a changelog. It's the kind of thing someone records and shares in Slack.",
+      "title": "Confetti Burst on Task Completion — Ceremony for the Win",
+      "description": "When a worker transitions to status === 'done' between poll cycles (detected by comparing previous and current allWorkers snapshots via a prevWorkersRef), trigger a brief confetti animation from that worker's card. Implementation: inject a canvas element absolutely positioned over the workers grid (z-index 50, pointer-events none, full container width). On detection of a done transition, call burstConfetti(cardElement) which calculates the card's getBoundingClientRect and spawns ~55 particles (small squares, 4–8px, randomized hue from the Bloberto palette: purple, green, blue, pink) using requestAnimationFrame. Particles arc outward, decelerate, fade to opacity 0 over 1.2s, then the canvas clears. No external library. WHY: Right now task completion is completely invisible on the dashboard — a progress bar silently hits 100% and turns blue. That's a missed moment. A burst of confetti for 1.2 seconds is the difference between a tool and a product with a soul. It's the kind of thing that makes someone call a coworker over to watch.",
+      "effort": "medium",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "office-life",
+      "title": "Desk Nameplates — Ground Every Desk in a Person",
+      "description": "Each occupied .desk element currently shows only a monitor. Add a tiny SVG nameplate below the monitor: a 28×10px rounded rectangle (matching the desk's border color) containing the worker's first name in 5px uppercase SVG text. The nameplate fades in when a worker occupies the desk (CSS opacity transition matching the desk's 0.3s ease) and fades out when the desk empties. Ghost desks show the name text at 50% opacity and italic. Error-status desks show the nameplate text in red. The deskOccupants map already contains everything needed — this is a pure rendering addition in the DESKS.map() block inside Office.jsx. WHY: Desks are currently anonymous furniture. A nameplate is the minimal signal that says a person works here. It deepens the spatial metaphor of the office, makes ghost desks feel melancholy in the right way, and helps orient viewers who don't have the characters memorized. It's approximately 20 lines of JSX and 10 lines of CSS.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
       "priority": "could",
+      "category": "office-life",
+      "title": "Coffee Corner Crowd — Idle Workers Drift There Visually",
+      "description": "The coffee corner is a static widget that ignores the rest of the simulation. Make it reactive: when 1 or more workers are idle, render a stack of tiny 18×18px avatar chips (using CharacterAvatar SVG scaled down) visually overlapping near the coffee corner element — positioned absolutely at roughly right: 6%, top: 12%. Each chip is staggered 8px to the right of the previous. Maximum 4 chips shown, with a '+N more' text chip if there are additional idle workers. Each chip has a hover tooltip showing the worker's name. The chips animate in using the existing fade-in-char keyframe from Office.css. When idleWorkers becomes empty, the chips fade out. The idleWorkers array is already computed in the Office component. WHY: The idle-wander animation already implies workers are somewhere on the floor. The coffee corner gives that somewhere a name. It makes the idle state narrative instead of abstract — the team isn't just idle, they're at the coffee machine. That's a completely different emotional read.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "could",
+      "category": "visual",
+      "title": "Desk Heat Map — Show Intensity, Not Just Occupancy",
+      "description": "For every occupied desk, compute the worker's continuous active duration from worker.updated_at (the same formatDuration logic already in App.jsx). Map that duration to a heat intensity: less than 15 min → no glow, 15–45 min → faint amber radial gradient, 45–90 min → warm orange, 90+ min → deep ember red. Apply the gradient as a box-shadow or a ::before pseudo-element radial-gradient overlay on the .desk div using an inline --heat-opacity CSS variable set from the duration calculation. Transition the value smoothly on each render. Error-status desks always render at maximum heat intensity in red regardless of duration. WHY: Two workers can both be working — one just sat down, one has been grinding for two hours. Occupancy is binary; intensity is a spectrum. A heat map turns the office floor into a performance canvas you can read at a glance without ever touching the dashboard tab.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "could",
       "category": "feature",
-      "title": "Keyboard Command Palette — ⌘K for Power Users",
-      "description": "Pressing ⌘K (or Ctrl+K on Windows/Linux) opens a minimal floating command palette modal centered on screen. Commands available: 'Switch to Office', 'Switch to Dashboard', 'Toggle dark/light theme', 'Refresh data now', 'Copy current status to clipboard' (formats a plain-text team summary: 'N active, N idle, vibe: X'). Arrow keys navigate the list, Enter executes, Escape closes. The modal is a simple <dialog> element with a short CSS slide-down animation. The command list is a static array of {label, action} objects — adding new commands is two lines. WHY: Power users who embed this dashboard on a second monitor shouldn't need a mouse for routine actions. A command palette also signals that this is a serious, keyboard-first product. It takes half a day to build and permanently elevates the perceived quality of the tool.",
+      "title": "Late Night Mode — The Office Knows What Time It Is",
+      "description": "Between 10pm and 6am, automatically apply a night-shift aesthetic to the office floor. Implementation: compute isNightShift from new Date().getHours(), set data-night-shift='true' on .office-floor. CSS targets: slightly darker --floor-bg (10% darker via color-mix), grid lines shift from near-invisible white to a soft midnight-blue tint, a subtle radial background layer adds 8–10 tiny static star-dot pseudo-elements (via a long box-shadow trick on a ::after). Workers in working status during night-shift get a tiny coffee emoji appended next to their name tag via a .char__name::after CSS rule scoped to [data-night-shift] .char--working. The header already computes the current hour for the greeting — reuse that value. WHY: The office is used around the clock. Right now 2am looks identical to 10am. Night shift workers are the most dedicated people in any org — the dashboard should acknowledge them. A subtle environmental change says we see you without any intrusion.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "wild",
+      "category": "storytelling",
+      "title": "Ghost Sticky Notes — Absent Workers Leave a Note",
+      "description": "Support an optional away_message field in the workers.json roster entries (e.g. 'away_message': 'OOO — back Thursday 🌴'). When a roster member is in ghost state (present in roster, not in active workers), hovering their ghost character triggers a sticky-note speech bubble styled differently from Bloberto's corporate bubble: yellow background (#fef08a), slightly rotated (-2deg), handwritten-style font (Georgia or serif fallback), with a small dog-ear fold drawn via a CSS border-triangle trick on ::after. The sticky note shows the away_message if present, or a randomized default from: ['Out of reach 👻', 'Somewhere on Slack…', 'Gone but not forgotten 🌫️', 'Ask Bloberto �']. The data field is optional and additive — zero breaking changes, zero new fetching. WHY: Ghost workers currently communicate one thing: absence. A sticky note makes absence a story. It transforms a gray floating silhouette into a character with intentions. This is the single idea most likely to be screenshotted and shared.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "team",
-      "title": "Live Roster Presence Strip — See Who, Not Just How Many",
-      "description": "Insert a compact horizontal chip strip between the StatsBar and the section header on the Dashboard tab. Every roster member gets a 32×32px avatar chip with a colored presence ring: solid green ring (working), pulsing yellow ring (idle), dashed grey ring (offline/ghost), blinking red ring (error). Chips are ordered: working first, then idle, then offline. Each chip has a tooltip on hover showing their current task or away message. Clicking an offline chip scrolls to their ghost desk in the office view (or shows a mini popover with their away message from the Ghost Sticky Notes idea). The data source is the existing allWorkers array + roster array already in App state — no new fetching. WHY: The StatsBar tells you '3 active' — a number. The Presence Strip tells you 'Carlos, Maya, and Dave are active' — a team. Aggregate metrics erase individuals. This restores the human layer of the data without adding a single API call.",
+      "category": "feature",
+      "title": "Live Activity Ticker Strip — Breaking News From Your Team",
+      "description": "Add a fixed-position horizontal ticker strip at the very bottom of the viewport (above the footer, position: sticky; bottom: 0; z-index: 50). The ticker streams recent activity log entries as scrolling news-headline text — rendered as a CSS marquee animation on a compact dark pill-shaped container. Each entry is prefixed with its type icon and worker name: '🟢 Carlos joined the office · ✅ Maya completed Deploy staging pipeline · ❌ Dave encountered an error in CI build ·'. Entries are dequeued from the activity log on each sync cycle; new entries slide in from the right. The ticker pauses on hover via CSS animation-play-state: paused. A dismiss button saves a localStorage preference to hide it permanently. The activity log is already fetched and stored in state — the ticker is a new consumer of existing data. WHY: The activity log is a panel you have to scroll down to reach. The ticker surfaces events to the top of awareness without requiring navigation. It creates a sense of a living, active newsroom — something is always happening in this office. It's also the most screenshot-worthy addition we could ship.",
       "effort": "large",
       "assigned_to": "tbd"
     }
   ],
-  "hire_proposals": [
-    {
-      "role": "Developer Experience Engineer / Data Pipeline Owner",
-      "reason": "The dashboard is a read-only window into JSON files that someone updates manually (or via bots we can't see). There is no write path, no schema contract, no tooling for the team to update their own status. A DX hire would own: the workers.json + activity.json schema and versioning, the CLI or webhook that bots use to push state changes, validation that prevents malformed data from breaking the UI, and potentially a lightweight admin panel for manual overrides. Without this role, every new dashboard feature is blocked by the fragility of the data layer. Every idea in Review 1 and Review 2 renders correctly only as long as the JSON is well-formed. That's a single point of failure for a product that's becoming a real team artifact.",
-      "priority": "must"
-    }
-  ]
+  "hire_proposals": []
 }
