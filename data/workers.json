@@ -9,6 +9,16 @@
       "progress": 100,
       "hired_at": "2026-03-06T16:25:00Z",
       "updated_at": "2026-03-07T01:14:00Z"
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Implementing Mood Monitor + Cinematic Card Entry (Luna review #3)",
+      "progress": 0,
+      "hired_at": "2026-03-06T19:21:00Z",
+      "updated_at": "2026-03-07T01:26:00Z"
     }
   ],
   "roster": [
@@ -43,6 +53,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T01:25:00Z",
+  "last_updated": "2026-03-07T01:26:00Z",
   "manager": "Bloberto"
 }
