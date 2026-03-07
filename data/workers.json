@@ -19,16 +19,6 @@
       "task": "Implementing error badge on dashboard tab (Luna idea #2)",
       "progress": 5,
       "updated_at": "2026-03-07T06:25:00Z"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA & Product Analyst",
-      "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #19 \u2014 site analysis & suggestions",
-      "progress": 10,
-      "updated_at": "2026-03-07T06:37:00Z"
     }
   ]
 }

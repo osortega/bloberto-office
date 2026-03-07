@@ -1,105 +1,114 @@
 {
-  "review_number": 18,
-  "reviewer": "Sofia",
-  "timestamp": "2026-03-07T06:07:00Z",
-  "overall_score": 3.9,
-  "previous_score": 3.7,
-  "summary": "The 4 high-priority issues from review #17 are ALL FIXED — timezone greeting now uses Intl.DateTimeFormat, tabpanels have tabIndex={0}, tablist has aria-label='View selector', and deep-glow is in the reduced-motion block. Score up to 3.9/5. Remaining debt is mostly medium-priority accessibility and code cleanup that's been carried forward for several reviews.",
+  "analyst": "Sofia",
+  "review_number": 19,
+  "timestamp": "2026-03-07T06:37:00Z",
+  "scores": {
+    "visual": 4,
+    "ux": 4,
+    "responsiveness": 3,
+    "performance": 4,
+    "accessibility": 4,
+    "code_quality": 4,
+    "features": 4,
+    "fun_factor": 5
+  },
+  "overall_score": 4.0,
+  "summary": "Score up to 4.0/5 — first time hitting this milestone. All 3 high-priority accessibility issues from #18 are FIXED (confetti reduced-motion, keyboard speech bubbles, keyboard tooltips). All characters now have tabIndex={0} + focus/blur handlers. Dead CSS purge appears done. The codebase is genuinely solid now. Remaining issues are mostly about polish — timestamps not ticking, some code dedup, and mobile responsiveness gaps. The fun factor remains excellent.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "Confetti layer still plays unconditionally for reduced-motion users",
-      "description": "App.jsx renders 30 confetti-piece spans with CSS animation. No prefers-reduced-motion check exists — either suppress confetti in CSS or add a JS matchMedia check to skip rendering entirely. This was flagged in #17 as medium but promoting to high since all other reduced-motion gaps are fixed.",
+      "category": "bug",
+      "title": "Activity log relative timestamps never update",
+      "description": "App.jsx getRelativeTime() is called only at render. If the dashboard stays open, '2m ago' stays frozen forever. This has been flagged since review #18 as medium but promoting to high — it's a visible user-facing bug. Fix: add a 60s interval that bumps a tick state to force re-renders of timestamp components.",
       "effort": "small",
-      "assignee": "maya"
+      "assignee": "carlos"
     },
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "Bloberto speech bubbles have no keyboard/focus trigger",
-      "description": "Office.jsx Character component only uses onMouseEnter/onMouseLeave for speech bubbles. Keyboard-only users can never trigger Bloberto quotes. Add tabIndex={0} and onFocus/onBlur handlers to the manager character div.",
+      "category": "bug",
+      "title": "Office idle duration timestamps also never update",
+      "description": "Office.jsx formatIdleDuration() is pure — called once at render. Same frozen-timestamp bug as the activity log. An idle worker showing '5m' will show '5m' forever. Fix: share a global tick context or add a local interval in the Character component.",
       "effort": "small",
-      "assignee": "maya"
+      "assignee": "carlos"
     },
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "Character tooltips (data-tooltip) are hover-only — no keyboard access",
-      "description": "Working characters show task info via CSS ::after on hover. No tabIndex or focus handler exists on non-manager characters. Keyboard and screen reader users get no info. Add tabIndex={0} and focus-visible styling.",
-      "effort": "small",
+      "category": "responsiveness",
+      "title": "Office view not usable on small screens",
+      "description": "The 2D office layout uses absolute positioning with percentage-based left/top values. On screens under ~600px wide, characters overlap and nameplates become unreadable. No media query adjusts the office floor layout for mobile. Consider: stack characters vertically on mobile, or show a simplified list view.",
+      "effort": "large",
       "assignee": "maya"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "Activity log relative timestamps never tick",
-      "description": "getRelativeTime() is called only at render time. If the tab stays open, '2m ago' stays '2m ago' forever. Add a 60s interval to bump a tick counter that triggers re-render of timestamps.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "DEFAULT_ROSTER still lives in Office.jsx — should be in constants.js",
-      "description": "ROLE_EMOJIS and ROLE_COLORS were extracted to utils/constants.js. DEFAULT_ROSTER was not. Move it for consistency and reuse.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Dead CSS in App.css: .hire-form-*, .hq-badge, .btn-danger",
-      "description": "App.css still contains ~80 lines of unused CSS for hire-form, hq-badge, and btn-danger. None of these exist in App.jsx anymore. This has been flagged since review #14. Delete them.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": ".progress-bar-inner in App.css reduced-motion targets wrong class",
-      "description": "App.css reduced-motion block references .progress-bar-inner but the actual class is .progress-bar-fill. The rule does nothing.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Idle duration on characters never updates",
-      "description": "Office.jsx formatIdleDuration() is pure — called once at render. An idle worker showing '5m' will show '5m' forever if no re-render is triggered. Same pattern as the activity log timestamps.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "No keyboard shortcut discovery for tab switching",
-      "description": "Pressing 1/2 switches tabs but there's no tooltip or hint. Add title attributes to tab buttons: 'Office view (press 1)' and 'Dashboard view (press 2)'.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Date display in header uses viewer locale, not consistent",
-      "description": "Line 597: new Date().toLocaleDateString('en-US', ...) — this is fine for formatting but doesn't use the PST timezone, so date can be wrong near midnight for non-PST viewers. Minor but inconsistent with the now-fixed greeting.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "low",
       "category": "code",
       "title": "MANAGER_QUOTES array is redundant with VIBE_QUOTES",
-      "description": "Office.jsx has both MANAGER_QUOTES (line 13) and VIBE_QUOTES (line 23). MANAGER_QUOTES is only used as fallback when managerVibe is undefined, which shouldn't happen. Could be removed.",
+      "description": "Office.jsx line 6: MANAGER_QUOTES is only used as fallback when managerVibe is undefined (line 371, 389). Since getTeamVibeKey always returns a valid key, VIBE_QUOTES always matches. MANAGER_QUOTES is dead code. Remove it.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
-      "priority": "low",
+      "priority": "medium",
+      "category": "code",
+      "title": "DEFAULT_ROSTER still in Office.jsx — should be in constants.js",
+      "description": "ROLE_EMOJIS and ROLE_COLORS were extracted to utils/constants.js but DEFAULT_ROSTER was not. Move it for consistency. Carried forward from #18.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Header date doesn't use PST timezone",
+      "description": "App.jsx line ~597: new Date().toLocaleDateString('en-US', { weekday, month, day }) — uses viewer's local timezone. Near midnight, non-PST viewers see wrong date. The greeting was already fixed to use Intl with America/Los_Angeles — do the same for the date.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
       "category": "perf",
       "title": "WindowElement re-renders every 60s even when hour hasn't changed",
-      "description": "The setInterval in WindowElement fires every 60s and calls setHour(getHour()). Since the hour only changes once per hour, 59 of 60 calls are no-ops. Minor but could use a smarter check.",
+      "description": "Office.jsx: setInterval fires every 60s calling setHour(getHour()). Since the hour changes once per hour, 59 of 60 calls are wasted renders. Minor but easy fix: compare before setting.",
       "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "No loading state for activity log",
+      "description": "Activity log shows 'No activity yet…' during initial fetch, which is misleading — it implies there IS no activity. Should show a skeleton or spinner during isLoading, then 'No activity yet…' only if the fetch succeeds with 0 entries.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Activity filter buttons lack group label for screen readers",
+      "description": "The activity filter bar has role='group' and aria-label which is good, but individual filter buttons lack aria-pressed or aria-selected state indication. They use className 'active' but screen readers don't announce CSS classes. Add aria-pressed={activityFilter === key}.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Ghost characters have no keyboard interaction feedback",
+      "description": "Ghost characters (roster members not currently working) have tabIndex={0} but onMouseEnter/onBlur only shows the OOO bubble for manager/working variants. Ghosts show a bubble but it's triggered via useState ghostBubble with a random timer — keyboard focus doesn't trigger it. Minor since ghosts are decorative.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Worker card flip state persists when worker changes status",
+      "description": "WorkerCard uses local useState for isFlipped. If a worker goes from working to idle while the card is flipped, the back still shows. The card should auto-unflip when the worker's status changes.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "No way to see historical score trends",
+      "description": "Sofia's been reviewing for 19 cycles. It would be valuable to show a simple sparkline or score history on the dashboard. Not urgent, but a nice-to-have for tracking improvement over time.",
+      "effort": "medium",
       "assignee": "carlos"
     }
   ]
