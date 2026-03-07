@@ -544,7 +544,7 @@
   .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
   .workers-grid { grid-template-columns: 1fr; }
   .header-title h1 { font-size: 1.35rem; }
-  .header-right { gap: 0.5rem; }
+  .header-right { gap: 0.5rem; flex-wrap: wrap; }
 }
 
 @media (max-width: 420px) {

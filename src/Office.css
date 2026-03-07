@@ -675,7 +675,7 @@
 
 @media (max-width: 480px) {
   .office-floor {
-    min-height: 350px;
+    min-height: 280px;
   }
   .char__avatar {
     width: 24px;

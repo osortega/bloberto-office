@@ -219,6 +219,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
             className="worker-card__back-close"
             onClick={() => setIsFlipped(false)}
             aria-label="Close activity history"
+            tabIndex={isFlipped ? 0 : -1}
           >✕ Close</button>
           <div className="worker-card__back-title">{worker.name}</div>
           {workerHistory.length === 0 ? (
@@ -584,7 +585,7 @@ export default function App() {
 
   const errorCount = activeWorkers.filter(w => w.status === 'error').length
 
-  const currentHour = parseInt(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Los_Angeles' }).format(new Date()), 10)
+  const currentHour = new Date().getHours()
   const greeting =
     currentHour < 12
       ? '☕ Good morning'
@@ -620,7 +621,7 @@ export default function App() {
           <span className="vibe-pill" data-vibe={teamVibe.key}>
             {teamVibe.label}
           </span>
-          {vibeStreak >= 3 && <span style={{fontSize:'0.72rem',fontWeight:700,color:'var(--accent)',marginLeft:'0.35rem'}}>x{vibeStreak}</span>}
+          {vibeStreak >= 3 && <span title={`Vibe streak: ${vibeStreak} consecutive syncs at this vibe level`} style={{fontSize:'0.72rem',fontWeight:700,color:'var(--accent)',marginLeft:'0.35rem'}}>x{vibeStreak}</span>}
           <button className='sync-now-btn' onClick={() => syncFromGitHub()} disabled={isSyncing} aria-label='Sync now' title='Refresh data (R)'>↺</button>
           <button
             className="theme-toggle"
@@ -675,11 +676,11 @@ export default function App() {
         </div>
 
         {tab === 'office' ? (
-          <div role="tabpanel" id="tabpanel-office" tabIndex={0}>
+          <div role="tabpanel" id="tabpanel-office">
             <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} />
           </div>
         ) : (
-          <div role="tabpanel" id="tabpanel-dashboard" tabIndex={0}>
+          <div role="tabpanel" id="tabpanel-dashboard">
             <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} />
 
             <div className="section-header">
@@ -693,7 +694,7 @@ export default function App() {
               )}
             </div>
 
-            <div className="workers-grid" aria-live="polite">
+            <div className="workers-grid">
               {isLoading ? (
                 <LoadingSkeleton />
               ) : activeWorkers.length === 0 && Object.keys(fadingMap).length === 0 ? (
@@ -728,7 +729,7 @@ export default function App() {
                 Last {Math.min(activityLog.length, 20)} events
               </span>
             </div>
-            <div className="activity-filter-bar" role="group" aria-label="Filter activity log">
+            <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log">
               {[
                 { key: 'all', label: 'All' },
                 { key: 'hires', label: '🟢 Hires' },
@@ -737,9 +738,10 @@ export default function App() {
               ].map(({ key, label }) => (
                 <button
                   key={key}
+                  role="radio"
                   className={activityFilter === key ? 'active' : ''}
                   onClick={() => setActivityFilter(key)}
-                  aria-pressed={activityFilter === key}
+                  aria-checked={activityFilter === key}
                 >
                   {label}
                 </button>
