@@ -15,20 +15,21 @@
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "started": null
+      "status": "working",
+      "task": "Implementing Luna review #22: Vibe-reactive boss honorific + floor grid glow",
+      "progress": 5,
+      "started": "2026-03-07T22:35:00Z",
+      "updated_at": "2026-03-07T22:35:00Z"
     },
     {
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
       "emoji": "\ud83c\udf19",
-      "status": "working",
-      "task": "Creative review #22 \u2014 visual + ideation cycle",
-      "progress": 10,
-      "started": "2026-03-07T22:30:00Z"
+      "status": "idle",
+      "task": "",
+      "progress": 0,
+      "started": null
     },
     {
       "id": "carlos",
@@ -78,5 +79,5 @@
       "role": "Creative Director"
     }
   ],
-  "last_updated": "2026-03-07T22:30:00Z"
+  "last_updated": "2026-03-07T22:35:00Z"
 }

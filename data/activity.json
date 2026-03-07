@@ -579,5 +579,17 @@
     "type": "complete",
     "worker": "Sofia",
     "message": "QA review #31 complete \u2014 overall score 3.8/5, 12 suggestions (3 high, 5 medium, 4 low). Persistent: App.jsx extraction (6th flag), React.memo (9th flag!), ErrorBoundary (6th flag). New: vibeStreak incorrect increment, completionToast blocks clicks."
+  },
+  {
+    "timestamp": "2026-03-07T22:30:00Z",
+    "type": "complete",
+    "worker": "Luna",
+    "message": "Creative review #22 complete \u2014 7 ideas (2 must, 2 should, 2 could, 1 wild). Theme: Voices & Vitals."
+  },
+  {
+    "timestamp": "2026-03-07T22:35:00Z",
+    "type": "hire",
+    "worker": "Dave",
+    "message": "Assigned: Vibe-reactive boss honorific + floor grid glow (Luna review #22, must priority)"
   }
 ]
