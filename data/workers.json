@@ -4,10 +4,19 @@
       "name": "Maya",
       "role": "Frontend Engineer",
       "status": "working",
-      "task": "Implementing idle wanderer tooltips + solo worker spotlight (Luna #14)",
+      "task": "Fix duplicate tooltip CSS + whiteboard 375px breakpoint (Sofia #24)",
       "progress": 10,
-      "started_at": "2026-03-07T18:40:00Z",
+      "started_at": "2026-03-07T18:47:00Z",
       "emoji": "🎨"
+    },
+    {
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "status": "working",
+      "task": "Extract DEFAULT_ROSTER to constants.js + fix date timezone + React.memo (Sofia #24)",
+      "progress": 10,
+      "started_at": "2026-03-07T18:47:00Z",
+      "emoji": "⚙️"
     }
   ]
 }
