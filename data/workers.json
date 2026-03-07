@@ -1,3 +1,56 @@
-{
-  "workers": []
-}
+[
+  {
+    "name": "Bloberto",
+    "role": "manager",
+    "status": "idle",
+    "emoji": "🫠",
+    "task": "",
+    "progress": 0,
+    "updated_at": "2026-03-07T19:30:00Z"
+  },
+  {
+    "name": "Luna",
+    "role": "creative-director",
+    "status": "working",
+    "emoji": "🌙",
+    "task": "Creative review #16 — reviewing site and writing ideas",
+    "progress": 10,
+    "updated_at": "2026-03-07T19:30:00Z"
+  },
+  {
+    "name": "Maya",
+    "role": "frontend",
+    "status": "idle",
+    "emoji": "🎨",
+    "task": "",
+    "progress": 0,
+    "updated_at": "2026-03-07T19:30:00Z"
+  },
+  {
+    "name": "Carlos",
+    "role": "backend",
+    "status": "idle",
+    "emoji": "⚡",
+    "task": "",
+    "progress": 0,
+    "updated_at": "2026-03-07T19:30:00Z"
+  },
+  {
+    "name": "Dave",
+    "role": "devops",
+    "status": "idle",
+    "emoji": "🔧",
+    "task": "",
+    "progress": 0,
+    "updated_at": "2026-03-07T19:30:00Z"
+  },
+  {
+    "name": "Sofia",
+    "role": "qa",
+    "status": "idle",
+    "emoji": "🧪",
+    "task": "",
+    "progress": 0,
+    "updated_at": "2026-03-07T19:30:00Z"
+  }
+]
