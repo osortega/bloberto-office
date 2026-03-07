@@ -645,15 +645,25 @@ export default function Office({ workers = [], roster = [], isSyncing = false })
         })}
 
         {/* Idle workers wandering the lower floor */}
-        {idleWorkers.map((w, i) => (
-          <Character
-            key={w.id}
-            worker={w}
-            variant="idle"
-            wanderIdx={(i % 4) + 1}
-            delay={i * 0.2}
-          />
-        ))}
+        {idleWorkers.map((w, i) => {
+          const wIdx = (i % 4) + 1
+          const wanderTooltips = {
+            1: '☕ Heading to the coffee corner',
+            2: '💬 Lingering by the whiteboard',
+            3: '🪟 Staring out the window',
+            4: '🧘 Taking a mindful moment',
+          }
+          return (
+            <Character
+              key={w.id}
+              worker={w}
+              variant="idle"
+              wanderIdx={wIdx}
+              delay={i * 0.2}
+              tooltip={wanderTooltips[wIdx]}
+            />
+          )
+        })}
 
         {/* Office window — time-aware sky view */}
         <WindowElement />

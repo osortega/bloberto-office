@@ -715,34 +715,49 @@ export default function App() {
               )}
             </div>
 
-            <div className="workers-grid">
-              {isLoading ? (
-                <LoadingSkeleton />
-              ) : activeWorkers.length === 0 && Object.keys(fadingMap).length === 0 ? (
-                <EmptyState />
-              ) : (
-                <>
-                  {activeWorkers.map((w, i) => (
-                    <WorkerCard
-                      key={w.id}
-                      worker={w}
-                      index={i}
-                      isNew={newIds.has(w.id)}
-                      activityEntries={activityLog}
-                    />
-                  ))}
-                  {Object.values(fadingMap).map((w) => (
-                    <WorkerCard
-                      key={w.id}
-                      worker={w}
-                      index={activeWorkers.length}
-                      isFading
-                      activityEntries={activityLog}
-                    />
-                  ))}
-                </>
-              )}
-            </div>
+            {!isLoading && activeWorkers.length === 1 && Object.keys(fadingMap).length === 0 ? (
+              <div className="workers-grid--solo">
+                <div className="workers-grid workers-grid--solo-card">
+                  <WorkerCard
+                    key={activeWorkers[0].id}
+                    worker={activeWorkers[0]}
+                    index={0}
+                    isNew={newIds.has(activeWorkers[0].id)}
+                    activityEntries={activityLog}
+                  />
+                </div>
+                <p className="solo-spotlight-msg">🌟 Running solo today. Carrying the whole team on one pair of hands.</p>
+              </div>
+            ) : (
+              <div className="workers-grid">
+                {isLoading ? (
+                  <LoadingSkeleton />
+                ) : activeWorkers.length === 0 && Object.keys(fadingMap).length === 0 ? (
+                  <EmptyState />
+                ) : (
+                  <>
+                    {activeWorkers.map((w, i) => (
+                      <WorkerCard
+                        key={w.id}
+                        worker={w}
+                        index={i}
+                        isNew={newIds.has(w.id)}
+                        activityEntries={activityLog}
+                      />
+                    ))}
+                    {Object.values(fadingMap).map((w) => (
+                      <WorkerCard
+                        key={w.id}
+                        worker={w}
+                        index={activeWorkers.length}
+                        isFading
+                        activityEntries={activityLog}
+                      />
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
 
             <div className="section-header" style={{ marginTop: '2.5rem' }}>
               <div className="section-title">📋 Activity Log</div>
