@@ -566,7 +566,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false })
         </div>
         <div className="mgr-desk">
           <div className="mgr-desk__monitor" data-vibe={vibe} />
-          <div className="mgr-desk__nameplate">Manager</div>
+          <div key={vibe} className="mgr-desk__nameplate mgr-desk__nameplate--vibe">
+            {vibe === 'crushing' ? 'CVO' : vibe === 'on-fire' ? 'INCIDENT CMD' : vibe === 'in-flow' ? 'MANAGER' : vibe === 'slow-day' ? 'DIR. OF VIBES' : vibe === 'after-hours' ? 'NIGHT WATCH' : 'MANAGER'}
+          </div>
           <span className="sr-only">Manager desk</span>
         </div>
 
@@ -578,20 +580,29 @@ export default function Office({ workers = [], roster = [], isSyncing = false })
           return (
             <div
               key={desk.id}
-              className={`desk${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}`}
+              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}`}
               style={{
                 left: `${desk.left}%`,
                 top: `${desk.top}%`,
                 ...(isWorking ? { '--role-color': ROLE_COLORS[occ.worker.role] } : {}),
               }}
             >
-              <div className="desk__monitor" />
-              {occ && !occ.ghost && (
-                <div
-                  className={`desk__nameplate${isWorking ? ' desk__nameplate--active' : ''}${hasError ? ' desk__nameplate--error' : ''}`}
-                >
-                  {occ.worker.name.split(' ')[0]}
-                </div>
+              {!occ ? (
+                <>
+                  <div className="desk__monitor desk__monitor--vacant" />
+                  <div className="desk__nameplate desk__nameplate--vacant">📋 Vacant</div>
+                </>
+              ) : (
+                <>
+                  <div className="desk__monitor" />
+                  {!occ.ghost && (
+                    <div
+                      className={`desk__nameplate${isWorking ? ' desk__nameplate--active' : ''}${hasError ? ' desk__nameplate--error' : ''}`}
+                    >
+                      {occ.worker.name.split(' ')[0]}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )

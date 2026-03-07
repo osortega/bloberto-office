@@ -313,6 +313,44 @@
 .desk__nameplate--active { color:var(--role-color,var(--accent)); text-shadow:0 0 8px var(--role-color,var(--accent)); transition:color 0.4s, text-shadow 0.4s; }
 .desk__nameplate--error { color:var(--red); animation:nameplate-pulse 0.8s ease-in-out infinite; }
 @keyframes nameplate-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* ── Vacant desk state ── */
+.desk--vacant {
+  opacity: 0.4;
+  border: 1.5px dashed var(--border);
+  animation: vacant-pulse 3s ease-in-out infinite;
+}
+@keyframes vacant-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.25; }
+}
+.desk__monitor--vacant {
+  position: relative;
+  background: transparent;
+  border: 1.5px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.desk__monitor--vacant::after {
+  content: '?';
+  position: absolute;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  opacity: 0.6;
+}
+.desk__nameplate--vacant {
+  color: var(--text-muted);
+  font-style: italic;
+  opacity: 0.7;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+/* ── Manager nameplate vibe fade ── */
+@keyframes vibe-title-fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+.mgr-desk__nameplate--vibe { animation: vibe-title-fade 0.35s ease forwards; }
 .char__name {
   font-size: 0.58rem;
   color: var(--text-muted);
