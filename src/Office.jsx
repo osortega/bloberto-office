@@ -3,17 +3,6 @@ import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
 import { ROLE_COLORS } from './utils/constants.js'
 
-const MANAGER_QUOTES = [
-  'Per my last commit…',
-  'Can we circle back on that PR?',
-  'It is not a bug, it is a feature roadmap item.',
-  'Have you tried shipping it on Friday?',
-  'My calendar says we are aligned.',
-  'Let us take this offline.',
-  'I will ping you async.',
-  'This could have been a commit message.',
-]
-
 const VIBE_QUOTES = {
   'crushing': [
     'I knew all along this team was special.',
@@ -368,7 +357,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
 
     const id = setInterval(() => {
       if (isHoveringRef.current) return  // hover takes priority
-      const quotes = (managerVibe && VIBE_QUOTES[managerVibe]) || MANAGER_QUOTES
+      const quotes = VIBE_QUOTES[managerVibe] || VIBE_QUOTES['in-flow']
       const quote = quotes[Math.floor(Math.random() * quotes.length)]
       setBubble({ quote, show: true })
       if (timerRef.current) clearTimeout(timerRef.current)
@@ -386,7 +375,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
     if (variant === 'ghost') { setGhostBubble(true); return }
     if (variant !== 'manager') return
     isHoveringRef.current = true
-    const quotes = (managerVibe && VIBE_QUOTES[managerVibe]) || MANAGER_QUOTES
+    const quotes = VIBE_QUOTES[managerVibe] || VIBE_QUOTES['in-flow']
     const quote = quotes[Math.floor(Math.random() * quotes.length)]
     if (timerRef.current) clearTimeout(timerRef.current)
     setBubble({ quote, show: true })

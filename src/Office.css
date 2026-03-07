@@ -438,7 +438,8 @@
   z-index: 100;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
-.char[data-tooltip]:hover::after {
+.char[data-tooltip]:hover::after,
+.char[data-tooltip]:focus-visible::after {
   opacity: 1;
 }
 
@@ -838,12 +839,13 @@
 
   /* error-halo is a safety signal — intentionally kept */
 
-  /* error-pulse reduced for a11y */
+  /* sos-morse reduced for a11y */
   .desk--error .desk__monitor { animation: none; }
 }
 
 /* ── Worker tooltip on hover (Luna #7) ── */
-.char[data-tooltip]:hover::after {
+.char[data-tooltip]:hover::after,
+.char[data-tooltip]:focus-visible::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: 100%;
@@ -864,15 +866,9 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-/* ── Error desk red pulse (Luna #7) ── */
-.desk--error .desk__monitor {
-  box-shadow: 0 0 12px rgba(239,68,68,0.6);
-  animation: error-pulse 1.2s ease-in-out infinite;
-}
-@keyframes error-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(239,68,68,0.4); }
-  50% { box-shadow: 0 0 16px rgba(239,68,68,0.8); }
-}
+/* ── Error desk SOS morse flash (Luna #7) ── */
+.desk--error .desk__monitor { animation: sos-morse 4.2s step-start infinite; box-shadow: 0 0 0 2px var(--red), 0 0 12px rgba(239,68,68,0.4); }
+@keyframes sos-morse { 0%{background:var(--red);opacity:1} 5%{opacity:0} 10%{opacity:1} 15%{opacity:0} 20%{opacity:1} 25%{opacity:0} 33%{background:#ff6600;opacity:1} 40%{opacity:0} 49%{opacity:1} 56%{opacity:0} 65%{opacity:1} 70%{opacity:0} 75%{background:var(--red);opacity:1} 80%{opacity:0} 83%{opacity:1} 88%{opacity:0} 93%{opacity:1} 98%{opacity:0} 100%{opacity:1} }
 
 /* ── Idle duration badge ── */
 .idle-duration {

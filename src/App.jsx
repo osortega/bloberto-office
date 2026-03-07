@@ -172,9 +172,9 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
     .reverse()
 
   return (
-    <div className={classes.join(' ')} style={{ '--i': index }} tabIndex={0}>
+    <div className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`}>
       <div className="worker-card__inner">
-        <div className="worker-card__front">
+        <div className="worker-card__front" aria-hidden={isFlipped || undefined}>
           <div className="worker-header">
             <div className="worker-avatar">{getRoleEmoji(worker.role)}</div>
             <div className="worker-info" style={{ flex: 1, paddingLeft: '0.75rem' }}>
@@ -214,7 +214,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
           <ProgressBar progress={worker.progress} />
         </div>
 
-        <div className="worker-card__back">
+        <div className="worker-card__back" aria-hidden={!isFlipped || undefined}>
           <button
             className="worker-card__back-close"
             onClick={() => setIsFlipped(false)}
@@ -242,6 +242,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
   const idle = workers.filter((w) => w.status === 'idle').length
+  const errorCount = workers.filter((w) => w.status === 'error').length
 
   const syncLabel = lastSynced
     ? lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -272,6 +273,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
         <span className="stat-label">✨ Team Vibe</span>
         <span className="stat-value vibe-value">{vibe.label}</span>
       </div>
+      {errorCount > 0 && <div className='stat-card stat-card--error'><div className='stat-label'>❌ Errors</div><div className='stat-value'>{errorCount}</div></div>}
     </div>
   )
 }
@@ -348,10 +350,11 @@ export default function App() {
       if (e.key === '1') { setTab('office'); window.location.replace('#office') }
       else if (e.key === '2') { setTab('dashboard'); window.location.replace('#dashboard') }
       else if (e.key === 'Escape') document.activeElement?.blur()
+      else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && !isSyncing) syncFromGitHub()
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [isSyncing, syncFromGitHub])
 
   // ── Hash-based tab sync (browser back/forward) ──
   useEffect(() => {
@@ -563,7 +566,7 @@ export default function App() {
     link.rel = 'icon'
     link.href = c.toDataURL()
     if (!link.parentNode) document.head.appendChild(link)
-  }, [teamVibe])
+  }, [teamVibe.key])
 
   // ── Document title updates (Luna #7) ──
   useEffect(() => {
@@ -618,6 +621,7 @@ export default function App() {
             {teamVibe.label}
           </span>
           {vibeStreak >= 3 && <span style={{fontSize:'0.72rem',fontWeight:700,color:'var(--accent)',marginLeft:'0.35rem'}}>x{vibeStreak}</span>}
+          <button className='sync-now-btn' onClick={() => syncFromGitHub()} disabled={isSyncing} aria-label='Sync now' title='Refresh data (R)'>↺</button>
           <button
             className="theme-toggle"
             onClick={toggleTheme}
