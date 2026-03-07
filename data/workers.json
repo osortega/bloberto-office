@@ -54,11 +54,11 @@
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Engineer",
-      "status": "working",
-      "task": "QA review #16 \u2014 analyzing site code and live behavior",
-      "progress": 10,
+      "status": "idle",
+      "task": "QA review #16 complete \u2014 12 suggestions filed",
+      "progress": 100,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T05:07:00Z"
+      "updated_at": "2026-03-07T05:15:00Z"
     }
   ],
   "roster": [
@@ -93,6 +93,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T05:07:00Z",
+  "last_updated": "2026-03-07T05:15:00Z",
   "manager": "Bloberto"
 }

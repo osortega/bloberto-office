@@ -1,109 +1,106 @@
 {
-  "analyst": "Sofia",
-  "review_number": 15,
-  "timestamp": "2026-03-07T04:40:00Z",
-  "scores": {
-    "visual": 4,
-    "ux": 3.5,
-    "responsiveness": 3.5,
-    "performance": 3,
-    "accessibility": 3,
-    "code_quality": 3.5,
-    "features": 4,
-    "fun_factor": 4.5
-  },
-  "overall_score": 3.6,
-  "highlights": [
-    "Bloberto mood faces are a delightful touch — personality cranked to 11",
-    "Vibe whiteboard and ambient broadcasts give the office real character",
-    "Deep work aura and idle duration displays add meaningful info at a glance",
-    "Custom SVG character avatars for each team member — no more generic blobs",
-    "Error halo system is well-designed with proper a11y considerations"
-  ],
+  "review_number": 16,
+  "reviewer": "Sofia",
+  "timestamp": "2026-03-07T05:15:00Z",
+  "overall_score": 3.7,
+  "previous_score": 3.6,
+  "summary": "Cactus flower is a nice touch. Deep-work aura and vibe streak are great additions. But the timezone bug in the header greeting is still there — flagged since #15. Several accessibility issues persist across reviews. The codebase is growing but some cleanup debt is accumulating.",
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Keyboard shortcuts '1' and '2' are STILL inverted — review #14 flagged this",
-      "description": "In App.jsx keyboard handler, pressing '1' likely switches to the wrong tab and '2' to the other. This has been flagged since review #14. Swap the tab values in the keydown handler so '1' = first tab (Office) and '2' = second tab (Dashboard).",
-      "effort": "small"
+      "title": "Header greeting still uses viewer's local timezone — flagged since #15",
+      "description": "App.jsx: `const currentHour = new Date().getHours()`. The window sky was fixed to use America/Los_Angeles, but the greeting ('Good morning/afternoon/evening') still uses the viewer's local clock. A viewer in Tokyo sees 'Good evening' when LA is morning. Use the same Intl.DateTimeFormat approach as WindowElement. This is inconsistent behavior within the same app.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "WindowElement uses viewer's local timezone, not PST — flagged since #12",
-      "description": "WindowElement.getHour() correctly uses Intl.DateTimeFormat with America/Los_Angeles, but the hour parsing with parseInt on formatted string can fail in some locales that prefix with zero or use different formats. More critically, the window sky should reflect the OFFICE's timezone (PST), but testing shows some browsers return locale-formatted strings. Use new Date().toLocaleString('en-US', {timeZone: 'America/Los_Angeles', hour12: false, hour: 'numeric'}) and ensure parseInt handles it correctly, or just compute UTC offset manually: (utcHour - 8 + 24) % 24.",
-      "effort": "small"
+      "category": "accessibility",
+      "title": "deep-glow keyframe missing from prefers-reduced-motion — flagged since #15",
+      "description": "Office.css reduced-motion block nullifies bob, manager-wobble, wander-*, etc. But `deep-glow` (used by .char--deep-work) is not listed. It pulses continuously — exactly the kind of animation that triggers vestibular issues. Add `@keyframes deep-glow { from {} to {} }` and `.char--deep-work { animation: none !important; filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.5)); }` inside the reduced-motion block.",
+      "effort": "small",
+      "assignee": "maya"
     },
     {
       "priority": "high",
-      "category": "performance",
-      "title": "getTeamVibe called redundantly — 3 calls in Office.jsx, 2 in App.jsx",
-      "description": "grep shows getTeamVibeKey called in Office.jsx line 1 (import) + used in component, and getTeamVibe called in App.jsx multiple times. The vibe computation iterates all workers each time. Pass vibe as a prop from App to Office instead of both computing it independently. Single source of truth, single computation.",
-      "effort": "small"
+      "category": "accessibility",
+      "title": "tabpanel divs still missing tabIndex={0} — flagged since #14",
+      "description": "App.jsx: both tabpanel divs (id='tabpanel-office' and 'tabpanel-dashboard') lack tabIndex. Per WAI-ARIA 1.1, tabpanels should have tabIndex={0} so keyboard users can navigate into panel content after tab switch. Three reviews now.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "char--deep-work references undefined @keyframes char-bob",
-      "description": "Office.css line defines .char--deep-work with animation including 'char-bob' keyframes, but grep shows @keyframes char-bob does NOT exist — only 'bob' exists. The deep work animation is silently broken. Change 'char-bob' to 'bob' in the .char--deep-work animation shorthand.",
-      "effort": "small"
+      "category": "accessibility",
+      "title": "Tab container role='tablist' still missing aria-label — flagged since #14",
+      "description": "App.jsx: the div with role='tablist' has no aria-label. Screen readers announce 'tab list' with no context. Add aria-label='View selector' or similar.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Office character tooltips are hover-only — zero keyboard access",
-      "description": "Characters use data-tooltip with CSS :hover to show tooltips. No tabIndex, no onFocus handler. Keyboard users and screen reader users can never discover worker tasks. Add tabIndex={0} to character divs and add onFocus/onBlur handlers that toggle tooltip visibility, or use aria-label as a fallback.",
-      "effort": "small"
+      "title": "Bloberto speech bubble has no keyboard/focus trigger — flagged since #15",
+      "description": "The manager character shows speech bubbles on mouseenter only. Keyboard-only users can never trigger quotes. Add tabIndex={0} to the manager character wrapper and onFocus/onBlur handlers mirroring mouseenter/mouseleave.",
+      "effort": "small",
+      "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "prefers-reduced-motion block misses new animations",
-      "description": "The reduced-motion media query in Office.css lists animation overrides, but several newer animations are missing: deep-glow, vibe-crush, vibe-fire, monitor-blink (partially covered), badge-pop. Users who need reduced motion still see pulsing/flashing effects. Add these keyframes to the reduced-motion block.",
-      "effort": "small"
+      "title": "Character tooltips still hover-only — flagged since #14",
+      "description": "Characters with data-tooltip show info via CSS ::after on hover. No keyboard equivalent exists. Add tabIndex={0} and focus/blur handlers, or at minimum a visually-hidden span with tooltip text for screen readers.",
+      "effort": "medium",
+      "assignee": "maya"
     },
     {
       "priority": "medium",
+      "category": "bug",
+      "title": "Activity log relative timestamps never update — flagged since #14",
+      "description": "getRelativeTime() is called at render time only. If the page stays open, '2m ago' never ticks to '5m ago'. Add a tick counter updated every 60s to force re-render of timestamps.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "DEFAULT_ROSTER still in Office.jsx instead of constants.js — flagged since #15",
+      "description": "ROLE_EMOJIS and ROLE_COLORS were moved to utils/constants.js. DEFAULT_ROSTER was not. It's a data constant defining team composition. Move it to constants.js for consistency.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "VIBE_QUOTES and MANAGER_QUOTES could move to a dedicated data file",
+      "description": "Office.jsx has ~50 lines of quote strings at the top. These are pure data, not component logic. Moving them to a utils/quotes.js or data/quotes.js would clean up the component file and make it easier to add/edit quotes without touching component code.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Dead CSS still in App.css — .hire-form*, .hq-badge, .btn-danger — flagged since #14",
+      "description": "App.css still contains .hire-form-wrapper, .hire-form-title, .hire-form, .hq-badge, .btn-danger. None exist in App.jsx. Orphaned since the hire form was removed. Four reviews now. Delete them.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": ".progress-bar-inner in App.css reduced-motion targets wrong class — flagged since #15",
+      "description": "App.css reduced-motion block references .progress-bar-inner but the actual class is .progress-bar-fill. The rule targets nothing. Fix the class name.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "low",
       "category": "ux",
-      "title": "Browser back/forward doesn't switch tabs — no popstate listener",
-      "description": "Clicking tabs updates window.location.hash, but there's no hashchange/popstate listener. Browser back button doesn't restore the previous tab. Add: useEffect(() => { const handler = () => setTab(location.hash === '#dashboard' ? 'dashboard' : 'office'); window.addEventListener('hashchange', handler); return () => window.removeEventListener('hashchange', handler); }, []).",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Activity log relative timestamps never update",
-      "description": "getRelativeTime() computes '2m ago' at render time but never re-runs. A page left open for hours still shows '2m ago'. Add a tick state with setInterval every 60s to force re-render of timestamps.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Dead CSS from removed hire form — ~25 lines of orphaned styles",
-      "description": "App.css contains .hire-form-wrapper, .hire-form-title, .hire-form, .hq-badge, and .btn-danger styles. None of these classes exist in the JSX. Delete them to reduce noise and bundle size.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "ROLE_EMOJIS still duplicated in App.jsx vs constants.js",
-      "description": "constants.js exports ROLE_EMOJIS but App.jsx may still have its own copy. Consolidate to single import from utils/constants.js.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Cactus plant needs visual differentiation — flagged 3 reviews in a row",
-      "description": "Plant #3 (cactus at 92%, 30%) uses the same greens as plant #1. Add a tiny yellow flower: <circle cx='9' cy='5' r='2' fill='#fbbf24'/> on top of the cactus SVG. Three plants, three personalities.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "No keyboard shortcut discoverability",
-      "description": "The 1/2 keyboard shortcuts exist but users have no way to discover them. Add title attributes to tab buttons: title='Press 1' and title='Press 2', or a small help tooltip.",
-      "effort": "small"
+      "title": "No keyboard shortcut discovery — flagged since #14",
+      "description": "The 1/2 keyboard shortcuts for tab switching have no discovery path. Add title attributes to tab buttons: 'Press 1 for Office' / 'Press 2 for Dashboard'. Hidden features aren't features.",
+      "effort": "small",
+      "assignee": "maya"
     }
   ]
 }
