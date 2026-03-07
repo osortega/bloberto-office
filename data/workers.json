@@ -1,29 +1,62 @@
-[
-  {
-    "name": "Maya",
-    "role": "Frontend Engineer",
-    "emoji": "\ud83c\udfa8",
-    "status": "working",
-    "task": "Per-Desk Completion Burst animation (Luna idea #2)",
-    "progress": 10,
-    "started": "2026-03-07T22:05:00Z"
-  },
-  {
-    "name": "Dave",
-    "role": "DevOps Engineer",
-    "emoji": "\ud83d\ude80",
-    "status": "idle",
-    "task": "",
-    "progress": 0,
-    "started": null
-  },
-  {
-    "name": "Luna",
-    "role": "Creative Director",
-    "emoji": "\ud83c\udf19",
-    "status": "idle",
-    "task": "",
-    "progress": 0,
-    "started": null
-  }
-]
+{
+  "workers": [
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "emoji": "🎨",
+      "status": "working",
+      "task": "Per-Desk Completion Burst animation (Luna idea #2)",
+      "progress": 10,
+      "started": "2026-03-07T22:05:00Z"
+    },
+    {
+      "id": "dave",
+      "name": "Dave",
+      "role": "DevOps Engineer",
+      "emoji": "🚀",
+      "status": "idle",
+      "task": "",
+      "progress": 0,
+      "started": null
+    },
+    {
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
+      "status": "idle",
+      "task": "",
+      "progress": 0,
+      "started": null
+    },
+    {
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "🔧",
+      "status": "idle",
+      "task": "",
+      "progress": 0,
+      "started": null
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "🔍",
+      "status": "idle",
+      "task": "",
+      "progress": 0,
+      "started": null
+    }
+  ],
+  "roster": [
+    { "id": "carlos", "name": "Carlos", "role": "Backend Engineer" },
+    { "id": "maya", "name": "Maya", "role": "Frontend Engineer" },
+    { "id": "dave", "name": "Dave", "role": "DevOps Engineer" },
+    { "id": "sofia", "name": "Sofia", "role": "QA Engineer" },
+    { "id": "luna", "name": "Luna", "role": "Creative Director" }
+  ],
+  "last_updated": "2026-03-07T22:23:00Z"
+}
