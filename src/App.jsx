@@ -52,6 +52,15 @@ const ACTIVITY_ICONS = {
   system: '⚙️',
 }
 
+/** Bumps every 60s so relative timestamps stay fresh */
+function useTimeTick(intervalMs = 60_000) {
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), intervalMs)
+    return () => clearInterval(id)
+  }, [intervalMs])
+}
+
 function ActivityLogEntry({ entry }) {
   return (
     <div className={`activity-entry activity-entry--${entry.type}`}>
@@ -309,6 +318,7 @@ const TABS = ['office', 'dashboard']
 const IDLE_TIMEOUT = 10 * 60_000
 
 export default function App() {
+  useTimeTick(60_000) // keep relative timestamps fresh
   const [allWorkers, setAllWorkers] = useState([])
   const [roster, setRoster] = useState([])
   const [activityLog, setActivityLog] = useState([])
@@ -560,6 +570,7 @@ export default function App() {
     const workingCount = activeWorkers.filter(w => w.status === 'working').length
     const total = activeWorkers.length
     const hasError = activeWorkers.some(w => w.status === 'error')
+
     const prefix = hasError ? '⚠️ ' : ''
     if (workingCount === 0 && total === 0) {
       document.title = "😴 Bloberto's Office — All quiet"
@@ -567,6 +578,8 @@ export default function App() {
       document.title = `${prefix}(${workingCount}/${total}) Bloberto's Office — ${teamVibe.label}`
     }
   }, [activeWorkers, teamVibe])
+
+  const errorCount = activeWorkers.filter(w => w.status === 'error').length
 
   const currentHour = parseInt(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Los_Angeles' }).format(new Date()), 10)
   const greeting =
@@ -598,6 +611,7 @@ export default function App() {
               weekday: 'long',
               month: 'short',
               day: 'numeric',
+              timeZone: 'America/Los_Angeles',
             })}
           </div>
           <span className="vibe-pill" data-vibe={teamVibe.key}>
@@ -652,6 +666,7 @@ export default function App() {
             onKeyDown={handleTabKeyDown}
           >
             📊 Dashboard
+            {errorCount > 0 && <span className='tab-error-badge'>{errorCount}</span>}
           </button>
         </div>
 

@@ -307,6 +307,12 @@
   background-color: var(--error-tint) !important;
   border-color: rgba(239, 68, 68, 0.4) !important;
 }
+
+/* ── Desk nameplates ── */
+.desk__nameplate { position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); font-size:0.6rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-muted); white-space:nowrap; pointer-events:none; }
+.desk__nameplate--active { color:var(--role-color,var(--accent)); text-shadow:0 0 8px var(--role-color,var(--accent)); transition:color 0.4s, text-shadow 0.4s; }
+.desk__nameplate--error { color:var(--red); animation:nameplate-pulse 0.8s ease-in-out infinite; }
+@keyframes nameplate-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 .char__name {
   font-size: 0.58rem;
   color: var(--text-muted);
@@ -492,6 +498,11 @@
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-4px); }
 }
+
+/* Ghost OOO speech bubble */
+.ghost-ooo-bubble { position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); background:rgba(30,27,75,0.92); border:1px solid rgba(139,92,246,0.3); border-radius:8px; padding:6px 10px; font-size:0.68rem; color:#c4b5fd; white-space:nowrap; pointer-events:none; z-index:150; animation:ooo-in 0.15s ease; text-align:center; line-height:1.5; }
+.ghost-ooo-role { font-size:0.62rem; color:#8b5cf6; display:block; }
+@keyframes ooo-in { from { opacity:0; transform:translateX(-50%) scale(0.9); } to { opacity:1; transform:translateX(-50%) scale(1); } }
 
 /* Gentle typing bob */
 @keyframes bob {

@@ -351,6 +351,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   const roleColor = !isManager ? (ROLE_COLORS[worker.role] ?? '#6b7280') : null
 
   const [bubble, setBubble] = useState({ quote: null, show: false })
+  const [ghostBubble, setGhostBubble] = useState(false)
   const timerRef = useRef(null)      // hover auto-hide timeout
   const ambientRef = useRef(null)    // ambient broadcast interval
   const isHoveringRef = useRef(false) // prevents ambient overlap with hover
@@ -382,6 +383,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   }, [variant, managerVibe])
 
   const handleMouseEnter = () => {
+    if (variant === 'ghost') { setGhostBubble(true); return }
     if (variant !== 'manager') return
     isHoveringRef.current = true
     const quotes = (managerVibe && VIBE_QUOTES[managerVibe]) || MANAGER_QUOTES
@@ -392,6 +394,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   }
 
   const handleMouseLeave = () => {
+    if (variant === 'ghost') { setGhostBubble(false); return }
     if (variant !== 'manager') return
     isHoveringRef.current = false
     if (timerRef.current) clearTimeout(timerRef.current)
@@ -425,7 +428,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   }
   if (isError) classes.push('char--glitch')
 
-  const extraProps = tooltip ? { 'data-tooltip': tooltip } : {}
+  const extraProps = (tooltip && variant !== 'ghost') ? { 'data-tooltip': tooltip } : {}
 
   return (
     <div className={classes.join(' ')} style={style} {...extraProps}
@@ -444,6 +447,9 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
         <div className={`speech-bubble${bubble.show ? ' speech-bubble--visible' : ''}`}>
           {bubble.quote}
         </div>
+      )}
+      {variant === 'ghost' && ghostBubble && (
+        <div className='ghost-ooo-bubble'>📵 OOO<br/><span className='ghost-ooo-role'>{worker.role}</span></div>
       )}
       <div className={`char__avatar${isError ? ' char__avatar--error' : ''}`}>
         <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} vibeKey={vibeKey} />
@@ -476,7 +482,10 @@ function WindowElement() {
   const [hour, setHour] = useState(getHour)
 
   useEffect(() => {
-    const id = setInterval(() => setHour(getHour()), 60000)
+    const id = setInterval(() => {
+      const h = getHour()
+      setHour(prev => prev === h ? prev : h)
+    }, 60000)
     return () => clearInterval(id)
   }, [])
 
@@ -588,6 +597,13 @@ export default function Office({ workers = [], roster = [], isSyncing = false })
               }}
             >
               <div className="desk__monitor" />
+              {occ && !occ.ghost && (
+                <div
+                  className={`desk__nameplate${isWorking ? ' desk__nameplate--active' : ''}${hasError ? ' desk__nameplate--error' : ''}`}
+                >
+                  {occ.worker.name.split(' ')[0]}
+                </div>
+              )}
             </div>
           )
         })}
