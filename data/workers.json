@@ -4,7 +4,7 @@
       "id": "maya",
       "name": "Maya",
       "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8",
+      "emoji": "🎨",
       "status": "working",
       "task": "Per-Desk Completion Burst animation (Luna idea #2)",
       "progress": 10,
@@ -14,7 +14,7 @@
       "id": "dave",
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80",
+      "emoji": "🚀",
       "status": "working",
       "task": "Desk Lamp Glow Scales with Worker Progress (Luna idea #4)",
       "progress": 5,
@@ -25,17 +25,17 @@
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19",
-      "status": "idle",
-      "task": "",
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review #24 — visual + code analysis",
       "progress": 0,
-      "started": null
+      "started": "2026-03-07T23:30:00Z"
     },
     {
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "\ud83d\udd27",
+      "emoji": "🔧",
       "status": "working",
       "task": "Vibe-Shift Reaction + Coffee Corner Reacts to Vibe (Luna ideas #1 & #5)",
       "progress": 5,
@@ -46,7 +46,7 @@
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d",
+      "emoji": "🔍",
       "status": "idle",
       "task": "",
       "progress": 0,
@@ -81,5 +81,5 @@
       "role": "Creative Director"
     }
   ],
-  "last_updated": "2026-03-07T23:20:00Z"
+  "last_updated": "2026-03-07T23:30:00Z"
 }
