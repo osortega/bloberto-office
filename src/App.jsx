@@ -77,8 +77,38 @@ function ActivityLogEntry({ entry, roster }) {
   )
 }
 
+function getTimeGroup(timestamp) {
+  const now = Date.now()
+  const ts = new Date(timestamp).getTime()
+  const diffMs = now - ts
+  const nowDate = new Date(now)
+  const entryDate = new Date(ts)
+  if (diffMs < 5 * 60 * 1000) return 'Just now'
+  if (
+    entryDate.getFullYear() === nowDate.getFullYear() &&
+    entryDate.getMonth() === nowDate.getMonth() &&
+    entryDate.getDate() === nowDate.getDate()
+  ) return 'Earlier today'
+  const yesterday = new Date(nowDate)
+  yesterday.setDate(nowDate.getDate() - 1)
+  if (
+    entryDate.getFullYear() === yesterday.getFullYear() &&
+    entryDate.getMonth() === yesterday.getMonth() &&
+    entryDate.getDate() === yesterday.getDate()
+  ) return 'Yesterday'
+  return 'Older'
+}
+
+const TIME_GROUP_ORDER = ['Just now', 'Earlier today', 'Yesterday', 'Older']
+
 function ActivityLog({ entries, error, roster }) {
   const displayed = [...entries].reverse().slice(0, 20)
+
+  const groups = TIME_GROUP_ORDER.map(label => ({
+    label,
+    items: displayed.filter(e => getTimeGroup(e.timestamp) === label),
+  })).filter(g => g.items.length > 0)
+
   return (
     <div className="activity-log">
       {error ? (
@@ -86,7 +116,12 @@ function ActivityLog({ entries, error, roster }) {
       ) : displayed.length === 0 ? (
         <div className="activity-empty">No activity yet…</div>
       ) : (
-        displayed.map((entry, i) => <ActivityLogEntry key={entry.timestamp + entry.worker + i} entry={entry} roster={roster} />)
+        groups.map(({ label, items }) => (
+          <div key={label}>
+            <div className="activity-time-separator"><span>{label}</span></div>
+            {items.map((entry, i) => <ActivityLogEntry key={entry.timestamp + entry.worker + i} entry={entry} roster={roster} />)}
+          </div>
+        ))
       )}
     </div>
   )

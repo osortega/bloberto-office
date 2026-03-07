@@ -978,3 +978,7 @@
 [data-streak-tier='hot'] .vibe-pill { box-shadow: 0 0 10px rgba(251,191,36,0.45); }
 [data-streak-tier='legendary'] .vibe-pill { animation: rainbow-shift 2s linear infinite; }
 @keyframes rainbow-shift { 0%{filter:hue-rotate(0deg)} 100%{filter:hue-rotate(360deg)} }
+
+/* Activity log time-block separators */
+.activity-time-separator { display:flex; align-items:center; gap:8px; margin:12px 0 8px; font-size:0.7rem; color:var(--text-muted); letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
+.activity-time-separator::before, .activity-time-separator::after { content:''; flex:1; height:1px; background:var(--border); }
