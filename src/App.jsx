@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import './App.css'
 import Office from './Office.jsx'
 
@@ -59,6 +59,17 @@ function getRelativeTime(timestamp) {
   return `${days}d ago`
 }
 
+function formatFullDateTime(timestamp) {
+  return new Date(timestamp).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
+}
+
 const ACTIVITY_ICONS = {
   hire: '🟢',
   complete: '✅',
@@ -74,7 +85,7 @@ function ActivityLogEntry({ entry }) {
         {entry.worker && <span className="activity-worker">{entry.worker}</span>}
         <span className="activity-message">{entry.message}</span>
       </div>
-      <span className="activity-time">{getRelativeTime(entry.timestamp)}</span>
+      <span className="activity-time" title={formatFullDateTime(entry.timestamp)}>{getRelativeTime(entry.timestamp)}</span>
     </div>
   )
 }
@@ -253,6 +264,8 @@ function LoadingSkeleton() {
 
 const TABS = ['office', 'dashboard']
 
+const IDLE_TIMEOUT = 10 * 60_000
+
 export default function App() {
   const [allWorkers, setAllWorkers] = useState([])
   const [roster, setRoster] = useState([])
@@ -266,6 +279,20 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
   const [tab, setTab] = useState('office')
+
+  const lastActivity = useRef(Date.now())
+
+  useEffect(() => {
+    const touch = () => { lastActivity.current = Date.now() }
+    window.addEventListener('mousemove', touch)
+    window.addEventListener('keydown', touch)
+    window.addEventListener('touchstart', touch)
+    return () => {
+      window.removeEventListener('mousemove', touch)
+      window.removeEventListener('keydown', touch)
+      window.removeEventListener('touchstart', touch)
+    }
+  }, [])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -330,11 +357,16 @@ export default function App() {
     const getInterval = () =>
       document.visibilityState === 'hidden' ? POLL_INTERVAL_HIDDEN : POLL_INTERVAL_ACTIVE
 
-    let timer = setInterval(syncFromGitHub, getInterval())
+    const pollTick = () => {
+      if (Date.now() - lastActivity.current > IDLE_TIMEOUT) return
+      syncFromGitHub()
+    }
+
+    let timer = setInterval(pollTick, getInterval())
 
     const handleVisibilityChange = () => {
       clearInterval(timer)
-      timer = setInterval(syncFromGitHub, getInterval())
+      timer = setInterval(pollTick, getInterval())
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
