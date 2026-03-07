@@ -1,7 +1,7 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-07T01:12:00Z",
-  "review_number": 8,
+  "timestamp": "2026-03-07T01:45:00Z",
+  "review_number": 9,
   "scores": {
     "visual": 4,
     "ux": 3.5,
@@ -13,77 +13,77 @@
     "fun_factor": 4.5
   },
   "overall_score": 3.6,
-  "notes": "Score holding steady at 3.6. The office view is genuinely fun — the character SVGs, speech bubbles, and animations give it real personality. But there are recurring issues I keep flagging that haven't been addressed: mobile responsiveness is still rough, accessibility gaps remain, and the CSS has a syntax error. The task tags and error halo from last cycle are nice additions though.",
+  "notes": "Score holding at 3.6. The CSS syntax error I flagged in review #8 is STILL there — that's the most embarrassing one, it's literally a broken selector. The office view remains the star of the show. New task tags and error halo from last cycle landed well. But we keep accumulating tech debt without fixing the fundamentals. Time to fix bugs before adding features.",
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "CSS syntax error — orphaned property block in App.css",
-      "description": "At the bottom of App.css there's an orphaned CSS block starting with 'background: var(--surface2);' that's not inside any selector (around the .skeleton class). This is a parse error that could cause downstream styles to break or be ignored. The .skeleton class definition is missing its selector. Should be '.skeleton { background: var(--surface2); border-radius: var(--radius); animation: shimmer 1.5s ease-in-out infinite; }'",
+      "title": "CSS syntax error — orphaned .skeleton block in App.css STILL UNFIXED",
+      "description": "This has been flagged since review #8 and is still broken. Around line 370 of App.css, there's a bare property block ('background: var(--surface2); border-radius: var(--radius); animation: shimmer...') that's missing its '.skeleton' selector. This is a CSS parse error that will cause any styles defined after it to potentially break. Fix: add '.skeleton {' before the orphaned properties. This is a 10-second fix. Please do it.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "ux",
-      "title": "No loading state for Office tab",
-      "description": "The Dashboard tab has a nice LoadingSkeleton component, but the Office tab has no loading indicator at all. When the page first loads and data is being fetched, the office view renders with zero workers and no visual feedback. Users see an empty office floor with just Bloberto until data arrives. Add a loading state or skeleton to the Office view.",
+      "title": "Office tab has no loading state",
+      "description": "Dashboard tab has LoadingSkeleton but Office tab renders an empty floor with just Bloberto while data fetches. First-time visitors see a sad empty office. The isLoading state exists in App.jsx but isn't passed to or used by Office.jsx. Add a simple 'Loading team...' overlay or reuse the skeleton pattern.",
       "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Tab toggle buttons missing focus styles",
-      "description": "The tab toggle and activity filter buttons have hover styles but no visible focus indicators. Keyboard users can't tell which button is focused. Add :focus-visible outlines to .tab-toggle button and .activity-filter-bar button.",
+      "title": "Tab and filter buttons lack focus-visible styles",
+      "description": ".tab-toggle button and .activity-filter-bar button have :hover styles but no :focus-visible outlines. Keyboard-only users can't see what's focused. Add: '.tab-toggle button:focus-visible, .activity-filter-bar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }'. Two lines of CSS.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "Polling continues when tab is idle for 10+ minutes but resumes without check",
-      "description": "The IDLE_TIMEOUT stops polling after 10 minutes of inactivity, which is great. But when the user comes back and moves the mouse, polling doesn't immediately resume — it waits for the next interval tick. Should trigger an immediate sync on activity resume after idle timeout.",
+      "title": "No immediate sync after idle timeout recovery",
+      "description": "When IDLE_TIMEOUT (10 min) stops polling and the user returns, they have to wait up to 30s for the next interval tick to get fresh data. Add: check in the activity event listeners if lastActivity was beyond IDLE_TIMEOUT and if so, call syncFromGitHub() immediately.",
       "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "Activity log filter state not preserved across tab switches",
-      "description": "If you select 'Completions' filter in the activity log, switch to Office tab, then switch back to Dashboard, the filter resets to 'All'. Minor but annoying for users who are tracking specific event types.",
+      "category": "bug",
+      "title": "seenIdsRef never resets — 'new' animation only fires once per session",
+      "description": "seenIdsRef tracks all worker IDs ever seen in the session. If a worker clocks out and clocks back in, they won't get the green pulse animation because their ID is already in seenIdsRef. For a live dashboard where workers come and go repeatedly, this means returning workers look like they were always there. Consider resetting or using a time-based approach.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "feature",
-      "title": "No roster view — can't see team members who aren't active",
-      "description": "The ghost characters in the office view hint at roster members, but there's no way to see the full team roster with roles, hire dates, etc. A simple 'Team' section or third tab showing all roster members (active or not) would add value. Currently roster data is fetched but only used for ghost placement.",
+      "title": "Add a Team/Roster tab or section",
+      "description": "Roster data is fetched and used for ghost placement but there's no way to browse the full team. A 'Team' tab or section showing all members with roles, status (active/off), and hire dates would be useful. The data is already there — just needs a UI.",
       "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "CharacterAvatar has massive if-else chain for each worker",
-      "description": "The CharacterAvatar component in Office.jsx has individual if blocks for bloberto, carlos, maya, dave, sofia, and luna — each with ~20 lines of inline SVG. This doesn't scale. If we add more team members, this file will balloon. Consider a data-driven approach where character features (hair color, skin tone, accessories) are stored in worker data and rendered by a generic avatar builder.",
-      "effort": "large"
+      "title": "prevActiveWorkersRef diffing runs on every render",
+      "description": "The useEffect that diffs activeWorkers runs every time allWorkers changes, but activeWorkers is recalculated on every render (no useMemo). This means the diff logic and all the timer management runs more than necessary. Wrap activeWorkers in useMemo to prevent unnecessary diff cycles.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Footer quote feels stale",
-      "description": "The footer always shows 'If it compiles, ship it.' — would be more fun if it rotated through a few Bloberto-isms, similar to the hover speech bubbles. Small delight that reinforces the personality.",
+      "title": "Rotate footer quotes like the Bloberto speech bubbles",
+      "description": "Footer permanently shows 'If it compiles, ship it.' — would be more engaging to rotate through quotes on each page load. The MANAGER_QUOTES array already exists in Office.jsx — export it or duplicate a few for the footer.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "No way to see historical suggestions/scores",
-      "description": "Each QA review overwrites suggestions.json. There's no history of how scores have changed over time. Consider appending to an array or using timestamped files (suggestions-2026-03-07.json) so we can track improvement trends.",
+      "title": "Suggestion history is lost — each review overwrites",
+      "description": "suggestions.json gets overwritten every review. No way to track score trends over time. Consider appending reviews to an array or using timestamped filenames. This would let us build a score chart on the dashboard eventually.",
       "effort": "medium"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Coffee corner is decorative-only",
-      "description": "The coffee corner in the office view is cute but doesn't do anything. Could show idle workers hanging out there instead of wandering randomly, or display a fun 'coffees consumed today' counter based on activity count. Small touch that would make the office feel more alive.",
-      "effort": "medium"
+      "title": "Idle workers wander through desks — path collision",
+      "description": "The wander keyframe paths (wander-1 through wander-4) can overlap with desk positions, making idle workers appear to walk through furniture. Constrain wander paths to the lower 20% of the floor (y: 78-90%) and the coffee corner area to avoid visual clipping with desks.",
+      "effort": "small"
     }
   ]
 }

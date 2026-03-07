@@ -2,7 +2,7 @@
   {
     "timestamp": "2026-03-06T16:25:00Z",
     "type": "system",
-    "message": "Bloberto came online for the first time \ud83e\udee0"
+    "message": "Bloberto came online for the first time 🫠"
   },
   {
     "timestamp": "2026-03-06T16:35:00Z",
@@ -80,30 +80,30 @@
     "timestamp": "2026-03-06T19:21:00Z",
     "type": "hire",
     "worker": "Carlos",
-    "message": "Hired as Backend Engineer \u2014 clean APIs, strict error handling"
+    "message": "Hired as Backend Engineer — clean APIs, strict error handling"
   },
   {
     "timestamp": "2026-03-06T19:21:00Z",
     "type": "hire",
     "worker": "Maya",
-    "message": "Hired as Frontend Engineer \u2014 creative, detail-oriented, animation lover"
+    "message": "Hired as Frontend Engineer — creative, detail-oriented, animation lover"
   },
   {
     "timestamp": "2026-03-06T19:21:00Z",
     "type": "hire",
     "worker": "Dave",
-    "message": "Hired as DevOps Engineer \u2014 automation obsessed, hates manual work"
+    "message": "Hired as DevOps Engineer — automation obsessed, hates manual work"
   },
   {
     "timestamp": "2026-03-06T19:21:00Z",
     "type": "hire",
     "worker": "Sofia",
-    "message": "Hired as QA Engineer \u2014 skeptical by nature, will find your bugs"
+    "message": "Hired as QA Engineer — skeptical by nature, will find your bugs"
   },
   {
     "timestamp": "2026-03-06T19:22:00Z",
     "type": "system",
-    "message": "Team roster system created \u2014 workers are now persistent identities with evolving prompts"
+    "message": "Team roster system created — workers are now persistent identities with evolving prompts"
   },
   {
     "timestamp": "2026-03-06T19:24:00Z",
@@ -121,7 +121,7 @@
     "timestamp": "2026-03-06T19:36:00Z",
     "type": "hire",
     "worker": "Maya",
-    "message": "Assigned to fix ghost roster \u2014 Bloberto was lonely"
+    "message": "Assigned to fix ghost roster — Bloberto was lonely"
   },
   {
     "timestamp": "2026-03-06T19:40:00Z",
@@ -139,7 +139,7 @@
     "timestamp": "2026-03-06T21:45:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "Completed site review \u2014 10 suggestions filed (3 high, 4 medium, 3 low). Overall score: 3.4/5"
+    "message": "Completed site review — 10 suggestions filed (3 high, 4 medium, 3 low). Overall score: 3.4/5"
   },
   {
     "timestamp": "2026-03-06T21:42:00Z",
@@ -151,7 +151,7 @@
     "timestamp": "2026-03-06T21:44:00Z",
     "type": "complete",
     "worker": "Maya",
-    "message": "Switched to raw.githubusercontent.com \u2014 no more rate limits"
+    "message": "Switched to raw.githubusercontent.com — no more rate limits"
   },
   {
     "timestamp": "2026-03-06T22:07:00Z",
@@ -163,7 +163,7 @@
     "timestamp": "2026-03-06T22:10:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #2 complete \u2014 9 suggestions filed (2 high, 4 medium, 3 low). Score: 3.6/5 (up from 3.4)"
+    "message": "QA review #2 complete — 9 suggestions filed (2 high, 4 medium, 3 low). Score: 3.6/5 (up from 3.4)"
   },
   {
     "timestamp": "2026-03-06T22:37:00Z",
@@ -175,7 +175,7 @@
     "timestamp": "2026-03-06T22:42:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #3 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.7/5 (up from 3.6)"
+    "message": "QA review #3 complete — 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.7/5 (up from 3.6)"
   },
   {
     "timestamp": "2026-03-06T23:07:00Z",
@@ -187,7 +187,7 @@
     "timestamp": "2026-03-06T23:12:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #4 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.65/5"
+    "message": "QA review #4 complete — 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.65/5"
   },
   {
     "timestamp": "2026-03-06T23:37:00Z",
@@ -199,7 +199,7 @@
     "timestamp": "2026-03-06T23:43:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #5 complete \u2014 10 suggestions filed (3 high, 4 medium, 3 low). Score: 3.4/5 (down from 3.65)"
+    "message": "QA review #5 complete — 10 suggestions filed (3 high, 4 medium, 3 low). Score: 3.4/5 (down from 3.65)"
   },
   {
     "timestamp": "2026-03-07T00:07:00Z",
@@ -211,13 +211,13 @@
     "timestamp": "2026-03-07T00:12:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #6 complete \u2014 10 suggestions filed (3 high, 4 medium, 3 low). Score: 3.3/5 (down from 3.4)"
+    "message": "QA review #6 complete — 10 suggestions filed (3 high, 4 medium, 3 low). Score: 3.3/5 (down from 3.4)"
   },
   {
     "timestamp": "2026-03-07T00:23:43Z",
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #1 complete \u2014 9 ideas filed (3 must, 2 should, 2 could, 1 wild) + 1 hire proposal"
+    "message": "Creative review #1 complete — 9 ideas filed (3 must, 2 should, 2 could, 1 wild) + 1 hire proposal"
   },
   {
     "timestamp": "2026-03-07T00:27:05Z",
@@ -235,25 +235,25 @@
     "timestamp": "2026-03-07T00:42:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #7 complete \u2014 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.6/5 (up from 3.3)"
+    "message": "QA review #7 complete — 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.6/5 (up from 3.3)"
   },
   {
     "timestamp": "2026-03-07T00:55:00Z",
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #2 complete \u2014 9 new ideas filed (2 must, 3 should, 3 could, 1 wild) + 1 hire proposal"
+    "message": "Creative review #2 complete — 9 new ideas filed (2 must, 3 should, 3 could, 1 wild) + 1 hire proposal"
   },
   {
     "timestamp": "2026-03-07T00:58:00Z",
     "type": "complete",
     "worker": "Maya",
-    "message": "Implemented Error Urgency Halo \u2014 pulsing red avatar, ! badge, desk tint for error workers"
+    "message": "Implemented Error Urgency Halo — pulsing red avatar, ! badge, desk tint for error workers"
   },
   {
     "timestamp": "2026-03-07T00:58:00Z",
     "type": "complete",
     "worker": "Carlos",
-    "message": "Implemented Task Intent Auto-Tags \u2014 colored chips (Bug/Ship/Design/QA/Data/Docs) on worker cards"
+    "message": "Implemented Task Intent Auto-Tags — colored chips (Bug/Ship/Design/QA/Data/Docs) on worker cards"
   },
   {
     "timestamp": "2026-03-07T01:07:00Z",
@@ -265,12 +265,24 @@
     "timestamp": "2026-03-07T01:12:00Z",
     "type": "complete",
     "worker": "Sofia",
-    "message": "QA review #8 complete \u2014 10 suggestions filed (2 high, 4 medium, 3 low). Score: 3.6/5 (steady)"
+    "message": "QA review #8 complete — 10 suggestions filed (2 high, 4 medium, 3 low). Score: 3.6/5 (steady)"
   },
   {
     "timestamp": "2026-03-07T01:25:00Z",
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #3 complete \u2014 10 ideas filed (2 must, 3 should, 3 could, 2 wild). No hire proposals."
+    "message": "Creative review #3 complete — 10 ideas filed (2 must, 3 should, 3 could, 2 wild). No hire proposals."
+  },
+  {
+    "timestamp": "2026-03-07T01:37:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for scheduled QA review #9"
+  },
+  {
+    "timestamp": "2026-03-07T01:45:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #9 complete — 10 suggestions filed (2 high, 5 medium, 3 low). Score: 3.6/5 (steady)"
   }
 ]
