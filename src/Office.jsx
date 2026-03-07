@@ -2,7 +2,7 @@ import { useMemo, useState, useRef, useEffect, memo } from 'react'
 import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
 import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD } from './utils/constants.js'
-import { VIBE_QUOTES } from './utils/quotes.js'
+import { VIBE_QUOTES, VIBE_TRANSITION_QUOTES } from './utils/quotes.js'
 
 
 const CharacterAvatar = memo(function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
@@ -279,6 +279,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   const timerRef = useRef(null)      // hover auto-hide timeout
   const ambientRef = useRef(null)    // ambient broadcast interval
   const isHoveringRef = useRef(false) // prevents ambient overlap with hover
+  const prevVibeRef = useRef(null)
 
   // Cleanup both timer and interval on unmount
   useEffect(() => () => {
@@ -289,6 +290,16 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   // Ambient broadcast loop — fires every 45s, resets on vibe change
   useEffect(() => {
     if (variant !== 'manager') return
+
+    if (prevVibeRef.current !== null && prevVibeRef.current !== managerVibe) {
+      const transitionQuote = VIBE_TRANSITION_QUOTES[prevVibeRef.current + ':' + managerVibe]
+      if (transitionQuote) {
+        setBubble({ quote: transitionQuote, show: true })
+        if (timerRef.current) clearTimeout(timerRef.current)
+        timerRef.current = setTimeout(() => setBubble(b => ({ ...b, show: false })), 4000)
+      }
+    }
+    prevVibeRef.current = managerVibe
 
     const id = setInterval(() => {
       if (isHoveringRef.current) return  // hover takes priority
@@ -393,6 +404,18 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       })()}
       <div className={`char__avatar${isError ? ' char__avatar--error' : ''}`}>
         <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} vibeKey={vibeKey} />
+        {variant === 'working' && typeof worker.progress === 'number' && (
+          <svg className={`progress-ring${worker.progress >= 100 ? ' progress-ring--complete' : ''}`} width={avatarSize + 6} height={avatarSize + 6} viewBox={`0 0 ${avatarSize + 6} ${avatarSize + 6}`} aria-label={`${worker.progress}% complete`}>
+            <circle className="progress-ring__track" cx={(avatarSize + 6) / 2} cy={(avatarSize + 6) / 2} r={(avatarSize) / 2} />
+            <circle className="progress-ring__fill" cx={(avatarSize + 6) / 2} cy={(avatarSize + 6) / 2} r={(avatarSize) / 2}
+              style={{
+                stroke: worker.progress >= 100 ? '#22c55e' : (roleColor || ROLE_COLORS[worker.role] || '#a78bfa'),
+                strokeDasharray: Math.PI * avatarSize,
+                strokeDashoffset: Math.PI * avatarSize * (1 - Math.min(worker.progress, 100) / 100),
+              }}
+            />
+          </svg>
+        )}
         {isError && (
           <div className="char__error-badge" role="img" aria-label="Error">!</div>
         )}
@@ -559,7 +582,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         })}
 
         {/* Coffee corner — top right */}
-        <div className="coffee-corner">
+        <div className="coffee-corner" data-vibe={vibe}>
           <div className="coffee-corner__body">
             <span className="coffee-corner__emoji">☕</span>
           </div>

@@ -1028,3 +1028,42 @@
   .char--coffee-break { animation: none; left: 92%; top: 8%; }
   .coffee-corner--visited::after { animation: none; opacity: 0.5; }
 }
+
+/* Coffee corner vibe reactions */
+[data-vibe='crushing'] .coffee-corner-label { color: #4ade80; }
+[data-vibe='crushing'] .coffee-corner-label::after { content: ' TRIPLE SHOT'; font-weight: 700; }
+[data-vibe='on-fire'] .coffee-corner-label { color: #f97316; }
+[data-vibe='on-fire'] .coffee-corner-label::after { content: ' STRONG. NOW.'; font-weight: 700; }
+[data-vibe='slow-day'] .coffee-corner-label::after { content: ' ...zzz'; }
+[data-vibe='after-hours'] .coffee-corner-label::after { content: ' (decaf? jk)'; font-style: italic; }
+
+/* ── Progress Ring on Working Avatars ── */
+.progress-ring {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  pointer-events: none;
+  transform: rotate(-90deg);
+}
+.progress-ring__track {
+  fill: none;
+  stroke: rgba(255,255,255,0.1);
+  stroke-width: 2;
+}
+.progress-ring__fill {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease, stroke 0.3s ease;
+}
+.progress-ring--complete .progress-ring__fill {
+  animation: ring-complete 0.8s ease-in-out;
+}
+@keyframes ring-complete {
+  0%   { stroke-width: 2.5; }
+  50%  { stroke-width: 5; filter: drop-shadow(0 0 4px #22c55e); }
+  100% { stroke-width: 2.5; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress-ring--complete .progress-ring__fill { animation: none; }
+}
