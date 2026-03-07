@@ -343,19 +343,6 @@ export default function App() {
   const previousVibeKeyRef = useRef(null)
   const [confettiActive, setConfettiActive] = useState(false)
 
-  // ── Keyboard shortcuts ──
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
-      if (e.key === '1') { setTab('office'); window.location.replace('#office') }
-      else if (e.key === '2') { setTab('dashboard'); window.location.replace('#dashboard') }
-      else if (e.key === 'Escape') document.activeElement?.blur()
-      else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && !isSyncing) syncFromGitHub()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isSyncing, syncFromGitHub])
-
   // ── Hash-based tab sync (browser back/forward) ──
   useEffect(() => {
     const handleHashChange = () => {
@@ -447,6 +434,19 @@ export default function App() {
     setIsLoading(false)
     setIsSyncing(false)
   }, [])
+
+  // ── Keyboard shortcuts ──
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      if (e.key === '1') { setTab('office'); window.location.hash = '#office' }
+      else if (e.key === '2') { setTab('dashboard'); window.location.hash = '#dashboard' }
+      else if (e.key === 'Escape') document.activeElement?.blur()
+      else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && !isSyncing) syncFromGitHub()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isSyncing, syncFromGitHub])
 
   useEffect(() => {
     syncFromGitHub()
