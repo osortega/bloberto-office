@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo, memo } from 'react'
 import './App.css'
 import Office from './Office.jsx'
 import { getTeamVibe } from './utils/vibe.js'
@@ -224,7 +224,7 @@ function formatDuration(updatedAt) {
   return rem > 0 ? `Working for ${hours}h ${rem}m` : `Working for ${hours}h`
 }
 
-function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false, selectedTag = null, onTagClick = null, isDimmed = false }) {
+const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false, selectedTag = null, onTagClick = null, isDimmed = false }) {
   const [isFlipped, setIsFlipped] = useState(false)
   const cardRef = useRef(null)
 
@@ -323,7 +323,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
       </div>
     </div>
   )
-}
+})
 
 
 function DeltaBadge({ delta }) {
@@ -707,8 +707,10 @@ export default function App() {
   // ── Vibe Streak Counter + Confetti Burst ──
   useEffect(() => {
     const storedKey = sessionStorage.getItem('bloberto-vibe-key')
-    const storedStreak = parseInt(sessionStorage.getItem('bloberto-vibe-streak') || '1', 10)
-    const newStreak = storedKey === teamVibe.key ? storedStreak + 1 : 1
+    const storedStreak = parseInt(sessionStorage.getItem('bloberto-vibe-streak') || '0', 10)
+    // Only increment if the vibe key is the same AND this isn't the initial mount
+    const isInitialMount = previousVibeKeyRef.current === null
+    const newStreak = storedKey === teamVibe.key ? storedStreak + (isInitialMount ? 0 : 1) : 1
     sessionStorage.setItem('bloberto-vibe-key', teamVibe.key)
     sessionStorage.setItem('bloberto-vibe-streak', String(newStreak))
     setVibeStreak(newStreak)
