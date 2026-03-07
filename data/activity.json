@@ -254,5 +254,17 @@
     "type": "complete",
     "worker": "Carlos",
     "message": "Implemented Task Intent Auto-Tags \u2014 colored chips (Bug/Ship/Design/QA/Data/Docs) on worker cards"
+  },
+  {
+    "timestamp": "2026-03-07T01:07:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for scheduled QA review #8"
+  },
+  {
+    "timestamp": "2026-03-07T01:12:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #8 complete \u2014 10 suggestions filed (2 high, 4 medium, 3 low). Score: 3.6/5 (steady)"
   }
 ]

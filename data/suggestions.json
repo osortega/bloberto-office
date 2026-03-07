@@ -1,99 +1,89 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-07T00:37:00Z",
-  "review_number": 7,
+  "timestamp": "2026-03-07T01:12:00Z",
+  "review_number": 8,
   "scores": {
     "visual": 4,
     "ux": 3.5,
     "responsiveness": 3,
     "performance": 3.5,
     "accessibility": 3,
-    "code_quality": 4,
-    "features": 3,
+    "code_quality": 3.5,
+    "features": 3.5,
     "fun_factor": 4.5
   },
   "overall_score": 3.6,
-  "notes": "Score up from 3.3 last review. Maya's recent additions (hover monologue + vibe meter) added real personality. Code quality is solid — well-structured components, good separation. Main gaps are mobile responsiveness and accessibility.",
+  "notes": "Score holding steady at 3.6. The office view is genuinely fun — the character SVGs, speech bubbles, and animations give it real personality. But there are recurring issues I keep flagging that haven't been addressed: mobile responsiveness is still rough, accessibility gaps remain, and the CSS has a syntax error. The task tags and error halo from last cycle are nice additions though.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "ux",
-      "title": "Activity log timestamps are relative-only — no absolute fallback",
-      "description": "getRelativeTime() only shows '2h ago' etc. After a day everything says 'Xd ago' with no way to see the actual date/time. Add a tooltip or secondary line showing the absolute timestamp on hover. Users checking back after a weekend have no idea WHEN things happened.",
-      "effort": "small",
-      "assignee": "maya"
+      "category": "bug",
+      "title": "CSS syntax error — orphaned property block in App.css",
+      "description": "At the bottom of App.css there's an orphaned CSS block starting with 'background: var(--surface2);' that's not inside any selector (around the .skeleton class). This is a parse error that could cause downstream styles to break or be ignored. The .skeleton class definition is missing its selector. Should be '.skeleton { background: var(--surface2); border-radius: var(--radius); animation: shimmer 1.5s ease-in-out infinite; }'",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "performance",
-      "title": "Polling continues when tab is hidden for hours",
-      "description": "POLL_INTERVAL_HIDDEN is 60s. If someone leaves the tab open overnight, that's hundreds of unnecessary fetches to raw.githubusercontent.com. Should pause polling entirely after ~10 minutes of inactivity and resume on visibility change. Also consider adding an exponential backoff.",
-      "effort": "small",
-      "assignee": "maya"
+      "category": "ux",
+      "title": "No loading state for Office tab",
+      "description": "The Dashboard tab has a nice LoadingSkeleton component, but the Office tab has no loading indicator at all. When the page first loads and data is being fetched, the office view renders with zero workers and no visual feedback. Users see an empty office floor with just Bloberto until data arrives. Add a loading state or skeleton to the Office view.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Office view has no keyboard navigation",
-      "description": "The entire Office component is a visual-only experience. Characters aren't focusable, desks aren't navigable. Screen reader users get 'Virtual office visualization' and nothing else. Add an accessible roster list below the visual or make characters focusable with aria-labels describing who's where and doing what.",
-      "effort": "medium",
-      "assignee": "maya"
+      "title": "Tab toggle buttons missing focus styles",
+      "description": "The tab toggle and activity filter buttons have hover styles but no visible focus indicators. Keyboard users can't tell which button is focused. Add :focus-visible outlines to .tab-toggle button and .activity-filter-bar button.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "Polling continues when tab is idle for 10+ minutes but resumes without check",
+      "description": "The IDLE_TIMEOUT stops polling after 10 minutes of inactivity, which is great. But when the user comes back and moves the mouse, polling doesn't immediately resume — it waits for the next interval tick. Should trigger an immediate sync on activity resume after idle timeout.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "No indication of WHICH review cycle Sofia's suggestions are from",
-      "description": "The dashboard shows the activity log with all of Sofia's reviews, but suggestions.json only holds the latest batch. Previous suggestions are lost. Consider appending to a suggestions history array or showing review number in the activity log entries.",
-      "effort": "medium",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "visual",
-      "title": "Ghost characters and active workers can visually overlap",
-      "description": "Desk assignment is sequential — if there are 2 working + 4 ghosts, they all get desk slots but the visual positions can get cramped. On mobile especially, the 6 desk slots get tight. Consider hiding ghost characters on small screens or reducing their size.",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "Activity log filter state not preserved across tab switches",
+      "description": "If you select 'Completions' filter in the activity log, switch to Office tab, then switch back to Dashboard, the filter resets to 'All'. Minor but annoying for users who are tracking specific event types.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "feature",
-      "title": "No way to see roster members' history or stats",
-      "description": "Each team member has a rich history in activity.json but there's no per-worker view. Clicking a character or worker card should show their activity timeline — when they were hired, what they've completed, how many tasks. Would make the dashboard feel way more alive.",
-      "effort": "large",
-      "assignee": "maya"
+      "title": "No roster view — can't see team members who aren't active",
+      "description": "The ghost characters in the office view hint at roster members, but there's no way to see the full team roster with roles, hire dates, etc. A simple 'Team' section or third tab showing all roster members (active or not) would add value. Currently roster data is fetched but only used for ghost placement.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "CharacterAvatar is a 200+ line switch statement",
-      "description": "Each character's SVG is hardcoded in Office.jsx. This won't scale when new team members are added. Consider extracting avatars into separate components or a data-driven approach with configurable parts (hair, skin, clothes, accessories).",
-      "effort": "large",
-      "assignee": "maya"
+      "title": "CharacterAvatar has massive if-else chain for each worker",
+      "description": "The CharacterAvatar component in Office.jsx has individual if blocks for bloberto, carlos, maya, dave, sofia, and luna — each with ~20 lines of inline SVG. This doesn't scale. If we add more team members, this file will balloon. Consider a data-driven approach where character features (hair color, skin tone, accessories) are stored in worker data and rendered by a generic avatar builder.",
+      "effort": "large"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Footer quote is static — rotate it",
-      "description": "The footer always says 'If it compiles, ship it.' Would be fun to rotate through a few Bloberto-isms on each load. Small touch that adds personality.",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "Footer quote feels stale",
+      "description": "The footer always shows 'If it compiles, ship it.' — would be more fun if it rotated through a few Bloberto-isms, similar to the hover speech bubbles. Small delight that reinforces the personality.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "No sound/notification when a worker clocks in or finishes",
-      "description": "Since this is a 'live monitor', it would be cool to have an optional notification sound or browser notification when workers change status. Opt-in only, with a toggle in the header.",
-      "effort": "medium",
-      "assignee": "maya"
+      "title": "No way to see historical suggestions/scores",
+      "description": "Each QA review overwrites suggestions.json. There's no history of how scores have changed over time. Consider appending to an array or using timestamped files (suggestions-2026-03-07.json) so we can track improvement trends.",
+      "effort": "medium"
     },
     {
       "priority": "low",
-      "category": "ux",
-      "title": "Theme preference could sync with system preference",
-      "description": "Currently defaults to dark and only changes via toggle. Could use prefers-color-scheme media query as the initial default, then let the toggle override. Minor but nice.",
-      "effort": "small",
-      "assignee": "maya"
+      "category": "visual",
+      "title": "Coffee corner is decorative-only",
+      "description": "The coffee corner in the office view is cute but doesn't do anything. Could show idle workers hanging out there instead of wandering randomly, or display a fun 'coffees consumed today' counter based on activity count. Small touch that would make the office feel more alive.",
+      "effort": "medium"
     }
   ]
 }
