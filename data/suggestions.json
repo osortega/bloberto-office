@@ -1,88 +1,99 @@
 {
   "analyst": "Sofia",
-  "role": "QA Analyst",
-  "timestamp": "2026-03-06T23:42:11.090Z",
+  "review_number": 6,
+  "timestamp": "2026-03-07T00:08:39.041Z",
   "scores": {
     "visual": 4,
     "ux": 3,
     "responsiveness": 3,
     "performance": 4,
     "accessibility": 2,
-    "code_quality": 4,
+    "code_quality": 3,
     "features": 3,
-    "fun_factor": 4,
-    "overall": 3.4
+    "fun_factor": 4
   },
+  "overall_score": 3.3,
+  "notes": "Dug deeper this round and found actual bugs hiding in the charming exterior. The SVG gradient ID collision is the most embarrassing one — Luna's hair is probably broken in dual-view scenarios and nobody noticed because the Office tab is the default. Also, silent single-source failures and stale relative timestamps are the kind of thing that quietly erodes trust. Code quality drops to 3 this review — the dead CSS and ignored `emoji` field suggest some cleanup debt is accumulating.",
   "suggestions": [
     {
-      "id": 1,
-      "area": "seo",
       "priority": "high",
-      "title": "No meta description or Open Graph tags",
-      "description": "The page lacks <meta name=\"description\"> and Open Graph tags (og:title, og:description, og:image). This hurts SEO rankings and means link previews on Slack, Twitter, etc. show no useful info when shared."
+      "category": "bug",
+      "title": "SVG gradient ID 'lunaHairGrad' collides on dual render",
+      "description": "Luna's CharacterAvatar SVG hardcodes id=\"lunaHairGrad\" for her hair gradient. SVG IDs must be unique per HTML document — if Luna appears in both the Office tab and a Dashboard worker card simultaneously, the second instance references the first's gradient definition (wrong orientation/colors) or gets nothing. The fix is to use a unique ID per render, e.g. suffix with a React key or use a linearGradient with a data URI paint server. This is a real rendering bug, not a hypothetical.",
+      "effort": "small",
+      "assignee": "maya"
     },
     {
-      "id": 2,
-      "area": "code_quality",
       "priority": "high",
-      "title": "No React error boundary",
-      "description": "There is no ErrorBoundary component wrapping the app or key subtrees. Any unhandled render error will cause a completely blank page for the user with no recovery path. Add an ErrorBoundary with a fallback UI."
+      "category": "bug",
+      "title": "Single-source fetch failure is completely silent",
+      "description": "In syncFromGitHub(), the fetchError banner only appears when BOTH requests (workers + activity) fail. If only workers.json fails, isLive flips to false and worker data goes stale, but no user-facing error is shown — users stare at outdated cards with zero indication anything is wrong. The fix: set fetchError (or a separate workersError) whenever workersResult.status === 'rejected', regardless of activity result.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
-      "id": 3,
-      "area": "accessibility",
       "priority": "high",
-      "title": "Animations ignore prefers-reduced-motion",
-      "description": "CSS animations and transitions do not check the prefers-reduced-motion media query. Users who have enabled reduced motion in their OS settings (often due to vestibular disorders or epilepsy) still see full animations, which can cause discomfort or harm."
+      "category": "accessibility",
+      "title": "ProgressBar has zero ARIA semantics",
+      "description": "The ProgressBar component renders a styled div with no role=\"progressbar\", no aria-valuenow, no aria-valuemin, and no aria-valuemax. Screen readers cannot perceive or announce task progress at all. This is a straightforward fix: add role=\"progressbar\" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} to the progress-bar-bg div.",
+      "effort": "small",
+      "assignee": "maya"
     },
     {
-      "id": 4,
-      "area": "visual",
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "ARIA tab pattern is incomplete — missing IDs and aria-labelledby",
+      "description": "The tab buttons have role=\"tab\" and aria-selected, which is good. But they have no id attributes, and the role=\"tabpanel\" divs have no aria-labelledby to link back to their controlling tab. The ARIA tabs pattern requires: each tab button gets an id (e.g. tab-office), each panel gets aria-labelledby pointing to that id, and each panel gets its own id for aria-controls on the button. As-is, assistive technology cannot announce which panel belongs to which tab.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Activity log relative timestamps go stale and never refresh",
+      "description": "getRelativeTime() is called during render to compute '5m ago', '2h ago', etc. After the initial load, these strings are frozen in time — there is no interval or effect to re-render the activity entries on a tick. Leave the page open for 30 minutes and everything still shows its original relative time. Fix: either add a useEffect with a 60-second setInterval that forces a re-render of the log, or use a live clock stored in state.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "'Creative Director' missing from ROLE_EMOJIS and ROLE_COLORS",
+      "description": "Luna's role is 'Creative Director' but this string appears in neither ROLE_EMOJIS (App.jsx) nor ROLE_COLORS (Office.jsx). In the Dashboard, Luna's worker card displays the generic robot emoji 🤖 fallback. In the Office generic fallback SVG, she'd render with grey (#6b7280) body color. Luna has a custom avatar so she's fine in the Office, but any future worker added with this role title in the Dashboard will look like an unnamed bot. Add 'Creative Director': '🎭' to ROLE_EMOJIS and a suitable color to ROLE_COLORS.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Roster 'emoji' field from workers.json is fetched but never consumed",
+      "description": "The roster entries in workers.json each carry an 'emoji' property (e.g. Luna: '🌙', Carlos: '⚙️'). However, getRoleEmoji() in App.jsx only looks up ROLE_EMOJIS[role] and never reads worker.emoji. The WorkerCard passes worker to getRoleEmoji but only uses the role string. This means the data model supports per-character emoji overrides but the UI ignores them — dead data that adds confusion. Either use worker.emoji as a priority override in getRoleEmoji, or remove the field from the data to reduce maintenance confusion.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Office character tooltips are CSS-only and keyboard/SR inaccessible",
+      "description": "Task tooltips on office characters use CSS ::after pseudo-elements triggered by :hover. They are invisible to keyboard navigation and screen readers entirely. Characters with pointer-events re-enabled (.char--working, .char--idle, .char--ghost) can be hovered by mouse, but there is no focus state, no aria-label, and no title attribute. Given the office view has role=\"img\" and aria-label, individual characters are not exposed to AT at all. Consider adding focusable wrappers with aria-label=\"{name}: {task}\" to working/idle characters.",
+      "effort": "medium",
+      "assignee": "maya"
+    },
+    {
       "priority": "low",
-      "title": "No branded favicon",
-      "description": "The app uses the default Vite favicon. A custom favicon matching the app's brand/theme would improve polish and help users identify the tab among many open tabs."
+      "category": "code",
+      "title": "Dead CSS: .stat-card.done styles with no matching DOM element",
+      "description": "App.css contains .stat-card.done .stat-value { color: var(--blue); } but the StatsBar component only renders cards with classes total, active, idle, and sync-status — 'done' is never used. This suggests a stat for completed workers was removed from the UI but the CSS was left behind. It's harmless but signals incomplete cleanup and will confuse anyone maintaining the stylesheet.",
+      "effort": "small",
+      "assignee": "dave"
     },
     {
-      "id": 5,
-      "area": "features",
-      "priority": "medium",
-      "title": "Activity log has no filtering or search",
-      "description": "The activity log displays all events in a flat list with no way to filter by worker, event type, or date range, and no search input. As the log grows this becomes unusable. Add at minimum a text search and event-type filter."
-    },
-    {
-      "id": 6,
-      "area": "ux",
-      "priority": "medium",
-      "title": "No loading state when switching tabs",
-      "description": "Switching between tabs triggers data fetches or re-renders with no visual feedback. Users with slower connections see a blank or stale panel with no indication that content is loading. Add a skeleton or spinner during tab transitions."
-    },
-    {
-      "id": 7,
-      "area": "features",
       "priority": "low",
-      "title": "Coffee corner is purely decorative",
-      "description": "The coffee corner UI element is a static decoration. It could be made functional by letting workers toggle a 'on break' status that shows in the coffee corner, giving the feature real utility and reinforcing the fun theme."
-    },
-    {
-      "id": 8,
-      "area": "ux",
-      "priority": "low",
-      "title": "No keyboard shortcuts to switch tabs",
-      "description": "Power users cannot navigate between tabs without reaching for the mouse. Adding keyboard shortcuts (e.g., Ctrl+1/2/3 or Alt+arrow keys) would significantly improve efficiency for frequent users."
-    },
-    {
-      "id": 9,
-      "area": "features",
-      "priority": "medium",
-      "title": "Worker cards do not show hire date",
-      "description": "Worker cards display status and role but omit the hire date. This is often useful context for managers (e.g., identifying new vs. tenured workers). Add hire date as a secondary detail on each card."
-    },
-    {
-      "id": 10,
-      "area": "ux",
-      "priority": "medium",
-      "title": "No notification or sound when worker status changes",
-      "description": "Status changes happen silently. Users who leave the app in a background tab miss updates entirely. Adding a browser notification (with permission) and/or a subtle sound cue would keep supervisors informed without requiring constant manual refreshing."
+      "category": "code",
+      "title": "color-mix() in .hq-badge has no fallback for older browsers",
+      "description": "The .hq-badge class uses color-mix(in srgb, var(--accent) 12%, transparent) for background and border colors. color-mix() is only supported from Chrome 111, Firefox 113, and Safari 16.2 — any browser before that renders the badge with no background or border at all. A simple rgba fallback before the color-mix line would provide basic styling: background: rgba(124, 106, 247, 0.12); background: color-mix(...).",
+      "effort": "small",
+      "assignee": "maya"
     }
   ]
 }
