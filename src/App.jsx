@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import './App.css'
 import Office from './Office.jsx'
 import { getTeamVibe } from './utils/vibe.js'
+import { ROLE_EMOJIS, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
 
 const GITHUB_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json'
@@ -9,33 +10,6 @@ const ACTIVITY_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/activity.json'
 const POLL_INTERVAL_ACTIVE = 30_000
 const POLL_INTERVAL_HIDDEN = 60_000
-
-const ROLE_EMOJIS = {
-  'Frontend Engineer': '🎨',
-  'Backend Engineer': '⚙️',
-  'DevOps Engineer': '🚀',
-  'Designer': '✏️',
-  'Manager': '🫠',
-  'QA Engineer': '🔍',
-  'Data Engineer': '📊',
-  'Security Engineer': '🔒',
-  'Creative Director': '🌙',
-  'Other': '🤖',
-}
-
-const STATUS_LABELS = {
-  working: 'Working',
-  idle: 'Idle',
-  done: 'Done',
-  error: 'Error',
-}
-
-const STATUS_EMOJIS = {
-  working: '⚡',
-  idle: '😴',
-  done: '✅',
-  error: '💀',
-}
 
 async function fetchWorkersFromGitHub() {
   const res = await fetch(GITHUB_API_URL + '?t=' + Date.now())
@@ -218,11 +192,10 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false }) {
 }
 
 
-function StatsBar({ workers, lastSynced, isLive }) {
+function StatsBar({ workers, vibe, lastSynced, isLive }) {
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
   const idle = workers.filter((w) => w.status === 'idle').length
-  const vibe = getTeamVibe(workers)
 
   const syncLabel = lastSynced
     ? lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -323,6 +296,16 @@ export default function App() {
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  // ── Hash-based tab sync (browser back/forward) ──
+  useEffect(() => {
+    const handleHashChange = () => {
+      const h = window.location.hash.slice(1)
+      if (h === 'dashboard' || h === 'office') setTab(h)
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
   // ── Worker cinematic entry / exit state ──
@@ -433,6 +416,8 @@ export default function App() {
     (w) => w.status === 'working' || w.status === 'idle' || w.status === 'error'
   )
 
+  const teamVibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers])
+
   // ── Diff activeWorkers vs previous snapshot ──
   useEffect(() => {
     const currentIds = new Set(activeWorkers.map(w => w.id))
@@ -491,33 +476,31 @@ export default function App() {
       crushing: '#22c55e', 'on-fire': '#ef4444', 'in-flow': '#3b82f6',
       'slow-day': '#9ca3af', 'after-hours': '#8b5cf6',
     }
-    const v = getTeamVibe(activeWorkers)
     const c = document.createElement('canvas')
     c.width = 32; c.height = 32
     const ctx = c.getContext('2d')
     ctx.beginPath()
     ctx.arc(16, 16, 14, 0, Math.PI * 2)
-    ctx.fillStyle = vibeColors[v.key] || '#3b82f6'
+    ctx.fillStyle = vibeColors[teamVibe.key] || '#3b82f6'
     ctx.fill()
     const link = document.querySelector('link[rel="icon"]') || document.createElement('link')
     link.rel = 'icon'
     link.href = c.toDataURL()
     if (!link.parentNode) document.head.appendChild(link)
-  }, [activeWorkers])
+  }, [teamVibe])
 
   // ── Document title updates (Luna #7) ──
   useEffect(() => {
     const workingCount = activeWorkers.filter(w => w.status === 'working').length
     const total = activeWorkers.length
-    const v = getTeamVibe(activeWorkers)
     const hasError = activeWorkers.some(w => w.status === 'error')
     const prefix = hasError ? '⚠️ ' : ''
     if (workingCount === 0 && total === 0) {
       document.title = "😴 Bloberto's Office — All quiet"
     } else {
-      document.title = `${prefix}(${workingCount}/${total}) Bloberto's Office — ${v.label}`
+      document.title = `${prefix}(${workingCount}/${total}) Bloberto's Office — ${teamVibe.label}`
     }
-  }, [activeWorkers])
+  }, [activeWorkers, teamVibe])
 
   const currentHour = new Date().getHours()
   const greeting =
@@ -544,8 +527,8 @@ export default function App() {
               day: 'numeric',
             })}
           </div>
-          <span className="vibe-pill" data-vibe={getTeamVibe(activeWorkers).key}>
-            {getTeamVibe(activeWorkers).label}
+          <span className="vibe-pill" data-vibe={teamVibe.key}>
+            {teamVibe.label}
           </span>
           <button
             className="theme-toggle"
@@ -578,7 +561,7 @@ export default function App() {
             aria-controls="tabpanel-office"
             tabIndex={tab === 'office' ? 0 : -1}
             className={tab === 'office' ? 'active' : ''}
-            onClick={() => { setTab('office'); window.location.replace('#office') }}
+            onClick={() => { setTab('office'); window.location.hash = 'office' }}
             onKeyDown={handleTabKeyDown}
           >
             🏢 Office
@@ -589,7 +572,7 @@ export default function App() {
             aria-controls="tabpanel-dashboard"
             tabIndex={tab === 'dashboard' ? 0 : -1}
             className={tab === 'dashboard' ? 'active' : ''}
-            onClick={() => { setTab('dashboard'); window.location.replace('#dashboard') }}
+            onClick={() => { setTab('dashboard'); window.location.hash = 'dashboard' }}
             onKeyDown={handleTabKeyDown}
           >
             📊 Dashboard
@@ -602,7 +585,7 @@ export default function App() {
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard">
-            <StatsBar workers={activeWorkers} lastSynced={lastSynced} isLive={isLive} />
+            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} />
 
             <div className="section-header">
               <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>

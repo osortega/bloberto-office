@@ -1,101 +1,121 @@
 {
   "analyst": "Sofia",
   "review_number": 14,
-  "timestamp": "2026-03-07T04:10:00Z",
+  "timestamp": "2026-03-07T04:08:49Z",
   "scores": {
-    "visual": 4.3,
-    "ux": 3.9,
-    "responsiveness": 3.5,
-    "performance": 3.5,
-    "accessibility": 3.9,
-    "code_quality": 3.7,
-    "features": 3.6,
-    "fun_factor": 4.5
+    "visual": 4.4,
+    "ux": 3.6,
+    "responsiveness": 3.7,
+    "performance": 3.2,
+    "accessibility": 3.4,
+    "code_quality": 3.3,
+    "features": 4.0,
+    "fun_factor": 4.7
   },
-  "overall_score": 3.9,
+  "overall_score": 3.8,
+  "highlights": [
+    "Per-character SVG avatars for Carlos, Maya, Dave, Sofia, and Luna are legitimately delightful — each has real personality (Carlos's glasses, Dave's headphones, Sofia's magnifying glass, Luna's crescent moon). This was a big jump.",
+    "VIBE_QUOTES for Bloberto's speech bubbles is a great upgrade. Bloberto now says context-aware things depending on team vibe. Finally, the manager is earning his salary.",
+    "Desk monitor glow using role-color CSS variable is a slick touch. Ghost roster members subtly floating at empty desks is exactly the right level of melancholy.",
+    "Window cloud animation for daytime view is a nice polish detail."
+  ],
   "suggestions": [
     {
       "priority": "high",
-      "category": "performance",
-      "title": "getTeamVibe called 4+ times per render — STILL UNFIXED from review #13",
-      "description": "In App.jsx, getTeamVibe(activeWorkers) is called inline at least 4 times: vibe-pill (line ~header), StatsBar component, favicon effect, and document title effect. Each call filters and recomputes. Fix: compute once with useMemo at the top of App and pass the result as a prop. This is the third time I'm flagging this.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
       "category": "bug",
-      "title": "Office window sky uses viewer's local timezone — STILL UNFIXED from review #12",
-      "description": "WindowElement in Office.jsx uses new Date().getHours() which gives the viewer's local time. A viewer in Tokyo sees Tokyo sky while the office is supposed to be in PST. Use Intl.DateTimeFormat with timeZone: 'America/Los_Angeles' or compute with a fixed UTC offset. This has been flagged THREE reviews in a row now.",
+      "title": "Keyboard shortcuts '1' and '2' are inverted",
+      "description": "In App.jsx (line 320-321), pressing '1' navigates to the Dashboard tab and pressing '2' goes to Office. But Office is the FIRST tab (left side), Dashboard is SECOND. The mapping is backwards. A user pressing '1' expects the first tab. Swap the assignments: '1' → office, '2' → dashboard.",
       "effort": "small"
     },
     {
       "priority": "high",
-      "category": "code",
-      "title": "ROLE_EMOJIS, ROLE_COLORS, DEFAULT_ROSTER scattered across files — STILL UNFIXED",
-      "description": "ROLE_EMOJIS lives in App.jsx, ROLE_COLORS and DEFAULT_ROSTER live in Office.jsx. Adding a new role means editing 2-3 files. Extract all role-related constants to src/utils/constants.js. Third time flagging this.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "Tab state not synced with browser back/forward — STILL UNFIXED from review #13",
-      "description": "Clicking tabs updates location.hash via window.location.replace(), but there's no hashchange or popstate listener. Pressing browser Back doesn't switch tabs. Add useEffect with a hashchange event listener that calls setTab. This was flagged last review.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
       "category": "performance",
-      "title": "ActivityLog creates 2 new arrays every render — STILL UNFIXED",
-      "description": "[...entries].reverse().slice(0, 20) in ActivityLog allocates two arrays per render. Wrap in useMemo(). Small fix, growing impact as activity log gets longer.",
+      "title": "getTeamVibe now called 5x per render — got WORSE since review #13",
+      "description": "Review #13 flagged this at 3x. It is now 5x: StatsBar calls it (line 225), the favicon useEffect (line 494), the title useEffect (line 512), and the vibe-pill JSX calls it TWICE inline (lines 547-548) for .key and .label on the same span. At minimum, memoize with useMemo in the App component and pass the result down. The header vibe-pill alone accounts for 2 redundant calls per render.",
       "effort": "small"
     },
     {
-      "priority": "medium",
-      "category": "ux",
-      "title": "No loading skeleton for Office tab",
-      "description": "Dashboard has LoadingSkeleton but the Office tab shows an empty floor during initial fetch. During the first load, the office view looks like a ghost town before data arrives. Add a subtle loading state or skeleton for the office view.",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Keyboard shortcut 1/2 for tabs conflicts with typing in any future input",
-      "description": "The keydown handler checks for e.target.tagName === 'INPUT' || 'TEXTAREA' but doesn't check contenteditable elements or elements with role='textbox'. If any rich text input is added, shortcuts will fire during typing. Also, there's no discoverability — users don't know 1/2/Esc shortcuts exist.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "feature",
-      "title": "No 'recently completed' section — repeated suggestion",
-      "description": "Workers that finish just vanish (with the nice fade animation). A collapsed 'Recently Completed' section showing last 3-5 finished workers would give context. Activity log partially covers this but it's mixed with other events.",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "visual",
-      "title": "Whiteboard could rotate messages like Bloberto's speech bubbles",
-      "description": "The whiteboard shows one static string per vibe state. It would be more engaging if it rotated through 2-3 messages on an interval, similar to how Bloberto's speech bubbles already work. The VIBE_WHITEBOARD map already exists — just make it an array and cycle.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
+      "priority": "high",
       "category": "accessibility",
-      "title": "Activity filter buttons mix aria-pressed with visual tab pattern",
-      "description": "Filter bar uses role='group' with aria-pressed but behaves like segmented tabs. Either use proper role='tablist'/role='tab' with aria-selected, or keep as toggle buttons. Current mix is semantically confusing for screen readers.",
+      "title": "Office character animations completely absent from prefers-reduced-motion block",
+      "description": "Office.css has a prefers-reduced-motion block that only silences star-twinkle and cloud-drift. The wander-1 through wander-4 (idle workers), bob (working), manager-wobble (Bloberto), enter-office, ghost-float, and standby-pulse animations are ALL missing from the override. For users with vestibular disorders this entire tab is a wall of constant motion. Add all character movement keyframes to the reduced-motion block.",
+      "effort": "medium"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "WindowElement still uses viewer's local timezone — flagged in reviews #12 and #13",
+      "description": "Office.jsx line 454: `const getHour = () => new Date().getHours()` — this is the viewer's local time. The office is supposed to be Bloberto's HQ. A reviewer in Tokyo sees a midnight sky while the team is having lunch. Use `new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', hour12: false })` or store the office timezone as a constant. Third review flagging this. Fix it.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "role=tabpanel divs missing tabIndex — WAI-ARIA spec violation",
+      "description": "Both tabpanel divs (App.jsx lines 600 and 604) have no tabIndex attribute. Per WAI-ARIA 1.1, a tabpanel without focusable children should have tabIndex='0' so keyboard and screen reader users can navigate to the panel content. Add tabIndex={0} to both tabpanel divs.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "role=\"tablist\" missing aria-label",
+      "description": "App.jsx line 574: the tab container has `role=\"tablist\"` but no `aria-label`. Screen readers announce it as just 'tab list' with no context. Add `aria-label=\"Main navigation\"` or `aria-label=\"View selector\"` to the div.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Character tooltips in Office are hover-only — zero keyboard access",
+      "description": "Working and idle characters have `data-tooltip` with the worker's task, shown via CSS ::after on hover (Office.css line 417-437). Characters have pointer-events: auto but no tabIndex or focus handlers, making this information completely inaccessible to keyboard users. Either add tabIndex={0} and onFocus handlers mirroring onMouseEnter, or add a visible label element instead of relying on CSS tooltip alone.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Activity log 'Xm ago' timestamps never refresh",
+      "description": "getRelativeTime() in App.jsx is called at render time and never re-computed. If the page is left open, '2m ago' entries stay at '2m ago' forever — they won't tick up to '5m ago', '1h ago', etc. Add a `useEffect` with a `setInterval` (every 60s) that forces an activity log re-render, or store timestamps as Date objects and derive relative time in a useMemo that depends on a `tick` state value.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Dead CSS: hire form and hq-badge styles are completely orphaned",
+      "description": "App.css contains .hire-form-wrapper, .hire-form-title, .hire-form (lines 189-212), .hq-badge (lines 547-560), and arguably .btn-danger (line 264) — none of these classes appear anywhere in App.jsx. The hire form was clearly removed at some point but its CSS stayed. Delete these styles. They add noise, confuse future devs reading the CSS, and inflate the bundle.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Browser back/forward doesn't switch tabs — flagged in review #13, still broken",
+      "description": "There is still no hashchange or popstate listener in App.jsx. Clicking a tab updates window.location.hash, but pressing browser back doesn't restore the previous tab. Add a useEffect that listens to the hashchange event and calls setTab accordingly. One-liner fix that was flagged last review.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Magic numbers: 45000ms ambient interval, 400ms fade, 1500ms new pulse",
-      "description": "Several timing constants are hardcoded inline in Office.jsx and App.jsx. Extract to named constants at the top of each file (AMBIENT_INTERVAL_MS, FADE_OUT_MS, NEW_PULSE_MS). Makes tuning easier and code more readable.",
+      "title": "ROLE_EMOJIS / ROLE_COLORS / DEFAULT_ROSTER still scattered — flagged in #13",
+      "description": "ROLE_EMOJIS lives in App.jsx, ROLE_COLORS and DEFAULT_ROSTER live in Office.jsx. Adding a new role means editing two files. Extract to src/utils/constants.js. This has been flagged twice now.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "title": "ActivityLog still allocates 2 arrays per render — flagged in #13",
+      "description": "App.jsx line 95: `[...entries].reverse().slice(0, 20)` — spread creates one array, reverse mutates in place (fine), slice creates a second. Wrap in useMemo with entries as dependency. Still unfixed from last review.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Office plants still lack variety — flagged since review #12",
-      "description": "All three plants use similar green palettes. The cactus could use a small pink flower, the left plant could have a different pot color. Purely cosmetic but it's been flagged three times now.",
+      "title": "Plant #3 (the cactus) is still suspiciously similar to plant #1 — flagged in #12 and #13",
+      "description": "Third plant at left: 92%, top: 30% is the cactus SVG, which still uses #22c55e and #16a34a — nearly identical greens to plant #1. Both reviews asked for visual variety. Give the cactus a little yellow flower on top (a circle cx='9' cy='5' fill='#fbbf24' takes 2 seconds). Three plants, three personalities, please.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "No keyboard shortcut discovery — users will never find '1'/'2' hotkeys",
+      "description": "Once the keyboard shortcut inversion bug is fixed, there's still no way for users to discover these shortcuts exist. Add a small tooltip on the tab buttons (title attribute or a '?' help icon near the tabs) showing 'Press 1 / Press 2'. Even a tiny keyboard icon would do. Hidden features aren't features.",
       "effort": "small"
     }
   ]

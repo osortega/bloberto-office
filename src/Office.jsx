@@ -1,6 +1,7 @@
 import { useMemo, useState, useRef, useEffect } from 'react'
 import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
+import { ROLE_COLORS } from './utils/constants.js'
 
 const MANAGER_QUOTES = [
   'Per my last commit…',
@@ -47,19 +48,6 @@ const VIBE_QUOTES = {
     'Night shift gets the best commit messages.',
     'Just me and the servers. As it should be.',
   ],
-}
-
-const ROLE_COLORS = {
-  'Frontend Engineer': '#a78bfa',
-  'Backend Engineer': '#38bdf8',
-  'DevOps Engineer': '#fb923c',
-  'Manager': '#c084fc',
-  'QA Engineer': '#f43f5e',
-  'Designer': '#34d399',
-  'Data Engineer': '#facc15',
-  'Security Engineer': '#94a3b8',
-  'Creative Director': '#7c3aed',
-  'Other': '#6b7280',
 }
 
 const DEFAULT_ROSTER = [
@@ -451,7 +439,14 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
 }
 
 function WindowElement() {
-  const getHour = () => new Date().getHours()
+  const getHour = () => {
+    const pstStr = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles',
+      hour: 'numeric',
+      hour12: false,
+    }).format(new Date())
+    return parseInt(pstStr, 10)
+  }
   const [hour, setHour] = useState(getHour)
 
   useEffect(() => {
