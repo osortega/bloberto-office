@@ -16,15 +16,5 @@
     "task": "",
     "progress": 0,
     "started": null
-  },
-  {
-    "id": "sofia",
-    "name": "Sofia",
-    "role": "QA & Product Analyst",
-    "emoji": "🔍",
-    "status": "working",
-    "task": "QA review #30 — full site analysis with Puppeteer screenshots",
-    "progress": 5,
-    "started": "2026-03-07T21:45:00Z"
   }
 ]

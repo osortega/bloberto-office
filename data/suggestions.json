@@ -1,110 +1,115 @@
 {
   "analyst": "Sofia",
-  "review_number": 29,
-  "timestamp": "2026-03-07T21:15:00Z",
-  "visual_notes": "Screenshots based on QA28 visual baseline (same codebase, ~1h prior). Chromium unavailable in this environment due to pthread thread-creation limit. Key visual observations: office floor renders correctly on desktop; mobile has ~40% dead space below the floor; window element renders as large opaque block on mobile right side.",
+  "review_number": 30,
+  "timestamp": "2026-03-07T21:50:00Z",
   "scores": {
-    "visual": 4,
-    "ux": 2,
-    "responsiveness": 3,
-    "performance": 3,
-    "accessibility": 4,
-    "code_quality": 3,
-    "features": 4,
-    "fun_factor": 5
+    "visual": 4.2,
+    "ux": 3.5,
+    "responsiveness": 3.5,
+    "performance": 3.0,
+    "accessibility": 4.0,
+    "code_quality": 3.0,
+    "features": 4.2,
+    "fun_factor": 5.0
   },
-  "overall_score": 3,
+  "overall_score": 3.8,
+  "notes": "Review #29 critical bug (flat array workers.json) was fixed. Keyboard hash bug also fixed. Core persistent issues remain: no ErrorBoundary (5th flag), no React.memo (8th flag), App.jsx monolith (5th flag). New issues found this review: ProgressBar milestone flash bug, stats-bar grid overflow.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "workers.json is a flat array \u2014 real worker data NEVER loads",
-      "description": "The live GitHub workers.json is a raw JSON array [{worker1}, {worker2}], but App.jsx reads data.workers ?? [] and data.roster ?? []. Accessing .workers on a JS array returns undefined, so both resolve to []. Result: allWorkers is always empty regardless of server data, all characters are permanently rendered as DEFAULT_ROSTER ghosts, and the Dashboard always shows an empty worker grid. This is almost certainly the root cause of the persistent DEFAULT_ROSTER id mismatch (flagged 9x) \u2014 real data never arrives. Fix: wrap the JSON as { workers: [...], roster: [...] } in workers.json, OR change App.jsx to handle a flat array: Array.isArray(data) ? data : (data.workers ?? []).",
-      "effort": "small"
+      "category": "code",
+      "title": "App.jsx is a 997-line monolith — extract components NOW",
+      "description": "App.jsx contains WorkerCard, StatsBar, ActivityLog, ProgressBar, EmptyState, LoadingSkeleton, StatusBadge, DeltaBadge, and the main App all in one file. This is the 5th consecutive review flagging this. Extract each into its own file under src/components/. This blocks testability, maintainability, and code review quality.",
+      "effort": "medium",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "No ErrorBoundary — any render crash = blank white screen",
+      "description": "5th consecutive flag. No ErrorBoundary anywhere. A single null dereference in CharacterAvatar or bad timestamp crashes the entire app with zero recovery. Add a top-level ErrorBoundary in main.jsx and a secondary one around Office.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Keyboard shortcut hash uses literal # prefix \u2014 double-hash breaks tab sync",
-      "description": "App.jsx lines 565-566 set window.location.hash = '#office' and '#dashboard' \u2014 both include a literal # in the value. Setting window.location.hash = '#office' produces the URL fragment ##office (browser prepends # to the assigned value). When handleHashChange reads window.location.hash.slice(1), it gets '#office' instead of 'office', matching neither branch, so the tab state never updates on keyboard shortcut. Tab buttons on lines 787/800 correctly use window.location.hash = 'office' (no # prefix). Fix: remove the # prefix from both keyboard shortcut lines (565 and 566).",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "StatsBar stuck-worker detection silently fails \u2014 DEFAULT_ROSTER workers have no 'started' field",
-      "description": "StatsBar line 327 filters stuck workers with (Date.now() - new Date(w.started).getTime()) > 7_200_000. DEFAULT_ROSTER workers have no started field, so w.started is undefined. new Date(undefined).getTime() returns NaN, and Date.now() - NaN is NaN, which is always false in comparisons. The stuck-worker badge never fires for roster-based workers. Since real workers never load (bug #1), the started field from fetched workers is also never exercised in production. Fix: use w.updated_at ?? w.started as the timestamp source and add a null guard before the subtraction.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Luna's SVG linearGradient ID is always 'luna-hair-luna' \u2014 DOM id collision risk",
-      "description": "In CharacterAvatar (Office.jsx), Luna's gradient is const gradId = `luna-hair-${workerId}` where workerId is always 'luna', always producing 'luna-hair-luna'. SVG gradient IDs must be globally unique in the document. If the Luna character SVG is ever rendered in multiple places simultaneously, duplicate IDs cause browsers to silently apply the first definition to all instances, breaking the gradient for the second render. Fix: generate a unique suffix per instance using React 18's useId() hook, or a module-level incrementing counter.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Tab switching via window.location.hash pollutes browser history",
-      "description": "Every tab click sets window.location.hash = 'office' or 'dashboard', pushing a new browser history entry each time. After navigating Office -> Dashboard -> Office -> Dashboard, pressing back cycles through internal tab states instead of returning to the previous page. Fix: replace all window.location.hash = tab assignments (lines 565, 566, 509, 510, 787, 800) with history.replaceState(null, '', '#' + tab) to update the URL without creating history entries.",
-      "effort": "small"
+      "title": "ProgressBar milestone flash fires on mount for pre-progressed workers",
+      "description": "When a worker loads at 60% progress, the milestone useEffect immediately triggers flash animations for 25% and 50% because milestonesRef starts empty. Pre-populate milestonesRef with already-passed milestones on init.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "visual",
-      "title": "Mobile: ~40% empty viewport below office floor",
-      "description": "On 375px mobile, the office floor's aspect-ratio: 4/3 renders at ~250px tall. After header (~100px), tabs (~50px), and the floor (~280px), roughly 300px of empty vertical space sits before the footer. The office tab has zero secondary content on mobile. Fix: add a compact vibe summary strip or mini stats panel below the office floor on mobile, or adjust aspect-ratio to 1/1 at max-width 480px via a media query.",
-      "effort": "medium"
+      "title": "StatsBar grid breaks with conditional Error/Stuck cards",
+      "description": "stats-bar uses grid-template-columns: repeat(5, 1fr). When Error or Stuck cards render (6-7 cards total), overflow cards sit awkwardly on a second row. Use repeat(auto-fill, minmax(130px, 1fr)) instead.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Tab switching pollutes browser history",
+      "description": "Every tab click pushes a new history entry via window.location.hash. After switching tabs 5 times, the back button cycles through internal tab states instead of leaving the page. Replace with history.replaceState().",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "visual",
-      "title": "stats-bar hardcoded 5-column grid breaks when Error or Stuck cards conditionally appear",
-      "description": "The stats-bar CSS uses grid-template-columns: repeat(5, 1fr), creating exactly 5 columns. When the Error card or Stuck worker card conditionally renders (making 6 or 7 total cards), overflow cards spill onto a second row. A lone 6th card stretches to fill 1/5 of the row width while the other 4/5 is empty \u2014 visually broken. Fix: replace repeat(5, 1fr) with repeat(auto-fill, minmax(130px, 1fr)) so the grid adapts naturally to variable card counts.",
-      "effort": "small"
+      "title": "Mobile: ~40% dead space below office floor",
+      "description": "On 375px mobile, the office floor + header + tabs take ~430px, leaving ~300px of empty space. Add a compact vibe strip or mini stats below the floor on mobile, or change aspect-ratio to 1/1 for small screens.",
+      "effort": "medium",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "ProgressBar milestone flash fires spuriously on initial mount for already-progressed workers",
-      "description": "ProgressBar's useEffect iterates MILESTONES [25, 50, 75, 100] and triggers a CSS flash animation for any milestone where progress >= m AND the milestone is not in milestonesRef.current. On first mount, milestonesRef is an empty Set, so a worker already at 60% immediately triggers the 25% and 50% milestone animations \u2014 an unwanted celebratory pulse on every page load or component remount. Fix: pre-populate milestonesRef.current on initialization with milestones already passed: milestonesRef.current = new Set(MILESTONES.filter(m => m <= progress)).",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "getRelativeTime utility is duplicated in App.jsx and Office.jsx",
-      "description": "getRelativeTime is defined as a standalone function in App.jsx (lines 26-35) and then reimplemented inline inside the Character component in Office.jsx (lines 381-390). Two nearly-identical implementations mean any bug fix or format change must be applied twice. Fix: extract to src/utils/time.js and import in both files.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "WorkerCard shows generic role emoji; Office floor shows custom SVG art \u2014 identity inconsistency",
-      "description": "WorkerCard (App.jsx line 245) uses getRoleEmoji(worker.role) \u2014 the same emoji for ALL workers with the same role (e.g., every QA Engineer gets the same magnifying glass). The Office floor uses the rich custom CharacterAvatar SVG with unique per-person illustrations. Users clicking a character in the office land on the Dashboard and see a different, generic representation of the same person. Fix: import CharacterAvatar into App.jsx and use it in WorkerCard so both views share the same character identity.",
-      "effort": "medium"
-    },
-    {
-      "priority": "low",
       "category": "performance",
-      "title": "WorkerCard, ActivityLog, StatsBar, ProgressBar still not memoized (flagged 7x)",
-      "description": "None of these heavy components are wrapped in React.memo. Every 30-second syncFromGitHub() call triggers a full re-render of all WorkerCards (flip state, progress milestone effect, activity history filtering), the entire ActivityLog with time-group sorting, and StatsBar with stuck-worker useMemo. Even when data is unchanged, all children re-render from scratch. Fix: wrap WorkerCard, StatsBar, ActivityLog, ActivityLogEntry, and ProgressBar in React.memo.",
-      "effort": "medium"
+      "title": "No React.memo on any component — full re-render every 30s",
+      "description": "8th flag. WorkerCard, StatsBar, ActivityLog, ProgressBar all re-render from scratch on every poll cycle even when data is unchanged. Wrap in React.memo.",
+      "effort": "medium",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "StatsBar stuck-worker detection fails for null 'started' field",
+      "description": "Workers with started: null (like idle Dave) cause new Date(null).getTime() = 0, making Date.now() - 0 always > 7200000. Every idle worker with null started shows as 'stuck'. Add a null guard.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "No ErrorBoundary \u2014 any render crash shows a blank white screen with no recovery",
-      "description": "Neither App.jsx nor Office.jsx wraps children in a React ErrorBoundary. A thrown exception in any child component (malformed worker data, null dereference in CharacterAvatar, bad timestamp in formatDuration) crashes the entire React tree with a blank white page and no recovery path. Fix: add a top-level ErrorBoundary in main.jsx and a secondary one around the Office component to isolate office-floor render crashes from the rest of the dashboard.",
-      "effort": "small"
+      "title": "getRelativeTime duplicated in App.jsx and Office.jsx",
+      "description": "Nearly identical implementations in both files. Extract to src/utils/time.js.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "WorkerCard uses generic role emoji while Office uses custom SVG — identity inconsistency",
+      "description": "Clicking a character in the office shows a rich SVG avatar. The dashboard shows a generic role emoji for the same person. Import CharacterAvatar into WorkerCard for consistency.",
+      "effort": "medium",
+      "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Footer version hardcoded as 'v1.0.0-chaos' string literal",
-      "description": "The footer hardcodes v1.0.0-chaos as a string (App.jsx line 920). This silently falls out of date as the project evolves. Fix: import { version } from '../package.json' (Vite supports JSON imports by default) and render version dynamically so the footer always reflects the real package.json version.",
-      "effort": "small"
+      "title": "Footer version hardcoded as 'v1.0.0-chaos'",
+      "description": "Import version from package.json instead of hardcoding. Vite supports JSON imports natively.",
+      "effort": "small",
+      "assignee": "Dave"
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "Luna SVG gradient ID collision risk",
+      "description": "luna-hair-luna is always the gradient ID. If Luna renders in multiple contexts simultaneously, gradient references break. Use React useId() for unique IDs.",
+      "effort": "small",
+      "assignee": "Maya"
     }
   ]
 }
