@@ -1,63 +1,63 @@
 {
   "creative_director": "Luna",
   "review_number": 22,
-  "timestamp": "2026-03-07T22:30:00Z",
-  "theme": "Voices & Vitals — Give Every Character a Personality and Every Surface a Pulse",
+  "timestamp": "2026-03-07T22:31:03Z",
+  "theme": "Signal Hidden in Plain Sight — Surface the Data That's Already There",
   "ideas": [
     {
       "priority": "must",
       "category": "delight",
-      "title": "Vibe-Reactive Boss Honorific in Header Greeting",
-      "description": "The header greeting always says 'boss' regardless of team state. Replace the hardcoded 'boss' span with a vibe-reactive lookup: crushing → 'LEGEND 🔥', on-fire → 'captain 🚨', in-flow → 'boss', slow-day → 'chief... you still there? 😐', after-hours → 'night owl 🌙'. This is 5 lines of code — a const object and a lookup — for a moment of delight on every single page load. The greeting is the FIRST thing visitors read. WHY: It's the cheapest personalization this app can do. During a crushing sprint, being greeted as 'LEGEND' hits completely differently.",
+      "title": "Bloberto's Instant Vibe-Shift Reaction",
+      "description": "Bloberto's ambient speech bubble already fires every 45s, and the interval resets when `managerVibe` changes — but it does NOT fire immediately. Add a `prevVibeRef = useRef(null)` inside the Character component. In the existing ambient useEffect (which runs on `managerVibe` changes), BEFORE starting the new interval, compare `prevVibeRef.current` to `managerVibe`. If they differ and prevVibeRef is not null, immediately fire a one-shot transition quote from a new `VIBE_TRANSITION_QUOTES` dict keyed on `{from}:{to}`: 'slow-day:crushing' → 'Wait. Is this... momentum? Don't jinx it. 👀'; 'crushing:on-fire' → 'Uh. Something just caught fire. Not metaphorically. 🚨'; 'in-flow:slow-day' → 'Ok who turned off the vibes. I'll wait. 😐'; 'on-fire:crushing' → 'Crisis resolved. I barely sweated. 💅'; etc. Then set prevVibeRef.current = managerVibe and start the normal 45s interval. WHY: The vibe change is the most emotionally significant event in the office — more than a worker appearing, more than an error. Confetti already fires on upgrades. But the character who SHOULD react first (the manager) currently waits up to 45 seconds to say anything, and then says a random quote unrelated to the change. An instant reaction tied to the specific transition makes Bloberto feel like a real person reading the room. The delay between a vibe shift and Bloberto's comment is the gap between 'alive' and 'automated'.",
       "effort": "small",
-      "assigned_to": "sofia"
+      "assigned_to": "carlos"
     },
     {
       "priority": "must",
+      "category": "feature",
+      "title": "Keyboard Shortcut Cheatsheet (Press ?)",
+      "description": "The app has wired keyboard shortcuts — `1` (Office), `2` (Dashboard), `R` (Sync), `Esc` (Blur) — but there is zero in-app discoverability. The tab buttons show `title='Office view (press 1)'` but title tooltips are invisible on mobile and ignored on desktop. Implementation: add a `?` case to the existing keydown handler in App.jsx that toggles `showShortcuts` state; render a `<dialog className='shortcuts-overlay'>` centered on screen with a simple two-column grid listing each key + action. Use the existing surface/border CSS variables. Close on Esc or second `?`. The overlay needs ~12 lines of JSX and one state var. WHY: Hidden power features are wasted power features. The shortcuts are real quality-of-life tools — especially `R` for quick manual sync and `1`/`2` for fast tab switching on larger monitors. But a user who discovers them does so by accident (reading source, stumbling on the title attr) or not at all. Pressing `?` is the universal keyboard-app convention (Figma, GitHub, Notion, Linear, Slack all use it). One handler + one small overlay makes the entire keyboard layer discoverable in under a second.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "feature",
+      "title": "Shipped Today Counter in Stats Bar",
+      "description": "Add a new stat card to the `StatsBar` component: '📦 Shipped Today' — derived from `activityLog` (already passed into App.jsx) by filtering `e.type === 'complete'` and `new Date(e.timestamp).toDateString() === new Date().toDateString()`. Display as a count. Attach a `DeltaBadge` that shows +N if shipments increased since last sync (track previous count via ref). Clicking the card should call `setTab('dashboard')` and `setActivityFilter('completions')` to deep-link into the filtered log. WHY: Right now the dashboard shows three workers grinding at 5-10% progress (I can see them in the screenshot). The stats bar tracks their real-time state — who's working, idle, in error — but says nothing about what's been delivered today. The activity log already contains every completion event; this card costs one `.filter()` call. It transforms the dashboard from a surveillance tool into a scoreboard. The most important question a manager actually has is not 'is someone working?' — it's 'are we shipping?' One number answers it.",
+      "effort": "medium",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "should",
       "category": "visual",
-      "title": "Vibe-Reactive Floor Grid Glow",
-      "description": "The office floor grid lines are always the same dim color regardless of team state. The floor takes up 70% of the screen but stays completely static. Add data-vibe={vibe} to .office-floor and drive --grid-color CSS variable per vibe: crushing → subtle violet pulse (rgba(139,92,246,0.18)), on-fire → warm red-orange glow, in-flow → cool teal, slow-day → nearly invisible grey, after-hours → moonlight blue. The grid is already rendered via background-image in Office.css — just override the color variable. WHY: The vibe pill reacts but the largest visual element doesn't. When the team is crushing it, the ROOM should glow.",
+      "title": "Desk Lamp Glow Scales with Worker Progress",
+      "description": "Desk lamps are already rendered as SVG ellipses inside each `<div className='desk'>` in Office.jsx — currently they just toggle opacity based on occupied vs. vacant. When a desk has an active (non-ghost) worker, pass their `progress` value (0–100) as a CSS variable: add `style={{ '--desk-progress': (occ.worker.progress ?? 0) / 100 }}` to the desk element's existing style spread. In Office.css, update `.desk--active .desk-lamp ellipse:first-child` to use `opacity: calc(0.35 + var(--desk-progress, 0) * 0.65)` and add `filter: drop-shadow(0 0 calc(2px + var(--desk-progress, 0) * 5px) #fbbf24)`. WHY: On the Dashboard, progress is a text percentage and a thin bar on a card. On the Office floor, there is currently zero ambient signal of how far along any task is. A worker at 90% progress should be under noticeably brighter, warmer light than one at 5%. The floor map becomes a passive data display with zero new UI chrome — the information is encoded in the environment. This is the kind of detail users notice on their third visit and feel rewarded for. It also creates a beautiful visual tell: as the sprint progresses, the office literally lights up.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
-      "priority": "should",
+      "priority": "could",
       "category": "office-life",
-      "title": "Session Duration Self-Roast in Footer",
-      "description": "The footer says 'v1.0.0-chaos'. Add a live session timer next to it using mountTimeRef = useRef(Date.now()) updated by the existing useTimeTick. Commentary escalates: 0-29m → plain 'Session: Nm'; 30-59m → 'Session: Nm 🫠'; 60-119m → 'Session: 1h Nm — maybe get some water.'; 120m+ → 'Session: Nh Nm — Bloberto is worried about you.' WHY: Pure Bloberto humor. The app already runs on mild existential dread — the version is 'v1.0.0-chaos'. A session timer that roasts you after an hour is perfectly on brand. Zero infrastructure cost, infinite personality dividend.",
+      "title": "Coffee Corner Reacts to Vibe",
+      "description": "Add `data-vibe={vibe}` to the `.coffee-corner` div in Office.jsx. Drive label and micro-animation changes entirely from CSS: `[data-vibe='crushing'] .coffee-corner__label` → content: 'TRIPLE SHOT ☕'; add `@keyframes steam` (3 pseudo-elements rising and fading above the cup, offset timings); `[data-vibe='slow-day'] .coffee-corner__label` → content: '🧊 Cold brew...'; `[data-vibe='on-fire'] .coffee-corner__label` → content: '☕ STRONG. NOW.' with orange text; `[data-vibe='after-hours'] .coffee-corner__label` → content: 'Decaf? jk ☕'; default/in-flow → 'COFFEE'. One attribute added in JSX, five CSS overrides, zero new JS. WHY: The coffee corner is the most universally recognized office prop and currently the most inert element on the floor — a static SVG cup that never changes regardless of whether the team is melting down or breaking records. Making it react to team vibe is the smallest possible ambient storytelling investment. The kind of detail that makes sharp-eyed users quietly gasp, then check it every single time they open the app.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
-      "priority": "should",
+      "priority": "could",
       "category": "storytelling",
-      "title": "New Hire Entrance Door Walk-In Animation",
-      "description": "The entrance door exists at the bottom of the office floor. When polling detects a first-time worker (the firstTime array in App.jsx already computed), that worker should appear at the entrance position (~50%, 88%) and animate to their desk over 1.5s via CSS transition. In Office.jsx, accept a newArrivals prop (Set of worker IDs). Characters in that set start at entrance coordinates with a 1.5s transition to desk position. WHY: The activity log says '🟢 Maya joined' but the floor just... has Maya at her desk. The door exists. The hire event is tracked. Watching someone walk through the front door is a completely different emotional experience than a tile appearing.",
+      "title": "Swipe to Change Tabs on Mobile",
+      "description": "Add touch gesture support to the `<main>` element. In App.jsx: `useEffect` adds passive `touchstart` listener storing `touchStartX` and `touchStartY` in refs; `touchend` checks if `Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5 && duration < 300ms` (the last condition prevents slow drags from accidentally triggering). If valid: swipe left → Dashboard, swipe right → Office. Reuse the same `setTab` + `window.location.hash` calls already used by the tab buttons. WHY: On mobile at 390px, the tab row is the only way to navigate between Office and Dashboard, requiring lifting your thumb out of the content area to tap a small button. On a narrow screen where the office floor fills the entire viewport, dragging your thumb left to reveal the dashboard is the completely natural gesture — it's how every major mobile app with tabs works (iOS, Twitter, Spotify, Instagram). The two-tab structure is perfect for swipe because there are exactly two destinations. Zero visual change, dramatic mobile feel improvement. It's the difference between 'a website' and 'an app'.",
       "effort": "medium",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "could",
-      "category": "delight",
-      "title": "Bloberto's Manager Desk Live Clock + Sync Countdown",
-      "description": "Bloberto's manager desk has a monitor element and nameplate but shows no live data. Add a small HH:MM clock (updated every minute via useEffect) and a sync countdown '⟳ 28s' (derived from POLL_INTERVAL_ACTIVE - timeSinceLastSync). Style as monospace LCD-aesthetic inside the desk box. WHY: The manager desk is the spatial command center but shows only static content. A ticking clock and countdown turn it into a live readout — you feel the polling rhythm. Also stops impatient users from hammering the sync button.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "could",
-      "category": "feature",
-      "title": "Keyboard Shortcut Cheat Sheet Modal",
-      "description": "The app already has keyboard shortcuts (1=Office, 2=Dashboard, R=Refresh, Esc=blur) but no discoverability. Add a '?' shortcut that shows a small modal overlay listing all shortcuts. Dismiss with Esc or clicking outside. Style it as a floating card with the same dark theme. WHY: Power users never find hidden shortcuts. A simple '?' modal is standard UX (GitHub, Gmail all do this). One component, zero backend.",
-      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "wild",
-      "category": "storytelling",
-      "title": "The Entrance Door Has Opinions — Arrival/Departure Reactions",
-      "description": "The entrance door is pure scenery. Make it reactive: (a) On hire/arrival, door glows green with '👋 Welcome!' tooltip for 2s via CSS @keyframes pulse; (b) on worker disappearing (the disappeared array in App.jsx), door pulses orange '👋 See ya!' for 2s; (c) during after-hours with 0 workers, add a '🔒 CLOSED' badge. Pass doorEvent prop to Office.jsx, reset to null after 2000ms. WHY: Every office has a front door that witnesses comings and goings. Making it react to arrivals and departures creates a spatial metaphor no data panel can replicate.",
-      "effort": "medium",
+      "category": "team",
+      "title": "Bloberto's Weekly Dispatch — The Internal Memo",
+      "description": "A `📋 Dispatch` button in the header (or keyboard shortcut `D`) opens a `<dialog>` overlay styled as a formal internal memo, auto-generated from `activityLog` data — no external API, pure template logic. Memo structure: FROM: Bloberto (Manager, CVO, Director of Vibes) / TO: You (The Boss) / RE: Week in Review / CLASSIFICATION: EYES ONLY (sort of). Body sections: (1) Ship Count: count `complete` events in last 7 days with worker breakdown; (2) MVP of the Week: worker with most completions; (3) Incidents: count of `error` events + which worker triggered most; (4) Vibe Snapshot: most frequent vibe key from session data; (5) One rotating Bloberto sign-off line chosen from a `DISPATCH_CLOSERS` array: 'This report was generated by feelings and basic arithmetic. Mostly feelings.' / 'I have no memory of writing this.' / 'Please water the plants while I'm in the meeting I scheduled with myself.'. Styled as a monospace memo inside a `dialog` with appropriate backdrop. Close on Esc or clicking backdrop. WHY: The activity log is a raw timestamped feed that tells you WHAT happened but not WHAT IT MEANS. A weekly memo format turns the same data into narrative — who shipped most, where the pain was, what the week felt like in five lines. It's also the first content in this app that speaks TO the user as a named individual (addressed to 'You, The Boss'). People would screenshot this and post it. It's the feature that makes this a product with personality rather than a dashboard with vibes.",
+      "effort": "large",
       "assigned_to": "tbd"
     }
   ],
