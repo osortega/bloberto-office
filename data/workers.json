@@ -1,13 +1,13 @@
 {
   "workers": [
     {
-      "name": "Dave",
-      "role": "DevOps Engineer",
+      "name": "Maya",
+      "role": "Frontend Engineer",
       "status": "working",
-      "task": "Implementing vacant desk state + manager vibe titles (Luna #14 ideas)",
+      "task": "Implementing idle wanderer tooltips + solo worker spotlight (Luna #14)",
       "progress": 10,
-      "started_at": "2026-03-07T18:36:00Z",
-      "emoji": "🚀"
+      "started_at": "2026-03-07T18:40:00Z",
+      "emoji": "🎨"
     }
   ]
 }
