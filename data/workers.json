@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "name": "Carlos",
+    "role": "Backend Engineer",
+    "emoji": "⚙️",
+    "status": "working",
+    "task": "Bottleneck Beacon — stuck workers surface to stats bar",
+    "progress": 10,
+    "started": "2026-03-07T21:08:00Z"
+  },
+  {
+    "name": "Dave",
+    "role": "DevOps Engineer",
+    "emoji": "🚀",
+    "status": "working",
+    "task": "Sync Heartbeat Ripple — live dot sonar pulse",
+    "progress": 10,
+    "started": "2026-03-07T21:08:00Z"
+  }
+]
