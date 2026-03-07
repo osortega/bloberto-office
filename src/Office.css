@@ -223,6 +223,8 @@
 .char--manager {
   animation: manager-wobble 3.5s ease-in-out infinite;
   z-index: 12;
+  pointer-events: auto;
+  cursor: default;
 }
 .char--manager .char__avatar {
   width: 44px;
@@ -233,6 +235,45 @@
 }
 /* shift manager -22px to center the 44px avatar */
 .char--manager { margin-left: -22px; }
+
+/* ── Bloberto speech bubble ── */
+.speech-bubble {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 10, 28, 0.92);
+  color: #e2d9f3;
+  font-size: 0.65rem;
+  line-height: 1.45;
+  padding: 6px 10px;
+  border-radius: 9px;
+  width: max-content;
+  max-width: 160px;
+  white-space: normal;
+  text-align: center;
+  border: 1px solid rgba(124, 106, 247, 0.35);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.speech-bubble--visible {
+  opacity: 1;
+}
+
+/* Triangle pointer at bottom of bubble */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(10, 10, 28, 0.92);
+}
 
 /* ── Working — enters from door, then bobs (typing) ── */
 .char--working {

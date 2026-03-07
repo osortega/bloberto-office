@@ -1,5 +1,16 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import './Office.css'
+
+const MANAGER_QUOTES = [
+  'Per my last commit…',
+  'Can we circle back on that PR?',
+  'It is not a bug, it is a feature roadmap item.',
+  'Have you tried shipping it on Friday?',
+  'My calendar says we are aligned.',
+  'Let us take this offline.',
+  'I will ping you async.',
+  'This could have been a commit message.',
+]
 
 const ROLE_COLORS = {
   'Frontend Engineer': '#a78bfa',
@@ -234,6 +245,25 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
 
+  const [bubble, setBubble] = useState({ quote: null, show: false })
+  const timerRef = useRef(null)
+
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current) }, [])
+
+  const handleMouseEnter = () => {
+    if (variant !== 'manager') return
+    const quote = MANAGER_QUOTES[Math.floor(Math.random() * MANAGER_QUOTES.length)]
+    if (timerRef.current) clearTimeout(timerRef.current)
+    setBubble({ quote, show: true })
+    timerRef.current = setTimeout(() => setBubble(b => ({ ...b, show: false })), 3500)
+  }
+
+  const handleMouseLeave = () => {
+    if (variant !== 'manager') return
+    if (timerRef.current) clearTimeout(timerRef.current)
+    setBubble(b => ({ ...b, show: false }))
+  }
+
   const style = {}
   if (left !== undefined) style.left = `${left}%`
   if (top  !== undefined) style.top  = `${top}%`
@@ -257,7 +287,15 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   const extraProps = tooltip ? { 'data-tooltip': tooltip } : {}
 
   return (
-    <div className={classes.join(' ')} style={style} {...extraProps}>
+    <div className={classes.join(' ')} style={style} {...extraProps}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {variant === 'manager' && bubble.quote && (
+        <div className={`speech-bubble${bubble.show ? ' speech-bubble--visible' : ''}`}>
+          {bubble.quote}
+        </div>
+      )}
       <div className="char__avatar">
         <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} />
       </div>

@@ -168,17 +168,29 @@ function WorkerCard({ worker }) {
   )
 }
 
+function getTeamVibe(workers) {
+  if (workers.length === 0) return { label: '🌙 After Hours', key: 'after-hours' }
+  const hasErrors = workers.some(w => w.status === 'error')
+  if (hasErrors) return { label: '🚨 On Fire', key: 'on-fire' }
+  const working = workers.filter(w => w.status === 'working').length
+  const pct = working / workers.length
+  if (pct > 0.7) return { label: '🔥 Crushing It', key: 'crushing' }
+  if (pct >= 0.4) return { label: '⚡ In Flow', key: 'in-flow' }
+  return { label: '😴 Slow Day', key: 'slow-day' }
+}
+
 function StatsBar({ workers, lastSynced, isLive }) {
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
   const idle = workers.filter((w) => w.status === 'idle').length
+  const vibe = getTeamVibe(workers)
 
   const syncLabel = lastSynced
     ? lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     : 'never'
 
   return (
-    <div className="stats-bar">
+    <div className="stats-bar" data-vibe={vibe.key}>
       <div className="stat-card total">
         <span className="stat-label">👥 On the Clock</span>
         <span className="stat-value">{total}</span>
@@ -197,6 +209,10 @@ function StatsBar({ workers, lastSynced, isLive }) {
           {isLive ? 'Live' : 'Offline'}
         </span>
         <span className="stat-value sync-time">{syncLabel}</span>
+      </div>
+      <div className={`stat-card vibe vibe--${vibe.key}`}>
+        <span className="stat-label">✨ Team Vibe</span>
+        <span className="stat-value vibe-value">{vibe.label}</span>
       </div>
     </div>
   )

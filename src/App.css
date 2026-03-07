@@ -95,10 +95,18 @@
 /* ---- Stats Bar ---- */
 .stats-bar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
   margin-bottom: 2rem;
+  border-radius: var(--radius);
+  transition: background-color 0.4s ease;
 }
+
+.stats-bar[data-vibe='on-fire']     { background: rgba(248, 113, 113, 0.05); }
+.stats-bar[data-vibe='crushing']    { background: rgba(34, 197, 94, 0.05); }
+.stats-bar[data-vibe='in-flow']     { background: rgba(124, 106, 247, 0.05); }
+.stats-bar[data-vibe='slow-day']    { background: rgba(234, 179, 8, 0.05); }
+.stats-bar[data-vibe='after-hours'] { background: rgba(148, 163, 184, 0.05); }
 
 .stat-card {
   background: var(--surface);
@@ -131,6 +139,19 @@
 .stat-card.active .stat-value { color: var(--green); }
 .stat-card.done .stat-value   { color: var(--blue); }
 .stat-card.idle .stat-value   { color: var(--yellow); }
+
+/* Vibe card */
+.vibe-value {
+  font-size: 1rem !important;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.vibe--on-fire .vibe-value     { color: var(--red); }
+.vibe--crushing .vibe-value    { color: var(--green); }
+.vibe--in-flow .vibe-value     { color: var(--accent); }
+.vibe--slow-day .vibe-value    { color: var(--yellow); }
+.vibe--after-hours .vibe-value { color: var(--text-muted); }
 
 /* ---- Section header ---- */
 .section-header {
@@ -426,7 +447,7 @@ select option { background: var(--surface2); }
 
 /* ---- Responsive ---- */
 @media (max-width: 900px) {
-  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .stats-bar { grid-template-columns: repeat(3, 1fr); }
   .hire-form { grid-template-columns: 1fr 1fr; }
 }
 
