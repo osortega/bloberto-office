@@ -1,16 +1,15 @@
 {
-  "review_number": 16,
+  "review_number": 17,
   "reviewer": "Sofia",
-  "timestamp": "2026-03-07T05:15:00Z",
-  "overall_score": 3.7,
-  "previous_score": 3.6,
-  "summary": "Cactus flower is a nice touch. Deep-work aura and vibe streak are great additions. But the timezone bug in the header greeting is still there — flagged since #15. Several accessibility issues persist across reviews. The codebase is growing but some cleanup debt is accumulating.",
+  "timestamp": "2026-03-07T05:40:00Z",
+  "overall_score": "3.7/5",
+  "summary": "Same persistent issues from reviews #14-16 remain unfixed — the timezone bug, missing tabIndex on tabpanels, missing aria-label on tablist, and deep-glow reduced-motion gap. These are all small fixes that keep getting flagged. New observation: confetti layer lacks reduced-motion handling. Code quality is solid but the accessibility debt is real.",
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
       "title": "Header greeting still uses viewer's local timezone — flagged since #15",
-      "description": "App.jsx: `const currentHour = new Date().getHours()`. The window sky was fixed to use America/Los_Angeles, but the greeting ('Good morning/afternoon/evening') still uses the viewer's local clock. A viewer in Tokyo sees 'Good evening' when LA is morning. Use the same Intl.DateTimeFormat approach as WindowElement. This is inconsistent behavior within the same app.",
+      "description": "App.jsx: `const currentHour = new Date().getHours()`. The window sky was fixed to use America/Los_Angeles, but the greeting ('Good morning/afternoon/evening') still uses the viewer's local clock. A viewer in Tokyo sees 'Good evening' when LA is morning. Use the same Intl.DateTimeFormat approach as WindowElement.",
       "effort": "small",
       "assignee": "carlos"
     },
@@ -18,7 +17,7 @@
       "priority": "high",
       "category": "accessibility",
       "title": "deep-glow keyframe missing from prefers-reduced-motion — flagged since #15",
-      "description": "Office.css reduced-motion block nullifies bob, manager-wobble, wander-*, etc. But `deep-glow` (used by .char--deep-work) is not listed. It pulses continuously — exactly the kind of animation that triggers vestibular issues. Add `@keyframes deep-glow { from {} to {} }` and `.char--deep-work { animation: none !important; filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.5)); }` inside the reduced-motion block.",
+      "description": "Office.css reduced-motion block nullifies bob, manager-wobble, wander-*, etc. But `deep-glow` (used by .char--deep-work) is not listed. It pulses continuously — exactly the kind of animation that triggers vestibular issues. Add `@keyframes deep-glow { from {} to {} }` inside the reduced-motion block.",
       "effort": "small",
       "assignee": "maya"
     },
@@ -26,7 +25,7 @@
       "priority": "high",
       "category": "accessibility",
       "title": "tabpanel divs still missing tabIndex={0} — flagged since #14",
-      "description": "App.jsx: both tabpanel divs (id='tabpanel-office' and 'tabpanel-dashboard') lack tabIndex. Per WAI-ARIA 1.1, tabpanels should have tabIndex={0} so keyboard users can navigate into panel content after tab switch. Three reviews now.",
+      "description": "App.jsx: both tabpanel divs (id='tabpanel-office' and 'tabpanel-dashboard') lack tabIndex. Per WAI-ARIA 1.1, tabpanels should have tabIndex={0} so keyboard users can navigate into panel content after tab switch.",
       "effort": "small",
       "assignee": "carlos"
     },
@@ -41,8 +40,16 @@
     {
       "priority": "medium",
       "category": "accessibility",
+      "title": "Confetti layer has no reduced-motion handling — NEW",
+      "description": "The confetti burst (30 animated spans) plays unconditionally. Users with prefers-reduced-motion should not see rapidly flying particles. Add a CSS rule or JS check to suppress confetti when reduced motion is preferred.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
       "title": "Bloberto speech bubble has no keyboard/focus trigger — flagged since #15",
-      "description": "The manager character shows speech bubbles on mouseenter only. Keyboard-only users can never trigger quotes. Add tabIndex={0} to the manager character wrapper and onFocus/onBlur handlers mirroring mouseenter/mouseleave.",
+      "description": "The manager character shows speech bubbles on mouseenter only. Keyboard-only users can never trigger quotes. Add tabIndex={0} and onFocus/onBlur handlers.",
       "effort": "small",
       "assignee": "maya"
     },
@@ -50,7 +57,7 @@
       "priority": "medium",
       "category": "accessibility",
       "title": "Character tooltips still hover-only — flagged since #14",
-      "description": "Characters with data-tooltip show info via CSS ::after on hover. No keyboard equivalent exists. Add tabIndex={0} and focus/blur handlers, or at minimum a visually-hidden span with tooltip text for screen readers.",
+      "description": "Characters with data-tooltip show info via CSS ::after on hover. No keyboard equivalent exists. Add tabIndex={0} and focus/blur handlers.",
       "effort": "medium",
       "assignee": "maya"
     },
@@ -58,7 +65,7 @@
       "priority": "medium",
       "category": "bug",
       "title": "Activity log relative timestamps never update — flagged since #14",
-      "description": "getRelativeTime() is called at render time only. If the page stays open, '2m ago' never ticks to '5m ago'. Add a tick counter updated every 60s to force re-render of timestamps.",
+      "description": "getRelativeTime() is called at render time only. If the page stays open, '2m ago' never ticks to '5m ago'. Add a tick counter updated every 60s.",
       "effort": "small",
       "assignee": "carlos"
     },
@@ -66,15 +73,7 @@
       "priority": "medium",
       "category": "code",
       "title": "DEFAULT_ROSTER still in Office.jsx instead of constants.js — flagged since #15",
-      "description": "ROLE_EMOJIS and ROLE_COLORS were moved to utils/constants.js. DEFAULT_ROSTER was not. It's a data constant defining team composition. Move it to constants.js for consistency.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "VIBE_QUOTES and MANAGER_QUOTES could move to a dedicated data file",
-      "description": "Office.jsx has ~50 lines of quote strings at the top. These are pure data, not component logic. Moving them to a utils/quotes.js or data/quotes.js would clean up the component file and make it easier to add/edit quotes without touching component code.",
+      "description": "ROLE_EMOJIS and ROLE_COLORS were moved to utils/constants.js. DEFAULT_ROSTER was not. Move it for consistency.",
       "effort": "small",
       "assignee": "carlos"
     },
@@ -82,7 +81,7 @@
       "priority": "low",
       "category": "code",
       "title": "Dead CSS still in App.css — .hire-form*, .hq-badge, .btn-danger — flagged since #14",
-      "description": "App.css still contains .hire-form-wrapper, .hire-form-title, .hire-form, .hq-badge, .btn-danger. None exist in App.jsx. Orphaned since the hire form was removed. Four reviews now. Delete them.",
+      "description": "App.css still contains .hire-form-wrapper, .hire-form-title, .hire-form, .hq-badge, .btn-danger. None exist in App.jsx. Four reviews now. Delete them.",
       "effort": "small",
       "assignee": "maya"
     },
@@ -90,7 +89,7 @@
       "priority": "low",
       "category": "code",
       "title": ".progress-bar-inner in App.css reduced-motion targets wrong class — flagged since #15",
-      "description": "App.css reduced-motion block references .progress-bar-inner but the actual class is .progress-bar-fill. The rule targets nothing. Fix the class name.",
+      "description": "App.css reduced-motion block references .progress-bar-inner but the actual class is .progress-bar-fill. The rule targets nothing.",
       "effort": "small",
       "assignee": "maya"
     },
@@ -98,7 +97,7 @@
       "priority": "low",
       "category": "ux",
       "title": "No keyboard shortcut discovery — flagged since #14",
-      "description": "The 1/2 keyboard shortcuts for tab switching have no discovery path. Add title attributes to tab buttons: 'Press 1 for Office' / 'Press 2 for Dashboard'. Hidden features aren't features.",
+      "description": "The 1/2 keyboard shortcuts for tab switching have no discovery path. Add title attributes to tab buttons.",
       "effort": "small",
       "assignee": "maya"
     }
