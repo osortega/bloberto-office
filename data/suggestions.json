@@ -1,101 +1,101 @@
 {
   "analyst": "Sofia",
-  "review": 32,
-  "timestamp": "2026-03-07T22:45:00Z",
+  "review_number": 33,
+  "timestamp": "2026-03-07T23:15:00Z",
   "scores": {
-    "visual": 4.5,
+    "visual": 4,
     "ux": 4,
+    "responsiveness": 3,
     "performance": 3,
-    "accessibility": 3.5,
-    "code_quality": 2.5,
+    "accessibility": 3,
+    "code_quality": 3,
     "features": 4,
-    "fun_factor": 4.5,
-    "responsiveness": 3.5
+    "fun_factor": 5
   },
-  "overall_score": 3.7,
+  "overall_score": 3.6,
   "suggestions": [
     {
       "priority": "high",
       "category": "code",
-      "title": "App.jsx is 1025 lines — CRITICAL: needs component extraction (7th flag)",
-      "description": "App.jsx contains WorkerCard, StatsBar, ActivityLog, ProgressBar, EmptyState, LoadingSkeleton all in one file. Extract each into its own file under src/components/. This is the 7th time this has been flagged. WorkerCard alone is ~100 lines. StatsBar is ~50. ActivityLog + helpers are ~80. This would make App.jsx ~400 lines and massively improve maintainability.",
+      "title": "App.jsx is 1000+ lines — extract components (8th flag)",
+      "description": "App.jsx contains WorkerCard, StatsBar, ActivityLog, ProgressBar, DeltaBadge, StatusBadge, EmptyState, LoadingSkeleton all inline. Each should be its own file. This is the 8th time flagging this. Extract at minimum: WorkerCard.jsx, StatsBar.jsx, ActivityLog.jsx, ProgressBar.jsx. Import them back. This is a maintainability blocker.",
       "effort": "medium"
     },
     {
       "priority": "high",
       "category": "performance",
-      "title": "Missing React.memo on WorkerCard, StatsBar, ActivityLog (10th flag)",
-      "description": "WorkerCard re-renders on every poll cycle (30s) even when its props haven't changed. Wrap WorkerCard, StatsBar, ActivityLogEntry, and ProgressBar in React.memo. CharacterAvatar and Character in Office.jsx already use memo — apply the same pattern consistently. With 5+ workers, this causes unnecessary DOM thrashing.",
+      "title": "React.memo missing on hot-path components (11th flag)",
+      "description": "WorkerCard, ActivityLogEntry, StatusBadge, ProgressBar all re-render on every 30s poll even when their props haven't changed. Wrap with React.memo. WorkerCard is the most expensive — it contains ProgressBar, StatusBadge, and task tag logic. This causes unnecessary DOM diffing on every sync cycle.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "No ErrorBoundary — any component crash kills the entire app (7th flag)",
-      "description": "If Office.jsx or any WorkerCard throws (e.g., bad data from workers.json), the entire app white-screens. Add a React ErrorBoundary wrapping at minimum the Office and workers-grid sections. Show a friendly fallback ('Something went wrong, retrying...') and auto-retry fetch. This is basic production resilience.",
+      "title": "No ErrorBoundary — any component crash kills entire app (8th flag)",
+      "description": "If any worker card, the office floor, or activity log throws during render, the entire app white-screens. Add a React ErrorBoundary wrapper around at minimum the tab panels. A simple class component with componentDidCatch that shows 'Something went wrong, click to retry' would suffice. This is especially important since data comes from an external JSON file that could have unexpected shapes.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "vibeStreak sessionStorage logic is broken — increments on every render",
-      "description": "In the useEffect for vibeStreak (line ~680), the streak increments every time the effect runs, not just on poll cycles. Since teamVibe.key doesn't change between renders but the effect still fires, it counts up incorrectly. Fix: compare with a ref of the previous value and only increment when the key actually matches the PREVIOUS value from sessionStorage, not the current stored value.",
+      "title": "vibeStreak increment logic uses sessionStorage incorrectly",
+      "description": "The vibeStreak effect runs on every render where teamVibe.key changes, but it reads from sessionStorage and increments even on the initial mount. On first load, storedKey is null, so it always resets to 1. Then on the next poll (30s later), if vibe hasn't changed, it increments to 2. The streak counter is essentially meaningless — it counts poll cycles, not actual vibe persistence across meaningful time periods. Fix: store the streak in a ref and only persist to sessionStorage on unmount, or use a timestamp-based approach.",
       "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "completionToast has no pointer-events:none — blocks clicks for 3 seconds",
-      "description": "The completionToast div at the bottom of the screen has pointerEvents: 'none' set inline, but the confetti-layer divs above it do NOT have pointer-events:none. When workerConfetti fires, the confetti-layer covers the entire viewport and blocks all interaction for 2.5s. Add pointer-events:none to .confetti-layer in CSS.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "Two separate fetch calls on every poll — bundle into one request",
-      "description": "syncFromGitHub makes two parallel fetch calls to raw.githubusercontent.com (workers.json + activity.json). While Promise.allSettled is good, consider combining both into a single JSON file (e.g., state.json with {workers, roster, activity}) to halve the network requests. GitHub's raw CDN has rate limits.",
-      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Tab toggle buttons missing aria-label for keyboard shortcut hints",
-      "description": "The tab buttons show title='Office view (press 1)' but screen readers won't announce title attributes consistently. Add aria-keyshortcuts='1' and aria-keyshortcuts='2' to the tab buttons. Also, the theme toggle and sync button lack visible focus indicators in the current CSS.",
+      "title": "Office floor Character divs missing role='button' and keyboard activation",
+      "description": "Character components in Office.jsx have tabIndex={0} and onClick but no role attribute and no onKeyDown handler. Screen readers won't announce them as interactive. Pressing Enter/Space while focused does nothing. Add role='button' and onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick?.(worker) }}.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "StatsBar grid overflows on narrow screens (< 400px)",
-      "description": "The stats-bar uses a CSS grid that doesn't wrap well below 400px. The sync-status and vibe cards get squished. Add a flex-wrap fallback or reduce the grid to 2 columns on very small screens. The stuck-worker card also has long text that can overflow its container.",
+      "title": "completionToast blocks pointer events",
+      "description": "The completion toast has pointerEvents: 'none' which is correct, but it's positioned with position:fixed at bottom:2rem covering potential click targets. The real issue: it has no exit animation — it just vanishes after 3s. Add a fade-out keyframe for the last 300ms.",
       "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "feature",
-      "title": "No way to see worker history beyond 3 entries on card flip",
-      "description": "The worker card back side only shows the last 3 activity entries (.slice(-3)). For workers like Maya who have had many tasks, users can't see their full history. Consider a 'View all' link or scrollable list on the back of the card.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Office plants don't respond to theme — dark green on dark bg is invisible",
-      "description": "The SVG plants use hardcoded green fills (#22c55e, #16a34a) which work on the dark theme but look fine on light too. However, the pot colors (#c2410c, #92400e) are very dark and nearly invisible on dark theme. Consider slightly lighter pot fills or a subtle outline.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
       "category": "performance",
-      "title": "Canvas favicon regenerated on every activeWorkers change",
-      "description": "The favicon useEffect creates a new canvas element and draws a circle on every render where activeWorkers changes — even if the color hasn't changed. Memoize the color value and skip the canvas work when it's the same as last time.",
+      "title": "WORKER_ROLE_COLORS duplicates ROLE_COLORS from constants.js",
+      "description": "App.jsx line 17 defines WORKER_ROLE_COLORS mapping worker names to colors for confetti. constants.js already has ROLE_COLORS mapping roles to colors. The hex values even diverge (Maya: #a855f7 vs #a78bfa). Either document the intent or derive confetti color from ROLE_COLORS[worker.role].",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "responsiveness",
+      "title": "Mobile: large dead zone below office floor view",
+      "description": "On 375px mobile, there's ~250px of empty space between the office floor and footer due to .main flex:1 expanding beyond content. The office floor has fixed aspect-ratio:4/3 that doesn't fill available space. Add min-height:auto to .main on mobile or remove the flex expansion.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "ActivityLog entry keys include array index — fragile under filter changes",
+      "description": "key={entry.timestamp + entry.worker + i} uses index which shifts when filters toggle, forcing React to remount all entries. Use a purely data-derived key: key={entry.timestamp + '-' + (entry.worker || 'system') + '-' + entry.type}.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Whiteboard text splits mid-word on mobile",
+      "description": "On 375px viewport, the whiteboard shows '⚡ FL\\nOW' — word breaks mid-word due to narrow width. Use a smaller font-size in mobile media query for .office-whiteboard, or show just the emoji below a certain breakpoint.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "Ghost character OOO tooltips unreachable on touch devices",
+      "description": "Ghost characters show OOO bubble on hover only. No touch equivalent exists. Consider adding onClick handler for ghosts that toggles the bubble, or make OOO info always visible as a small badge on mobile.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "No loading state when sync button is clicked — only Bloberto typing dots",
-      "description": "When clicking the sync button, isSyncing is set but the only visual feedback is Bloberto's typing dots in the office view. In dashboard view, there's no indication that a refresh is happening. Add a subtle spinner or pulse to the sync button itself.",
+      "title": "No loading state when switching between activity log filters",
+      "description": "When clicking filter buttons (All/Hires/Completions/Errors), the list re-renders instantly which is fine, but if the list is long, there's no visual feedback that the filter changed. The active button styling helps but consider a brief fade transition on the list.",
       "effort": "small"
     }
   ]

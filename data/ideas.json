@@ -1,64 +1,64 @@
 {
   "creative_director": "Luna",
   "review_number": 23,
-  "timestamp": "2026-03-07T22:31:03Z",
-  "theme": "Signal Hidden in Plain Sight — Surface the Data That's Already There",
+  "timestamp": "2026-03-07T23:01:09Z",
+  "theme": "Every Pixel Has a Job — No Dead Space, No Mute Props",
   "ideas": [
     {
       "priority": "must",
-      "category": "delight",
-      "title": "Bloberto's Instant Vibe-Shift Reaction",
-      "description": "Bloberto's ambient speech bubble already fires every 45s, and the interval resets when `managerVibe` changes — but it does NOT fire immediately. Add a `prevVibeRef = useRef(null)` inside the Character component. In the existing ambient useEffect (which runs on `managerVibe` changes), BEFORE starting the new interval, compare `prevVibeRef.current` to `managerVibe`. If they differ and prevVibeRef is not null, immediately fire a one-shot transition quote from a new `VIBE_TRANSITION_QUOTES` dict keyed on `{from}:{to}`: 'slow-day:crushing' → 'Wait. Is this... momentum? Don't jinx it. 👀'; 'crushing:on-fire' → 'Uh. Something just caught fire. Not metaphorically. 🚨'; 'in-flow:slow-day' → 'Ok who turned off the vibes. I'll wait. 😐'; 'on-fire:crushing' → 'Crisis resolved. I barely sweated. 💅'; etc. Then set prevVibeRef.current = managerVibe and start the normal 45s interval. WHY: The vibe change is the most emotionally significant event in the office — more than a worker appearing, more than an error. Confetti already fires on upgrades. But the character who SHOULD react first (the manager) currently waits up to 45 seconds to say anything, and then says a random quote unrelated to the change. An instant reaction tied to the specific transition makes Bloberto feel like a real person reading the room. The delay between a vibe shift and Bloberto's comment is the gap between 'alive' and 'automated'.",
+      "category": "visual",
+      "title": "Kill the Mobile Dead Zone",
+      "description": "On mobile (390px), the office floor panel ends at roughly 55% of the viewport height, leaving ~300px of empty dark space before the footer — I can see it clearly in the mobile screenshot. The fix: in Office.css, set `.office-wrap` to `min-height: calc(100dvh - var(--header-height) - var(--tabs-height) - 4rem)` and add `height: 100%` to `.office-floor` so the floor stretches to fill the remaining screen. If the floor content is too small to fill that height naturally, use `aspect-ratio: unset` and let it breathe with `padding-bottom: env(safe-area-inset-bottom, 1rem)`. Also add `overflow: hidden` to prevent the ghost scroll. WHY: The dead zone is the first thing a new mobile visitor sees after the office — an unprofessional sea of nothing that makes the app feel unfinished. It's the highest-signal cosmetic bug on the screen and the easiest to fix. It doesn't need a design decision, just a CSS floor expansion.",
       "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "must",
-      "category": "feature",
-      "title": "Keyboard Shortcut Cheatsheet (Press ?)",
-      "description": "The app has wired keyboard shortcuts — `1` (Office), `2` (Dashboard), `R` (Sync), `Esc` (Blur) — but there is zero in-app discoverability. The tab buttons show `title='Office view (press 1)'` but title tooltips are invisible on mobile and ignored on desktop. Implementation: add a `?` case to the existing keydown handler in App.jsx that toggles `showShortcuts` state; render a `<dialog className='shortcuts-overlay'>` centered on screen with a simple two-column grid listing each key + action. Use the existing surface/border CSS variables. Close on Esc or second `?`. The overlay needs ~12 lines of JSX and one state var. WHY: Hidden power features are wasted power features. The shortcuts are real quality-of-life tools — especially `R` for quick manual sync and `1`/`2` for fast tab switching on larger monitors. But a user who discovers them does so by accident (reading source, stumbling on the title attr) or not at all. Pressing `?` is the universal keyboard-app convention (Figma, GitHub, Notion, Linear, Slack all use it). One handler + one small overlay makes the entire keyboard layer discoverable in under a second.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "should",
-      "category": "feature",
-      "title": "Shipped Today Counter in Stats Bar",
-      "description": "Add a new stat card to the `StatsBar` component: '📦 Shipped Today' — derived from `activityLog` (already passed into App.jsx) by filtering `e.type === 'complete'` and `new Date(e.timestamp).toDateString() === new Date().toDateString()`. Display as a count. Attach a `DeltaBadge` that shows +N if shipments increased since last sync (track previous count via ref). Clicking the card should call `setTab('dashboard')` and `setActivityFilter('completions')` to deep-link into the filtered log. WHY: Right now the dashboard shows three workers grinding at 5-10% progress (I can see them in the screenshot). The stats bar tracks their real-time state — who's working, idle, in error — but says nothing about what's been delivered today. The activity log already contains every completion event; this card costs one `.filter()` call. It transforms the dashboard from a surveillance tool into a scoreboard. The most important question a manager actually has is not 'is someone working?' — it's 'are we shipping?' One number answers it.",
-      "effort": "medium",
       "assigned_to": "sofia"
     },
     {
-      "priority": "should",
-      "category": "visual",
-      "title": "Desk Lamp Glow Scales with Worker Progress",
-      "description": "Desk lamps are already rendered as SVG ellipses inside each `<div className='desk'>` in Office.jsx — currently they just toggle opacity based on occupied vs. vacant. When a desk has an active (non-ghost) worker, pass their `progress` value (0–100) as a CSS variable: add `style={{ '--desk-progress': (occ.worker.progress ?? 0) / 100 }}` to the desk element's existing style spread. In Office.css, update `.desk--active .desk-lamp ellipse:first-child` to use `opacity: calc(0.35 + var(--desk-progress, 0) * 0.65)` and add `filter: drop-shadow(0 0 calc(2px + var(--desk-progress, 0) * 5px) #fbbf24)`. WHY: On the Dashboard, progress is a text percentage and a thin bar on a card. On the Office floor, there is currently zero ambient signal of how far along any task is. A worker at 90% progress should be under noticeably brighter, warmer light than one at 5%. The floor map becomes a passive data display with zero new UI chrome — the information is encoded in the environment. This is the kind of detail users notice on their third visit and feel rewarded for. It also creates a beautiful visual tell: as the sprint progresses, the office literally lights up.",
+      "priority": "must",
+      "category": "storytelling",
+      "title": "Vacant Desk Gets a Heartbeat",
+      "description": "The bottom-right desk slot currently renders `📋 Vacant` with a `?` ghost silhouette and zero personality — it's dead real estate in the most interactive part of the app. Replace with: in Office.jsx, detect `occ === undefined` (vacant) and render a `desk--hiring` modifier. Inside, swap `📋 Vacant` nameplate for `🔍 Hiring...` with a CSS blink cursor (`@keyframes blink { 50% { opacity: 0 } }`). Add a faint pulsing ring on the monitor element: `.desk--hiring .desk__monitor { animation: hiring-pulse 2.5s ease-in-out infinite; box-shadow: 0 0 0 0 var(--accent); }` with a `@keyframes hiring-pulse` that goes `0% { box-shadow: 0 0 0 0 rgba(168,85,247,0.5) } 70% { box-shadow: 0 0 0 8px transparent }`. Add `data-tooltip='Bloberto is interviewing 🧐'` for hover context. WHY: Every user who sees the vacant slot asks 'what goes here?' — right now the answer is 'nothing'. A hiring pulse says 'the office is alive and growing'. It also sets up a future feature where new hires visually appear at that exact desk, making the animation feel earned.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
-      "priority": "could",
+      "priority": "should",
       "category": "office-life",
-      "title": "Coffee Corner Reacts to Vibe",
-      "description": "Add `data-vibe={vibe}` to the `.coffee-corner` div in Office.jsx. Drive label and micro-animation changes entirely from CSS: `[data-vibe='crushing'] .coffee-corner__label` → content: 'TRIPLE SHOT ☕'; add `@keyframes steam` (3 pseudo-elements rising and fading above the cup, offset timings); `[data-vibe='slow-day'] .coffee-corner__label` → content: '🧊 Cold brew...'; `[data-vibe='on-fire'] .coffee-corner__label` → content: '☕ STRONG. NOW.' with orange text; `[data-vibe='after-hours'] .coffee-corner__label` → content: 'Decaf? jk ☕'; default/in-flow → 'COFFEE'. One attribute added in JSX, five CSS overrides, zero new JS. WHY: The coffee corner is the most universally recognized office prop and currently the most inert element on the floor — a static SVG cup that never changes regardless of whether the team is melting down or breaking records. Making it react to team vibe is the smallest possible ambient storytelling investment. The kind of detail that makes sharp-eyed users quietly gasp, then check it every single time they open the app.",
+      "title": "Task-Type Sticky Notes Float Above Active Desks",
+      "description": "The task tag system (Bug 🔴, Ship 🟠, Design 🟣, QA 🔵, Data 🟤, Docs 🟢) is a complete color-coded taxonomy that currently exists ONLY on the Dashboard worker cards — invisible on the office floor. For each working character in Office.jsx, call the existing `getTaskTags(worker.task)` function (import it from App.jsx or extract it to utils). Render a `<div className='desk-sticky'>` positioned absolutely above the desk (`top: -18px; left: 50%; transform: translateX(-50%)`) showing just the first tag's emoji + a tiny colored dot matching `task-tag--{type}` background. `.desk-sticky { font-size: 0.6rem; background: var(--surface2); border-radius: 4px; padding: 1px 4px; border-left: 2px solid var(--tag-color); white-space: nowrap; }` with `--tag-color` set per tag type. WHY: The office floor is a spatial view of the team — it should encode MORE information than the dashboard, not less. Right now a working character's desk tells you their name and nothing else. One tiny sticky note tells you what kind of work is happening across the whole floor at a glance: three bug tabs and a ship tab means the team is in fire-fighting mode, not building mode. The office floor becomes a task-type heatmap.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
-      "priority": "could",
-      "category": "storytelling",
-      "title": "Swipe to Change Tabs on Mobile",
-      "description": "Add touch gesture support to the `<main>` element. In App.jsx: `useEffect` adds passive `touchstart` listener storing `touchStartX` and `touchStartY` in refs; `touchend` checks if `Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5 && duration < 300ms` (the last condition prevents slow drags from accidentally triggering). If valid: swipe left → Dashboard, swipe right → Office. Reuse the same `setTab` + `window.location.hash` calls already used by the tab buttons. WHY: On mobile at 390px, the tab row is the only way to navigate between Office and Dashboard, requiring lifting your thumb out of the content area to tap a small button. On a narrow screen where the office floor fills the entire viewport, dragging your thumb left to reveal the dashboard is the completely natural gesture — it's how every major mobile app with tabs works (iOS, Twitter, Spotify, Instagram). The two-tab structure is perfect for swipe because there are exactly two destinations. Zero visual change, dramatic mobile feel improvement. It's the difference between 'a website' and 'an app'.",
+      "priority": "should",
+      "category": "feature",
+      "title": "'Find on Floor' — Reverse Navigation from Dashboard Card",
+      "description": "Clicking a worker on the office floor already navigates to the Dashboard and focuses their card with a 3s pulse. But the reverse direction is missing: there's no way to go from a Dashboard card BACK to the office floor and see that person's desk. Add a `🏢` button to each `WorkerCard`'s header row (beside the existing `ℹ️` flip button): `<button className='worker-card__floor-btn' onClick={() => { setTab('office'); window.location.hash = 'office'; triggerDeskPulse(worker.id) }} title='Find on floor'>🏢</button>`. In Office.jsx, accept a `pulsingDesk` prop; add `desk--pulsing` class to that desk for 2s: `@keyframes desk-ping { 0% { box-shadow: 0 0 0 0 var(--role-color, #a855f7) } 100% { box-shadow: 0 0 0 16px transparent } }`. Pass `pulsingDesk` down from App.jsx via state. WHY: Users who discover the drill-down (floor → dashboard) naturally want the reverse. More importantly, on mobile where Office and Dashboard are separate tabs, there's currently zero spatial orientation — you can't tell which desk belongs to which card you're reading. This button turns the tab split into a feature rather than a limitation.",
       "effort": "medium",
       "assigned_to": "maya"
     },
     {
+      "priority": "could",
+      "category": "visual",
+      "title": "Whiteboard Gets Vibe Doodles",
+      "description": "The whiteboard (`.office-whiteboard`) currently shows one vibe-keyed text string from `VIBE_WHITEBOARD`. It has `aria-label`, `role='img'`, and a `--urgent` modifier when `on-fire` — but visually it's just text on a light rectangle. Upgrade to render a small inline SVG doodle alongside the text, keyed to vibe. In Office.jsx, create a `VIBE_WHITEBOARD_SVG` map: `crushing` → a jagged rocket (8-path SVG, ~12 lines); `on-fire` → three stacked flame paths in orange/red; `slow-day` → a coffee mug with a zzz cloud; `after-hours` → a crescent moon + two stars; `in-flow` → a simple flow chart (two rounded rects, arrow). Render as `<div className='whiteboard-inner'><span className='whiteboard-doodle'>{VIBE_WHITEBOARD_SVG[vibe]}</span><span className='whiteboard-text'>{VIBE_WHITEBOARD[vibe]}</span></div>`. Each doodle gets a subtle `@keyframes whiteboard-draw` CSS stroke-dashoffset animation (0→1) triggered when vibe changes via `key={vibe}`. WHY: The whiteboard is the largest decorative element on the office floor and the one users stare at while watching Bloberto. Right now it tells you what the vibe is in text — but the office is a visual medium. A rocket scrawled on a whiteboard communicates 'crush mode' better than the words do. It's also the only wall prop that changes state, which makes it feel like evidence that real work is happening.",
+      "effort": "medium",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Activity Log Entry Hover Expands with Worker Snapshot",
+      "description": "The activity log entries are dense text rows — worker emoji, icon, message, timestamp — with no interaction beyond hover changing the background. On hover/focus of any `.activity-entry`, expand it to reveal a micro-snapshot of that worker's current state: a `<div className='activity-entry__expand'>` with `max-height: 0; overflow: hidden; transition: max-height 0.2s ease` that animates to `max-height: 48px` on `:hover`. Inside: `{worker.status === 'working' ? '⚡ Currently at {progress}%' : worker.status === 'idle' ? '😴 On break' : worker.status === 'error' ? '❌ In error state' : '⬜ Off duty'}` — looked up from the current `roster` prop already passed to `ActivityLog`. This requires passing `workers` (not just `roster`) down to `ActivityLog`, or lifting the worker lookup to `ActivityLogEntry`. WHY: The activity log shows the PAST. Users naturally want to know 'but what is this person doing RIGHT NOW?' — especially when reading a completion event. The expansion turns a static log into a bridge between history and present state. It also surfaces the worker status system to users who primarily live in the activity log tab.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
       "priority": "wild",
-      "category": "team",
-      "title": "Bloberto's Weekly Dispatch — The Internal Memo",
-      "description": "A `📋 Dispatch` button in the header (or keyboard shortcut `D`) opens a `<dialog>` overlay styled as a formal internal memo, auto-generated from `activityLog` data — no external API, pure template logic. Memo structure: FROM: Bloberto (Manager, CVO, Director of Vibes) / TO: You (The Boss) / RE: Week in Review / CLASSIFICATION: EYES ONLY (sort of). Body sections: (1) Ship Count: count `complete` events in last 7 days with worker breakdown; (2) MVP of the Week: worker with most completions; (3) Incidents: count of `error` events + which worker triggered most; (4) Vibe Snapshot: most frequent vibe key from session data; (5) One rotating Bloberto sign-off line chosen from a `DISPATCH_CLOSERS` array: 'This report was generated by feelings and basic arithmetic. Mostly feelings.' / 'I have no memory of writing this.' / 'Please water the plants while I'm in the meeting I scheduled with myself.'. Styled as a monospace memo inside a `dialog` with appropriate backdrop. Close on Esc or clicking backdrop. WHY: The activity log is a raw timestamped feed that tells you WHAT happened but not WHAT IT MEANS. A weekly memo format turns the same data into narrative — who shipped most, where the pain was, what the week felt like in five lines. It's also the first content in this app that speaks TO the user as a named individual (addressed to 'You, The Boss'). People would screenshot this and post it. It's the feature that makes this a product with personality rather than a dashboard with vibes.",
+      "category": "storytelling",
+      "title": "Bloberto Walks to the Whiteboard to Announce Completions",
+      "description": "When a worker's status transitions from `working` → `idle` (the `justShipped` detection already exists in App.jsx's worker diff logic), trigger a 6-second cinematic sequence on the office floor: (1) Bloberto's Character element gets class `char--walking-left` which CSS-animates `left` from 46% to 18% over 1.2s with a bob keyframe; (2) at the 1.3s mark, the whiteboard temporarily overrides its content to `'✅ {workerName} shipped it!'` with a new `celebWhiteboard` state prop passed to Office.jsx; (3) after 3 seconds, the whiteboard gets class `office-whiteboard--celebrate` with a green glow (`box-shadow: 0 0 16px #22c55e`); (4) at 5s, Bloberto walks back right (`char--walking-right`) and whiteboard reverts. All driven by a single `useEffect` on `justShipped` with sequential `setTimeout`s. The walk animations are two `@keyframes` — left-walk and right-walk — each just a `left` transition paired with the existing `bob` animation. WHY: Right now the completion event fires a toast and confetti — both screen-layer effects that float above the scene. But nothing on the OFFICE FLOOR changes. The characters at their desks are oblivious. Bloberto walking over to write the name on the whiteboard makes the office feel like a place with gravity — things that happen in it leave marks. It's the kind of thing users will open the tab specifically to watch.",
       "effort": "large",
-      "assigned_to": "tbd"
+      "assigned_to": "carlos"
     }
   ],
   "hire_proposals": []

@@ -47,11 +47,11 @@
       "name": "Sofia",
       "role": "QA Engineer",
       "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #33 \u2014 full site + code analysis",
-      "progress": 5,
-      "started": "2026-03-07T23:15:00Z",
-      "updated_at": "2026-03-07T23:15:00Z"
+      "status": "idle",
+      "task": "",
+      "progress": 0,
+      "started": null,
+      "updated_at": "2026-03-07T23:20:00Z"
     }
   ],
   "roster": [
@@ -81,5 +81,5 @@
       "role": "Creative Director"
     }
   ],
-  "last_updated": "2026-03-07T23:15:00Z"
+  "last_updated": "2026-03-07T23:20:00Z"
 }
