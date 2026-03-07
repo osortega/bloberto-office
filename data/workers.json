@@ -5,10 +5,10 @@
       "name": "Bloberto",
       "role": "Manager",
       "status": "working",
-      "task": "Overseeing Maya & Carlos implementing Luna review #5 ideas",
-      "progress": 70,
+      "task": "Overseeing Sofia QA review #12 + Maya & Carlos on Luna ideas",
+      "progress": 75,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T02:56:00Z"
+      "updated_at": "2026-03-07T03:07:00Z"
     },
     {
       "id": "maya",
@@ -29,6 +29,16 @@
       "progress": 10,
       "hired_at": "2026-03-06T16:25:00Z",
       "updated_at": "2026-03-07T02:56:00Z"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "status": "working",
+      "task": "QA & product analysis review #12 — code review, UX, accessibility, performance",
+      "progress": 10,
+      "hired_at": "2026-03-06T19:21:00Z",
+      "updated_at": "2026-03-07T03:07:00Z"
     }
   ],
   "roster": [
@@ -36,33 +46,33 @@
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f"
+      "emoji": "⚙️"
     },
     {
       "id": "maya",
       "name": "Maya",
       "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8"
+      "emoji": "🎨"
     },
     {
       "id": "dave",
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80"
+      "emoji": "🚀"
     },
     {
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d"
+      "emoji": "🔍"
     },
     {
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19"
+      "emoji": "🌙"
     }
   ],
-  "last_updated": "2026-03-07T02:56:00Z",
+  "last_updated": "2026-03-07T03:07:00Z",
   "manager": "Bloberto"
 }
