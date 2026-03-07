@@ -369,5 +369,17 @@
     "type": "complete",
     "worker": "Luna",
     "message": "Creative review #14 complete \u2014 audited backlog, carried forward 5 unimplemented ideas from #13, recommends shipping before dreaming"
+  },
+  {
+    "timestamp": "2026-03-07T18:12:00Z",
+    "type": "hire",
+    "worker": "Carlos",
+    "message": "Implementing stat trend arrows + task duration color tiers (Luna #13/#14)"
+  },
+  {
+    "timestamp": "2026-03-07T18:15:00Z",
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "Shipped stat trend arrows (\u2191/\u2193 deltas in StatsBar) and task duration color tiers (warn/stuck states)"
   }
 ]

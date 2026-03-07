@@ -1,13 +1,3 @@
 {
-  "workers": [
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "status": "working",
-      "task": "Implementing stat trend arrows + task duration color tiers (Luna #13/#14)",
-      "progress": 10,
-      "updated_at": "2026-03-07T18:08:00Z"
-    }
-  ]
+  "workers": []
 }

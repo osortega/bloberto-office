@@ -885,3 +885,15 @@
 .sync-now-btn:hover { color: var(--text); border-color: var(--accent); }
 .sync-now-btn[disabled] { animation: spin 0.7s linear infinite; pointer-events: none; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Stat Trend Arrows (Luna #13) ── */
+.stat-delta { display:block; font-size:0.6rem; font-weight:700; line-height:1; margin-top:3px; }
+.stat-delta--up { color:#4ade80; }
+.stat-delta--down { color:#f87171; }
+.stat-delta { animation:delta-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+@keyframes delta-pop { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:none} }
+
+/* ── Task Duration Color Tiers (Luna #13) ── */
+.worker-duration[data-tier='warn'] { color:#fbbf24; }
+.worker-duration[data-tier='stuck'] { color:#f87171; animation:duration-pulse 2.2s ease-in-out infinite; }
+@keyframes duration-pulse{0%,100%{opacity:1}50%{opacity:0.45}}

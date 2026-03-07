@@ -207,9 +207,11 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
             })()}
           </div>
 
-          {worker.status === 'working' && worker.updated_at && (
-            <div className="worker-duration">⏱️ {formatDuration(worker.updated_at)}</div>
-          )}
+          {worker.status === 'working' && worker.updated_at && (() => {
+            const durationMs = Date.now() - new Date(worker.updated_at).getTime()
+            const tier = durationMs < 30 * 60_000 ? 'normal' : durationMs < 2 * 3_600_000 ? 'warn' : 'stuck'
+            return <div className="worker-duration" data-tier={tier}>{tier === 'stuck' ? '⚠️ ' : ''}⏱️ {formatDuration(worker.updated_at)}</div>
+          })()}
 
           <ProgressBar progress={worker.progress} />
         </div>
@@ -239,11 +241,28 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
 }
 
 
+function DeltaBadge({ delta }) {
+  if (delta === 0) return null
+  return (
+    <span className={`stat-delta stat-delta--${delta > 0 ? 'up' : 'down'}`}>
+      {delta > 0 ? '↑' : '↓'}{Math.abs(delta)}
+    </span>
+  )
+}
+
 function StatsBar({ workers, vibe, lastSynced, isLive }) {
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
   const idle = workers.filter((w) => w.status === 'idle').length
   const errorCount = workers.filter((w) => w.status === 'error').length
+
+  const prevCountsRef = useRef({})
+  const activeDelta = active - (prevCountsRef.current.active ?? active)
+  const idleDelta = idle - (prevCountsRef.current.idle ?? idle)
+
+  useEffect(() => {
+    prevCountsRef.current = { active, idle, error: errorCount }
+  }, [active, idle, errorCount])
 
   const syncLabel = lastSynced
     ? lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -258,10 +277,12 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
       <div className="stat-card active">
         <span className="stat-label">⚡ Active</span>
         <span className="stat-value">{active}</span>
+        <DeltaBadge delta={activeDelta} />
       </div>
       <div className="stat-card idle">
         <span className="stat-label">😴 Idle</span>
         <span className="stat-value">{idle}</span>
+        <DeltaBadge delta={idleDelta} />
       </div>
       <div className="stat-card sync-status">
         <span className="stat-label">
