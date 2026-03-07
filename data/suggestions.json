@@ -1,13 +1,8 @@
 {
   "analyst": "Sofia",
   "emoji": "🔍",
-  "review_number": 28,
-  "timestamp": "2026-03-07T20:50:00Z",
-  "screenshots": {
-    "desktop": "screenshot-desktop-qa28.png",
-    "mobile": "screenshot-mobile-qa28.png",
-    "status": "captured via Puppeteer (Chromium --single-process)"
-  },
+  "review_number": 29,
+  "timestamp": "2026-03-07T21:20:00Z",
   "scores": {
     "visual": 4,
     "ux": 4,
@@ -18,115 +13,91 @@
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.8,
+  "overall_score": 3.9,
   "suggestions": [
     {
       "priority": "high",
       "category": "code",
-      "title": "App.jsx is 900+ lines — extract components into separate files",
-      "description": "App.jsx contains WorkerCard, ProgressBar, StatusBadge, DeltaBadge, ActivityLog, ActivityLogEntry, StatsBar, and the root App. Extract WorkerCard+ProgressBar+StatusBadge to src/components/WorkerCard.jsx and ActivityLog+ActivityLogEntry to src/components/ActivityLog.jsx. This is a maintenance timebomb that compounds with every feature.",
-      "effort": "medium",
-      "assign_to": "Carlos",
-      "persistent_flags": 4
+      "title": "App.jsx is 924 lines — extract components",
+      "description": "WorkerCard, StatsBar, ActivityLog, ProgressBar should each be their own file. This is the 5th time flagging. App.jsx is nearly 1000 lines and growing. Extract at minimum WorkerCard and StatsBar into separate modules.",
+      "effort": "medium"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "WorkerCard back-face uses key={i} — unstable React keys",
-      "description": "App.jsx workerHistory.map((e, i) => <div key={i}>) uses array index as key. If activity entries change order, React will reuse wrong DOM nodes. Use key={e.timestamp + (e.type ?? '') + (e.worker ?? '')} for stable identity.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 2
+      "title": "workers.json schema mismatch — no roster/workers wrapper",
+      "description": "App.jsx expects { workers: [], roster: [] } from fetchWorkersFromGitHub but workers.json is a flat array. setAllWorkers(data.workers ?? []) gets undefined when data is an array. This means the dashboard likely shows 0 workers despite the JSON having entries. Either wrap workers.json in {workers:[], roster:[]} or fix the destructuring.",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "No React ErrorBoundary — render errors white-screen the app",
-      "description": "A null reference in any component (e.g. malformed workers.json pushing null into CharacterAvatar) silently white-screens the entire app with no recovery. Add a class-based ErrorBoundary around the main content with a friendly fallback UI showing a reload button.",
-      "effort": "medium",
-      "assign_to": "Dave",
-      "persistent_flags": 4
+      "category": "code",
+      "title": "No ErrorBoundary — white screen on any render crash",
+      "description": "A single bad worker entry or undefined property will crash the entire app with no recovery. Add a React ErrorBoundary wrapper at minimum around the main content area. This has been flagged 5 times now.",
+      "effort": "small"
     },
     {
-      "priority": "high",
-      "category": "bug",
-      "title": "Confetti setTimeout has no cleanup ref — timer stacking on rapid vibe changes",
-      "description": "App.jsx setTimeout(() => setConfettiActive(false), 2500) stores no ref. Rapid vibe rank changes stack multiple timers that toggle confetti out of order. Fix: use useRef to store timer ID, clear before scheduling new one, and clear in effect cleanup.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 2
+      "priority": "medium",
+      "category": "performance",
+      "title": "ActivityLog re-renders on every poll cycle",
+      "description": "ActivityLog receives the full entries array which changes reference every 30s fetch. Wrap ActivityLog in React.memo and memoize the filtered entries array to prevent unnecessary re-renders of 20+ DOM nodes.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Mobile office floor is cramped — characters overlap on 375px viewport",
-      "description": "On mobile (375px), the office floor characters overlap each other and desk labels are barely readable. The desk grid uses percentage positioning that doesn't scale well below 480px. Consider switching to a simplified list view on mobile or increasing the floor min-height.",
-      "effort": "medium",
-      "assign_to": "Maya",
-      "persistent_flags": 1
+      "title": "No loading state for activity log",
+      "description": "When activity fails to load, the error message is generic. Add a skeleton loader for the activity log section matching the worker card skeletons, and show a retry button inline.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "Activity log re-renders all entries on every poll cycle",
-      "description": "ActivityLog receives the full entries array prop which changes reference on every fetch (new array from JSON.parse). The .reverse().slice(0,20) creates new arrays each render. Memoize the displayed list with useMemo keyed on entries.length + last timestamp to avoid re-rendering 20 ActivityLogEntry components every 30s.",
-      "effort": "small",
-      "assign_to": "Carlos",
-      "persistent_flags": 1
+      "title": "confetti-layer renders 30 spans every vibe upgrade",
+      "description": "The confetti burst creates 30 DOM elements that persist for 2.5s. Consider using CSS animation-fill-mode: forwards and removing the DOM nodes after animation completes, or use a canvas-based approach for better perf.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Dashboard tabpanel only renders active tab — AT can't discover all panels",
-      "description": "WAI-ARIA authoring practices recommend rendering both tabpanels in the DOM with hidden attribute on inactive ones, so screen readers can understand the full widget structure. Currently only one tabpanel exists at a time.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 1
+      "title": "Worker card flip has no keyboard trigger",
+      "description": "The info button flips the card, but there's no way to flip it back via keyboard without tabbing to the close button inside the flipped card. The card itself is focusable (tabIndex=0) but Enter/Space don't toggle the flip.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "visual",
-      "title": "Ghost workers (OOO) have no visual distinction from active workers at a glance",
-      "description": "On the office floor, ghost/OOO workers look similar to active workers until you hover. Add a subtle opacity reduction (0.4-0.5) and a dashed ring around their avatar to make OOO status immediately obvious without interaction.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "medium",
-      "category": "feature",
-      "title": "No loading skeleton on initial fetch — blank cards flash before data arrives",
-      "description": "When the page first loads, there's a brief flash of empty state before workers.json loads. Add a simple skeleton/shimmer placeholder for the worker cards and activity log that shows during the initial fetch.",
-      "effort": "medium",
-      "assign_to": "Maya",
-      "persistent_flags": 0
+      "category": "ux",
+      "title": "Office floor characters lack click feedback",
+      "description": "Characters on the office floor are clickable (cursor: pointer) but provide no visual feedback on hover beyond the tooltip. Add a subtle scale transform or highlight ring on hover to signal interactivity.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "App.css is 980+ lines — split into per-component CSS files",
-      "description": "App.css contains styles for every component. As the codebase grows, this becomes unmaintainable. When extracting components, co-locate their CSS (WorkerCard.css, ActivityLog.css, etc.).",
-      "effort": "medium",
-      "assign_to": "Carlos",
-      "persistent_flags": 3
-    },
-    {
-      "priority": "low",
-      "category": "performance",
-      "title": "Office.jsx WindowElement polls every 60s but only changes once per hour",
-      "description": "WindowElement runs setInterval every 60s to check the hour, but the hour only changes once per hour. Calculate ms until next hour boundary and use setTimeout instead of fixed-interval polling.",
-      "effort": "small",
-      "assign_to": "Carlos",
-      "persistent_flags": 0
+      "title": "getRelativeTime duplicated in App.jsx and Office.jsx",
+      "description": "Both App.jsx (getRelativeTime) and Office.jsx (formatIdleDuration + inline ghost bubble logic) implement time-ago formatting independently. Extract to a shared utility in utils/time.js.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Vacant desk question mark icon is barely visible on dark background",
-      "description": "The vacant desk shows a small '?' that blends into the dark office floor. Increase its opacity or add a subtle dashed border outline to make empty desks more visible as potential spaces.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 0
+      "title": "Footer tagline quotes could rotate",
+      "description": "The footer shows a static quote per vibe. Since we already have VIBE_QUOTES in quotes.js, consider rotating the footer tagline every 30s for more personality.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "No way to see worker history beyond 3 entries on card back",
+      "description": "The flipped card only shows the last 3 activity entries. Consider a 'View all' link that scrolls to that worker's entries in the activity log, or expand to show more entries.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Vacant desk nameplates could show role needed",
+      "description": "Vacant desks just say '📋 Vacant'. If the desk was previously occupied by a specific role, showing 'Vacant — Frontend' would add context about team capacity.",
+      "effort": "small"
     }
   ]
 }

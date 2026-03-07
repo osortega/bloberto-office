@@ -2,28 +2,19 @@
   {
     "name": "Carlos",
     "role": "Backend Engineer",
-    "emoji": "⚙️",
+    "emoji": "\u2699\ufe0f",
     "status": "working",
-    "task": "Bottleneck Beacon — stuck workers surface to stats bar",
+    "task": "Bottleneck Beacon \u2014 stuck workers surface to stats bar",
     "progress": 10,
     "started": "2026-03-07T21:08:00Z"
   },
   {
     "name": "Dave",
     "role": "DevOps Engineer",
-    "emoji": "🚀",
+    "emoji": "\ud83d\ude80",
     "status": "working",
-    "task": "Sync Heartbeat Ripple — live dot sonar pulse",
+    "task": "Sync Heartbeat Ripple \u2014 live dot sonar pulse",
     "progress": 10,
     "started": "2026-03-07T21:08:00Z"
-  },
-  {
-    "name": "Sofia",
-    "role": "QA & Product Analyst",
-    "emoji": "🔍",
-    "status": "working",
-    "task": "QA review #29 — full site analysis",
-    "progress": 10,
-    "started": "2026-03-07T21:15:00Z"
   }
 ]
