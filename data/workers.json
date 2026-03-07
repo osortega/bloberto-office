@@ -19,6 +19,16 @@
       "progress": 0,
       "hired_at": "2026-03-06T19:21:00Z",
       "updated_at": "2026-03-07T01:26:00Z"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "status": "working",
+      "task": "QA & Product Analysis review #10 \u2014 analyzing live site and codebase",
+      "progress": 0,
+      "hired_at": "2026-03-06T19:21:00Z",
+      "updated_at": "2026-03-07T02:07:00Z"
     }
   ],
   "roster": [
@@ -26,33 +36,33 @@
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "⚙️"
+      "emoji": "\u2699\ufe0f"
     },
     {
       "id": "maya",
       "name": "Maya",
       "role": "Frontend Engineer",
-      "emoji": "🎨"
+      "emoji": "\ud83c\udfa8"
     },
     {
       "id": "dave",
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "🚀"
+      "emoji": "\ud83d\ude80"
     },
     {
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Engineer",
-      "emoji": "🔍"
+      "emoji": "\ud83d\udd0d"
     },
     {
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙"
+      "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T02:00:00Z",
+  "last_updated": "2026-03-07T02:07:00Z",
   "manager": "Bloberto"
 }
