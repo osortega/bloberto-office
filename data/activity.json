@@ -427,5 +427,17 @@
     "type": "complete",
     "worker": "Luna",
     "message": "Creative review #6 complete \u2014 11 fresh ideas filed. Theme: The Office Has Memory"
+  },
+  {
+    "timestamp": "2026-03-07T03:27:15Z",
+    "type": "hire",
+    "worker": "Maya",
+    "message": "Assigned Luna #6: Bloberto Ambient Broadcasts + Vibe Whiteboard"
+  },
+  {
+    "timestamp": "2026-03-07T03:27:15Z",
+    "type": "hire",
+    "worker": "Dave",
+    "message": "Assigned Luna #6: Active Desk Monitor Glow + Daytime Window Clouds"
   }
 ]
