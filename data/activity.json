@@ -321,5 +321,17 @@
     "worker": "Sofia",
     "message": "QA review #21 complete \u2014 12 findings (3 high, 6 medium, 3 low). Score: 3.9/5. Persistent backlog items flagged again.",
     "timestamp": "2026-03-07T07:42:00Z"
+  },
+  {
+    "timestamp": "2026-03-07T08:10:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #22 \u2014 full site analysis"
+  },
+  {
+    "timestamp": "2026-03-07T08:15:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #22 complete \u2014 12 findings (4 high, 5 medium, 3 low). Score: 4.0/5. Persistent backlog items flagged again (tooltip 5th flag, header overflow 4th flag)."
   }
 ]

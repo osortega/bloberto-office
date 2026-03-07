@@ -1,113 +1,112 @@
 {
   "analyst": "Sofia",
-  "review_number": 21,
-  "timestamp": "2026-03-07T07:40:00Z",
+  "review_number": 22,
+  "timestamp": "2026-03-07T08:15:00Z",
   "scores": {
     "visual": 4.2,
-    "ux": 3.8,
+    "ux": 3.9,
     "responsiveness": 3.5,
-    "performance": 3.6,
+    "performance": 3.7,
     "accessibility": 3.8,
-    "code_quality": 3.7,
+    "code_quality": 3.8,
     "features": 4.0,
     "fun_factor": 4.5
   },
-  "overall_score": 3.9,
-  "summary": "Score holding at 3.9/5. The persistent backlog items from reviews #18-#20 remain unfixed — MANAGER_QUOTES dead code, DEFAULT_ROSTER not extracted, and CharacterAvatar missing React.memo. These are 5-minute fixes that keep getting punted. New this review: found a real bug with the keyboard shortcut R-to-sync conflicting with text input focus detection, and the useCallback hoisting issue is technically a lint violation. Mobile header overflow at 375px is the biggest UX gap remaining.",
+  "overall_score": 4.0,
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "R-key sync shortcut fires during IME composition and contentEditable elements",
-      "description": "App.jsx keyboard handler checks for INPUT and TEXTAREA tags but misses contentEditable elements, elements with role='textbox', and IME composition events. If any future feature adds a contentEditable area (or a third-party widget does), pressing R will trigger a sync mid-typing. Add: if (e.target.isContentEditable || e.isComposing) return. Trivial fix, prevents a future footgun.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "high",
       "category": "accessibility",
-      "title": "CSS tooltip only triggers on :hover — keyboard users see nothing (4th flag)",
-      "description": "The data-tooltip attribute on Character elements renders via CSS ::after on :hover only. Keyboard users who tab to a character get focus-visible outlines but never see the tooltip. Add :focus-within to the tooltip CSS rule alongside :hover. This was flagged in reviews #19 and #20. Still not fixed.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "Card flip back-face not hidden from screen readers when front is showing (3rd flag)",
-      "description": "WorkerCard uses aria-hidden on front/back faces keyed to isFlipped state, but the back-face content is still in the DOM and tabbable (the close button). Add tabIndex={-1} to the close button when !isFlipped, or use inert attribute on the hidden face. Screen reader users can currently tab into invisible content.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "MANAGER_QUOTES is permanently unreachable dead code (4th flag)",
-      "description": "Office.jsx: MANAGER_QUOTES was the original fallback but VIBE_QUOTES covers all 5 vibe keys. The || fallback never executes. This has been flagged since review #18. It's a 1-line delete. Please just do it.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "DEFAULT_ROSTER still in Office.jsx — move to constants.js (5th flag)",
-      "description": "Office.jsx lines 53-59: DEFAULT_ROSTER, VIBE_QUOTES, VIBE_WHITEBOARD, and DESKS are all pure data that belong in utils/constants.js. ROLE_EMOJIS and ROLE_COLORS were already extracted. This is a consistency issue. Flagged since review #17.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Mobile header overflow — vibe pill + sync button + theme toggle clip at 375px (3rd flag)",
-      "description": "At 375px viewport width, .header-right doesn't wrap. The vibe pill, sync button, streak counter, and theme toggle overflow. Add flex-wrap: wrap to .header-right in the @media (max-width: 600px) query. Alternatively, hide the streak counter on mobile since it has no tooltip anyway.",
+      "title": "CSS tooltip only triggers on :hover — keyboard users see nothing (5th flag)",
+      "description": "Office floor character tooltips use CSS :hover only. Keyboard-focused users (Tab nav) never see worker names/roles. Add :focus-within or a JS-driven tooltip that responds to focus events. This has been flagged 5 times now — it's the #1 persistent accessibility gap.",
       "effort": "medium",
       "assignee": "maya"
     },
     {
+      "priority": "high",
+      "category": "accessibility",
+      "title": "Card flip back-face not hidden from screen readers when front is showing (4th flag)",
+      "description": "WorkerCard's back face (.worker-card__back) is always in the DOM and readable by screen readers even when the card isn't flipped. Add aria-hidden={!isFlipped} to the back div and aria-hidden={isFlipped} to the front div. Already partially done but the conditional is wrong — isFlipped check uses || undefined which doesn't toggle correctly.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "high",
+      "category": "responsiveness",
+      "title": "Mobile header overflow — vibe pill + sync button + theme toggle clip at 375px (4th flag)",
+      "description": "At 375px viewport, the header-right flex container overflows. The vibe pill, sync button, header badge, and theme toggle don't wrap properly. Add flex-wrap: wrap to .header-right and consider hiding the header-badge on screens <480px, or moving it below the title.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "MANAGER_QUOTES is permanently unreachable dead code (5th flag)",
+      "description": "Office.jsx has VIBE_QUOTES object but the old MANAGER_QUOTES constant (or its usage pattern) is never referenced from any render path. The quotes only show in Bloberto's speech bubble but are selected from VIBE_QUOTES directly. If MANAGER_QUOTES was removed, great — but verify there's no orphaned reference. The speech bubble quote selection logic could also benefit from a stable random seed per sync interval to avoid flickering.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "DEFAULT_ROSTER still hardcoded in Office.jsx — move to constants.js (6th flag)",
+      "description": "DEFAULT_ROSTER array is defined in Office.jsx but it's configuration data, not component logic. Move it to src/utils/constants.js alongside ROLE_EMOJIS and ROLE_COLORS for consistency and single-source-of-truth. This has been flagged 6 times — it's a 2-minute move.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
       "priority": "medium",
       "category": "performance",
-      "title": "CharacterAvatar and Character components missing React.memo (3rd flag)",
+      "title": "CharacterAvatar and Character components missing React.memo (4th flag)",
       "description": "Office.jsx: CharacterAvatar is a pure function of its props but isn't memoized. Every 30s poll re-renders all characters even when nothing changed. Wrap both CharacterAvatar and Character in React.memo(). Free optimization, zero risk.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "syncFromGitHub useCallback referenced before definition — lint violation",
-      "description": "App.jsx: the keyboard shortcut useEffect at ~line 465 references syncFromGitHub in its dependency array, but the useCallback defining it is at ~line 500. JavaScript hoisting makes it work at runtime, but eslint-plugin-react-hooks will flag this. Move the useCallback above the useEffect. While at it, the useEffect deps include [isSyncing, syncFromGitHub] but syncFromGitHub is stable (empty deps useCallback), so isSyncing alone would suffice.",
+      "category": "ux",
+      "title": "Vibe streak counter has no tooltip for new visitors (3rd flag)",
+      "description": "The 'x7' number next to the vibe pill has no title or aria-label. First-time visitors see a random number with zero context. Add title='Consecutive syncs at this vibe level' to the streak span.",
       "effort": "small",
-      "assignee": "carlos"
+      "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Vibe streak counter has no explanation for new visitors (2nd flag)",
-      "description": "The 'x7' number next to the vibe pill has no tooltip or label. First-time visitors have zero context. Add title='Consecutive syncs at this vibe level' to the streak span. One attribute, huge clarity improvement.",
+      "title": "Empty state message references night time regardless of actual time",
+      "description": "EmptyState component always shows '🌙 Everyone's off the clock' with a moon emoji and 'The office is quiet... for now 🌙'. This is misleading during daytime hours. Consider using the same time-aware greeting logic from the header, or a neutral message like 'No workers on duty right now.'",
       "effort": "small",
       "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "R-key sync shortcut fires during text input in contentEditable elements",
+      "description": "The keyboard shortcut handler checks for INPUT and TEXTAREA tags but not contentEditable divs or elements with role='textbox'. If any future feature adds editable areas, pressing R will trigger a sync. Add a contentEditable check: if (e.target.isContentEditable) return.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Orphaned .stat-card.done CSS — no rendered element uses it",
-      "description": "App.css line 157: .stat-card.done .stat-value { color: var(--blue); } — no stat card with class 'done' is rendered. Dead CSS from a removed feature. Delete it or re-add the done stat card if it was intentional.",
+      "title": "Orphaned .stat-card.done CSS rule — no element uses it",
+      "description": "App.css has .stat-card.done .stat-value { color: var(--blue); } but no stat card ever gets class 'done'. Remove it or document why it exists for future use.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "low",
-      "category": "ux",
+      "category": "responsiveness",
       "title": "Whiteboard text truncates to 'SH IP IT' on narrow mobile viewports",
-      "description": "The office-whiteboard is 5.5% wide with word-break. At 375px that's ~20px, breaking 'SHIP IT' mid-word. Either increase width on mobile, use emoji-only format, or hide below 480px.",
+      "description": "The office-whiteboard element at 5.5% width with word-break breaks 'SHIP IT' mid-word at 375px (only ~20px wide). Either increase min-width on mobile, use emoji-only format below 480px, or hide the whiteboard text entirely on small screens.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "WindowElement's getHour() function is recreated every render",
-      "description": "Office.jsx WindowElement: getHour is defined inside the component body and also used inside useEffect, but it's recreated every render. Extract it outside the component or wrap in useCallback. Minor but it's a code smell.",
+      "title": "WindowElement getHour() recreated every render",
+      "description": "Office.jsx WindowElement component defines getHour() inside the component body. It's recreated every render and also used in useEffect. Extract it outside the component as a module-level helper since it has no dependency on component state.",
       "effort": "small",
       "assignee": "carlos"
     }
