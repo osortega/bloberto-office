@@ -4,7 +4,7 @@
       "id": "maya",
       "name": "Maya",
       "role": "Frontend Engineer",
-      "emoji": "🎨",
+      "emoji": "\ud83c\udfa8",
       "status": "working",
       "task": "Per-Desk Completion Burst animation (Luna idea #2)",
       "progress": 10,
@@ -14,7 +14,7 @@
       "id": "dave",
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "🚀",
+      "emoji": "\ud83d\ude80",
       "status": "idle",
       "task": "",
       "progress": 0,
@@ -24,17 +24,17 @@
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "started": null
+      "emoji": "\ud83c\udf19",
+      "status": "working",
+      "task": "Creative review #22 \u2014 visual + ideation cycle",
+      "progress": 10,
+      "started": "2026-03-07T22:30:00Z"
     },
     {
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "🔧",
+      "emoji": "\ud83d\udd27",
       "status": "idle",
       "task": "",
       "progress": 0,
@@ -44,7 +44,7 @@
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Engineer",
-      "emoji": "🔍",
+      "emoji": "\ud83d\udd0d",
       "status": "idle",
       "task": "",
       "progress": 0,
@@ -52,11 +52,31 @@
     }
   ],
   "roster": [
-    { "id": "carlos", "name": "Carlos", "role": "Backend Engineer" },
-    { "id": "maya", "name": "Maya", "role": "Frontend Engineer" },
-    { "id": "dave", "name": "Dave", "role": "DevOps Engineer" },
-    { "id": "sofia", "name": "Sofia", "role": "QA Engineer" },
-    { "id": "luna", "name": "Luna", "role": "Creative Director" }
+    {
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer"
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer"
+    },
+    {
+      "id": "dave",
+      "name": "Dave",
+      "role": "DevOps Engineer"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer"
+    },
+    {
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director"
+    }
   ],
-  "last_updated": "2026-03-07T22:23:00Z"
+  "last_updated": "2026-03-07T22:30:00Z"
 }
