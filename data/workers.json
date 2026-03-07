@@ -11,14 +11,14 @@
       "updated_at": "2026-03-07T02:00:00Z"
     },
     {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
       "status": "working",
-      "task": "Implementing Mood Monitor + Cinematic Card Entry (Luna review #3)",
+      "task": "Creative review #5 \u2014 reviewing site and generating ideas",
       "progress": 0,
       "hired_at": "2026-03-06T19:21:00Z",
-      "updated_at": "2026-03-07T01:26:00Z"
+      "updated_at": "2026-03-07T02:20:00Z"
     }
   ],
   "roster": [
@@ -53,6 +53,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T02:12:00Z",
+  "last_updated": "2026-03-07T02:20:00Z",
   "manager": "Bloberto"
 }
