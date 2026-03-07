@@ -1,24 +1,14 @@
 {
   "workers": [
     {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8",
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
       "status": "working",
-      "task": "Implementing desk nameplates with status glow (Luna idea #1)",
-      "progress": 5,
-      "updated_at": "2026-03-07T06:25:00Z"
-    },
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f",
-      "status": "working",
-      "task": "Implementing error badge on dashboard tab (Luna idea #2)",
-      "progress": 5,
-      "updated_at": "2026-03-07T06:25:00Z"
+      "task": "Creative review #12 — reviewing site and writing new ideas",
+      "progress": 10,
+      "updated_at": "2026-03-07T06:50:00Z"
     }
   ]
 }
