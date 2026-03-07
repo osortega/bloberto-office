@@ -405,5 +405,11 @@
     "worker": "Luna",
     "message": "Creative review #15 (continued from #14 ideas - container timed out on Puppeteer)",
     "timestamp": "2026-03-07T19:05:00Z"
+  },
+  {
+    "timestamp": "2026-03-07T19:15:21Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #25 \u2014 full site analysis"
   }
 ]
