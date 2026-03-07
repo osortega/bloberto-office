@@ -34,11 +34,11 @@
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "status": "idle",
-      "task": "Creative review #8 complete \u2014 12 ideas filed",
-      "progress": 100,
+      "status": "working",
+      "task": "Creative review #9 \u2014 reviewing site and writing fresh ideas",
+      "progress": 10,
       "hired_at": "2026-03-06T20:00:00Z",
-      "updated_at": "2026-03-07T04:24:51Z"
+      "updated_at": "2026-03-07T04:50:00Z"
     },
     {
       "id": "dave",
@@ -93,6 +93,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T04:45:33Z",
+  "last_updated": "2026-03-07T04:50:00Z",
   "manager": "Bloberto"
 }
