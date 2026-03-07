@@ -180,7 +180,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false }) {
   if (isFading) classes.push('worker-card--fading')
 
   return (
-    <div className={classes.join(' ')} style={{ '--i': index }}>
+    <div className={classes.join(' ')} style={{ '--i': index }} tabIndex={0}>
       <div className="worker-header">
         <div className="worker-avatar">{getRoleEmoji(worker.role)}</div>
         <div className="worker-info" style={{ flex: 1, paddingLeft: '0.75rem' }}>
@@ -321,6 +321,18 @@ export default function App() {
   })
 
   const lastActivity = useRef(Date.now())
+
+  // ── Keyboard shortcuts ──
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      if (e.key === '1') { setTab('dashboard'); window.location.replace('#dashboard') }
+      else if (e.key === '2') { setTab('office'); window.location.replace('#office') }
+      else if (e.key === 'Escape') document.activeElement?.blur()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   // ── Worker cinematic entry / exit state ──
   // fadingMap: { [id]: worker } — workers playing their 400ms fade-out

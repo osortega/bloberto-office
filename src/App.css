@@ -769,3 +769,15 @@ select option { background: var(--surface2); }
   color: #fff;
   box-shadow: 0 0 12px var(--accent-glow);
 }
+
+/* ---- Keyboard Accessibility ---- */
+.worker-card:focus-visible {
+  outline: 2px solid var(--accent, #a78bfa);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2);
+}
+
+.tab-toggle button:focus-visible {
+  outline: 2px solid var(--accent, #a78bfa);
+  outline-offset: 2px;
+}

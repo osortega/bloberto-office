@@ -351,6 +351,11 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
         )}
       </div>
       <div className="char__name">{firstName}</div>
+      {variant === 'working' && (
+        <div className="typing-dots">
+          <span /><span /><span />
+        </div>
+      )}
     </div>
   )
 }
@@ -463,6 +468,33 @@ export default function Office({ workers = [], roster = [] }) {
             delay={i * 0.2}
           />
         ))}
+
+        {/* Decorative plants */}
+        <div className="office-plant" style={{ left: '85%', top: '55%' }}>
+          <svg width="20" height="28" viewBox="0 0 20 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M 6 18 L 4 28 L 16 28 L 14 18 Z" fill="#c2410c" />
+            <ellipse cx="10" cy="14" rx="4" ry="6" fill="#22c55e" />
+            <ellipse cx="5" cy="16" rx="3" ry="5" fill="#16a34a" transform="rotate(-20 5 16)" />
+            <ellipse cx="15" cy="16" rx="3" ry="5" fill="#16a34a" transform="rotate(20 15 16)" />
+          </svg>
+        </div>
+        <div className="office-plant" style={{ left: '3%', top: '75%' }}>
+          <svg width="20" height="28" viewBox="0 0 20 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M 6 18 L 4 28 L 16 28 L 14 18 Z" fill="#92400e" />
+            <ellipse cx="10" cy="13" rx="5" ry="4" fill="#4ade80" />
+            <line x1="10" y1="9" x2="10" y2="18" stroke="#166534" strokeWidth="1.5" />
+            <line x1="7" y1="11" x2="7" y2="18" stroke="#166534" strokeWidth="1" />
+            <line x1="13" y1="11" x2="13" y2="18" stroke="#166534" strokeWidth="1" />
+          </svg>
+        </div>
+        <div className="office-plant office-plant--cactus" style={{ left: '92%', top: '30%' }}>
+          <svg width="18" height="28" viewBox="0 0 18 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M 5 20 L 3 28 L 15 28 L 13 20 Z" fill="#c2410c" />
+            <rect x="7" y="8" width="4" height="14" rx="2" fill="#22c55e" />
+            <rect x="2" y="12" width="6" height="3" rx="1.5" fill="#16a34a" />
+            <rect x="10" y="10" width="6" height="3" rx="1.5" fill="#16a34a" />
+          </svg>
+        </div>
 
       </div>
     </div>
