@@ -597,9 +597,23 @@
 }
 
 .live-dot.live {
+  position: relative;
   background: #22c55e;
   box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
   animation: pulse-live 2s ease-in-out infinite;
+}
+
+.live-dot.live::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.6);
+  transform: translate(-50%, -50%) scale(1);
+  animation: sync-ripple 2.5s ease-out infinite;
 }
 
 .live-dot.offline {
@@ -609,6 +623,22 @@
 @keyframes pulse-live {
   0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
   50%       { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+}
+
+@keyframes sync-ripple {
+  0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot.live {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4);
+  }
+  .live-dot.live::after {
+    animation: none;
+    display: none;
+  }
 }
 
 .stat-card.sync-status .stat-label {
@@ -982,3 +1012,18 @@
 /* Activity log time-block separators */
 .activity-time-separator { display:flex; align-items:center; gap:8px; margin:12px 0 8px; font-size:0.7rem; color:var(--text-muted); letter-spacing:0.05em; text-transform:uppercase; font-weight:600; }
 .activity-time-separator::before, .activity-time-separator::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── Bottleneck Beacon ── */
+.stat-card--stuck {
+  border-color: rgba(251,191,36,0.55);
+  background: rgba(251,191,36,0.07);
+  cursor: pointer;
+  animation: stuck-pulse 2.4s ease-in-out infinite;
+}
+.stat-card--stuck .stat-value { color: #fbbf24; font-weight: 700; font-size: 0.78rem; }
+.stat-card--stuck:hover { background: rgba(251,191,36,0.13); border-color: rgba(251,191,36,0.8); }
+@keyframes stuck-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+  50% { box-shadow: 0 0 0 5px rgba(251,191,36,0.2); }
+}
+@media (prefers-reduced-motion: reduce) { .stat-card--stuck { animation: none; border-color: rgba(251,191,36,0.55); } }
