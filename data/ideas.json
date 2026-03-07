@@ -1,88 +1,104 @@
 {
   "creative_director": "Luna",
-  "review_number": 7,
-  "timestamp": "2026-03-07T03:52:00Z",
-  "theme": "The Office Breathes — Make Every Pixel React to What's Happening Right Now",
+  "review_number": 8,
+  "timestamp": "2026-03-07T04:21:26Z",
+  "theme": "The Office Has Memory — Every Moment Should Feel Earned, Connected, and Alive Over Time",
   "ideas": [
     {
       "priority": "must",
       "category": "delight",
-      "title": "Coffee Corner Visits — Idle Workers Should Wander to Coffee",
-      "description": "Idle workers currently float around the lower floor with generic wander animations, but they never interact with the coffee corner. When a worker is idle, give them a 30% chance per animation cycle of wandering toward the coffee corner (top-right area). Add a new `char--wander-coffee` class with a keyframe that moves the character to ~80% left, ~15% top, pauses for 2s (picking up coffee), then drifts back. While at the coffee corner, show a tiny ☕ emoji bubble above their head (same mechanism as speech bubble but simpler). WHY: The coffee corner is a prop with zero interaction — it's furniture. Making idle workers visit it transforms it into a social space and makes the idle state feel intentional rather than aimless. Every office has that one person who's always at the coffee machine.",
+      "title": "Vibe Streak Counter — Reward Consistency",
+      "description": "Track consecutive polling cycles where the team vibe stays the same using sessionStorage (key: 'bloberto-vibe-streak'). Store {vibe, count}. On each sync, increment if vibe matches, reset if it changes. When streak >= 3, show a small animated badge on the vibe pill in the header: '� 3-sync streak'. At 5+, swap to '⚡ On a roll'. At 10+, '💎 Legendary'. Animate the badge in with a quick scale bounce (keyframe: 0% scale(0), 70% scale(1.2), 100% scale(1)). WHY: Game mechanics like streaks create genuine investment. Users will leave the tab open just to watch the streak climb. It also contextualizes the vibe — a streak of 8 'crushing' syncs tells a story that a single data point never could.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "must",
+      "category": "storytelling",
+      "title": "Idle Duration Above Wandering Workers — Tell the Full Story",
+      "description": "Idle workers are already rendered with the `char--idle` class and wander animations, but there's zero context about how long they've been idle. Add a small duration label above each idle character's nameplate using the worker's `updated_at` timestamp: format as '💤 8m' or '💤 1h'. In Office.jsx, pass the duration down to the Character component and render it in a `<div className='char__idle-duration'>` element (position: absolute, bottom: 100% of the char__name, font-size 0.6rem, color var(--text-muted), opacity 0.75). WHY: An idle worker who's been idle for 4 minutes is very different from one who's been idle 2 hours. Right now the office floor strips away all time context. Duration turns 'idle' from a status into a story — 'Sofia has been wandering for 47 minutes' immediately creates narrative tension.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "must",
       "category": "feature",
-      "title": "Favicon Vibe Indicator — The Browser Tab Should Tell the Story",
-      "description": "The browser tab currently shows the default Vite favicon regardless of team state. Use a tiny canvas-generated favicon that changes with vibe: crushing→green circle, on-fire→red circle, in-flow→blue circle, slow-day→gray circle, after-hours→purple circle with moon. In App.jsx, add a useEffect watching the vibe key: create a 32x32 canvas, draw a filled circle with the vibe color, convert to dataURL, and set it as the favicon via `document.querySelector('link[rel=icon]').href = dataURL`. WHY: People who keep the tab open (our target user!) will see the team's state without switching to it. A red dot in the tab bar is an instant 'something's happening' signal. Zero UI footprint, maximum ambient awareness.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Theme Transition Ripple — Dark/Light Toggle Should Feel Satisfying",
-      "description": "Currently toggling dark/light mode is an instant swap. Add a CSS transition ripple: when the theme toggle is clicked, use View Transitions API (document.startViewTransition) if available, falling back to a simple 300ms CSS transition on background-color and color properties on :root. For the fancy path: set `::view-transition-old(root)` and `::view-transition-new(root)` with a clip-path circle animation originating from the toggle button's position. For the simple fallback: add `transition: background-color 0.3s ease, color 0.3s ease` to the root custom properties block. WHY: Theme toggles are the most clicked UI element after navigation. Making it feel tactile and smooth turns a utilitarian feature into a moment of delight. Every major design system has this now.",
+      "title": "Sync Countdown in the Live Indicator — Stop Leaving Users Guessing",
+      "description": "The stats bar shows a 'Live' dot and last-sync time but no indication of when the next refresh will happen. Add a live countdown next to the sync timestamp: '↺ in 22s'. In App.jsx, track a `nextSyncIn` state initialized to POLL_INTERVAL_ACTIVE/1000. Decrement it with a setInterval(1000) alongside the existing poll timer. Reset to the appropriate interval after each sync. Render it in the stat-card as a small `<span className='sync-countdown'>↺ in {nextSyncIn}s</span>` below the sync time. When count reaches 0, swap to '↺ Syncing…' while the fetch runs. WHY: Users who care enough to keep this tab open deserve to know when their data refreshes. The current UX creates anxiety: 'Is this stale? Is it stuck?' A simple countdown eliminates that entirely.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Worker Tooltip Task Preview on Office Floor — Hover to See What They're Building",
-      "description": "Working characters already have a `data-tooltip` attribute set to their task, but there's no CSS to actually show it! Add a pure CSS tooltip: `.char[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 8px; font-size: 0.65rem; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; z-index: 20; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }`. WHY: The data is already there — we're just not showing it! This is the lowest-effort, highest-value fix possible. Users hovering over characters on the office floor want to know what they're doing without switching to the dashboard tab.",
+      "title": "Deep Work Aura — Recognize the Long Haul",
+      "description": "Any working worker who has been in 'working' status for 45+ minutes (check `updated_at` vs. Date.now()) deserves visual recognition. In Office.jsx, add a `char--deep-work` class to the Character when `(Date.now() - new Date(worker.updated_at)) > 45 * 60 * 1000`. In Office.css, add: `.char--deep-work .char__avatar { filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7)); animation: deep-pulse 3s ease-in-out infinite; }` and `@keyframes deep-pulse { 0%,100% { filter: drop-shadow(0 0 5px rgba(251,191,36,0.5)); } 50% { filter: drop-shadow(0 0 12px rgba(251,191,36,0.9)); } }`. Also add a 🧘 label above their nameplate. On the Dashboard, show '🧘 Deep work' instead of the normal working duration when 45+ min. WHY: Long-running focus sessions are the most valuable thing in any engineering team. Right now they're invisible. A golden aura says: 'this person is in the zone — don't disturb.' It transforms duration into prestige.",
       "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Window Vibe-Weather Sync — The Sky Should Match the Mood",
+      "description": "The window already shows time-of-day sky gradients. Layer vibe-reactive weather ON TOP of the time-based sky. This is purely additive — do not remove existing behavior. In WindowElement, receive a `vibeKey` prop (pass it from Office.jsx which already knows the vibe). Add conditional renders: vibe='on-fire' → show 2 small animated storm clouds (dark gray rounded divs) drifting slowly across the window, plus a lightning bolt pseudo-element flash every ~8s (CSS animation with 95% opacity 0, 96% opacity 1, 97% opacity 0 pattern). vibe='crushing' → add a simple SVG sun (circle with short radiating lines) in the top-right corner of the window sky that rotates slowly. vibe='slow-day' → a single flat gray cloud (no animation, just static). vibe='after-hours' already has star elements. WHY: The window is currently a passive time clock. Making it react to team state creates the feeling that the universe itself is responding to the team's work. A stormy window during 'on-fire' is instantly atmospheric and deeply satisfying.",
+      "effort": "medium",
       "assigned_to": "dave"
     },
     {
       "priority": "should",
       "category": "office-life",
-      "title": "Error Worker Red Pulse on Office Floor — Errors Should Scream",
-      "description": "Workers with status 'error' show an exclamation badge on their avatar, but their desk doesn't react at all. Add a pulsing red glow to desks with errors: `.desk--error .desk__monitor { box-shadow: 0 0 12px rgba(239,68,68,0.6); animation: error-pulse 1.2s ease-in-out infinite; }` `@keyframes error-pulse { 0%,100% { box-shadow: 0 0 8px rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 16px rgba(239,68,68,0.8); } }`. The desk--error class is already being set in the JSX! We just need the CSS. WHY: An error at a desk should make you look. Right now errors are whisper-quiet on the office floor — easy to miss. A red pulse draws the eye immediately, which is exactly what errors should do.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "should",
-      "category": "feature",
-      "title": "Document Title Updates — Show Team State in the Tab Title",
-      "description": "The page title is always 'Bloberto's Office' regardless of what's happening. Add a useEffect in App.jsx that updates document.title based on active workers: `document.title = \\`(${workingCount}/${total}) Bloberto's Office — ${vibe.label}\\``. When all workers are idle: `document.title = '😴 Bloberto's Office — All quiet'`. When there's an error: prepend '⚠️'. WHY: Combined with the favicon vibe indicator, this turns the browser tab into a complete ambient status display. Users who keep multiple tabs open will see '(3/5) Bloberto's Office — Crushing It 🔥' and know exactly what's happening without clicking.",
+      "title": "Ghost Worker 'Available' Pulse — The Bench Should Feel Ready",
+      "description": "Ghost workers (roster members not currently active) are rendered with the 'ghost' variant and appear faded at desks. They currently feel 'absent' or 'absent and forgotten'. Add a subtle soft green pulse to their avatar: `.char--ghost .char__avatar { animation: ghost-ready 4s ease-in-out infinite; opacity: 0.45; }` `@keyframes ghost-ready { 0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); } 50% { box-shadow: 0 0 8px 2px rgba(34,197,94,0.25); } }`. Also change the ghost tooltip from just the role to: '${name} · Available'. WHY: Ghost workers are bench strength. They shouldn't feel like holes in the floor — they should feel like potential energy. A gentle green pulse says 'ready to go' rather than 'not here'. This reframes the team composition story entirely.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
-      "category": "delight",
-      "title": "Konami Code Easter Egg — Reward the Curious",
-      "description": "Track keystrokes in a useEffect: ↑↑↓↓←→←→BA. When the sequence is completed, trigger a 3-second 'party mode': every character on the office floor gets a brief confetti burst (CSS-only: spawn 8 small colored squares with randomized animation-delay that fall and fade from above each character). Add a `party-mode` class to `.office-floor` that triggers the confetti keyframe. Remove it after 3s. Could also briefly change all nameplates to silly titles ('Supreme Overlord', 'Bug Whisperer', 'CSS Wizard'). WHY: Easter eggs are the hallmark of products built with love. The Konami code is universally known among developers — our target audience. Someone WILL find it, screenshot it, and share it.",
+      "category": "feature",
+      "title": "Office Snapshot to Clipboard — Make it Shareable",
+      "description": "Add a '📸' button inside the office view (position: absolute, top-right of .office-wrap, small button with `btn btn-sm btn-ghost` styles). On click, use the native `html-to-image` npm package (or a lightweight canvas fallback using the existing SVG avatars + DOM layout) to capture .office-floor as a PNG. Use `navigator.clipboard.writeText` if Clipboard API isn't available for images, falling back to a `<a download>` trigger. Show a brief '✅ Copied!' toast (2s) after success. WHY: Shareability is the most powerful growth mechanic. When the whole team is crushing it, someone WILL want to screenshot that perfect office scene and drop it in the team Slack. Right now they have to manually screenshot. One click to share turns users into evangelists. This is how a dashboard becomes a product people talk about.",
+      "effort": "medium",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Bloberto's Daily Brief — A New Message Every Morning",
+      "description": "Add a collapsible 'Daily Brief' section in the header (or as a dismissible banner just below the header). The message is determined by `new Date().toDateString()` hashed to an index in an array of 30+ unique 'manager memos' — guaranteeing a different one each calendar day. Examples: 'Memo: The CI pipeline is a suggestion, not a law.' / 'Today's theme: Aggressive optimism.' / 'Reminder: We pivot every sprint, not every commit.' Render as a small italic quote with a 📝 icon. Add a localStorage key 'bloberto-brief-dismissed-{date}' so users who dismiss it won't see it again that day. WHY: A daily changing message is the cheapest possible reason to open the tab again tomorrow. It creates a ritual — 'what did Bloberto say today?' — without any backend. Combined with the vibe streak, this turns a monitoring dashboard into something with personality and continuity.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "team",
+      "title": "Worker Personality-Based Idle Animations — Stop Making Everyone Wander the Same",
+      "description": "Currently all idle workers use generic `char--wander-1` through `char--wander-4` keyframes that are essentially the same lateral drift. Each team member has a distinct SVG avatar with personality — Dave has headphones, Maya has pink hair, Sofia has a magnifying glass. Their idle animations should match. In Office.css, add worker-specific wander variants: Carlos: slightly wider X drift (methodical), Maya: add a 360deg spin halfway through the wander (impulsive), Dave: slow pace back and forth with almost no Y movement (stoic), Sofia: small figure-eight pattern (curious). Apply by adding `char--wander-carlos` etc. class based on `worker.id` in the Character component, falling back to the existing wander-N variants for unknown workers. WHY: Personality is the most memorable part of this dashboard. The moment users notice Dave pacing and Maya spinning, they will narrate it to colleagues. This is the difference between 'cool dashboard' and 'the one with the characters that act like themselves'.",
       "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "visual",
-      "title": "Subtle Floor Reflections — The Office Floor Should Have Depth",
-      "description": "The office floor is a flat colored rectangle. Add a subtle CSS pseudo-element reflection under each desk: `.desk::after { content: ''; position: absolute; bottom: -4px; left: 10%; width: 80%; height: 3px; background: radial-gradient(ellipse, rgba(0,0,0,0.15), transparent); border-radius: 50%; }`. Also add a very subtle linear gradient to the floor itself to simulate depth: change `.office-floor` background to include `linear-gradient(to bottom, var(--floor-color) 0%, color-mix(in srgb, var(--floor-color) 85%, black) 100%)`. WHY: Flat surfaces feel like placeholder art. Two CSS pseudo-elements transform the office from a colored box into a space with implied lighting and dimension. Zero performance cost.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "could",
       "category": "feature",
-      "title": "Activity Log Sound Toggle — Optional Ambient Notification Pings",
-      "description": "Add an optional sound toggle (🔇/🔊 button next to theme toggle). When enabled, play a subtle 'ping' sound via Web Audio API (no audio files needed — generate a short sine wave: `new AudioContext(), createOscillator(), frequency 800Hz, duration 100ms, gain ramp to 0`) when a new activity log entry arrives of type 'complete'. For 'error' type, use a lower frequency (400Hz) two-tone descending beep. Persist the toggle in localStorage as 'bloberto-sound'. Default: off. WHY: For users who keep the tab open while working, audio cues are the ultimate ambient awareness tool. A quiet 'ping' when someone completes a task is satisfying. A low tone on error is immediately attention-grabbing. But it MUST be opt-in — unsolicited sounds are the fastest way to lose a user.",
+      "title": "Vibe History Sparkline — Memory for the Stats Bar",
+      "description": "The stats bar shows a snapshot in time but has no memory. Add a tiny sparkline (10-point line chart, pure SVG, 60px wide × 20px tall) to the Team Vibe stat card that shows the last 10 recorded vibes as a line connecting 5 vibe levels mapped to Y values (crushing=5, in-flow=4, slow-day=3, on-fire=2, after-hours=1). On each successful sync, push the current vibe key to a sessionStorage array (max 10). On mount, read from sessionStorage to restore the spark. Render the SVG using a simple polyline calculated from the Y-mapped vibe values. Color the line with the current vibe color. WHY: A sparkline turns a single stat into a trend. 'Crushing It' as a current state is fine. 'Crushing It after 3 syncs of on-fire' is a comeback story. The sparkline makes that visible at a glance without taking any space from the existing card. This is the minimum viable team retrospective.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "office-life",
-      "title": "Seasonal Office Decorations — The Office Should Know What Month It Is",
-      "description": "Check `new Date().getMonth()` and add subtle seasonal decorations to the office: December → tiny string of colored lights along the top wall (CSS dots with alternating colors and a twinkle animation). October → a small jack-o-lantern prop next to the plants. February → a few tiny heart particles floating near the coffee corner. Summer months → the window shows a brighter, more vivid sky gradient. Each decoration is a conditional render inside Office.jsx based on the current month. Keep them minimal — one small addition per season, not a full redesign. WHY: Seasonal decoration is the single strongest signal that a product is alive and maintained. It tells visitors 'someone cares about this.' It creates return visits ('I wonder what it looks like in December'). And it's pure delight — nobody expects an office dashboard to have Halloween decorations.",
-      "effort": "medium",
-      "assigned_to": "maya"
+      "category": "delight",
+      "title": "Plant Watering Easter Egg — The Office Has Secret Life",
+      "description": "The decorative plants (there are 3 — two leaf plants and a cactus) currently exist solely as static SVG props. Add an onClick handler to each `.office-plant`. On click, trigger a 1.5s watering animation: spawn a tiny 💧 emoji that arcs from outside the floor and lands on the plant (CSS keyframe: start above-right with opacity 0, arc toward plant top, end at plant with opacity 1 then fade). Also briefly scale the plant to 110% and back (spring ease). Track 'total waters' in localStorage. At 10 total waters, the cactus sprouts a tiny SVG flower (a small pink circle added to its top, rendered conditionally). At 25 waters, a hidden `aria-label` on the plants changes to 'very happy plant'. WHY: Easter eggs that reward patience create devotion. The moment someone discovers the cactus bloomed after 10 clicks, they will tell everyone. It's the kind of thing that ends up in team lore. And it costs almost nothing — three click handlers and a couple keyframes.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "wild",
+      "category": "feature",
+      "title": "Editable Office Sign — Let the Team Own It",
+      "description": "The '🏢 Bloberto's HQ' office sign is currently hardcoded JSX. Make it editable: double-click the sign to replace it with an `<input>` (max 24 chars), styled identically to the sign (same font-size, font-weight, background transparent, border-bottom dashed 2px accent). On Enter or blur, save to localStorage as 'bloberto-office-name' and restore the static display. On mount, read from localStorage. Add a very faint '✏️' icon that appears on hover as a hint. WHY: Ownership is the most powerful engagement mechanic. The moment someone types their actual team name into that sign — 'Payments Team' or 'Studio B' or 'Chaos Corner' — they have claimed the dashboard. It stops being Bloberto's product and becomes theirs. This is also zero-backend, zero-config personalization, which is the holy grail.",
+      "effort": "small",
+      "assigned_to": "dave"
     }
   ],
   "hire_proposals": []
