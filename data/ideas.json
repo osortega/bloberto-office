@@ -1,96 +1,88 @@
 {
   "creative_director": "Luna",
-  "review_number": 6,
-  "timestamp": "2026-03-07T03:22:00Z",
-  "theme": "The Office Has Memory — Give Every Element a Past, a Pulse, and a Personality Tick",
+  "review_number": 7,
+  "timestamp": "2026-03-07T03:52:00Z",
+  "theme": "The Office Breathes — Make Every Pixel React to What's Happening Right Now",
   "ideas": [
     {
       "priority": "must",
-      "category": "storytelling",
-      "title": "Bloberto Ambient Broadcasts — The Manager Talks Whether You're Watching or Not",
-      "description": "Currently Bloberto only speaks when you hover over him. That means most visitors never discover the speech bubble at all. Add a self-firing broadcast loop: in the `Character` component's `useEffect` (when `variant === 'manager'`), set a `setInterval` of 45000ms that picks a random quote from the current vibe pool and calls `setBubble({ quote, show: true })`, then auto-hides after 4000ms via `setTimeout`. The interval should reset when vibe changes. Crucially: hover still works as today, and an in-progress hover cancels the ambient timer. Add a `useRef` flag `ambientActiveRef` to prevent overlap. WHY: An office where the manager just stands there silently until prodded feels dead. Ambient broadcasts make Bloberto feel like he has his own inner monologue — and they're the most shareable moments ('I left the tab open and Bloberto said \"This could have been a commit message.\" at 3pm'). Zero new UI — pure behavioral delight.",
+      "category": "delight",
+      "title": "Coffee Corner Visits — Idle Workers Should Wander to Coffee",
+      "description": "Idle workers currently float around the lower floor with generic wander animations, but they never interact with the coffee corner. When a worker is idle, give them a 30% chance per animation cycle of wandering toward the coffee corner (top-right area). Add a new `char--wander-coffee` class with a keyframe that moves the character to ~80% left, ~15% top, pauses for 2s (picking up coffee), then drifts back. While at the coffee corner, show a tiny ☕ emoji bubble above their head (same mechanism as speech bubble but simpler). WHY: The coffee corner is a prop with zero interaction — it's furniture. Making idle workers visit it transforms it into a social space and makes the idle state feel intentional rather than aimless. Every office has that one person who's always at the coffee machine.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "must",
       "category": "feature",
-      "title": "Worker Card Activity Drawer — One Click Reveals Their Whole Day",
-      "description": "Worker cards show current snapshot only. Add an expandable history drawer: clicking anywhere on a `WorkerCard` toggles a `useState` `expanded` boolean. When true, render a `.worker-card__history` div below the progress bar that animates open via `max-height: 0 → 220px; overflow: hidden; transition: max-height 0.3s ease`. Inside: filter `activityLog` (pass as a prop from App.jsx: `<WorkerCard worker={w} activityLog={activityLog} .../>`) where `entry.worker === worker.name`, slice last 5, render as a compact timeline. Each entry: a 6px colored dot (green=complete, red=error, gray=system) + truncated message + relative time. A '▾ History' / '▴ Hide' toggle label at bottom of card. CSS: `.worker-card__history { padding: 0.75rem 0; border-top: 1px solid var(--border); margin-top: 0.5rem; }` `.history-entry { display: flex; gap: 8px; font-size: 0.75rem; color: var(--text-muted); padding: 3px 0; }`. WHY: 'What has Sofia been doing?' is the most natural question a manager asks. Right now the dashboard has no answer. This single feature turns a status board into a team narrative.",
-      "effort": "medium",
+      "title": "Favicon Vibe Indicator — The Browser Tab Should Tell the Story",
+      "description": "The browser tab currently shows the default Vite favicon regardless of team state. Use a tiny canvas-generated favicon that changes with vibe: crushing→green circle, on-fire→red circle, in-flow→blue circle, slow-day→gray circle, after-hours→purple circle with moon. In App.jsx, add a useEffect watching the vibe key: create a 32x32 canvas, draw a filled circle with the vibe color, convert to dataURL, and set it as the favicon via `document.querySelector('link[rel=icon]').href = dataURL`. WHY: People who keep the tab open (our target user!) will see the team's state without switching to it. A red dot in the tab bar is an instant 'something's happening' signal. Zero UI footprint, maximum ambient awareness.",
+      "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "visual",
-      "title": "Active Desk Monitor Glow — Working Workers Illuminate Their Screens",
-      "description": "The six desk monitors (`div.desk__monitor`) are static black rectangles regardless of who's sitting there. This is a wasted canvas. When a desk is occupied by a `working` worker, add `desk--active` class to the outer `.desk` div and pass `style={{ '--role-color': ROLE_COLORS[worker.role] }}` on that same div (already calculated during `deskOccupants` build in Office.jsx). In Office.css add: `.desk--active .desk__monitor { box-shadow: 0 0 8px color-mix(in srgb, var(--role-color, var(--accent)) 55%, transparent); background: #0d0d1a; animation: monitor-blink 1.8s step-start infinite; }` and `@keyframes monitor-blink { 0%,89%{ opacity:1 } 90%,100%{ opacity:0.85 } }` — a subtle opacity tick that reads as a cursor blink without being distracting. Respect `prefers-reduced-motion` by setting the animation to `none` inside the existing reduced-motion block. WHY: A monitor with no glow is an off monitor. An active monitor should announce itself. This one CSS change transforms the office floor from furniture into a live workspace.",
+      "title": "Theme Transition Ripple — Dark/Light Toggle Should Feel Satisfying",
+      "description": "Currently toggling dark/light mode is an instant swap. Add a CSS transition ripple: when the theme toggle is clicked, use View Transitions API (document.startViewTransition) if available, falling back to a simple 300ms CSS transition on background-color and color properties on :root. For the fancy path: set `::view-transition-old(root)` and `::view-transition-new(root)` with a clip-path circle animation originating from the toggle button's position. For the simple fallback: add `transition: background-color 0.3s ease, color 0.3s ease` to the root custom properties block. WHY: Theme toggles are the most clicked UI element after navigation. Making it feel tactile and smooth turns a utilitarian feature into a moment of delight. Every major design system has this now.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Vibe-Reactive Footer Tagline — The Last Line of Copy Should Earn Its Keep",
-      "description": "The footer currently shows a hard-coded `\"If it compiles, ship it.\"` every single time regardless of team state. This is leaving comedy on the table. Create a `FOOTER_TAGLINES` constant object keyed by vibe: `crushing: 'We are absolutely sending it. No notes.'`, `on-fire: 'Everything is on fire and that is a deployment strategy.'`, `in-flow: 'If it compiles, ship it.'`, `slow-day: 'Have you tried turning the team off and on again?'`, `after-hours: 'Go to sleep. The server will handle it.'`. In the `<footer>` in App.jsx, compute `const vibe = getTeamVibe(activeWorkers)` (already imported) and render `FOOTER_TAGLINES[vibe.key]`. Wrap the tagline span in a CSS `transition: opacity 0.4s ease` with a key prop so React re-mounts on vibe change for the fade effect — or use `useEffect` + `useState` to cross-fade. WHY: Every vibe change should ripple through the entire page. The footer is the exclamation mark at the end of everything you just read. Making it react costs 10 lines and pays off every single session.",
+      "title": "Worker Tooltip Task Preview on Office Floor — Hover to See What They're Building",
+      "description": "Working characters already have a `data-tooltip` attribute set to their task, but there's no CSS to actually show it! Add a pure CSS tooltip: `.char[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 8px; font-size: 0.65rem; white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; z-index: 20; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }`. WHY: The data is already there — we're just not showing it! This is the lowest-effort, highest-value fix possible. Users hovering over characters on the office floor want to know what they're doing without switching to the dashboard tab.",
       "effort": "small",
-      "assigned_to": "sofia"
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "should",
+      "category": "office-life",
+      "title": "Error Worker Red Pulse on Office Floor — Errors Should Scream",
+      "description": "Workers with status 'error' show an exclamation badge on their avatar, but their desk doesn't react at all. Add a pulsing red glow to desks with errors: `.desk--error .desk__monitor { box-shadow: 0 0 12px rgba(239,68,68,0.6); animation: error-pulse 1.2s ease-in-out infinite; }` `@keyframes error-pulse { 0%,100% { box-shadow: 0 0 8px rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 16px rgba(239,68,68,0.8); } }`. The desk--error class is already being set in the JSX! We just need the CSS. WHY: An error at a desk should make you look. Right now errors are whisper-quiet on the office floor — easy to miss. A red pulse draws the eye immediately, which is exactly what errors should do.",
+      "effort": "small",
+      "assigned_to": "dave"
     },
     {
       "priority": "should",
       "category": "feature",
-      "title": "Keyboard Shortcut Help Modal — The Secret Menu Deserves a Door",
-      "description": "The app has keyboard shortcuts (1→Office, 2→Dashboard, Escape→blur) but they're completely invisible to 100% of users. Add a `?` button in `.header-right` (same style as `.theme-toggle`: `border-radius: 20px; padding: 0.4rem 0.7rem; font-size: 1rem`). On click, toggle a `useState showHelp` boolean that renders a `.shortcut-modal` overlay: `position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 999; display: flex; align-items: center; justify-content: center`. Inside: a centered `.shortcut-modal__card` (`background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; max-width: 340px; width: 90%`). Content: a `<dl>` of shortcut rows — `kbd` styled elements for keys, descriptions alongside. Keyboard shortcuts to document: `1` Office tab, `2` Dashboard tab, `T` Toggle theme (add this shortcut!), `?` This help, `Esc` Dismiss focus. Closes on backdrop click or Escape. `role='dialog'`, `aria-modal='true'`, `aria-label='Keyboard shortcuts'`. Focus the modal on open. WHY: Power users reward products that reward them. This modal transforms the shortcuts from tribal knowledge into a discoverable feature.",
+      "title": "Document Title Updates — Show Team State in the Tab Title",
+      "description": "The page title is always 'Bloberto's Office' regardless of what's happening. Add a useEffect in App.jsx that updates document.title based on active workers: `document.title = \\`(${workingCount}/${total}) Bloberto's Office — ${vibe.label}\\``. When all workers are idle: `document.title = '😴 Bloberto's Office — All quiet'`. When there's an error: prepend '⚠️'. WHY: Combined with the favicon vibe indicator, this turns the browser tab into a complete ambient status display. Users who keep multiple tabs open will see '(3/5) Bloberto's Office — Crushing It 🔥' and know exactly what's happening without clicking.",
       "effort": "small",
       "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Daytime Window Clouds — The Sky Deserves to Move",
-      "description": "The office window shows time-based gradients and midnight stars, but the daytime sky (9am–4pm, the hours most users are watching) is a completely static gradient. Stars move at night — clouds should move by day. In `WindowElement`, when `hour >= 9 && hour <= 16`, render two `div.window-cloud` elements inside `.office-window__sky`. CSS: `.window-cloud { position: absolute; height: 5px; border-radius: 99px; background: rgba(255,255,255,0.65); top: 28%; animation: cloud-drift 11s linear infinite; }` `.window-cloud:nth-child(1) { width: 14px; animation-duration: 11s; }` `.window-cloud:nth-child(2) { width: 9px; animation-duration: 16s; animation-delay: -5s; top: 55%; }` `@keyframes cloud-drift { from { left: -20%; } to { left: 115%; } }`. Golden hour (5–7pm): render one thin cloud tinted `rgba(251,191,36,0.4)` for atmosphere. Respect prefers-reduced-motion. WHY: The window already tells you if it's day or night — but a static daytime sky feels like a screensaver paused. Two tiny animated divs make the window feel like a real window.",
-      "effort": "small",
-      "assigned_to": "dave"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "Team Efficiency Grade Card — An A+ Is Worth More Than a Percentage",
-      "description": "Replace (or add alongside) the vibe stat card in `StatsBar` with an Efficiency Grade: compute `grade = Math.round(working / total * 100)` then map to a letter: `≥90 → A+`, `≥80 → A`, `≥65 → B`, `≥45 → C`, `<45 → D`. Store previous grade in a `useRef prevGradeRef`. Show a `↑` trend arrow (color: var(--green)) if grade improved, `↓` (color: var(--red)) if dropped, `→` if same since last poll. Render as a new `.stat-card.efficiency` with `stat-value` showing the letter at 2rem font-weight 800. Grade colors: A+/A → `var(--green)`, B → `var(--accent)`, C → `var(--yellow)`, D → `var(--red)`. The trend arrow sits as a small `0.85rem` superscript. On mobile collapse to grade only (hide trend arrow). WHY: Percentages require math. Letter grades are visceral — you know in your bones what a D means. This card communicates team health faster than any number, and the trend arrow makes each poll feel like an update worth noticing.",
-      "effort": "small",
-      "assigned_to": "sofia"
+      "title": "Konami Code Easter Egg — Reward the Curious",
+      "description": "Track keystrokes in a useEffect: ↑↑↓↓←→←→BA. When the sequence is completed, trigger a 3-second 'party mode': every character on the office floor gets a brief confetti burst (CSS-only: spawn 8 small colored squares with randomized animation-delay that fall and fade from above each character). Add a `party-mode` class to `.office-floor` that triggers the confetti keyframe. Remove it after 3s. Could also briefly change all nameplates to silly titles ('Supreme Overlord', 'Bug Whisperer', 'CSS Wizard'). WHY: Easter eggs are the hallmark of products built with love. The Konami code is universally known among developers — our target audience. Someone WILL find it, screenshot it, and share it.",
+      "effort": "medium",
+      "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "office-life",
-      "title": "Vibe Whiteboard — The Left Wall Has Something to Say",
-      "description": "There are currently three physical props in the office: coffee corner, door, and plants. Add a fourth: a whiteboard on the left wall (Office.jsx, inside `.office-floor`). Position: `position: absolute; left: 1%; top: 38%; width: 5.5%; height: 16%;`. Element: `<div className={'office-whiteboard' + (vibe === 'on-fire' ? ' office-whiteboard--urgent' : '')} aria-label={'Whiteboard: ' + whiteboardText}>`. Content: a small centered text showing vibe message. `WHITEBOARD_MSGS = { crushing: '🏆 SHIP IT', 'on-fire': '🚨 HELP', 'in-flow': '⚡ FLOW', 'slow-day': 'TODO: ???', 'after-hours': '🌙 ZZZ' }`. CSS: `.office-whiteboard { background: #f0f0e8; border: 1.5px solid #ccc; border-radius: 3px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; font-size: 0.42rem; font-weight: 700; color: #1a1a1a; text-align: center; z-index: 2; }` `.office-whiteboard--urgent { background: #fff0f0; border-color: var(--red); }`. Add a `transition: background 0.5s ease` so it softly reacts to vibe changes. WHY: The whiteboard is a zero-interaction ambient prop that tells the story of the current moment. Every office has a whiteboard. Ours had an empty wall.",
+      "category": "visual",
+      "title": "Subtle Floor Reflections — The Office Floor Should Have Depth",
+      "description": "The office floor is a flat colored rectangle. Add a subtle CSS pseudo-element reflection under each desk: `.desk::after { content: ''; position: absolute; bottom: -4px; left: 10%; width: 80%; height: 3px; background: radial-gradient(ellipse, rgba(0,0,0,0.15), transparent); border-radius: 50%; }`. Also add a very subtle linear gradient to the floor itself to simulate depth: change `.office-floor` background to include `linear-gradient(to bottom, var(--floor-color) 0%, color-mix(in srgb, var(--floor-color) 85%, black) 100%)`. WHY: Flat surfaces feel like placeholder art. Two CSS pseudo-elements transform the office from a colored box into a space with implied lighting and dimension. Zero performance cost.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "dave"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Unread Activity Badge on Dashboard Tab — Surface the Signal While You're Watching the Floor",
-      "description": "When you're on the Office tab and new activity entries arrive (detected by comparing `activityLog.length` or the newest entry's timestamp to a `useRef lastSeenActivityCountRef`), show a small badge count on the Dashboard tab button. In App.jsx: track `unseenCount` with `useState(0)`. In `useEffect` watching `activityLog`, if `tab !== 'dashboard'`, increment `unseenCount` by the delta. When user clicks Dashboard tab, reset `unseenCount` to 0. Render the badge inside the button: `{unseenCount > 0 && <span className='tab-badge'>{unseenCount > 9 ? '9+' : unseenCount}</span>}`. CSS: `.tab-badge { background: var(--red); color: #fff; font-size: 0.6rem; font-weight: 800; border-radius: 999px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }`. Cap display at '9+'. WHY: Right now you can watch the office floor for 20 minutes and have no idea 3 workers completed tasks and someone had an error. The badge creates a pull: something happened, go check. It's the dashboard's heartbeat made visible.",
-      "effort": "small",
+      "title": "Activity Log Sound Toggle — Optional Ambient Notification Pings",
+      "description": "Add an optional sound toggle (🔇/🔊 button next to theme toggle). When enabled, play a subtle 'ping' sound via Web Audio API (no audio files needed — generate a short sine wave: `new AudioContext(), createOscillator(), frequency 800Hz, duration 100ms, gain ramp to 0`) when a new activity log entry arrives of type 'complete'. For 'error' type, use a lower frequency (400Hz) two-tone descending beep. Persist the toggle in localStorage as 'bloberto-sound'. Default: off. WHY: For users who keep the tab open while working, audio cues are the ultimate ambient awareness tool. A quiet 'ping' when someone completes a task is satisfying. A low tone on error is immediately attention-grabbing. But it MUST be opt-in — unsolicited sounds are the fastest way to lose a user.",
+      "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "visual",
-      "title": "Bloberto's Flaming Crown — On-Fire Vibe Deserves a Crown on Fire",
-      "description": "Bloberto already has a golden crown SVG (`<polygon points='13,15 15,9 18,12 20,8 22,12 25,9 27,15' fill='#fbbf24'>`). When vibe is `on-fire`, add 3 animated flame paths above the crown's three highest points (x=15, x=20, x=25 at y≈9). Each flame is a `<path>` like `M 15,9 Q 14,5 15,2 Q 16,5 17,3 Q 16,6 15,9` (a narrow teardrop flame). Colors: `#f97316` base with a `#fef08a` inner glow (two layered paths per flame, outer orange + inner pale yellow thinner). Animate via CSS applied to a `<g className='crown-flames'>` wrapper: `@keyframes flame-flicker { 0%,100%{transform:scaleY(1) scaleX(1);opacity:0.9} 33%{transform:scaleY(1.2) scaleX(0.9);opacity:1} 66%{transform:scaleY(0.85) scaleX(1.1);opacity:0.8} }`. Three `<g>` children staggered `animation-delay: 0s, 0.2s, 0.4s`. The entire crown-flames group is only rendered when `v === 'on-fire'` in `blobFace()` — or ideally in the crown rendering which sits outside `blobFace()`. Adjust: move crown render into a function `blobCrown(v)` that returns either the static polygon or polygon + flames. WHY: The mood face reacts. The crown should too. A king's crown on fire is the most legible 'on-fire' metaphor imaginable. This is the screenshot-able moment that makes someone DM the link to their entire engineering team.",
+      "category": "office-life",
+      "title": "Seasonal Office Decorations — The Office Should Know What Month It Is",
+      "description": "Check `new Date().getMonth()` and add subtle seasonal decorations to the office: December → tiny string of colored lights along the top wall (CSS dots with alternating colors and a twinkle animation). October → a small jack-o-lantern prop next to the plants. February → a few tiny heart particles floating near the coffee corner. Summer months → the window shows a brighter, more vivid sky gradient. Each decoration is a conditional render inside Office.jsx based on the current month. Keep them minimal — one small addition per season, not a full redesign. WHY: Seasonal decoration is the single strongest signal that a product is alive and maintained. It tells visitors 'someone cares about this.' It creates return visits ('I wonder what it looks like in December'). And it's pure delight — nobody expects an office dashboard to have Halloween decorations.",
       "effort": "medium",
       "assigned_to": "maya"
-    },
-    {
-      "priority": "wild",
-      "category": "storytelling",
-      "title": "Worker Anniversary Celebrations — Give the Team a Memory",
-      "description": "Add a `joined_at` ISO date string field to the worker data schema (e.g., `'joined_at': '2024-03-07'`). In App.jsx, create a `getAnniversaryMessage(worker)` function: check if `new Date(worker.joined_at)` has the same month and day as today (`new Date()`). If within 0 days: anniversary. If within 1 year: calculate years. Return an object `{ isAnniversary: true, years: N, message: '🎂 Carlos's 2-year anniversary!' }` or null. Render a dismissable `.anniversary-banner` below the stats bar when any active workers have anniversaries: `background: linear-gradient(135deg, color-mix(in srgb, var(--roleColor) 15%, transparent), var(--surface)); border-left: 3px solid var(--roleColor); border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;`. In the Office floor, show a tiny 🎂 emoji badge on the relevant character's avatar (same mechanism as the error badge: `.char__birthday-badge { position: absolute; top: -3px; left: -3px; font-size: 9px; }` ). WHY: Anniversaries transform a read-only dashboard into a social artifact. 'Happy 2 years, Sofia!' isn't just data — it's the moment someone sends the dashboard screenshot to their whole team. This feature costs almost nothing once `joined_at` is in the data and it produces the most human moment in the product.",
-      "effort": "medium",
-      "assigned_to": "tbd"
     }
   ],
   "hire_proposals": []
