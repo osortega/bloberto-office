@@ -1,114 +1,103 @@
 {
   "analyst": "Sofia",
-  "review_number": 10,
-  "timestamp": "2026-03-07T02:09:01Z",
+  "review_number": 11,
+  "timestamp": "2026-03-07T02:38:58Z",
   "scores": {
-    "visual": 4,
-    "ux": 3,
-    "responsiveness": 3,
-    "performance": 3,
-    "accessibility": 4,
-    "code_quality": 3,
-    "features": 3,
-    "fun_factor": 5
+    "visual": 4.0,
+    "ux": 3.5,
+    "responsiveness": 3.5,
+    "performance": 2.5,
+    "accessibility": 3.5,
+    "code_quality": 3.5,
+    "features": 4.0,
+    "fun_factor": 5.0
   },
-  "overall_score": 3.5,
+  "overall_score": 3.7,
+  "notes": "Review #11. Solid aesthetic improvement this cycle — the SVG character portraits are genuinely charming and the vibe-reactive theming is cohesive. However, a critical CSS bug silently kills the dust-particle effect entirely, error/done workers are invisible to the dashboard, and an ever-growing animation count with zero prefers-reduced-motion support is a real accessibility and battery-life liability. The getTeamVibe duplication survived from last review — starting to feel personal. Fun factor stays at 5; no amount of bugs can ruin Bloberto.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "code",
-      "title": "Duplicated getTeamVibe logic in App.jsx and Office.jsx",
-      "description": "getTeamVibe is defined twice — once in App.jsx (returns {label, key} object) and once in Office.jsx (returns a plain string key). The threshold logic is identical but the return shapes differ, creating a silent divergence risk. Extract to a shared src/utils/vibe.js module and import in both files. This is a correctness bug waiting to happen when someone updates one copy and forgets the other.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "office-floor has role=img but contains an interactive element",
-      "description": "The .office-floor div carries role='img' (line 392 of Office.jsx), but Bloberto (.char--manager) has pointer-events: auto and triggers mouse events — it is interactive. Placing interactive elements inside role='img' violates ARIA authoring practices and will confuse screen readers. Change role='img' to role='region' with the same aria-label, and add aria-live='polite' so screen readers announce vibe changes.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "high",
-      "category": "performance",
-      "title": "getTeamVibe called twice on every render in App.jsx header",
-      "description": "Lines 510–511 of App.jsx call getTeamVibe(activeWorkers) twice in the same render pass (once for data-vibe attribute, once for the label text). This is redundant computation. Hoist the call to a const vibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers]) and reference vibe.key and vibe.label where needed.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Polling silently pauses after idle timeout with no user feedback",
-      "description": "After IDLE_TIMEOUT (10 min) of inactivity, pollTick silently stops syncing. The UI shows stale data and the Live indicator may still appear green because isLive is not reset. Users have no idea the feed is paused. Add a visual 'Paused — move mouse to resume' chip in the header or over the live-dot, and reset isLive=false when the idle timeout kicks in.",
-      "effort": "medium",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Office tab shows no loading state and no error state",
-      "description": "The Dashboard tab has LoadingSkeleton while isLoading=true, but the Office tab just renders an empty floor with only Bloberto. Similarly, if fetchError fires the error banner only appears on the Dashboard; switching to Office shows nothing wrong. Pass isLoading and hasError flags to Office and render a simple overlay or placeholder text so the Office tab communicates its state.",
-      "effort": "medium",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Character data-tooltip is CSS-only and invisible to screen readers",
-      "description": "Tooltip text on worker characters is rendered via .char[data-tooltip]::after which is purely visual. Screen readers will not announce it. Working characters show their current task; ghost characters show their role — this information is entirely inaccessible. Add a title attribute matching the data-tooltip value, or implement a proper tooltip with role='tooltip' and aria-describedby. Also, Bloberto's speech bubble fades in with no ARIA announcement.",
-      "effort": "medium",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "Simultaneous CSS animations with no prefers-reduced-motion guard",
-      "description": "Up to 8 concurrent animations can run at once: manager-wobble, bob, wander-1/2/3/4, vibe-crush/fire, error-halo, ghost-float, standby-pulse, pulse-live, shimmer, card-rise. On low-powered devices this is a battery and performance drain. Add @media (prefers-reduced-motion: reduce) to disable or freeze all cosmetic animations (wanders, wobble, bob, pulses) while keeping functionally meaningful ones like the error-halo.",
-      "effort": "medium",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Inline styles in JSX should be CSS classes",
-      "description": "WorkerCard uses style={{ flex: 1, paddingLeft: '0.75rem' }} inside JSX (line 186), and multiple section headers use style={{ marginTop: '2.5rem' }} and similar (lines 573, 608). Inline styles bypass the CSS variable system and cannot respond to theme changes or media queries. Move these to named CSS classes in App.css.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
       "category": "bug",
-      "title": "seenIdsRef never resets — returning workers never get the new-arrival animation",
-      "description": "seenIdsRef accumulates every worker ID ever seen in the current session (line 452). When a worker clocks out and returns, their ID is already in the set so firstTime is empty and the green pulse animation never fires again. For a live dashboard that cycles workers in and out, this means the visual confirmation of arrival only ever works once. Reset or expire seenIdsRef entries, or key on a session identifier from the data payload.",
-      "effort": "small",
-      "assignee": "carlos"
+      "title": "Dust particles don't render — box-shadow percentages are invalid CSS",
+      "description": "Office.css lines 653-661: the .office-floor::before pseudo-element uses box-shadow with percentage x/y offsets (e.g. '12% 18% 0 1px rgba(...)'). CSS box-shadow offsets must be length values (px, rem, em) — percentages are not valid here. The spec rejects them silently, so the entire dust-particle effect is invisible. Replace with pixel values or switch to absolute-positioned pseudo-random <span> elements with CSS custom properties for coordinates. A canvas overlay is another clean option.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Workers with 'done' or 'error' status are completely invisible on the dashboard",
+      "description": "App.jsx line 441: activeWorkers filters to only 'working' and 'idle'. Workers in 'done' or 'error' states never appear in the workers-grid, never contribute to StatsBar totals, and never render in the Office (since Office also receives activeWorkers). The Dashboard even has fully styled .stat-card.done and .worker-card.error CSS — but those states can never render. Add 'done' and 'error' to the activeWorkers filter (or rename it to visibleWorkers), and add a Done count to StatsBar. Error workers are especially critical — the vibe pill can say '🚨 On Fire' while the cause remains completely hidden.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "accessibility",
+      "title": "Zero prefers-reduced-motion support across 15+ concurrent animations",
+      "description": "At full load the app can run: manager-wobble, bob (×N working), wander-1/2/3/4 (×N idle), typing-dot ×3 (×N), plant-sway ×3, dust-drift, error-halo, vibe-crush/fire/in-flow, ghost-float, standby-pulse, pulse-live, shimmer, card-rise simultaneously. There is no @media (prefers-reduced-motion: reduce) block anywhere. This is a real issue for users with vestibular disorders and a battery drain on mobile. Add a single prefers-reduced-motion block that sets animation: none on all cosmetic animations, keeping only the error-halo (safety signal) and progress-bar transition.",
+      "effort": "medium"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "getTeamVibe still duplicated — survived from Review #10 unaddressed",
+      "description": "The function is defined in both App.jsx (returns {label, key} object) and Office.jsx (returns a plain string). The thresholds are identical so they don't diverge *yet*, but this is a maintenance trap. When someone tweaks the thresholds in one file, the vibe pill, stats bar, and office floor will disagree. Extract to src/utils/vibe.js, export the object-returning version, and import in both files. Office.jsx can destructure .key where it only needs the string.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Character tooltips are hover-only — inaccessible on touch and keyboard",
+      "description": "The data-tooltip CSS trick (.char[data-tooltip]::after) only fires on :hover. On mobile touch, working characters' task descriptions and ghost characters' role labels are completely invisible. Keyboard users focusing past the office panel also get nothing. Since the office is role='img', interactive info really belongs in the Dashboard panel — but if you want tooltips in the Office, use a small React tooltip component triggered by both mouseenter and focus, with role='tooltip' and aria-describedby wiring. At minimum add a title attribute matching data-tooltip as a low-effort fallback.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Dead CSS: hire-form, hq-badge, and stat-card.done rules reference nothing in JSX",
+      "description": "App.css contains full styling blocks for .hire-form-wrapper, .hire-form, .form-group, .hq-badge, and .stat-card.done — none of these classes are rendered anywhere in App.jsx or Office.jsx. The hire form was presumably removed at some point. Dead CSS adds confusion ('is this used somewhere I missed?'), inflates bundle size, and makes future refactors harder. Remove them or, if the hire form is coming back, at least put a TODO comment on the CSS block.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Worker cards are keyboard-focusable but pressing Enter/Space does nothing",
+      "description": "WorkerCard has tabIndex={0} and a :focus-visible outline (good!) but no onKeyDown handler. A keyboard user tabbing through cards expects Enter or Space to do *something* — expand details, link to a profile, or at minimum trigger a visual acknowledgement. Either add a keydown handler that provides a meaningful action (e.g. announce the task via aria-live), or remove tabIndex and place focusable elements (like a 'View details' button) inside the card instead. Focusable elements that do nothing are worse than non-focusable ones.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Character name labels in the Office view are illegibly small at default zoom",
+      "description": "Office.css: .char__name is 0.58rem (~9px). The 480px breakpoint hides them entirely. At 0.58rem on a 16px base that's ~9.3px — below the 11px minimum that most accessibility guidelines recommend even for decorative text. The names are a key wayfinding element in the office ('which blob is which?'). Bump to 0.7rem minimum. On 480px it's reasonable to hide them, but between 481-600px they should be visible and legible.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "getTeamVibe(activeWorkers) called 3x per render in App.jsx header with no memoization",
+      "description": "The App render calls getTeamVibe(activeWorkers) twice for the vibe-pill element (once for data-vibe, once for the label text) and StatsBar calls it a third time internally. Hoist to const vibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers]) near the top of the App component and pass vibe as a prop to StatsBar. The function itself is cheap but the pattern scales poorly as more components reference vibe state.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "Idle wander paths clip through second-row desks",
+      "description": "Office.css wander-1 through wander-4 use top values as low as 73%. The second row of desks sits at top: 50% (DESKS array). Characters positioned at the desk have their avatar offset to top: 46% (desk.top - 4). The wander zones start at 73% which visually clears the desks, but on certain viewport widths where aspect-ratio: auto kicks in and the floor compresses vertically, idle characters can visually overlap the desk furniture. Set a hard floor for wander top values at 78%+ and test at 768px viewport width.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Empty .progress-wrapper {} ruleset is dead CSS",
-      "description": "Line 439 of App.css has '.progress-wrapper {}' with no declarations inside. This is dead code left over from a refactor. Remove it to keep the stylesheet clean. Minor, but it signals incomplete cleanup.",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "Inline IIFE inside JSX for task tags is unnecessarily convoluted",
+      "description": "WorkerCard lines 196-208 use {(() => { const tags = getTaskTags(worker.task); return tags.length > 0 ? (...) : null })()} — an IIFE inside JSX. This is hard to read, harder to test, and adds no functional value over a simple extracted component. Replace with a <TaskTags task={worker.task} /> component that returns null when no tags match. This also makes the task-tag rendering independently testable.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "Activity log key is fragile — risk of React duplicate key warnings",
-      "description": "ActivityLog uses key={entry.timestamp + entry.worker + i} (line 102). The index fallback i masks potential duplicate key collisions when two events share the same timestamp and worker name (e.g. rapid re-hires). Request the API to include a stable unique id field on each activity entry, then use that as the React key.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Idle wander paths overlap desk area — workers clip through furniture",
-      "description": "Wander keyframes 1–4 use top values as low as 73–74% which overlaps the second row of desks (positioned at top: 50%). An idle worker can visually slide through a desk. Clamp all wander top values to 79% or higher so idle characters stay in the unobstructed bottom corridor of the floor. Also affects the mobile view where the aspect-ratio: auto layout changes the effective desk positions.",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "No worker status filter on the Dashboard workers grid",
+      "description": "The Activity Log has a filter bar (All / Hires / Completions / Errors) but the workers grid has no equivalent. Once error/done workers are visible (see suggestion #2), users will want to quickly filter by status. A simple pill-style filter strip above the workers-grid — matching the exact pattern already used for the activity filter — would complete the UX parity. Reuse the .activity-filter-bar CSS; the component pattern is already there.",
+      "effort": "small"
     }
   ]
 }
