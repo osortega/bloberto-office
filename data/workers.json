@@ -25,5 +25,14 @@
     "task": "",
     "progress": 0,
     "started": null
+  },
+  {
+    "name": "Sofia",
+    "role": "QA Engineer",
+    "emoji": "\ud83d\udd0d",
+    "status": "working",
+    "task": "QA review #31 \u2014 full site code review and analysis",
+    "progress": 50,
+    "started": "2026-03-07T22:15:00Z"
   }
 ]

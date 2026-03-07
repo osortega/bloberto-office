@@ -1,115 +1,114 @@
 {
   "analyst": "Sofia",
+  "timestamp": "2026-03-07T21:45:51Z",
   "review_number": 30,
-  "timestamp": "2026-03-07T21:50:00Z",
   "scores": {
-    "visual": 4.2,
-    "ux": 3.5,
-    "responsiveness": 3.5,
-    "performance": 3.0,
-    "accessibility": 4.0,
-    "code_quality": 3.0,
-    "features": 4.2,
-    "fun_factor": 5.0
+    "visual": 4,
+    "ux": 4,
+    "responsiveness": 3,
+    "performance": 4,
+    "accessibility": 3,
+    "code_quality": 2,
+    "features": 4,
+    "fun_factor": 4
   },
-  "overall_score": 3.8,
-  "notes": "Review #29 critical bug (flat array workers.json) was fixed. Keyboard hash bug also fixed. Core persistent issues remain: no ErrorBoundary (5th flag), no React.memo (8th flag), App.jsx monolith (5th flag). New issues found this review: ProgressBar milestone flash bug, stats-bar grid overflow.",
+  "overall_score": 3.5,
+  "note": "Puppeteer screenshots failed (system resource limits); review based on QA-29 screenshots + full source analysis of App.jsx, Office.jsx, App.css, Office.css, and data files. No feature regressions observed in confirmed-working items, but flat-array schema has genuine new bugs.",
+  "new_since_last_review": [
+    "Activity log time-block separators (working)",
+    "Flat array workers.json format support (partially broken — see HIGH bugs)",
+    "Completion confetti on working→idle transition (working)",
+    "Personalized confetti color per worker (Maya in-progress, Carlos/vibe confetti working)",
+    "Vibe streak counter with tier icons (working)"
+  ],
   "suggestions": [
     {
       "priority": "high",
-      "category": "code",
-      "title": "App.jsx is a 997-line monolith — extract components NOW",
-      "description": "App.jsx contains WorkerCard, StatsBar, ActivityLog, ProgressBar, EmptyState, LoadingSkeleton, StatusBadge, DeltaBadge, and the main App all in one file. This is the 5th consecutive review flagging this. Extract each into its own file under src/components/. This blocks testability, maintainability, and code review quality.",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "high",
-      "category": "code",
-      "title": "No ErrorBoundary — any render crash = blank white screen",
-      "description": "5th consecutive flag. No ErrorBoundary anywhere. A single null dereference in CharacterAvatar or bad timestamp crashes the entire app with zero recovery. Add a top-level ErrorBoundary in main.jsx and a secondary one around Office.",
+      "category": "bug",
+      "title": "Flat-array workers missing `id` breaks avatars, ghost detection, and React keys",
+      "description": "workers.json flat array has `id` for Sofia but NOT for Maya or Dave. This cascades into three distinct failures: (1) `CharacterAvatar` checks `workerId === 'maya'` etc., but `worker.id` is `undefined` for un-id'd workers — so Maya renders as a bare 🎨 emoji and Dave as 🚀 in the Office view instead of their personalized SVGs. (2) `activeIds = new Set(workers.map(w => w.id))` becomes `{undefined, 'sofia'}`, so Maya and Dave are NOT recognized as active — causing them to appear as ghosts in the roster AND working characters simultaneously. (3) `<Character key={occ.worker.id}/>` produces `key=undefined`, triggering React reconciliation warnings. Fix: ensure all workers in the flat array include an `id` field matching their expected character ID (e.g. `\"id\": \"maya\"`).",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "ProgressBar milestone flash fires on mount for pre-progressed workers",
-      "description": "When a worker loads at 60% progress, the milestone useEffect immediately triggers flash animations for 25% and 50% because milestonesRef starts empty. Pre-populate milestonesRef with already-passed milestones on init.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "visual",
-      "title": "StatsBar grid breaks with conditional Error/Stuck cards",
-      "description": "stats-bar uses grid-template-columns: repeat(5, 1fr). When Error or Stuck cards render (6-7 cards total), overflow cards sit awkwardly on a second row. Use repeat(auto-fill, minmax(130px, 1fr)) instead.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Tab switching pollutes browser history",
-      "description": "Every tab click pushes a new history entry via window.location.hash. After switching tabs 5 times, the back button cycles through internal tab states instead of leaving the page. Replace with history.replaceState().",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "visual",
-      "title": "Mobile: ~40% dead space below office floor",
-      "description": "On 375px mobile, the office floor + header + tabs take ~430px, leaving ~300px of empty space. Add a compact vibe strip or mini stats below the floor on mobile, or change aspect-ratio to 1/1 for small screens.",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "No React.memo on any component — full re-render every 30s",
-      "description": "8th flag. WorkerCard, StatsBar, ActivityLog, ProgressBar all re-render from scratch on every poll cycle even when data is unchanged. Wrap in React.memo.",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "StatsBar stuck-worker detection fails for null 'started' field",
-      "description": "Workers with started: null (like idle Dave) cause new Date(null).getTime() = 0, making Date.now() - 0 always > 7200000. Every idle worker with null started shows as 'stuck'. Add a null guard.",
+      "title": "`updated_at` vs `started` field mismatch silently breaks duration display and deep-work badge",
+      "description": "workers.json (flat array format) provides a `started` field but Office.jsx and WorkerCard both reference `worker.updated_at`. Specific breakage: (1) WorkerCard's `formatDuration(worker.updated_at)` guard `worker.status === 'working' && worker.updated_at` always fails for flat-array workers → the ⏱️ working duration never renders. (2) Office.jsx `char--deep-work` class check: `worker.updated_at && Date.now() - new Date(worker.updated_at).getTime() > 45 * 60 * 1000` — always false, so the deep-work visual never fires. (3) `ProgressBar` ETA calculation gets `updatedAt={worker.updated_at}` → `undefined` → ETA is never shown. Note StatsBar correctly uses `w.started` — that one works. Fix: either normalize the flat array schema to include `updated_at`, or make the code accept `worker.updated_at ?? worker.started` as the working timestamp.",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
-      "priority": "low",
+      "priority": "high",
       "category": "code",
-      "title": "getRelativeTime duplicated in App.jsx and Office.jsx",
-      "description": "Nearly identical implementations in both files. Extract to src/utils/time.js.",
+      "title": "ErrorBoundary still absent — 5th flag, escalating to blocking",
+      "description": "No React ErrorBoundary anywhere in the component tree. This has been flagged in reviews #26, #27, #28, #29, and now #30. A data-shape error (e.g. null worker.name, malformed activity.json entry) will crash the entire UI with a blank white screen and zero user feedback. With the new flat-array format introducing nullable fields (Dave has `task: ''`, `started: null`), the blast radius is growing. `new Date(null).getTime()` returns 0 — this means any code path doing date math on `started: null` without a guard will produce wildly incorrect values rather than crashing, which is actually worse (silent garbage). Wrap at minimum the main content area and activity log in an ErrorBoundary that renders a friendly fallback. Effort is genuinely small — it's a 20-line component.",
       "effort": "small",
-      "assignee": "Maya"
+      "assignee": "Carlos"
     },
     {
-      "priority": "low",
-      "category": "ux",
-      "title": "WorkerCard uses generic role emoji while Office uses custom SVG — identity inconsistency",
-      "description": "Clicking a character in the office shows a rich SVG avatar. The dashboard shows a generic role emoji for the same person. Import CharacterAvatar into WorkerCard for consistency.",
-      "effort": "medium",
-      "assignee": "Maya"
+      "priority": "medium",
+      "category": "bug",
+      "title": "Activity log worker emojis fall back to 🤖 in flat-array mode",
+      "description": "When workers.json is a flat array, `syncFromGitHub` calls `setRoster([])`. `ActivityLogEntry` resolves worker emoji via `roster?.find(r => r.name === entry.worker)`, which finds nothing when roster is empty → all named workers show 🤖 instead of their real emoji (🎨, 🚀, 🔍, etc.). The flat-array workers DO carry an `emoji` field but it's never plumbed to the activity log lookup. Fix: pass `allWorkers` as a fallback emoji source — e.g. `const workerEmoji = workerData?.emoji ?? allWorkers.find(w => w.name === entry.worker)?.emoji ?? '🤖'`.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
-      "priority": "low",
+      "priority": "medium",
       "category": "code",
-      "title": "Footer version hardcoded as 'v1.0.0-chaos'",
-      "description": "Import version from package.json instead of hardcoding. Vite supports JSON imports natively.",
+      "title": "Component extraction still pending — App.jsx is 38 KB, Office.jsx is 28 KB (5th flag)",
+      "description": "App.jsx has grown to 38 KB and now houses: ActivityLogEntry, ActivityLog, StatusBadge, ProgressBar, WorkerCard, DeltaBadge, StatsBar, EmptyState, LoadingSkeleton, and the root App. Office.jsx at 28 KB contains: CharacterAvatar (250 lines of SVG paths), Character, WindowElement, and the Office orchestrator. This monolith makes diffs noisy, increases risk of merge conflicts, and blocks Maya from working on confetti/animations without touching Carlos's data logic. Proposed extraction targets: `src/components/WorkerCard.jsx`, `src/components/ActivityLog.jsx`, `src/components/StatsBar.jsx`, `src/components/CharacterAvatar.jsx`, `src/components/WindowElement.jsx`. The CharacterAvatar SVG alone is 200+ lines and has zero business logic — it belongs in its own file.",
+      "effort": "medium",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "`WORKER_ROLE_COLORS` in App.jsx duplicates and diverges from `ROLE_COLORS` in constants.js",
+      "description": "App.jsx line 14 defines `WORKER_ROLE_COLORS = { Maya: '#a855f7', Carlos: '#3b82f6', Dave: '#f97316', Sofia: '#22c55e', Luna: '#8b5cf6' }` keyed by NAME. constants.js defines `ROLE_COLORS` keyed by ROLE (e.g. 'Frontend Engineer': '#a78bfa'). Not only is this duplication, the actual hex values differ: Maya's confetti fires `#a855f7` (purple-500) but her role color is `#a78bfa` (violet-400). This means the personalized completion confetti doesn't visually match the role accent color used on her card and desk. Consolidate: either key WORKER_ROLE_COLORS off IDs and move it to constants.js, or derive it from ROLE_COLORS via the worker's role string.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Idle worker with empty `task` field shows hollow task section",
+      "description": "Dave's workers.json entry has `task: \"\"`. WorkerCard renders the task block unconditionally: `<div class='worker-task'><strong>📋 Current Task</strong>{worker.task}</div>`. When task is an empty string, this renders the label but nothing beneath it — a visually awkward empty box with just the '📋 Current Task' heading. Same issue would affect any future worker in idle/done status without a task. Fix: either suppress the task block entirely when `!worker.task`, or show a placeholder like 'On standby' / 'No active task'.",
       "effort": "small",
       "assignee": "Dave"
     },
     {
       "priority": "low",
-      "category": "bug",
-      "title": "Luna SVG gradient ID collision risk",
-      "description": "luna-hair-luna is always the gradient ID. If Luna renders in multiple contexts simultaneously, gradient references break. Use React useId() for unique IDs.",
+      "category": "code",
+      "title": "Completion toast uses ~200 chars of inline styles instead of a CSS class",
+      "description": "The `completionToast` element in App.jsx (line ~781) is styled with a large `style` prop object: `position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)'`, plus border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, and animation. Every other transient UI element (fetch-error-banner, speech-bubble, etc.) uses CSS classes. The inline styles make it impossible to override via theme variables and kill light-mode compatibility — the background hardcodes `var(--surface2)` as a string in JS but the box-shadow hardcodes `rgba(0,0,0,0.4)` which is dark-mode only. Extract to `.completion-toast` CSS class, apply theme-aware variables.",
       "effort": "small",
       "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "Interactive character divs in Office.jsx lack `role=\"button\"`",
+      "description": "In Office.jsx, the `Character` component renders a `<div>` with `tabIndex={0}`, `onClick`, `onFocus`, and `onBlur` — making it a custom interactive element. Without `role=\"button\"`, screen readers announce these as generic regions, not as activatable controls. VoiceOver and NVDA users would hear 'group' or nothing interactive for clickable characters. Add `role=\"button\"` when `onClick` is defined (i.e., when `handleClick` is set). Also consider adding `onKeyDown` to trigger click on Enter/Space for full keyboard equivalence (currently tabbing to a character and pressing Enter does nothing actionable).",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "`prefers-reduced-motion` not applied to App.css animations",
+      "description": "Office.css has a `@media (prefers-reduced-motion: reduce)` block that disables character/plant animations and a separate block for the window. App.css has a `@media (prefers-reduced-motion: reduce)` block only for `.live-dot`. Missing: `card-rise`, `new-border-pulse`, `confetti-piece`, `ambient-particle`, `worker-card--focused` bounce, and `progress-milestone-*` flash animations. For users with vestibular disorders, 30 confetti pieces flying and cards bouncing in on every data refresh is genuinely problematic. Add a comprehensive reduce-motion block in App.css similar to what Office.css already does.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Activity log silently drops events beyond 20 with no load-more affordance",
+      "description": "ActivityLog does `[...entries].reverse().slice(0, 20)` with no pagination. The current activity.json has enough entries that users can't see older history at all. As the log grows (especially with high-frequency syncs and team activity), the cutoff becomes more impactful. The 'Last N events' counter in the section header accurately tells users they're seeing a subset, which is good, but there's no way to see more. A simple 'Load more' button or expanding accordion for the 'Older' time group would resolve this with minimal effort.",
+      "effort": "small",
+      "assignee": "Carlos"
     }
   ]
 }

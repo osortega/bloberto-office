@@ -1,63 +1,63 @@
 {
   "creative_director": "Luna",
-  "review_number": 20,
-  "timestamp": "2026-03-07T21:31:09Z",
-  "theme": "From Grid to Story — Every Pixel Should Know Something the Others Don't",
+  "review_number": 21,
+  "timestamp": "2026-03-07T22:01:08Z",
+  "theme": "The Floor Is Alive — Make Every Surface React, Every Click Speak, Every Second Count",
   "ideas": [
     {
       "priority": "must",
-      "category": "feature",
-      "title": "Task Tag Filter Chips — One Click to Find Your People",
-      "description": "Worker cards already render colourful task-tag pills (PR, Bug, Docs, Deploy, etc.) parsed from each worker's task string via `getTaskTags()`. But they're purely cosmetic — clicking them does nothing. Make them interactive: clicking any tag pill on any card filters the worker grid to highlight only workers sharing that tag (others dim to 30% opacity). A second click or an ✕ button clears the filter. Implementation: add `selectedTag` state in App, pass it down to WorkerCard as a prop, apply `.worker-card--dimmed` when the card has no matching tag. The filter chips in each card double as the filter toggle. WHY: Once the team grows past 6 workers, 'who else is on this PR?' requires reading every card. One click answers it. The data and UI elements already exist — it's zero-net-new data, pure event wiring. This is the most under-leveraged surface on the dashboard.",
+      "category": "delight",
+      "title": "Worker Click Quips — Characters Who Talk Back",
+      "description": "Clicking an active worker on the office floor currently jumps straight to the Dashboard tab. That's functional but cold. Instead, fire a 2-second speech bubble from that worker's avatar FIRST — a status-specific one-liner — then navigate. Each worker gets their own voice: Maya clicking at 'working' → 'Hot take incoming. Reviewing in 5.' Carlos at 'error' → 'The logs lie. I'm looking into it.' Dave at 'idle' → 'Pipeline's building. Touch grass window is open.' Sofia at 'working' → 'Test coverage? We don't talk about test coverage.' Implementation: in Character.jsx, intercept the onClick prop, fire a local `clickQuote` state that shows the bubble for 1800ms (using setTimeout), then call the original onWorkerClick. Define a `WORKER_QUIPS` const of `{ workerId: { statusKey: string[] } }` — 2-3 lines each. WHY: The office floor currently rewards clicking with a tab switch. That's a navigation event, not a character moment. A single line of dialogue transforms a UI interaction into a personality encounter. It makes each worker feel like a real person, not a status tile.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "must",
-      "category": "delight",
-      "title": "Per-Desk Completion Burst — The Floor Celebrates Where It Happened",
-      "description": "When a worker's status transitions to `complete` (detectable via the existing `appeared`/`disappeared` tracking in the polling diff loop), fire a small SVG ring animation from that worker's desk position on the Office floor — a 10px-to-70px expanding circle that fades over 0.8s. Keep it brief, non-blocking, and scoped to the `.office-floor` coordinate space. Implementation: in `Office.jsx`, track a `completionBursts` array of `{ deskId, key }` objects; render an absolutely-positioned `<span className='desk-burst'>` for each, auto-remove after 800ms via `setTimeout`. The `<DeskBurst>` component is ~15 lines. WHY: Global confetti fires on vibe rank-up, which is rare and coarse. This fires every time ANY single person ships something. It's a micro-celebration at the exact spatial location of the win. It reinforces that the Office floor is a live scene, not a static diagram.",
+      "category": "visual",
+      "title": "Vibe-Reactive Floor Grid Glow — The Room Breathes the Vibe",
+      "description": "The office floor grid lines are always the same dim dark color regardless of whether the team is crushing it or melting down. Add `data-vibe={vibe}` to the `.office-floor` element and drive a `--grid-line-color` CSS variable per vibe state: 'crushing' → subtle violet/purple glow lines that pulse slowly (0.6 opacity, box-shadow on the floor container), 'on-fire' → faint red-orange grid with a slight warm glow, 'in-flow' → cool teal, 'slow-day' → nearly invisible grey (barely there), 'after-hours' → moonlight blue with reduced opacity. The grid itself is already rendered via `background-image` in Office.css — just override the color variable. Implementation: one attribute added in Office.jsx (`data-vibe={vibe}` on `.office-floor`), five CSS overrides using `[data-vibe='crushing'] .office-floor { --grid-color: rgba(139,92,246,0.18); }`. WHY: The vibe pill and Bloberto's face both react to team state, but the floor — which takes up 70% of the screen — stays static. When the team is crushing it, the ROOM itself should glow. Right now the most reactive element is a pill in the header. Flip that.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "dave"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Bloberto State-Reactive Interjections — He's Actually Watching",
-      "description": "Bloberto's speech bubbles today are random `VIBE_QUOTES` fired on a 45s interval — they feel like a fortune cookie dispenser, not a character. Add a second quote trigger: a `useEffect` that watches for specific state transitions and fires a context-specific line INSTEAD of the next ambient quote. Trigger map: (a) first error of the session → '⚠️ Luna's down! I've got eyes on it.'; (b) all workers simultaneously working → '🔥 Full house! Everyone locked in.'; (c) solo worker only → '📵 Just the two of us today, boss.'; (d) third consecutive stuck worker → '😰 This bottleneck is giving me heartburn.'. Implementation: a `prevStateRef` in the App component tracks the previous snapshot; derive trigger keys from the diff; pass a `forcedQuote` prop to `<Character worker={bloberto}>` that pre-empts the ambient timer for one cycle. WHY: Random quotes feel like a screensaver. Context-aware quotes feel like a personality. Bloberto is supposedly watching the team — he should act like it. This is the difference between a widget and a character.",
+      "title": "New Hire Walks In Through the Entrance — Arrivals as Events",
+      "description": "The entrance door already exists at the bottom of the office floor (`.office-door`, rendered in Office.jsx). When the polling diff detects a first-time worker (`firstTime` array in App.jsx, already computed), that worker should appear at the entrance position — not their desk — and animate to their desk over 1.5 seconds. Implementation: in Office.jsx, accept a `newArrivals` prop (Set of worker IDs that just appeared for the first time). When rendering a Character whose ID is in `newArrivals`, start their CSS `left`/`top` at the entrance coordinates (~50%, 88%) with a 1.5s CSS transition that moves them to their desk position. Use a `useEffect` that removes the ID from the local entrance-animation set after the transition completes. WHY: Right now the activity log says '🟢 Maya joined' but the office floor just... suddenly has Maya at her desk. The door already exists. The hire event is already tracked. The transition cost is one CSS animation. Watching someone walk in through the front door — even at 40px scale — is a completely different emotional experience than a grid tile appearing.",
       "effort": "medium",
-      "assigned_to": "carlos"
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "visual",
-      "title": "Progress Bar Colour Ladder — Watch It Go From Cold to Gold",
-      "description": "Every worker card has a progress bar. Right now it's a flat single colour that doesn't change as progress increases. Make the bar temperature-shift: 0–25% renders in cool grey-blue, 25–60% shifts to teal-green, 60–90% becomes amber, 90–99% turns warm gold, and at 100% a 1.5s rainbow shimmer fires before the card transitions to complete. Implementation: a CSS custom property `--progress-pct` already exists (or can be added inline). Use `background: linear-gradient(90deg, var(--pct-color) 0%, ...)` driven by a computed CSS `hsl()` value. The 100% shimmer is a `@keyframes progress-complete` animation triggered by adding `.progress--complete` class when `progress === 100`. WHY: Progress bars that don't visually encode momentum are just odometers. A bar that shifts from cold to warm to gold tells a story about the *energy* of the work, not just the percentage. You feel the sprint in the last 10%.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "could",
       "category": "office-life",
-      "title": "Weekend Desk Personality — Saturday Changes the Vibe",
-      "description": "The app is deeply time-aware (day/night window, greetings, after-hours vibe) but `new Date().getDay()` is never consulted. On Saturday and Sunday: (1) vacant desks show '🎣 Gone fishing' instead of '📋 Vacant'; (2) Bloberto's desk nameplate cycles to 'WEEKEND GUARD' regardless of vibe; (3) the greeting reads 'Shouldn't you be outside?' instead of 'Good morning/afternoon'. On Monday only: a single ambient quote added to VIBE_QUOTES['slow-day'] says 'Monday. They always come back on Monday.' Implementation: `const isWeekend = [0,6].includes(new Date().getDay())` in Office.jsx renders alternate strings. Zero new state, zero API calls. WHY: Most dashboard visitors probably ARE checking this on a weekend. Acknowledging that directly transforms a functional app into a character that has opinions about your work habits. It's 12 lines of code and a lifetime of personality.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "could",
-      "category": "feature",
-      "title": "Keyboard Shortcut Discovery — Surface the Hidden Express Lane",
-      "description": "Keyboard shortcuts `1` (Office) and `2` (Dashboard) are already wired. But there is zero UI affordance — no user will discover them without reading the source. Add: (a) a small `⌨` hint link in the bottom-right of the header bar that, on click, opens a fixed 200px overlay listing all shortcuts with their keys; (b) on FIRST visit (no `bloberto-shortcut-hint-seen` in sessionStorage), show a one-time ghost toast in the bottom-right: '⌨ Pro tip: Press 1 or 2 to switch tabs' — fades after 5s, never shows again that session. Implementation: `<ShortcutToast>` component, ~20 lines. The overlay is a simple `<dl>` with key/action pairs. WHY: Hidden shortcuts are a power-user delight — but only if power users find them. Discoverability that expires (one-time toast) is the respectful middle ground: it teaches newcomers without annoying regulars. Right now the feature is a secret that benefits no one.",
+      "title": "Vibe-Reactive 'Boss' Honorific — The Title Earns Its Keep",
+      "description": "The header greeting reads '{time greeting}, boss' on every single page load forever. The word 'boss' is hardcoded as a `<span>`. Make it vibe-reactive: 'crushing' → 'LEGEND 🔥', 'on-fire' → 'captain 🚨', 'in-flow' → 'boss', 'slow-day' → 'chief... you still there? 😐', 'after-hours' → 'night owl 🌙'. Implementation: replace the hardcoded `boss` string with a lookup: `const honorific = { crushing: 'LEGEND 🔥', 'on-fire': 'captain 🚨', 'in-flow': 'boss', 'slow-day': 'chief... you still there? 😐', 'after-hours': 'night owl 🌙' }[teamVibe.key] ?? 'boss'` in App.jsx. The `<span>` wrapper already exists for styling. WHY: The greeting is the FIRST thing you read on every visit. Right now it's a timestamp with a generic honorific. During a 'crushing' sprint, being greeted as 'LEGEND' hits different from 'boss'. It costs 5 lines of code and returns a persistent moment of delight on every page load. It's the cheapest personalization this app can do.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
-      "priority": "wild",
+      "priority": "could",
       "category": "visual",
-      "title": "Collab Web — Draw the Invisible Relationships Between Desks",
-      "description": "The office floor has desks but no visual relationships between them. Add 'collab threads': when 2+ active workers share a task tag (e.g., both tagged 'PR' or 'Bug'), render a thin SVG dashed line between their desk positions on the floor, colored by tag type (blue for PR, red for Bug, green for Docs). On hover, a small label appears: '↔ Working together: PR Review'. Lines gently pulse with a dash-offset animation. Implementation: in Office.jsx, after deskMap is built, compute a `collabPairs` list from active workers grouped by overlapping tags, then render an `<svg className='collab-web'>` absolutely positioned over `.office-floor` with `<line>` elements whose `x1/y1/x2/y2` are derived from the desk `left/top` CSS percentages × floor dimensions. WHY: The office currently shows WHERE people sit but not HOW they're connected. This turns a seating chart into a collaboration map. When you see a red line stretching across the floor between two desks, you feel the shared tension of an active bug. It's the one feature that turns a monitoring tool into a story.",
-      "effort": "large",
+      "title": "Bloberto's Live Clock + Sync Countdown on Manager Desk",
+      "description": "Bloberto's manager desk has a monitor element (`mgr-desk__monitor`) and a vibe nameplate, but shows no live information. Add a small HH:MM clock inside the manager desk area, updated every minute via a `useEffect` interval in Office.jsx. Directly beneath or beside it, show the next-sync countdown: '⟳ 28s' (passed as a `nextSyncIn` prop from App.jsx, derived from `POLL_INTERVAL_ACTIVE - timeSinceLastSync`). Style as a monospace LCD-aesthetic micro-label inside the desk box. Implementation: `<div className='mgr-desk__clock'>{currentTime}</div>` and `<div className='mgr-desk__sync-countdown'>⟳ {nextSyncIn}s</div>` within the manager desk JSX. WHY: The manager desk is the spatial command center of the office but currently shows only static content. A ticking clock and a countdown turn it into a live readout — you feel the rhythm of polling cycles. It also gives impatient users a reason not to hammer the manual sync button: they can SEE the refresh is coming in 12 seconds.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Session Duration Self-Roast in the Footer",
+      "description": "The footer says 'v1.0.0-chaos'. Add a live 'Session: 42m' counter right next to it — captured from a `mountTimeRef = useRef(Date.now())` in App.jsx, updated by the existing `useTimeTick` hook every 60 seconds. The commentary escalates with time: 0–29m → plain 'Session: Nm'; 30–59m → 'Session: Nm 🫠'; 60–119m → 'Session: 1h Nm — maybe get some water.'; 120m+ → 'Session: Nh Nm — Bloberto is worried about you.'. Implementation: a `formatSessionTime(ms)` utility function, rendered in the footer `<span>`. WHY: This is pure Bloberto humor. The app is already built on mild existential dread — the footer tagline changes with vibe, the version is 'v1.0.0-chaos'. A session timer that starts roasting you after an hour is perfectly on brand. It's also a subtle accessibility nudge to take breaks. Zero infrastructure cost, infinite personality dividend.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "wild",
+      "category": "storytelling",
+      "title": "The Entrance Door Has Opinions — Arrival and Departure Reactions",
+      "description": "The entrance door (`office-door` in Office.jsx, already rendered at the bottom of the floor) is currently pure scenery. Make it a reactive prop: (a) When a hire/arrival event fires, the door briefly glows green and shows a '👋 Welcome!' tooltip for 2 seconds — achieved by passing a `latestHireTimestamp` prop and triggering a CSS class `office-door--arrival` with a `@keyframes` green pulse; (b) when a worker disappears (done/departed, the `disappeared` array in App.jsx), the door pulses orange ('👋 See ya!') for 2 seconds; (c) during 'after-hours' vibe with 0 active workers, add a small '🔒 CLOSED' badge below the door label. Implementation: pass `doorEvent: { type: 'arrive'|'depart'|null, ts: number }` as a prop to Office.jsx, reset to null after 2000ms. The door component applies CSS classes based on this prop. WHY: Every office has a front door that witnesses comings and goings. Right now ours is furniture. Making the entrance door react to arrivals and departures creates a powerful spatial metaphor that no data panel or activity log can replicate — you literally see people walking in and out of the building. It makes the floor map feel like a place, not a diagram.",
+      "effort": "medium",
       "assigned_to": "tbd"
     }
   ],
