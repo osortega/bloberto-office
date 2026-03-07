@@ -1,3 +1,13 @@
 {
-  "workers": []
+  "workers": [
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "status": "working",
+      "task": "30-min site review & product analysis",
+      "progress": 10,
+      "updated_at": "2026-03-07T18:15:00Z"
+    }
+  ]
 }
