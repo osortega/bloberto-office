@@ -20,11 +20,11 @@
   {
     "name": "Maya",
     "role": "frontend",
-    "status": "idle",
+    "status": "working",
     "emoji": "\ud83c\udfa8",
-    "task": "",
-    "progress": 0,
-    "updated_at": "2026-03-07T19:30:00Z"
+    "task": "Luna #15: Activity log worker emoji + Progress bar ETA",
+    "progress": 10,
+    "updated_at": "2026-03-07T19:36:00Z"
   },
   {
     "name": "Carlos",
@@ -38,11 +38,11 @@
   {
     "name": "Dave",
     "role": "devops",
-    "status": "idle",
+    "status": "working",
     "emoji": "\ud83d\udd27",
-    "task": "",
-    "progress": 0,
-    "updated_at": "2026-03-07T19:30:00Z"
+    "task": "Luna #15: Mobile dead zone fix + Error state glow",
+    "progress": 10,
+    "updated_at": "2026-03-07T19:36:00Z"
   },
   {
     "name": "Sofia",
