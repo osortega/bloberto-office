@@ -1,0 +1,87 @@
+{
+  "creative_director": "Luna",
+  "timestamp": "2026-03-07T00:21:31Z",
+  "review_number": 1,
+  "theme": "The Office Is Alive — Every Pixel Should Tell a Story",
+  "ideas": [
+    {
+      "priority": "must",
+      "category": "visual",
+      "title": "Time-of-Day Atmosphere System",
+      "description": "The office floor should breathe with the clock. Dawn (5–8am): a soft amber gradient bleeds in from the top edge, the floor-bg lightens slightly. Day (9–17): neutral and bright. Late afternoon (17–20): warm golden wash, long desk shadows. Night (20–5am): deep indigo, each desk monitor glows blue, a subtle radial ceiling-light halo appears near the manager desk. Implement as a time-derived body class ('time-dawn', 'time-day', 'time-eve', 'time-night') set once on mount and re-evaluated every 60s. WHY: The greeting line already knows the time ('Good evening 🌙') but the space ignores it entirely. The atmosphere should match the words. This is the lowest-effort emotional upgrade in the backlog — it's pure CSS and one useEffect. Luna's domain is twilight; this has my fingerprints all over it.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "must",
+      "category": "storytelling",
+      "title": "Character Reaction Expressions on Status Change",
+      "description": "Status changes are currently silent and invisible in the office view — they only register on the dashboard. When a worker transitions to 'error', a small 💥 or sweat-drop SVG overlay should float above their avatar for 2s then fade. When 'done', a ✅ starburst. When first entering as 'working', a ⚡ zap blinks in. These are tiny absolutely-positioned SVG elements, rendered conditionally on a 'justChanged' flag (diffed on each poll). WHY: The office tab is decorative today. It should be diagnostic. A user should be able to glance at the floor and know if Carlos is on fire without reading a card. Expressions are the language of that signal.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "must",
+      "category": "delight",
+      "title": "Bloberto Hover Monologue",
+      "description": "When you hover Bloberto (the manager), a speech bubble appears above his crown with a randomly selected manager-ism from a curated list. Examples: 'Per my last commit…', 'Can we circle back on that PR?', 'It's not a bug, it's a feature roadmap item.', 'Have you tried shipping it on Friday?', 'My calendar says we're aligned.'. The list lives in a small JSON config (public/bloberto-quotes.json) so anyone can add lines. Bubble fades after 3.5s or on mouse-leave. WHY: Bloberto is the mascot and he is completely silent. He should have personality. This is the highest delight-to-effort ratio in the entire backlog — one event handler, one absolute div, one config file.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Office Decorations Layer — Plant, Whiteboard, Couch",
+      "description": "The office floor is a grid with six identical desks, a coffee corner, and a door. Nothing else. Add three props: (1) A living plant 🌱 in the bottom-left corner. It has two SVG states: healthy (green, upright) when error count is 0, wilting (drooping, yellowed) when errors > 0. This is a real-time ambient health indicator. (2) A whiteboard on the right wall rendered as an SVG rectangle with tally marks for tasks completed today (sourced from activity log 'complete' entries). (3) A small couch near the coffee corner — a wandering target for idle characters (add a wander path node that passes through it). WHY: The space feels like a test harness. These three props cost almost nothing and make it feel like a place people inhabit. The plant in particular does double duty as ambient status display.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Activity Log Hourly Chapter Grouping",
+      "description": "The flat activity log is a wall of identical rows. Group events into collapsible hour-blocks with an auto-generated one-line summary computed from that block's entries. Example header: '9am · 4 events — Carlos hired, Maya completed a task, 1 error'. The summary is pure client-side logic: count each event type, name the involved workers, pick a template string. Blocks default-expand the most recent hour, collapse older ones. WHY: A log tells you what happened. A story tells you why you should care. The distinction is grouping and narration. Operators currently have to read all 20 rows to understand 'a busy morning'. With chapters they scan headers and drill only when they need to. This is the single biggest UX improvement to the dashboard for zero backend changes.",
+      "effort": "medium",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "feature",
+      "title": "Team Vibe Meter — One-Glance Mood Badge",
+      "description": "Add a 'Vibe' stat card to StatsBar, computed as: (working / total) with color bands: >70% = 🔥 Crushing It (green), 40–70% = ⚡ In Flow (accent purple), <40% and >0 = 😴 Slow Day (yellow), any errors present = 🚨 On Fire (red pulse animation). Render as an emoji + bold label. The entire stats bar gets a faint background color wash matching the vibe state — not loud, just a 5% opacity tint. WHY: The current stats give you four numbers and demand mental arithmetic. The Vibe meter gives the operator an emotional read in under one second. It also gives the page a narrative mood — you know what kind of day it is before you read anything else.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "could",
+      "category": "office-life",
+      "title": "Coffee Corner — Click for an Office Fortune",
+      "description": "Make the coffee corner clickable (add pointer-events and a click handler). On click, a small popover appears above it with a randomly selected absurdist corporate-wisdom fortune. 'The merge conflict will resolve itself if you believe hard enough.' / 'Your standup will be remembered as async-friendly.' / 'Tickets don't close themselves. Or do they?' Fortune fades after 4 seconds. The fortune list lives in the same bloberto-quotes.json config as Bloberto's monologues, under a separate key. WHY: This office is read-only, which makes it passive. Adding one tiny interactive moment — even cosmetic — transforms it from dashboard to toy. Toys get revisited; dashboards get forgotten.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "could",
+      "category": "team",
+      "title": "Ghost Desk Away-Message Sticky Notes",
+      "description": "Ghost workers (roster members not currently clocked in) are dimmed clones sitting silently at desks. Instead, when ghost=true, render a small SVG sticky note on their desk with a character-specific away message. Carlos: 'In the DB — do not disturb 🗄️'. Maya: 'Chasing pixels 🌈'. Dave: 'Kubernetes did a thing 🚀'. Sofia: 'Writing test cases 🔍'. Luna: 'Dreaming in gradients 🌙'. These are hardcoded strings keyed by worker ID (fallback: 'BRB'). Render as a tiny colored rect + text overlaid on the desk element when the desk's occupant is ghost=true. WHY: Ghosts feel like absences. Away messages make them feel like people who stepped out — which is what they are. This is the exact storytelling move that separates a monitoring dashboard from a world.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "wild",
+      "category": "delight",
+      "title": "Done Workers Exit Animation — Victory Lap",
+      "description": "Workers whose status flips to 'done' currently vanish silently (activeWorkers filters them out). Instead: for 2.5 seconds after a done transition, keep them in the render via a 'departingWorkers' ref (populated by diffing previous vs current worker list on each poll). During this window, play a victory-lap keyframe: a small hop, a ✅ floats upward and fades, then the character walks toward the door and shrinks out. After the timer, remove from departingWorkers. WHY: Endings are as important as beginnings. Right now task completions are invisible in the office — you only see them in the log. Making departure visible creates a genuine moment of recognition. Teams feel something different when their work is seen, even by a cartoon blob. This is the hardest idea here, but it's the one that will make someone show the dashboard to their friends.",
+      "effort": "large",
+      "assigned_to": "tbd"
+    }
+  ],
+  "hire_proposals": [
+    {
+      "role": "Motion Designer / Creative Technologist",
+      "reason": "We have at least nine animation ideas and one frontend engineer. The animation layer of this product is its soul — it is the difference between a data table and a world. A motion specialist thinks in keyframes, easing curves, and emotional timing from the start, rather than appending them as afterthoughts to functional code. They would own the Office.css animation system, the character expressions, the atmosphere cycle, and the exit choreography. Strong candidate profile: CSS animation expert, ideally with SVG animation or GSAP background, who finds delight in the small things.",
+      "priority": "should"
+    }
+  ]
+}
