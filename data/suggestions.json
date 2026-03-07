@@ -1,113 +1,113 @@
 {
   "analyst": "Sofia",
-  "review_number": 22,
-  "timestamp": "2026-03-07T08:11:00Z",
+  "review_number": 23,
+  "timestamp": "2026-03-07T08:45:00Z",
   "scores": {
     "visual": 4.2,
     "ux": 3.7,
     "responsiveness": 3.4,
     "performance": 3.8,
     "accessibility": 3.3,
-    "code_quality": 3.8,
+    "code_quality": 3.7,
     "features": 4.0,
     "fun": 4.5
   },
   "overall_score": 3.8,
-  "summary": "Score dips to 3.8/5. Three fixes landed since #21 — MANAGER_QUOTES dead code finally deleted, the syncFromGitHub hoisting/ordering issue resolved, and the orphaned .stat-card.done CSS was cleaned up. Good. But we gained new problems: aria-live='polite' on the workers-grid announces every single worker card on every 30s poll — that's a screen reader nightmare. Timezone for the greeting is hardcoded to PST, so anyone not on the West Coast of the USA gets 'Good morning, boss' at 3pm their time. Mobile header overflow is now on its 4th flag. The persistent backlog keeps growing and getting more embarrassing.",
+  "summary": "Score holds at 3.8/5. No new regressions detected since #22, but no fixes landed either. The persistent backlog is now genuinely embarrassing — tooltip keyboard access is on its 6th flag, DEFAULT_ROSTER extraction on its 7th, mobile header overflow on its 5th, card flip tabbing on its 5th. These are all small-effort fixes that keep getting deprioritized. The aria-live screen reader spam and timezone greeting issues from #22 also remain unfixed. At this point the backlog IS the review.",
   "suggestions": [
     {
       "priority": "high",
       "category": "accessibility",
+      "title": "CSS tooltip only triggers on :hover — keyboard users see nothing (6TH FLAG)",
+      "description": "Office.css: data-tooltip renders via CSS ::after on :hover only. Keyboard users who tab to characters get focus-visible outlines but NEVER see the tooltip. Add :focus-within alongside :hover on the tooltip selector. ONE LINE OF CSS. This has been flagged in reviews #18, #19, #20, #21, and #22. Six reviews. One line. Please.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "high",
+      "category": "ux",
+      "title": "Mobile header overflow at 375px — elements clip off-screen (5TH FLAG)",
+      "description": "At 375px viewport, .header-right doesn't wrap. Vibe pill, sync button, streak counter, and theme toggle extend past the screen edge. The @media (max-width: 600px) query reduces gap but never adds flex-wrap: wrap. Add flex-wrap: wrap to .header-right in the 600px media query. Flagged in reviews #19, #20, #21, and #22.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "high",
+      "category": "accessibility",
       "title": "aria-live='polite' on workers-grid announces ALL workers every 30s poll",
-      "description": "App.jsx line 696: <div className='workers-grid' aria-live='polite'>. Every time the 30s poll fires and React re-renders the worker cards, the live region announces all card content to screen readers — potentially 5+ cards worth of text, unprompted, every half minute. This is brutal UX for AT users. Fix: remove aria-live from the grid container. Instead, add a visually-hidden status element outside the grid that announces only meaningful delta events (e.g., 'Luna joined the office', 'Carlos went idle') using a dedicated live region updated only when workers actually appear or disappear.",
+      "description": "App.jsx: <div className='workers-grid' aria-live='polite'> causes every worker card to be announced to screen readers on every 30s poll cycle. Replace with a dedicated visually-hidden live region that only announces delta events (worker joined/left/status changed). This is actively hostile to AT users.",
       "effort": "medium",
       "assignee": "carlos"
     },
     {
       "priority": "high",
       "category": "ux",
-      "title": "Greeting timezone hardcoded to America/Los_Angeles — wrong for everyone else",
-      "description": "App.jsx line 587: currentHour is derived using timeZone: 'America/Los_Angeles'. A user in Berlin opening the app at 19:00 CET (10:00 PST) gets 'Good morning, boss'. It's condescending when it's wrong. Fix: detect the user's local hour instead — just use new Date().getHours(). The PST conversion was probably copied from the favicon/title logic but belongs there (server-relative time), not in the greeting. One-line fix, zero risk.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "high",
-      "category": "ux",
-      "title": "Mobile header overflow — vibe pill + sync button + theme toggle clip at 375px (4th flag)",
-      "description": "At 375px viewport width, .header-right doesn't wrap. The vibe pill, sync button, streak counter, and theme toggle overflow the header. Confirmed again in the mobile screenshot — the header-badge row extends beyond the screen edge. The @media (max-width: 600px) query reduces gap from 0.75rem to 0.5rem (App.css line 544) but never adds flex-wrap: wrap to .header-right. Add flex-wrap: wrap to .header-right in the 600px media query. This has been flagged in reviews #19, #20, and #21. It is embarrassing at this point.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Activity filter buttons use aria-pressed but behave as an exclusive radio group",
-      "description": "App.jsx lines 731-747: the activity filter bar (All / Hires / Completions / Errors) uses aria-pressed on each button. But aria-pressed is for independent toggle buttons — each button should be pressable on/off independently. These filters are mutually exclusive: activating one deactivates the others. Screen reader users hear 'All, pressed; Hires, not pressed' but get no indication that pressing Hires will unpresses All. The correct ARIA pattern is role='radiogroup' on the container and role='radio' on each button with aria-checked instead of aria-pressed. This is a semantic error that misleads AT.",
+      "title": "Greeting timezone hardcoded to America/Los_Angeles",
+      "description": "App.jsx: currentHour uses timeZone: 'America/Los_Angeles'. Users outside PST get wrong greeting. Use new Date().getHours() for the user's local time. One-line fix.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
-      "category": "responsiveness",
-      "title": "min-height regression at <=480px — office floor gets TALLER as viewport shrinks",
-      "description": "Office.css has conflicting breakpoints: @media (max-width: 600px) sets .office-floor { min-height: 320px } and @media (max-width: 480px) sets .office-floor { min-height: 350px }. At 500px width the floor is 320px tall; at 375px it's 350px. The floor is getting taller as the screen gets narrower — the opposite of what you want. At 375px, this creates dead vertical space inside the office floor because content is scaled down but the container is forced larger. Fix: 480px rule should set min-height: 280px or just remove the 480px override entirely and let the 600px rule stand.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
       "category": "accessibility",
-      "title": "CSS tooltip only triggers on :hover — keyboard users see nothing (5th flag)",
-      "description": "The data-tooltip attribute on Character elements in Office.jsx renders its tooltip via CSS ::after on :hover only (Office.css). Keyboard users who tab to a character get focus-visible outlines but never see the tooltip. The fix is one line of CSS: add :focus-within or :focus alongside :hover on the tooltip selector. This has been flagged in reviews #18, #19, #20, and #21. The tooltip CSS rule needs a :focus-within selector, full stop.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Card flip back-face still tabbable when front is showing (4th flag)",
-      "description": "WorkerCard in App.jsx: the back-face close button (line 218-222) is not given tabIndex={-1} when !isFlipped. It remains tabbable even when visually hidden behind the 3D flip. The aria-hidden={!isFlipped} on the back div suppresses it from the AT tree, but keyboard tabbing still reaches it. Tab sequence goes: card front → info button → [invisible close button]. Add tabIndex={isFlipped ? 0 : -1} to the close button. Flagged in reviews #19, #20, and #21.",
+      "title": "Card flip back-face close button tabbable when front showing (5TH FLAG)",
+      "description": "WorkerCard back-face close button remains tabbable even when !isFlipped. aria-hidden suppresses it from AT tree but keyboard tab still reaches it. Add tabIndex={isFlipped ? 0 : -1}. Flagged since review #19.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
-      "category": "performance",
-      "title": "CharacterAvatar and Character components missing React.memo (4th flag)",
-      "description": "Office.jsx: CharacterAvatar is a pure function of its props but is recreated and re-rendered on every parent render. Every 30s poll re-renders ALL characters even when their data didn't change. Wrap CharacterAvatar and Character in React.memo(). This is a free win — zero behavioral change, meaningful render reduction especially when the roster is full. Flagged in reviews #19, #20, and #21. It is still a one-liner each.",
+      "category": "accessibility",
+      "title": "Activity filter buttons use aria-pressed but behave as exclusive radio group",
+      "description": "App.jsx: filter bar uses aria-pressed on mutually exclusive buttons. Correct pattern is role='radiogroup' on container and role='radio' + aria-checked on each button. Misleads screen reader users.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "DEFAULT_ROSTER still living in Office.jsx — move to constants.js (6th flag)",
-      "description": "Office.jsx lines 42-48: DEFAULT_ROSTER, VIBE_QUOTES, VIBE_WHITEBOARD, and DESKS are all pure static data objects defined inline in the component file. ROLE_EMOJIS and ROLE_COLORS were correctly extracted to utils/constants.js in a previous sprint, but the Office.jsx constants were never migrated. This inconsistency means any new developer has to look in two places. Move DEFAULT_ROSTER, VIBE_WHITEBOARD, and DESKS to constants.js; move VIBE_QUOTES to a new utils/quotes.js. Flagged since review #17 — this is the 6th time.",
+      "title": "DEFAULT_ROSTER, VIBE_QUOTES, DESKS still in Office.jsx (7TH FLAG)",
+      "description": "Office.jsx: ~60 lines of static data (DEFAULT_ROSTER, VIBE_QUOTES, VIBE_WHITEBOARD, DESKS) defined inline. ROLE_EMOJIS/ROLE_COLORS correctly live in utils/constants.js. Move these too. Consistency matters. Flagged since review #17.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
+      "category": "performance",
+      "title": "CharacterAvatar and Character missing React.memo (5TH FLAG)",
+      "description": "Office.jsx: CharacterAvatar is a pure function of props but recreated every render. Every 30s poll re-renders ALL characters. Wrap in React.memo(). Free win, zero behavioral change. Flagged since review #19.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "responsiveness",
+      "title": "Office floor min-height gets TALLER at narrower viewports",
+      "description": "Office.css: @media (max-width: 600px) sets min-height: 320px but @media (max-width: 480px) sets 350px. Floor gets taller as screen shrinks — opposite of intended. Fix the 480px rule to 280px or remove it.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
       "category": "ux",
-      "title": "Vibe streak counter has no label or tooltip — users have no idea what 'x7' means (3rd flag)",
-      "description": "App.jsx line 623: the vibe streak span renders as a bare 'x7' with only inline style — no title, no aria-label, no adjacent explanatory text. First-time users see a cryptic colored number in the header with zero context. The streak also only appears at >=3, so users never see it building, which undermines the engagement mechanic. Fix: add title='Vibe streak: consecutive syncs at this vibe level' to the span. Optionally show x1/x2 in a dimmed state to hint the mechanic exists. Flagged in reviews #20 and #21.",
+      "title": "Vibe streak 'x7' has no label or tooltip (4TH FLAG)",
+      "description": "App.jsx: vibe streak span renders bare 'x7' with no title, aria-label, or context. First-time users have no idea what it means. Add title='Vibe streak: consecutive syncs at this level'. Flagged since review #20.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "low",
       "category": "accessibility",
-      "title": "tabpanel divs have tabIndex=0 but contain focusable children — unnecessary tab stop",
-      "description": "App.jsx lines 678 and 682: both tabpanel divs have tabIndex={0}. Per WAI-ARIA spec, tabIndex=0 on a tabpanel is only appropriate when the panel has NO focusable descendants, to ensure keyboard users can reach the panel content. Both panels have plenty of focusable elements (worker cards, buttons, filter controls). The tabIndex={0} adds an extra tab stop — keyboard users have to press Tab once just to 'enter' the panel container before reaching actual content. Remove tabIndex from both tabpanel divs.",
+      "title": "tabpanel divs have tabIndex=0 but contain focusable children",
+      "description": "App.jsx: both tabpanel divs have tabIndex={0}. Per WAI-ARIA, this is only appropriate when panel has NO focusable descendants. Both have plenty. Adds unnecessary tab stop. Remove tabIndex.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "Whiteboard text breaks mid-word on narrow mobile viewports (2nd flag)",
-      "description": "Office.css: .office-whiteboard is 5.5% wide with word-break: break-word and font-size: 0.42rem. At 375px that's ~20px of actual width. '🏆 SHIP IT' becomes 'SH IP IT' across three lines. Confirmed visible in the mobile screenshot. The whiteboard becomes unreadable gibberish. Quick fix options: (1) shorten whiteboard text to emoji-only at <=480px (already done for char names — same approach), or (2) increase .office-whiteboard width to 7% in the 480px media query. Either works, takes 2 minutes. Flagged in review #21.",
+      "title": "Whiteboard text breaks mid-word on narrow mobile (3RD FLAG)",
+      "description": "Office.css: .office-whiteboard at 375px is ~20px wide, causing 'SHIP IT' to break as 'SH IP IT'. Shorten to emoji-only at <=480px or increase width to 7%. Flagged since review #21.",
       "effort": "small",
       "assignee": "maya"
     }
