@@ -455,6 +455,19 @@ select option { background: var(--surface2); }
 .worker-card.done .progress-bar-fill     { background: linear-gradient(90deg, var(--blue), #818cf8); }
 .worker-card.error .progress-bar-fill    { background: linear-gradient(90deg, var(--red), #fb923c); }
 
+.progress-bar-fill--overflow {
+  animation: rainbow-sweep 2s linear infinite;
+  background: linear-gradient(90deg, var(--accent), var(--green), #f59e0b, var(--red), var(--accent));
+  background-size: 200% 100%;
+}
+
+@keyframes rainbow-sweep {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.worker-card.error .worker-avatar { animation: char-glitch 3s infinite; }
+
 /* ---- Card flip ---- */
 .worker-card__inner {
   transition: transform 0.5s;

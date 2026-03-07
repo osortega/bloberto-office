@@ -130,8 +130,8 @@ function ProgressBar({ progress }) {
         aria-label={`Progress: ${progress}%`}
       >
         <div
-          className="progress-bar-fill"
-          style={{ width: `${progress}%` }}
+          className={`progress-bar-fill${progress >= 100 ? ' progress-bar-fill--overflow' : ''}`}
+          style={{ width: `${Math.min(progress, 100)}%` }}
         />
       </div>
     </div>
@@ -319,6 +319,7 @@ export default function App() {
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
   const [vibeStreak, setVibeStreak] = useState(1)
   const [tab, setTab] = useState(() => {
@@ -393,6 +394,7 @@ export default function App() {
   }
 
   const syncFromGitHub = useCallback(async () => {
+    setIsSyncing(true)
     const [workersResult, activityResult] = await Promise.allSettled([
       fetchWorkersFromGitHub(),
       fetchActivityFromGitHub(),
@@ -430,6 +432,7 @@ export default function App() {
 
     setLastSynced(new Date())
     setIsLoading(false)
+    setIsSyncing(false)
   }, [])
 
   useEffect(() => {
@@ -652,7 +655,7 @@ export default function App() {
 
         {tab === 'office' ? (
           <div role="tabpanel" id="tabpanel-office">
-            <Office workers={activeWorkers} roster={roster} />
+            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} />
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard">

@@ -344,7 +344,7 @@ function formatIdleDuration(updatedAt) {
   return rem > 0 ? `${hours}h ${rem}m` : `${hours}h`
 }
 
-function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey }) {
+function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
   const isManager = worker.id === 'bloberto'
@@ -423,6 +423,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   if (variant === 'working' && worker.updated_at && Date.now() - new Date(worker.updated_at).getTime() > 45 * 60 * 1000) {
     classes.push('char--deep-work')
   }
+  if (isError) classes.push('char--glitch')
 
   const extraProps = tooltip ? { 'data-tooltip': tooltip } : {}
 
@@ -431,6 +432,11 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {variant === 'manager' && isSyncing && (
+        <div className="bloberto-typing">
+          <span /><span /><span />
+        </div>
+      )}
       {variant === 'manager' && bubble.quote && (
         <div className={`speech-bubble${bubble.show ? ' speech-bubble--visible' : ''}`}>
           {bubble.quote}
@@ -509,7 +515,7 @@ function WindowElement() {
   )
 }
 
-export default function Office({ workers = [], roster = [] }) {
+export default function Office({ workers = [], roster = [], isSyncing = false }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
 
@@ -600,7 +606,7 @@ export default function Office({ workers = [], roster = [] }) {
         </div>
 
         {/* Bloberto — always at manager desk, always visible */}
-        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} />
+        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} />
 
         {/* Active workers at desks (working) or as ghosts (roster-only) */}
         {DESKS.map((desk, i) => {
