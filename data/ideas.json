@@ -1,89 +1,106 @@
 {
   "creative_director": "Luna",
-  "timestamp": "2026-03-07T02:23:16Z",
   "review_number": 5,
-  "theme": "The Invisible Layer \u2014 Sounds, Shortcuts, and Spatial Intelligence That Make the Office Feel Real Without Looking Different",
+  "timestamp": "2026-03-07T02:51:00Z",
+  "theme": "Making the Office Breathe — Time, Character Depth, and Micro-Rewards That Make You Look Twice",
   "ideas": [
     {
       "priority": "must",
       "category": "visual",
-      "title": "Character-Specific SVG Avatars \u2014 Every Team Member Deserves a Face",
-      "description": "The CharacterAvatar component in Office.jsx renders every non-Bloberto worker as the same generic gray blob with a colored body based on ROLE_COLORS. Carlos, Maya, Dave, Sofia, and Luna should each have unique SVG avatars that reflect their personality: Carlos gets dark hair, glasses, and a teal shirt (backend serious). Maya gets colorful streaks in her hair and a paint-stained top (creative energy). Dave gets headphones and a hoodie (DevOps vibes). Sofia gets a magnifying glass accessory and a sharp bun (QA precision). Luna gets silver-purple wavy hair and a crescent moon accessory (creative director). Each avatar is a 40x40 SVG, hand-drawn in the same art style as Bloberto \u2014 simple shapes, bold fills, 2-3 accent colors max. The CharacterAvatar function already switches on workerId for Bloberto \u2014 extend that switch to cover the 5 roster members. WHY: The office loses half its charm when 5 characters look identical. Unique faces make you care about who is working and who is idle. It transforms the Office tab from a status board into a cast of characters.",
+      "title": "Bloberto Mood Faces — The Manager Reacts to His Own Dashboard",
+      "description": "Bloberto's SVG face is completely static right now — same sleepy eyes and melty smile whether the team is crushing deadlines or on fire. Add five face variants keyed to vibe state: 'crushing' = wide eyes, big grin, little star sparkles; 'on-fire' = sweat droplet, worried brow arcs, mouth as a flat line; 'in-flow' = neutral content face (current); 'slow-day' = heavy droopy eyelids, mouth drooped; 'after-hours' = ZZZ cloud above head, eyes as sleeping dashes. Implement by having CharacterAvatar accept a 'vibeKey' prop when workerId is 'bloberto', and swap the relevant SVG path data per variant. Only 5-7 path/circle tweaks per variant — no full re-draw needed. WHY: Bloberto is the soul of the office. Giving him reactive emotions makes every vibe shift feel like a story beat, not just a color change on a monitor.",
       "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "must",
       "category": "feature",
-      "title": "Keyboard Navigation \u2014 The Dashboard Should Be Drivable Without a Mouse",
-      "description": "Add keyboard shortcuts for power users: Tab/Shift+Tab cycles focus through worker cards (each card gets tabIndex=0 and a visible :focus-visible outline matching the card accent color). 1 and 2 switch between Dashboard and Office tabs. Escape closes any open filter or tooltip. Ensure the tab toggle and theme button are keyboard-accessible with Enter/Space handlers. Add a tiny keyboard icon in the footer that on hover shows available shortcuts. WHY: Accessibility is not optional. A dashboard that can only be mouse-driven excludes keyboard users and power users.",
+      "title": "Worker Hover Profile Popover — Full Story in One Hover",
+      "description": "Currently hovering a character shows only plain tooltip text (task string or role). Replace with a rich CSS popover card that appears above the character on hover (pointer-events auto, z-index 50). The popover contains: the character's full name, role with role emoji, status badge, current task truncated to 2 lines, progress bar at current %, working duration if status is 'working', and a subtle role-color top border. Build as an absolutely-positioned ::before/::after-free div that fades in via opacity transition (0.15s). No React state needed — pure CSS :hover on .char[data-rich-tooltip] with a child .char__popover div that gains opacity:1 on parent hover. Pass the full worker data as a data attribute JSON string (or render the popover as a sibling div inside Character). WHY: The current tooltip is a one-liner. Workers deserve a face-card. This transforms a functional tooltip into a moment of genuine character discovery.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "office-life",
-      "title": "Office Whiteboard \u2014 A Living Artifact That Shows the Team's Current Focus",
-      "description": "Add a whiteboard element to the office floor \u2014 positioned at roughly left: 80%, top: 35%, sized 12% wide x 18% tall. The whiteboard is a rounded white rectangle with a slight shadow, containing dynamically rendered text: the count of active workers, the current vibe label, and the most recent activity log entry (truncated to 30 chars). Text is rendered as SVG text elements at small font sizes in a messy handwriting style. A dry-erase marker emoji sits at the bottom-right corner. WHY: Real offices have whiteboards covered in scribbles. This bridges the Office and Dashboard views \u2014 key stats appear visually in the office without needing to switch tabs.",
-      "effort": "medium",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "should",
-      "category": "delight",
-      "title": "Typing Indicator on Working Characters \u2014 Show That Work Is Happening",
-      "description": "Working characters at their desks currently bob up and down via the bob animation. Enhance this by adding a tiny typing-dots indicator below each working character avatar \u2014 three 3px dots that animate in sequence with staggered opacity delays. Position absolutely below the avatar. The dots use the worker role color from ROLE_COLORS. WHY: The bob animation says movement. Typing dots say productivity. It is a universally recognized UI pattern from chat apps repurposed for a novel context.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Office Floor Plants \u2014 Decorative Life That Makes the Space Warmer",
-      "description": "Add 2-3 small potted plant SVG elements scattered on the office floor at edges where no desks overlap. Each plant is a simple 20x28px SVG: a terracotta trapezoid pot with 3-4 green ellipse leaves. One could be a cactus variant. Add a subtle idle sway animation with a 6s duration. WHY: The office has furniture, people, and coffee but no life. Plants are the universal interior design shortcut for warmth.",
+      "title": "Real-Time Wall Clock — The Office Knows What Time It Is",
+      "description": "Add a small analog clock to the top-left area of the office floor, just to the right of the office-sign text, at roughly left:2%, top:8%. The clock is a 28x28px SVG: white circle face with a thin border (var(--border)), 12 hour-tick marks as 1px lines, an hour hand and minute hand updated every minute via setInterval in a new WallClock component (useState for hours/minutes). Hands are SVG lines rotating around cx:14 cy:14. Hour hand: length 7px, strokeWidth 2, rotate=(hours*30 + minutes*0.5)deg. Minute hand: length 10px, strokeWidth 1.5, rotate=(minutes*6)deg. Both use CSS transform-origin: 14px 14px. No seconds hand (too distracting). A tiny 'LOCAL' label below in 0.4rem. WHY: A real office has clocks. This one tiny detail grounds the entire visualization in actual time, creating a live ambient connection between the dashboard and the player's real world.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
       "priority": "should",
-      "category": "feature",
-      "title": "Worker Card Expand/Collapse \u2014 More Detail On Demand Without Cluttering the Grid",
-      "description": "Add a click handler that toggles expanded state on WorkerCard. When expanded, reveal full task description, hire date formatted relative, total session count from activity log, and last 3 activity entries inline. Only one card expanded at a time. Use a chevron icon to toggle. CSS max-height transition for smooth expand. WHY: The dashboard serves glancers and investigators. Expand/collapse serves both without compromise.",
-      "effort": "medium",
-      "assigned_to": "carlos"
+      "category": "visual",
+      "title": "Role-Colored Avatar Rings — Know the Role Without Reading the Label",
+      "description": "Every working character's .char__avatar currently has a green border (var(--green)) and every idle has yellow — regardless of their actual role. This throws away valuable visual information. Compute the role color from ROLE_COLORS[worker.role] and inject it as an inline style on the border of the avatar. Working workers: border-color = role color, box-shadow = 0 0 9px roleColor at 40% opacity. Idle workers: border-color = role color at 70% opacity (add via CSS filter or mix with rgba). Ghost workers: keep current standby-pulse but with role color. Only Bloberto keeps var(--accent) since he's special. Expose the color via a CSS custom property --role-color set on the .char element. WHY: Right now all working workers look the same except for their name. Role-colored rings let you read the team composition at a glance — a room full of purple (Frontend) looks different from a room of orange (DevOps).",
+      "effort": "small",
+      "assigned_to": "maya"
     },
     {
-      "priority": "could",
-      "category": "delight",
-      "title": "Easter Egg \u2014 Konami Code Triggers Bloberto Dance Party",
-      "description": "Listen for the Konami code via a keydown sequence tracker in App.jsx. When triggered, add a dance-party class to office-floor for 5 seconds. All characters start dancing with a spin animation. Bloberto speech bubble shows a celebration message. A disco ball emoji appears at top center. After 5 seconds return to normal. WHY: Easter eggs are the secret handshake between a product and its most curious users. The Konami code is universally known in tech circles.",
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Office Window — A Sky That Knows What Time It Is Outside",
+      "description": "Add a window element to the right wall of the office (right: 2%, top: 40%, width: 7%, height: 14%). It's a rect with a double-border frame and an inner gradient sky that reacts to real time of day: 5-8am = warm sunrise gradient (orange to pink); 9am-4pm = daylight (light blue to pale white); 5-7pm = golden hour (amber, coral); 8pm-11pm = dusk (deep purple to indigo); midnight-4am = midnight (near-black with 2-3 star dots). Implement as a div with inline background-gradient computed from getHours() in a useEffect that updates on the hour. Add a tiny cloud or moon SVG inside based on hour range. Optionally show rain dots if a future weather API is connected. WHY: This is the most poetic feature we could ship. The office window says: 'Your team is working in a world that has a sky.' It bridges the simulated office and real time in a way no stats number ever could.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "feature",
+      "title": "Dashboard Sort Controls — Triage the Team Your Way",
+      "description": "Add a compact sort toggle bar above the workers-grid (below the section-header). Three sort modes: 'Priority' (default: error first, then working, then idle), 'Name A-Z' (alphabetical by worker.name), 'Progress' (descending by worker.progress — see who's almost done). Implement as three small pill buttons with the same style as the activity-filter-bar. Use a useState 'sortMode' and a useMemo that sorts activeWorkers before rendering. Persist sort preference in localStorage under 'bloberto-sort'. WHY: Right now there's no way to quickly spot 'who is closest to done' or 'who needs help'. A one-click sort removes that cognitive overhead without adding dashboard clutter.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
-      "category": "visual",
-      "title": "Ambient Particle Layer \u2014 Subtle Floating Motes That Give the Office Depth",
-      "description": "Add a CSS-only particle layer to the office floor using a ::before pseudo-element. Generate 8-12 tiny circular box-shadows at random positions with a slow drift keyframe animation over 20s. Use white at 5-10% opacity in dark theme, darker motes in light theme. pointer-events none. WHY: The office floor grid is geometric and stark. Ambient particles add a subconscious sense of 3D space like dust motes in sunlight.",
+      "category": "delight",
+      "title": "Coffee Steam Wisps — The Corner Earns Its Keep",
+      "description": "The coffee corner is a static ☕ emoji in a box. When team vibe is 'crushing' or 'in-flow', add animated steam wisps above it — 2 thin SVG paths that drift upward and fade using a keyframe animation. The wisp paths use stroke-dashoffset animation: a vertical wavy path (M 0,0 Q 3,-6 0,-12 Q -3,-18 0,-24) that grows and fades over 2s infinite. Two wisps staggered by 0.8s. Add a .coffee-corner--steaming modifier class applied via JSX when vibe is 'crushing' or 'in-flow'. When vibe is 'slow-day' or 'after-hours' — no wisps (cold coffee energy). WHY: The coffee corner is one of three physical props in the office. Making it react to team energy turns it from decoration into atmosphere. Details this small are what people screenshot and share.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Responsive Office Layout \u2014 The Office Should Rearrange, Not Just Shrink",
-      "description": "Instead of just scaling down on mobile, rearrange the desk layout on screens below 600px: switch from a 3x2 grid to a 2x3 grid, move the coffee corner to the bottom-right, reduce manager desk width. Compute a mobile DESKS array via useMediaQuery hook. WHY: Mobile visitors see a squished office where characters overlap. A responsive rearrangement preserves the spatial metaphor instead of destroying it.",
-      "effort": "medium",
-      "assigned_to": "maya"
+      "title": "Activity Log Text Search — Find the Signal in the Noise",
+      "description": "The activity log has type-filter buttons but no way to search text. Add a small search input above the filter bar (full width, 32px height, styled with var(--surface2) background and var(--border) border, a 🔍 prefix icon). Filter activityLog entries client-side via case-insensitive includes check on entry.worker + entry.message. Debounce input by 150ms. Show a '0 results for X' empty state when no match. Clear button (×) inside the input when non-empty. WHY: Activity logs grow. When you're hunting for 'when did sofia last have an error' you want search, not scroll.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Manager Nameplate Vibe Mode — Bloberto's Desk Has Range",
+      "description": "The manager desk nameplate currently shows 'MANAGER' in static uppercase letters. Make it vibe-reactive: 'crushing' → '🔥 SHIPPING'; 'on-fire' → '🚨 INCIDENT'; 'in-flow' → '⚡ IN FLOW'; 'slow-day' → '☕ VIBES ONLY'; 'after-hours' → '🌙 BLOBERTO'. Use a computed string and pass vibe as a prop to the mgr-desk JSX. Add a CSS transition on color and opacity so the text softly crossfades when vibe changes. WHY: The manager desk is permanent real estate in the office. It's a missed storytelling canvas that can narrate the team's current state to anyone who glances at the room.",
+      "effort": "small",
+      "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "storytelling",
-      "title": "Worker Thought Bubbles \u2014 Random Idle Musings That Make Characters Feel Human",
-      "description": "Idle workers wandering the floor occasionally display thought bubbles (cloud-shaped, distinct from speech bubbles). Each roster member has 8-10 personality-appropriate thoughts: Carlos thinks about refactoring endpoints, Maya about parallax, Dave about automation, Sofia about bugs vs features, Luna about floating desks. Show randomly every 8-12s for 4 seconds. WHY: Idle workers are boring right now. Thought bubbles transform them from animated sprites into characters with inner lives.",
+      "category": "feature",
+      "title": "Progress History Sparkline — Did They Actually Move?",
+      "description": "Worker progress bars show a snapshot. They don't show momentum. Add a sessionStorage-backed progress history buffer: on each data sync, push each worker's current progress into sessionStorage['progress-history-{id}'] as a rolling array of the last 8 readings. Render as a tiny 8-point SVG sparkline (32px wide, 10px tall) inside the WorkerCard below the progress bar. Use a polyline connecting the 8 values normalized to 0-10px height range. Color the line green if the latest value is higher than the first, red if lower, gray if flat. Add a tooltip showing 'Progress over last N syncs'. WHY: A worker stuck at 42% for 4 syncs is a different story than one who went 10→20→35→42%. This feature turns a static number into a narrative trend — the kind of insight that only the dashboard can provide.",
       "effort": "medium",
       "assigned_to": "carlos"
+    },
+    {
+      "priority": "wild",
+      "category": "team",
+      "title": "Hire Proposal: Aria — The AI Engineer Who Never Sleeps",
+      "description": "As AI workloads become part of every engineering team, the roster is missing a character who represents that layer. Propose adding Aria (id: 'aria', role: 'AI Engineer', emoji: '🤖') to the DEFAULT_ROSTER. Her SVG avatar: sleek silver hair in a geometric cut, blue circuit-trace accents on her top, one eye rendered as a camera aperture shape (concentric circles with iris blades). Her ROLE_COLORS entry: '#06b6d4' (cyan). Her idle thought bubbles (if that feature ships): 'Attention is all you need.', 'Gradient descent feels personal.', 'I dreamed in tensors.'. She would occupy desk slot 5 and bring the roster to 6. Bloberto would get new quotes for her presence: 'Our most productive engineer has a GPU for a soul.' WHY: Aria makes the product future-proof as a narrative artifact. Every team has an AI story now. Ours should too.",
+      "effort": "small",
+      "assigned_to": "tbd"
     }
   ],
-  "hire_proposals": []
+  "hire_proposals": [
+    {
+      "name": "Aria",
+      "role": "AI Engineer",
+      "id": "aria",
+      "emoji": "🤖",
+      "rationale": "AI workloads are growing on every team. Aria represents that layer with a unique SVG avatar (geometric silver hair, circuit-trace top, aperture eye) and personality-driven thought bubbles. She fills desk slot 5 and expands the roster narrative into the AI era.",
+      "proposed_by": "Luna"
+    }
+  ]
 }
