@@ -14,11 +14,11 @@
       "id": "maya",
       "name": "Maya",
       "role": "Frontend Engineer",
-      "status": "idle",
-      "task": "Sprint complete: 4 high-priority fixes from QA #14",
-      "progress": 100,
+      "status": "working",
+      "task": "Implementing 3 Luna #8 quick wins: Vibe Streak Counter, Idle Duration display, Deep Work Aura",
+      "progress": 5,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T04:18:00Z"
+      "updated_at": "2026-03-07T04:25:08Z"
     },
     {
       "id": "carlos",
@@ -93,6 +93,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T04:24:51Z",
+  "last_updated": "2026-03-07T04:25:08Z",
   "manager": "Bloberto"
 }
