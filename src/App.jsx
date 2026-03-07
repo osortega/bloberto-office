@@ -149,44 +149,81 @@ function formatDuration(updatedAt) {
   return rem > 0 ? `Working for ${hours}h ${rem}m` : `Working for ${hours}h`
 }
 
-function WorkerCard({ worker, index = 0, isNew = false, isFading = false }) {
+function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [] }) {
+  const [isFlipped, setIsFlipped] = useState(false)
+
   const classes = ['worker-card', worker.status]
   if (isNew) classes.push('worker-card--new')
   if (isFading) classes.push('worker-card--fading')
+  if (isFlipped) classes.push('worker-card--flipped')
+
+  const workerHistory = activityEntries
+    .filter(e => e.worker === worker.name)
+    .slice(-3)
+    .reverse()
 
   return (
     <div className={classes.join(' ')} style={{ '--i': index }} tabIndex={0}>
-      <div className="worker-header">
-        <div className="worker-avatar">{getRoleEmoji(worker.role)}</div>
-        <div className="worker-info" style={{ flex: 1, paddingLeft: '0.75rem' }}>
-          <div className="worker-name">{worker.name}</div>
-          <div className="worker-role">{worker.role}</div>
-        </div>
-        <StatusBadge status={worker.status} />
-      </div>
-
-      <div className="worker-task">
-        <strong>📋 Current Task</strong>
-        {worker.task}
-        {(() => {
-          const tags = getTaskTags(worker.task)
-          return tags.length > 0 ? (
-            <div className="task-tags">
-              {tags.map(({ label, emoji, className }) => (
-                <span key={label} className={`task-tag ${className}`}>
-                  {emoji} {label}
-                </span>
-              ))}
+      <div className="worker-card__inner">
+        <div className="worker-card__front">
+          <div className="worker-header">
+            <div className="worker-avatar">{getRoleEmoji(worker.role)}</div>
+            <div className="worker-info" style={{ flex: 1, paddingLeft: '0.75rem' }}>
+              <div className="worker-name">{worker.name}</div>
+              <div className="worker-role">{worker.role}</div>
             </div>
-          ) : null
-        })()}
+            <StatusBadge status={worker.status} />
+            <button
+              className="worker-card__info-btn"
+              onClick={(e) => { e.stopPropagation(); setIsFlipped(true) }}
+              aria-label={`Show activity history for ${worker.name}`}
+              title="Show activity history"
+            >ℹ️</button>
+          </div>
+
+          <div className="worker-task">
+            <strong>📋 Current Task</strong>
+            {worker.task}
+            {(() => {
+              const tags = getTaskTags(worker.task)
+              return tags.length > 0 ? (
+                <div className="task-tags">
+                  {tags.map(({ label, emoji, className }) => (
+                    <span key={label} className={`task-tag ${className}`}>
+                      {emoji} {label}
+                    </span>
+                  ))}
+                </div>
+              ) : null
+            })()}
+          </div>
+
+          {worker.status === 'working' && worker.updated_at && (
+            <div className="worker-duration">⏱️ {formatDuration(worker.updated_at)}</div>
+          )}
+
+          <ProgressBar progress={worker.progress} />
+        </div>
+
+        <div className="worker-card__back">
+          <button
+            className="worker-card__back-close"
+            onClick={() => setIsFlipped(false)}
+            aria-label="Close activity history"
+          >✕ Close</button>
+          <div className="worker-card__back-title">{worker.name}</div>
+          {workerHistory.length === 0 ? (
+            <div className="worker-card__back-empty">No activity on record.</div>
+          ) : (
+            workerHistory.map((e, i) => (
+              <div key={i} className="worker-card__back-entry">
+                <span style={{ marginRight: '0.35rem' }}>{ACTIVITY_ICONS[e.type] ?? '🔧'}</span>
+                {e.message}
+              </div>
+            ))
+          )}
+        </div>
       </div>
-
-      {worker.status === 'working' && worker.updated_at && (
-        <div className="worker-duration">⏱️ {formatDuration(worker.updated_at)}</div>
-      )}
-
-      <ProgressBar progress={worker.progress} />
     </div>
   )
 }
@@ -245,17 +282,21 @@ function LoadingSkeleton() {
     <>
       {[0, 1, 2].map((i) => (
         <div key={i} className="worker-card">
-          <div className="worker-header">
-            <div className="skeleton" style={{ width: 44, height: 44, borderRadius: 10 }} />
-            <div style={{ flex: 1, paddingLeft: '0.75rem', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div className="skeleton" style={{ width: '55%', height: 14 }} />
-              <div className="skeleton" style={{ width: '38%', height: 11 }} />
+          <div className="worker-card__inner">
+            <div className="worker-card__front">
+              <div className="worker-header">
+                <div className="skeleton" style={{ width: 44, height: 44, borderRadius: 10 }} />
+                <div style={{ flex: 1, paddingLeft: '0.75rem', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div className="skeleton" style={{ width: '55%', height: 14 }} />
+                  <div className="skeleton" style={{ width: '38%', height: 11 }} />
+                </div>
+                <div className="skeleton" style={{ width: 72, height: 22, borderRadius: 20 }} />
+              </div>
+              <div className="skeleton" style={{ width: '100%', height: 46 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div className="skeleton" style={{ width: '100%', height: 8, borderRadius: 99 }} />
+              </div>
             </div>
-            <div className="skeleton" style={{ width: 72, height: 22, borderRadius: 20 }} />
-          </div>
-          <div className="skeleton" style={{ width: '100%', height: 46 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div className="skeleton" style={{ width: '100%', height: 8, borderRadius: 99 }} />
           </div>
         </div>
       ))}
@@ -286,6 +327,8 @@ export default function App() {
   })
 
   const lastActivity = useRef(Date.now())
+  const previousVibeKeyRef = useRef(null)
+  const [confettiActive, setConfettiActive] = useState(false)
 
   // ── Keyboard shortcuts ──
   useEffect(() => {
@@ -471,7 +514,7 @@ export default function App() {
     prevActiveWorkersRef.current = activeWorkers
   }, [activeWorkers])
 
-  // ── Vibe Streak Counter ──
+  // ── Vibe Streak Counter + Confetti Burst ──
   useEffect(() => {
     const storedKey = sessionStorage.getItem('bloberto-vibe-key')
     const storedStreak = parseInt(sessionStorage.getItem('bloberto-vibe-streak') || '1', 10)
@@ -479,6 +522,15 @@ export default function App() {
     sessionStorage.setItem('bloberto-vibe-key', teamVibe.key)
     sessionStorage.setItem('bloberto-vibe-streak', String(newStreak))
     setVibeStreak(newStreak)
+
+    // Confetti burst when vibe rank increases
+    const vibeRanking = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }
+    const prevKey = previousVibeKeyRef.current
+    if (prevKey !== null && vibeRanking[teamVibe.key] > (vibeRanking[prevKey] ?? -1)) {
+      setConfettiActive(true)
+      setTimeout(() => setConfettiActive(false), 2500)
+    }
+    previousVibeKeyRef.current = teamVibe.key
   }, [teamVibe.key])
 
   // ── Favicon vibe indicator (Luna #7) ──
@@ -523,6 +575,13 @@ export default function App() {
 
   return (
     <div className="app">
+      {confettiActive && (
+        <div className="confetti-layer" aria-hidden="true">
+          {Array.from({ length: 30 }, (_, i) => (
+            <span key={i} className="confetti-piece" style={{ '--i': i }} />
+          ))}
+        </div>
+      )}
       <a href="#main-content" className="skip-link">Skip to content</a>
       <header className="header">
         <div className="header-title">
@@ -623,6 +682,7 @@ export default function App() {
                       worker={w}
                       index={i}
                       isNew={newIds.has(w.id)}
+                      activityEntries={activityLog}
                     />
                   ))}
                   {Object.values(fadingMap).map((w) => (
@@ -631,6 +691,7 @@ export default function App() {
                       worker={w}
                       index={activeWorkers.length}
                       isFading
+                      activityEntries={activityLog}
                     />
                   ))}
                 </>
