@@ -2,19 +2,28 @@
   {
     "name": "Maya",
     "role": "Frontend Engineer",
-    "emoji": "🎨",
-    "status": "working",
-    "task": "Personalized completion confetti + coffee break animation (Luna ideas #3 & #4)",
-    "progress": 10,
-    "started": "2026-03-07T21:40:00Z"
-  },
-  {
-    "name": "Dave",
-    "role": "DevOps Engineer",
-    "emoji": "🚀",
+    "emoji": "\ud83c\udfa8",
     "status": "idle",
     "task": "",
     "progress": 0,
     "started": null
+  },
+  {
+    "name": "Dave",
+    "role": "DevOps Engineer",
+    "emoji": "\ud83d\ude80",
+    "status": "idle",
+    "task": "",
+    "progress": 0,
+    "started": null
+  },
+  {
+    "name": "Luna",
+    "role": "Creative Director",
+    "emoji": "\ud83c\udf19",
+    "status": "working",
+    "task": "Creative review #21 \u2014 site analysis and ideation",
+    "progress": 10,
+    "started": "2026-03-07T22:00:00Z"
   }
 ]
