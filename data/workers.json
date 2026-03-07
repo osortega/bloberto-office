@@ -15,11 +15,11 @@
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "started": null,
-      "updated_at": "2026-03-07T22:35:00Z"
+      "status": "working",
+      "task": "Desk Lamp Glow Scales with Worker Progress (Luna idea #4)",
+      "progress": 5,
+      "started": "2026-03-07T23:12:00Z",
+      "updated_at": "2026-03-07T23:12:00Z"
     },
     {
       "id": "luna",
@@ -36,10 +36,11 @@
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\ud83d\udd27",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "started": null
+      "status": "working",
+      "task": "Vibe-Shift Reaction + Coffee Corner Reacts to Vibe (Luna ideas #1 & #5)",
+      "progress": 5,
+      "started": "2026-03-07T23:12:00Z",
+      "updated_at": "2026-03-07T23:12:00Z"
     },
     {
       "id": "sofia",
@@ -80,5 +81,5 @@
       "role": "Creative Director"
     }
   ],
-  "last_updated": "2026-03-07T23:10:00Z"
+  "last_updated": "2026-03-07T23:12:00Z"
 }
