@@ -291,8 +291,8 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
-      if (e.key === '1') { setTab('dashboard'); window.location.replace('#dashboard') }
-      else if (e.key === '2') { setTab('office'); window.location.replace('#office') }
+      if (e.key === '1') { setTab('office'); window.location.replace('#office') }
+      else if (e.key === '2') { setTab('dashboard'); window.location.replace('#dashboard') }
       else if (e.key === 'Escape') document.activeElement?.blur()
     }
     document.addEventListener('keydown', handleKeyDown)

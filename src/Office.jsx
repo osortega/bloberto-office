@@ -657,6 +657,8 @@ export default function Office({ workers = [], roster = [] }) {
             <rect x="7" y="8" width="4" height="14" rx="2" fill="#22c55e" />
             <rect x="2" y="12" width="6" height="3" rx="1.5" fill="#16a34a" />
             <rect x="10" y="10" width="6" height="3" rx="1.5" fill="#16a34a" />
+            <circle cx="9" cy="6" r="2" fill="#fbbf24" />
+            <circle cx="9" cy="6" r="0.8" fill="#f59e0b" />
           </svg>
         </div>
 
