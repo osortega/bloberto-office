@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Maya",
+    "role": "Frontend Engineer",
+    "emoji": "\ud83c\udfa8",
+    "status": "working",
+    "task": "Per-Desk Completion Burst animation (Luna idea #2)",
+    "progress": 10,
+    "started": "2026-03-07T22:05:00Z"
+  },
+  {
+    "name": "Dave",
+    "role": "DevOps Engineer",
+    "emoji": "\ud83d\ude80",
+    "status": "idle",
+    "task": "",
+    "progress": 0,
+    "started": null
+  },
+  {
+    "name": "Luna",
+    "role": "Creative Director",
+    "emoji": "\ud83c\udf19",
+    "status": "idle",
+    "task": "",
+    "progress": 0,
+    "started": null
+  }
+]
