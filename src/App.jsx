@@ -238,7 +238,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
     .reverse()
 
   return (
-    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`}>
+    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`} data-worker-name={worker.name}>
       <div className="worker-card__inner">
         <div className="worker-card__front" aria-hidden={isFlipped || undefined} tabIndex={isFlipped ? -1 : undefined}>
           <div className="worker-header">
@@ -323,6 +323,11 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
   const idle = workers.filter((w) => w.status === 'idle').length
   const errorCount = workers.filter((w) => w.status === 'error').length
 
+  const stuckWorkers = useMemo(
+    () => workers.filter((w) => w.status === 'working' && (Date.now() - new Date(w.started).getTime()) > 7_200_000),
+    [workers]
+  )
+
   const prevCountsRef = useRef({})
   const activeDelta = active - (prevCountsRef.current.active ?? active)
   const idleDelta = idle - (prevCountsRef.current.idle ?? idle)
@@ -363,6 +368,22 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
         <span className="stat-value vibe-value">{vibe.label}</span>
       </div>
       {errorCount > 0 && <div className='stat-card stat-card--error'><div className='stat-label'>❌ Errors</div><div className='stat-value'>{errorCount}</div></div>}
+      {stuckWorkers.length > 0 && (
+        <div
+          className="stat-card stat-card--stuck"
+          onClick={() => {
+            const name = stuckWorkers[0].name
+            document.querySelector(`[data-worker-name="${name}"]`)?.scrollIntoView({ behavior: 'smooth' })
+          }}
+        >
+          <span className="stat-label">⚠️ Stuck</span>
+          <span className="stat-value">
+            {stuckWorkers.length === 1
+              ? `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].started)}`
+              : `${stuckWorkers.length} workers`}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
@@ -504,8 +525,14 @@ export default function App() {
 
     if (workersResult.status === 'fulfilled') {
       const data = workersResult.value
-      setAllWorkers(data.workers ?? [])
-      setRoster(data.roster ?? [])
+      // Support both flat array and {workers:[], roster:[]} formats
+      if (Array.isArray(data)) {
+        setAllWorkers(data)
+        setRoster([])
+      } else {
+        setAllWorkers(data.workers ?? [])
+        setRoster(data.roster ?? [])
+      }
       setIsLive(true)
     } else {
       setIsLive(false)
