@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import './App.css'
 import Office from './Office.jsx'
+import { getTeamVibe } from './utils/vibe.js'
 
 const GITHUB_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json'
@@ -216,16 +217,6 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false }) {
   )
 }
 
-function getTeamVibe(workers) {
-  if (workers.length === 0) return { label: '🌙 After Hours', key: 'after-hours' }
-  const hasErrors = workers.some(w => w.status === 'error')
-  if (hasErrors) return { label: '🚨 On Fire', key: 'on-fire' }
-  const working = workers.filter(w => w.status === 'working').length
-  const pct = working / workers.length
-  if (pct > 0.7) return { label: '🔥 Crushing It', key: 'crushing' }
-  if (pct >= 0.4) return { label: '⚡ In Flow', key: 'in-flow' }
-  return { label: '😴 Slow Day', key: 'slow-day' }
-}
 
 function StatsBar({ workers, lastSynced, isLive }) {
   const total = workers.length
@@ -439,7 +430,7 @@ export default function App() {
   }, [syncFromGitHub])
 
   const activeWorkers = allWorkers.filter(
-    (w) => w.status === 'working' || w.status === 'idle'
+    (w) => w.status === 'working' || w.status === 'idle' || w.status === 'error'
   )
 
   // ── Diff activeWorkers vs previous snapshot ──

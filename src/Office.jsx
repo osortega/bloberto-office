@@ -1,5 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from 'react'
 import './Office.css'
+import { getTeamVibeKey } from './utils/vibe.js'
 
 const MANAGER_QUOTES = [
   'Per my last commit…',
@@ -83,14 +84,6 @@ const DEFAULT_BLOBERTO = {
   id: 'bloberto', name: 'Bloberto', role: 'Manager', status: 'working',
 }
 
-function getTeamVibe(workers) {
-  if (workers.length === 0) return 'after-hours'
-  if (workers.some(w => w.status === 'error')) return 'on-fire'
-  const pct = workers.filter(w => w.status === 'working').length / workers.length
-  if (pct > 0.7) return 'crushing'
-  if (pct >= 0.4) return 'in-flow'
-  return 'slow-day'
-}
 
 function CharacterAvatar({ workerId, role, name, size = 40, emoji }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
@@ -362,7 +355,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
 
 export default function Office({ workers = [], roster = [] }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
-  const vibe = getTeamVibe(workers)
+  const vibe = getTeamVibeKey(workers)
 
   const bloberto = useMemo(
     () => [...workers, ...effectiveRoster].find(w => w.id === 'bloberto') ?? DEFAULT_BLOBERTO,

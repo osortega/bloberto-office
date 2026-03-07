@@ -649,27 +649,28 @@
   z-index: 1;
   pointer-events: none;
   animation: dust-drift 20s ease-in-out infinite;
+  /* px offsets converted from percentages (900px wide × 675px tall floor) */
   box-shadow:
-    12% 18% 0 1px rgba(255,255,255,0.06),
-    45% 72% 0 1px rgba(255,255,255,0.04),
-    78% 35% 0 0.5px rgba(255,255,255,0.05),
-    22% 88% 0 1px rgba(255,255,255,0.04),
-    65% 12% 0 0.5px rgba(255,255,255,0.06),
-    88% 62% 0 1px rgba(255,255,255,0.03),
-    35% 45% 0 0.5px rgba(255,255,255,0.05),
-    55% 90% 0 1px rgba(255,255,255,0.04);
+    108px 122px 0 1px rgba(255,255,255,0.06),
+    405px 486px 0 1px rgba(255,255,255,0.04),
+    702px 236px 0 0.5px rgba(255,255,255,0.05),
+    198px 594px 0 1px rgba(255,255,255,0.04),
+    585px 81px 0 0.5px rgba(255,255,255,0.06),
+    792px 419px 0 1px rgba(255,255,255,0.03),
+    315px 304px 0 0.5px rgba(255,255,255,0.05),
+    495px 608px 0 1px rgba(255,255,255,0.04);
 }
 
 [data-theme="light"] .office-floor::before {
   box-shadow:
-    12% 18% 0 1px rgba(0,0,0,0.03),
-    45% 72% 0 1px rgba(0,0,0,0.02),
-    78% 35% 0 0.5px rgba(0,0,0,0.03),
-    22% 88% 0 1px rgba(0,0,0,0.02),
-    65% 12% 0 0.5px rgba(0,0,0,0.03),
-    88% 62% 0 1px rgba(0,0,0,0.02),
-    35% 45% 0 0.5px rgba(0,0,0,0.03),
-    55% 90% 0 1px rgba(0,0,0,0.02);
+    108px 122px 0 1px rgba(0,0,0,0.03),
+    405px 486px 0 1px rgba(0,0,0,0.02),
+    702px 236px 0 0.5px rgba(0,0,0,0.03),
+    198px 594px 0 1px rgba(0,0,0,0.02),
+    585px 81px 0 0.5px rgba(0,0,0,0.03),
+    792px 419px 0 1px rgba(0,0,0,0.02),
+    315px 304px 0 0.5px rgba(0,0,0,0.03),
+    495px 608px 0 1px rgba(0,0,0,0.02);
 }
 
 @keyframes dust-drift {
@@ -677,4 +678,37 @@
   25% { transform: translateY(-8px) translateX(5px); }
   50% { transform: translateY(-15px) translateX(10px); }
   75% { transform: translateY(-5px) translateX(3px); }
+}
+
+/* ---- Accessibility: Reduced Motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable all cosmetic animations */
+  .office-worker,
+  .office-worker--ghost,
+  .office-worker--manager,
+  .office-plant,
+  .office-floor::before,
+  .speech-bubble span,
+  .worker-standby {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Target keyframe animations by name */
+  @keyframes bob { from {} to {} }
+  @keyframes manager-wobble { from {} to {} }
+  @keyframes wander-1 { from {} to {} }
+  @keyframes wander-2 { from {} to {} }
+  @keyframes wander-3 { from {} to {} }
+  @keyframes wander-4 { from {} to {} }
+  @keyframes plant-sway { from {} to {} }
+  @keyframes dust-drift { from {} to {} }
+  @keyframes typing-dot { from {} to {} }
+  @keyframes ghost-float { from {} to {} }
+  @keyframes standby-pulse { from {} to {} }
+  @keyframes ghost-enter { from {} to {} }
+  @keyframes enter-office { from {} to {} }
+  @keyframes fade-in-char { from {} to {} }
+
+  /* error-halo is a safety signal — intentionally kept */
 }

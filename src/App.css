@@ -781,3 +781,30 @@ select option { background: var(--surface2); }
   outline: 2px solid var(--accent, #a78bfa);
   outline-offset: 2px;
 }
+
+/* ---- Accessibility: Reduced Motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  /* Disable cosmetic animations on worker cards and UI chrome */
+  .worker-card,
+  .worker-card--new,
+  .live-badge,
+  .progress-bar-inner,
+  .skeleton,
+  .header-title {
+    animation: none !important;
+  }
+
+  /* Suppress cosmetic keyframes */
+  @keyframes card-rise { from {} to {} }
+  @keyframes shimmer { from {} to {} }
+  @keyframes pulse-live { from {} to {} }
+  @keyframes pulse { from {} to {} }
+  @keyframes new-border-pulse { from {} to {} }
+
+  /* Keep transition for progress bar fill — it communicates real state */
+  .progress-bar-inner {
+    transition: width 0.3s ease !important;
+  }
+
+  /* error-halo is a safety signal — intentionally kept */
+}
