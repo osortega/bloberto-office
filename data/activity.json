@@ -465,5 +465,17 @@
     "type": "complete",
     "worker": "Luna",
     "message": "Creative review #17 complete \u2014 8 ideas filed (2 must, 3 should, 2 could, 1 wild). Theme: Make It Breathe."
+  },
+  {
+    "timestamp": "2026-03-07T20:15:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #27 \u2014 full site analysis"
+  },
+  {
+    "timestamp": "2026-03-07T20:20:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #27 complete \u2014 overall score 3.9/5, 11 suggestions (3 high, 5 medium, 3 low). Persistent backlog: component extraction, React.memo."
   }
 ]

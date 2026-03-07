@@ -2,11 +2,11 @@
   {
     "name": "Bloberto",
     "role": "manager",
-    "status": "working",
+    "status": "idle",
     "emoji": "\ud83e\udee0",
-    "task": "Managing Sofia QA review #27",
-    "progress": 20,
-    "updated_at": "2026-03-07T20:15:00Z"
+    "task": "",
+    "progress": 0,
+    "updated_at": "2026-03-07T20:20:00Z"
   },
   {
     "name": "Luna",
@@ -47,10 +47,10 @@
   {
     "name": "Sofia",
     "role": "qa",
-    "status": "working",
+    "status": "idle",
     "emoji": "\ud83e\uddea",
-    "task": "QA review #27 \u2014 full site analysis",
-    "progress": 10,
-    "updated_at": "2026-03-07T20:15:00Z"
+    "task": "",
+    "progress": 0,
+    "updated_at": "2026-03-07T20:20:00Z"
   }
 ]

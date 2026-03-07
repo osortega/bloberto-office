@@ -1,118 +1,106 @@
 {
   "analyst": "Sofia",
-  "emoji": "🔍",
-  "timestamp": "2026-03-07T19:45:44Z",
-  "review_number": 26,
-  "screenshot_note": "Puppeteer blocked by thread limits in sandbox; analysis based on full source review + curl of live HTML + existing screenshots from prior sessions",
+  "review_number": 27,
+  "timestamp": "2026-03-07T20:15:00Z",
   "scores": {
     "visual": 4,
-    "ux": 3,
+    "ux": 4,
     "responsiveness": 4,
     "performance": 3,
-    "accessibility": 3,
+    "accessibility": 4,
     "code_quality": 3,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.6,
-  "score_delta": -0.2,
-  "score_explanation": "Score drops from 3.8 to 3.6. Features and visual polish keep climbing (ghost roster, time-aware window, confetti, ambient particles are genuinely great). But the workers.json structural mismatch, now flagged 9 consecutive times, means the live API returns zero workers every single page load. React.memo still missing on 6 components after 7 flags. Two accessibility bugs from #25 remain unpatched. A beautiful app held hostage by unfixed infrastructure.",
+  "overall_score": 3.9,
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "ESCALATE: workers.json flat array breaks entire live feed",
-      "description": "workers.json is a bare JSON array. App.jsx line 451 does `data.workers ?? []` and `data.roster ?? []` on the parsed result. Since the file is an array (not an object), both fall back to []. No live worker is ever displayed. Fix: wrap workers.json in { workers: [...], roster: [...] }. Also add 'id' fields matching DEFAULT_ROSTER ids (carlos, maya, dave, sofia, luna, bloberto) and use full role names matching ROLE_EMOJIS keys (e.g. 'Frontend Engineer' not 'frontend'). Without this the entire app runs on DEFAULT_ROSTER fallback only and all live-data features (CharacterAvatar ID matching, ghost detection, desk assignment) are silently broken.",
-      "effort": "small",
-      "persistent_flags": 9
-    },
-    {
-      "priority": "high",
-      "category": "performance",
-      "title": "ESCALATE: React.memo missing on 6 major components",
-      "description": "StatsBar (App.jsx line 277), WorkerCard (line 184), ActivityLog (line 80), ActivityLogEntry (line 64), EmptyState (line 327), and DeltaBadge (line 268) are plain functions that re-render every 30 seconds on every poll cycle regardless of whether their props changed. Office.jsx already wraps Character and CharacterAvatar in memo(). Apply the same pattern: wrap each in React.memo(). With 6+ workers this causes 6 x 30s = 180+ unnecessary re-renders per minute.",
-      "effort": "small",
-      "persistent_flags": 7
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "office-floor role='img' contains focusable children -- ARIA violation",
-      "description": "Office.jsx line 492: the office-floor div has role='img' aria-label='Virtual office visualization...' but the element contains Character components (line 569+) each with tabIndex={0}. Per ARIA spec, role='img' must be a leaf node -- assistive technologies skip all descendants including interactive ones. Screen reader users cannot reach any character. Fix: change to role='region' aria-label='Virtual office...'.",
-      "effort": "small",
-      "persistent_flags": 2
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "tabpanel elements missing aria-labelledby -- incomplete ARIA tab pattern",
-      "description": "App.jsx lines 730 and 734: both tabpanel divs have role='tabpanel' and id but NO aria-labelledby. The WAI-ARIA tabs pattern requires tabpanel elements to reference their controlling tab via aria-labelledby. Fix: add id='tab-btn-office' to the Office tab button (line 702) and id='tab-btn-dashboard' to Dashboard tab button (line 714), then add aria-labelledby='tab-btn-office' and aria-labelledby='tab-btn-dashboard' to the respective tabpanel divs.",
-      "effort": "small",
-      "persistent_flags": 1
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Confetti setTimeout has no cleanup ref -- stacked timers cause blinking",
-      "description": "App.jsx line 593: setTimeout(() => setConfettiActive(false), 2500) stores no ref. If vibe rank improves multiple times rapidly (e.g. slow-day to in-flow to crushing during a burst), timers pile up and may fire out of order, toggling confetti off and back on. Fix: add const confettiTimerRef = useRef(null), then before scheduling do if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current), and store the new timeout in the ref. Clear in effect cleanup.",
-      "effort": "small",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "ActivityLog copies+reverses entries array on every render without useMemo",
-      "description": "App.jsx line 81: const displayed = [...entries].reverse().slice(0, 20) runs on every render of ActivityLog. Since ActivityLog is not memoized, this runs every 30s. Wrap in useMemo: const displayed = useMemo(() => [...entries].slice().reverse().slice(0, 20), [entries]). Note: use .slice().reverse() instead of directly calling .reverse() on the spread copy for clarity.",
-      "effort": "small",
-      "persistent_flags": 2
-    },
-    {
-      "priority": "medium",
       "category": "code",
-      "title": "App.jsx is 843 lines -- extract WorkerCard and ActivityLog components",
-      "description": "App.jsx contains 10+ component definitions plus the root App function. Minimum viable split: move WorkerCard, ProgressBar, StatusBadge, and DeltaBadge to src/components/WorkerCard.jsx (~130 lines); move ActivityLog and ActivityLogEntry to src/components/ActivityLog.jsx (~60 lines). This reduces App.jsx to ~600 lines and makes future per-component CSS modules viable. App.css at 950+ lines has the same problem.",
+      "title": "App.jsx is 868 lines — extract WorkerCard and ActivityLog into separate files",
+      "description": "App.jsx has grown to 868 lines. WorkerCard alone is ~150 lines. Extract WorkerCard, ActivityLog, StatsBar, and FilterControls into separate component files under src/components/. This improves maintainability and makes code review easier.",
       "effort": "medium",
-      "persistent_flags": 2
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "performance",
+      "title": "React.memo missing on WorkerCard, ActivityLog, StatsBar, FilterControls",
+      "description": "CharacterAvatar and Character in Office.jsx are memoized, but the heavy components in App.jsx (WorkerCard, ActivityLog, ActivityLogEntry, StatsBar) are NOT memoized. Every 30s poll re-renders all cards even if data hasn't changed. Wrap these in React.memo with proper comparison.",
+      "effort": "small",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Confetti setTimeout has no cleanup — stacked timers cause blinking",
+      "description": "The confetti celebration effect uses setTimeout without storing the ref or cleaning up on unmount. If the component re-renders during the timeout window, multiple timers stack and the confetti blinks. Store the timeout ID in a ref and clear it in a useEffect cleanup.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "CSS data-tooltip invisible to keyboard users",
-      "description": "Office.jsx line 355 sets data-tooltip on Character divs with tabIndex={0}. The tooltip is CSS-only via [data-tooltip]::after (Office.css) and only appears on :hover. Keyboard users can focus a character but never see the tooltip. Fix: (1) add [data-tooltip]:focus-within::after, [data-tooltip]:focus::after { /* same styles as hover */ } to Office.css; (2) add title={tooltip} to the div as a native browser fallback for screen readers.",
+      "title": "CSS data-tooltip invisible to keyboard-only users",
+      "description": "Tooltips use :hover CSS which keyboard users can never trigger. Add :focus-within or :focus-visible selectors alongside :hover so keyboard navigation shows the same tooltip content.",
       "effort": "small",
-      "persistent_flags": 2
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "ActivityLog reverses entries array on every render without useMemo",
+      "description": "In ActivityLog, `[...entries].reverse().slice(0, 20)` creates a new array every render. Wrap in useMemo keyed on entries reference.",
+      "effort": "small",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "No React error boundary — render errors white-screen the app",
+      "description": "If any component throws during render, the entire app crashes to a blank white page with no recovery. Add a top-level ErrorBoundary component that catches render errors and shows a friendly fallback UI with a retry button.",
+      "effort": "medium",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Office tab shows empty floor with no loading indicator on initial fetch",
+      "description": "When the page first loads, the Office tab shows an empty office floor for 1-2 seconds before workers appear. Add a subtle skeleton/loading state so it doesn't look broken.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "office-floor div with role='img' contains interactive children",
+      "description": "The office floor container has clickable character elements inside but is wrapped with implicit presentation semantics. Characters with onClick handlers inside role='img' creates an ARIA violation. Remove role='img' from the container or restructure.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
       "title": "key={i} on workerHistory map in WorkerCard back face",
-      "description": "App.jsx line 255: workerHistory.map((e, i) => <div key={i}>) uses array index as React key. If activity entries are prepended or reordered, React will unnecessarily unmount/remount DOM nodes. Use key={e.timestamp + (e.type ?? '')} for stable identity.",
+      "description": "Using array index as key for the history entries in the card flip view. If the list changes, React can't track items properly. Use entry.timestamp + entry.type as key.",
       "effort": "small",
-      "persistent_flags": 0
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Add a 'last deployed' timestamp visible in the UI",
+      "description": "Users can't tell when the site was last updated. Show a small 'Last deployed: Xm ago' in the footer or header, pulled from the activity.json system entries.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "confetti-layer missing pointer-events:none -- blocks header clicks for 2.5s",
-      "description": "App.jsx line 649: the confetti-layer div renders on top of the entire viewport for 2.5s. During the confetti animation any click on the theme toggle, sync button, or tab bar is absorbed by the overlay. Add pointer-events: none to .confetti-layer in App.css. Confetti is purely decorative and should never intercept input.",
+      "title": "Vibe streak crown emoji clips on small viewports",
+      "description": "The crown/fire emoji for vibe streaks can overflow its container on narrow mobile widths (<360px). Add overflow:hidden or scale the emoji down at small breakpoints.",
       "effort": "small",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "No React error boundary -- render error silently white-screens",
-      "description": "If a worker object has an unexpected shape and causes a render-time throw (e.g. null.split call in CharacterAvatar name handling), there is no ErrorBoundary and the entire app white-screens with no user-facing message. Wrap the main content in a simple class-based ErrorBoundary component with a friendly 'Something went wrong -- try refreshing' fallback UI.",
-      "effort": "medium",
-      "persistent_flags": 2
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Office tab shows empty floor with no loading indicator during initial fetch",
-      "description": "Dashboard tab shows LoadingSkeleton during isLoading (App.jsx line 763). The Office tab just shows Bloberto alone on an empty floor with zero indication data is loading. Thread isSyncing or isLoading into Office.jsx and add a subtle 'Loading team...' label or faint shimmer on desks during the initial load cycle.",
-      "effort": "small",
-      "persistent_flags": 2
+      "assign_to": "Maya"
     }
   ]
 }
