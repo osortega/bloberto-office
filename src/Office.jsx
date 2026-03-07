@@ -10,6 +10,7 @@ const ROLE_COLORS = {
   'Designer': '#34d399',
   'Data Engineer': '#facc15',
   'Security Engineer': '#94a3b8',
+  'Creative Director': '#7c3aed',
   'Other': '#6b7280',
 }
 
@@ -35,7 +36,7 @@ const DEFAULT_BLOBERTO = {
   id: 'bloberto', name: 'Bloberto', role: 'Manager', status: 'working',
 }
 
-function CharacterAvatar({ workerId, role, name, size = 40 }) {
+function CharacterAvatar({ workerId, role, name, size = 40, emoji }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
   const ariaLabel = name ? `${name}, ${role}` : role
 
@@ -163,19 +164,20 @@ function CharacterAvatar({ workerId, role, name, size = 40 }) {
   }
 
   if (workerId === 'luna') {
+    const gradId = `luna-hair-${workerId}`
     return (
       <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         <defs>
-          <linearGradient id="lunaHairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#c0c0e0" />
             <stop offset="100%" stopColor="#8888cc" />
           </linearGradient>
         </defs>
         {/* Wavy hair strands — left and right */}
-        <path d="M 12 14 Q 8 20 10 26 Q 8 32 11 38" stroke="url(#lunaHairGrad)" strokeWidth="4.5" fill="none" strokeLinecap="round" />
-        <path d="M 28 14 Q 32 20 30 26 Q 32 32 29 38" stroke="url(#lunaHairGrad)" strokeWidth="4.5" fill="none" strokeLinecap="round" />
+        <path d="M 12 14 Q 8 20 10 26 Q 8 32 11 38" stroke={`url(#${gradId})`} strokeWidth="4.5" fill="none" strokeLinecap="round" />
+        <path d="M 28 14 Q 32 20 30 26 Q 32 32 29 38" stroke={`url(#${gradId})`} strokeWidth="4.5" fill="none" strokeLinecap="round" />
         {/* Hair on head */}
-        <ellipse cx="20" cy="8" rx="9" ry="5" fill="url(#lunaHairGrad)" />
+        <ellipse cx="20" cy="8" rx="9" ry="5" fill={`url(#${gradId})`} />
         {/* Head */}
         <circle cx="20" cy="14" r="8" fill="#f5cba7" />
         {/* Eyes */}
@@ -199,7 +201,15 @@ function CharacterAvatar({ workerId, role, name, size = 40 }) {
     )
   }
 
-  // Generic fallback — color based on role
+  // Generic fallback — emoji if available, else color-based blob
+  if (emoji) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
+        <text x="20" y="28" textAnchor="middle" fontSize="24" dominantBaseline="auto">{emoji}</text>
+      </svg>
+    )
+  }
+
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
       {/* Head */}
@@ -249,7 +259,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   return (
     <div className={classes.join(' ')} style={style} {...extraProps}>
       <div className="char__avatar">
-        <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} />
+        <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} />
       </div>
       <div className="char__name">{firstName}</div>
     </div>

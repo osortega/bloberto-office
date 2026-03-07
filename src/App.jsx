@@ -18,6 +18,7 @@ const ROLE_EMOJIS = {
   'QA Engineer': '🔍',
   'Data Engineer': '📊',
   'Security Engineer': '🔒',
+  'Creative Director': '🌙',
   'Other': '🤖',
 }
 
@@ -113,7 +114,14 @@ function ProgressBar({ progress }) {
         <span className="progress-label">Progress</span>
         <span className="progress-pct">{progress}%</span>
       </div>
-      <div className="progress-bar-bg">
+      <div
+        className="progress-bar-bg"
+        role="progressbar"
+        aria-valuenow={progress}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Progress: ${progress}%`}
+      >
         <div
           className="progress-bar-fill"
           style={{ width: `${progress}%` }}
@@ -235,6 +243,7 @@ export default function App() {
   const [activityLog, setActivityLog] = useState([])
   const [activityError, setActivityError] = useState(null)
   const [fetchError, setFetchError] = useState(null)
+  const [fetchWarn, setFetchWarn] = useState(null)
   const [activityFilter, setActivityFilter] = useState('all')
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
@@ -271,7 +280,6 @@ export default function App() {
       setAllWorkers(data.workers ?? [])
       setRoster(data.roster ?? [])
       setIsLive(true)
-      setFetchError(null)
     } else {
       setIsLive(false)
     }
@@ -284,8 +292,17 @@ export default function App() {
       setActivityError('Could not load activity log. Check your connection and try again.')
     }
 
-    if (workersResult.status === 'rejected' && activityResult.status === 'rejected') {
+    const workersFailed = workersResult.status === 'rejected'
+    const activityFailed = activityResult.status === 'rejected'
+    if (workersFailed && activityFailed) {
       setFetchError('Having trouble connecting to HQ. Data may be stale.')
+      setFetchWarn(null)
+    } else if (workersFailed || activityFailed) {
+      setFetchWarn('Some data may be stale.')
+      setFetchError(null)
+    } else {
+      setFetchError(null)
+      setFetchWarn(null)
     }
 
     setLastSynced(new Date())
@@ -358,10 +375,17 @@ export default function App() {
             <button className="btn btn-sm btn-ghost" onClick={syncFromGitHub}>↺ Retry</button>
           </div>
         )}
+        {fetchWarn && !fetchError && (
+          <div className="fetch-warn-banner" role="status">
+            <span>⚠️ {fetchWarn}</span>
+            <button className="btn btn-sm btn-ghost" onClick={syncFromGitHub}>↺ Retry</button>
+          </div>
+        )}
         <div className="tab-toggle" role="tablist">
           <button
             role="tab"
             aria-selected={tab === 'office'}
+            aria-controls="tabpanel-office"
             tabIndex={tab === 'office' ? 0 : -1}
             className={tab === 'office' ? 'active' : ''}
             onClick={() => setTab('office')}
@@ -372,6 +396,7 @@ export default function App() {
           <button
             role="tab"
             aria-selected={tab === 'dashboard'}
+            aria-controls="tabpanel-dashboard"
             tabIndex={tab === 'dashboard' ? 0 : -1}
             className={tab === 'dashboard' ? 'active' : ''}
             onClick={() => setTab('dashboard')}
@@ -382,11 +407,11 @@ export default function App() {
         </div>
 
         {tab === 'office' ? (
-          <div role="tabpanel">
+          <div role="tabpanel" id="tabpanel-office">
             <Office workers={activeWorkers} roster={roster} />
           </div>
         ) : (
-          <div role="tabpanel">
+          <div role="tabpanel" id="tabpanel-dashboard">
             <StatsBar workers={activeWorkers} lastSynced={lastSynced} isLive={isLive} />
 
             <div className="section-header">
