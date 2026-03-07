@@ -1,83 +1,89 @@
 {
   "analyst": "Sofia",
+  "timestamp": "2026-03-07T19:15:42.778Z",
   "review_number": 25,
-  "timestamp": "2026-03-07T19:15:00Z",
   "scores": {
-    "visual": 4.2,
-    "ux": 4.0,
-    "responsiveness": 3.7,
-    "performance": 3.9,
-    "accessibility": 3.9,
-    "code_quality": 4.0,
-    "features": 4.1,
-    "fun_factor": 4.5
+    "visual": 4,
+    "ux": 4,
+    "responsiveness": 3,
+    "performance": 4,
+    "accessibility": 3,
+    "code_quality": 3.5,
+    "features": 4,
+    "fun_factor": 5
   },
-  "overall_score": 4.0,
-  "summary": "Up from 3.9 to 4.0 — first time hitting 4. Major wins this round: constants fully extracted to utils/ (DEFAULT_ROSTER, DESKS, VIBE_WHITEBOARD all in constants.js, VIBE_QUOTES in quotes.js — FINALLY after 8 flags), React.memo applied to both CharacterAvatar and Character, WindowElement now uses local time correctly, date display no longer hardcoded to America/Los_Angeles, info button tabIndex properly gated by isFlipped, and aria-label added to vibeStreak span. Six long-standing issues resolved. What remains: whiteboard word-break at 375px, vibeStreak sessionStorage mechanic still broken (increments on effect re-run, not on sync), and a few polish items. The codebase is noticeably cleaner.",
+  "overall_score": 3.8,
+  "summary": "Review #25. All nine items from review #24 were addressed — this is the best single-cycle improvement streak we've seen. Character components are now memo'd (both CharacterAvatar and Character), constants are cleanly organized across constants.js and quotes.js, the LA timezone hardcoding is gone from both App.jsx AND Office.jsx, the card-flip info button tabIndex is fixed, the vibe streak has aria-label, and the duplicate tooltip CSS block is gone. Exceptional responsiveness from the team. However, the whiteboard fix introduced a new bug: font-size:0 hides the text but the ::before pseudo-element has no content property, leaving a blank white box at 480px. Additionally, App.jsx has grown to 31KB with 10+ colocated component functions — architectural debt that will compound. Role='img' on the interactive office floor is an ARIA semantic conflict. Score holds at 3.8 pending the whiteboard regression fix.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "ux",
-      "title": "Whiteboard text breaks mid-word at 375px viewport — 5th flag",
-      "description": "Office.css: .office-whiteboard is 5.5% wide with font-size 0.42rem and word-break: break-word. At 375px that's ~20px wide. '🏆 SHIP IT' renders as broken fragments. Fix: at the existing 480px media query breakpoint, either hide the text and show only the emoji via a ::before pseudo-element, or bump width to 7.5%. The text is decorative, not critical — hiding it on small screens is perfectly fine.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
       "category": "bug",
-      "title": "vibeStreak counter increments on effect re-run, not on actual sync cycles",
-      "description": "App.jsx: The vibeStreak useEffect runs on [teamVibe.key] changes. But sessionStorage persists within a tab, so refreshing the page increments the streak even if no sync happened. A user refreshing 10 times gets streak x10. Fix: move the streak logic into syncFromGitHub callback so it only increments on actual successful poll responses. Store the previous vibe key in a ref instead of sessionStorage.",
-      "effort": "medium",
-      "assignee": "carlos"
+      "title": "Whiteboard shows blank white box at 480px — ::before has no content",
+      "description": "Office.css, @media (max-width: 480px): The fix for whiteboard text wrapping used font-size:0 to hide the rendered text, then added .office-whiteboard::before { font-size: 0.7rem } expecting a pseudo-element to show a fallback. But there is NO content property on .office-whiteboard::before anywhere in the file. At 480px the whiteboard renders as a blank white rectangle. Fix: add content: attr(aria-label) to the ::before rule so it pulls the emoji+text from the JSX aria-label, OR simpler: keep font-size:0 on the text but use overflow-wrap:break-word + a smaller font-size (0.36rem) instead. The one-liner: .office-whiteboard::before { content: attr(aria-label); font-size: 0.55rem; }",
+      "effort": "small"
     },
     {
-      "priority": "medium",
-      "category": "performance",
-      "title": "Confetti layer renders 30 DOM elements on every vibe upgrade",
-      "description": "App.jsx: The confetti burst creates 30 <span> elements. These are inserted into the DOM on vibe upgrade and removed after 2.5s. Consider using CSS @keyframes with animation-fill-mode: forwards and removing the elements after animation completes, or use a canvas-based approach for smoother rendering. Current approach works but creates layout thrash.",
-      "effort": "medium",
-      "assignee": "maya"
+      "priority": "high",
+      "category": "accessibility",
+      "title": "office-floor has role='img' but contains focusable tabIndex=0 children",
+      "description": "Office.jsx line 495: <div className='office-floor' role='img' aria-label='Virtual office visualization...'> — then inside it, every Character component renders with tabIndex={0} (line 363). The ARIA spec states that elements with role='img' are presentational containers: their accessible children are suppressed and interactive descendants are not expected. Keyboard users can tab into the characters inside a container that announces itself as a static image — a semantic contradiction that confuses screen readers and misrepresents the interactivity model. Fix: change role='img' to role='region' (landmark) and keep the aria-label. This correctly declares a navigable region containing interactive focusable characters. One-word change.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "App.jsx is 31KB with 10+ component functions — needs splitting",
+      "description": "App.jsx currently contains: ActivityLogEntry, ActivityLog, StatusBadge, ProgressBar, WorkerCard, DeltaBadge, StatsBar, EmptyState, LoadingSkeleton, and the default App export — all in one 31KB file. Office.jsx is 27KB containing CharacterAvatar (15+ named character SVGs), Character, WindowElement, and Office. This is unsustainable for maintenance, code review, and tree-shaking. Suggested split: src/components/WorkerCard.jsx, src/components/ActivityLog.jsx, src/components/StatsBar.jsx, src/components/SkeletonState.jsx. Immediate wins: faster PRs, easier unit testing, better HMR performance in dev. This is medium effort but becomes large effort the longer it's deferred.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Office floor view has no keyboard navigation for characters",
-      "description": "Office.jsx: Characters have tabIndex={0} but no visible focus indicator in CSS. The .char class has pointer-events: none by default (overridden for some variants). Add a :focus-visible outline to .char and ensure all interactive characters (manager, ghost, working, idle) have pointer-events: auto consistently.",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "CSS data-tooltip not accessible to screen readers",
+      "description": "Office.css lines 461-481: character tooltips use .char[data-tooltip]::after { content: attr(data-tooltip) } — a CSS-only pseudo-element tooltip. Screen readers do not read CSS-generated content. A keyboard user navigating to a working character in the office will hear the character's aria-label (from CharacterAvatar's aria-label) but NOT the task tooltip (e.g. 'Fixing login page CSS'). Fix: in Character's JSX, add title={tooltip} alongside the existing data-tooltip attribute. title is read by screen readers as a fallback accessible name and also shows as a native browser tooltip on hover. One attribute addition, zero CSS changes.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "ActivityLog reverses entries array inline on every render — missing useMemo",
+      "description": "App.jsx ActivityLog component: const displayed = [...entries].reverse().slice(0, 20) — this creates a new array on EVERY render. ActivityLog re-renders on every 60-second tick (useTimeTick) and on every filter change. For 20 entries it's cheap, but it's also unnecessary. Fix: wrap in useMemo: const displayed = useMemo(() => [...entries].reverse().slice(0, 20), [entries]). Also applies to the filter callback in the parent: entries.filter(e => ...) before passing to ActivityLog — that's also a new array on every App render. Memoize the filtered list with useMemo([activityLog, activityFilter]).",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Ghost OOO bubble has no dismiss mechanism on mobile",
-      "description": "Office.jsx: Ghost characters show an OOO bubble on hover (onMouseEnter/onMouseLeave). On touch devices, there's no hover event. The bubble only shows on focus, which requires tapping. But there's no visual affordance indicating these are interactive. Add a subtle tap indicator or use a toggle pattern (tap to show, tap again to dismiss).",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "Vibe streak never increments within a single session",
+      "description": "App.jsx lines 572-580: The vibe streak useEffect has [teamVibe.key] as its dependency. It fires only when teamVibe.key changes to a new value. Within a single browser session, if the team stays at 'crushing' for 10 consecutive 30-second polls, the effect fires ONCE (on first arrival at 'crushing') and then never again — the streak stays at 1. The streak only grows across page reloads with the same vibe, OR if the vibe oscillates (crushing → in-flow → crushing = 2). The tooltip says 'consecutive syncs at this vibe level' which implies it should count polls. Fix: move the streak increment logic into the syncFromGitHub callback, compare teamVibe.key BEFORE and AFTER the fetch, and increment when the key stays the same.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Inline styles scattered in JSX belong in CSS classes",
+      "description": "App.jsx has multiple inline style blocks that should live in CSS: (1) vibeStreak span: style={{fontSize:'0.72rem',fontWeight:700,color:'var(--accent)',marginLeft:'0.35rem'}} — should be .vibe-streak-badge. (2) worker-info div: style={{ flex: 1, paddingLeft: '0.75rem' }} — should be in .worker-info CSS rule. (3) Section headers: style={{ marginTop: '2.5rem' }} and style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }} — should be .section-header + .section-subtitle. Inline styles bypass the theme system (var() works, but no dark/light overrides possible), break CSS specificity clarity, and can't be overridden by media queries. Small effort, large maintainability payoff.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "code_quality",
-      "title": "Ambient speech bubble interval (45s) creates subtle memory leak pattern",
-      "description": "Office.jsx Character: The ambient interval fires every 45s and sets a 4s timeout. If the component unmounts between the interval firing and the timeout resolving, the timeout still runs (setBubble on unmounted component). The cleanup only clears the interval and timerRef, but timerRef is only set for hover timeouts, not ambient ones. Store the ambient timeout ID and clear it on unmount.",
-      "effort": "small",
-      "assignee": "carlos"
+      "category": "ux",
+      "title": "Office tab shows empty floor while data loads — no loading state",
+      "description": "App.jsx: The Dashboard tab shows a LoadingSkeleton during isLoading. The Office tab renders <Office workers={activeWorkers} ... /> immediately with an empty workers array. On first load the office floor shows only Bloberto, all desks vacant, no characters — which looks broken for ~1-2 seconds before workers arrive. Fix: in the Office tab panel, wrap with {isLoading ? <div className='office-loading-msg'>Loading the team…</div> : <Office ... />} OR pass isLoading to Office and render a subtle shimmer over the floor. The isSyncing prop is already threaded through — add isLoading alongside it.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "visual",
-      "title": "Solo spotlight message could be more dynamic",
-      "description": "App.jsx: When only one worker is active, a static message 'Running solo today...' is shown. Consider rotating through 3-4 messages based on the worker's role or how long they've been solo. Small delight that makes repeated visits more engaging.",
-      "effort": "small",
-      "assignee": "maya"
+      "category": "code",
+      "title": "WorkerCard index prop drives CSS stagger animation — unstable on array reorder",
+      "description": "App.jsx: WorkerCard receives index={i} from the .map() call. This index feeds the CSS custom property --i which drives the stagger entrance animation delay. When a worker is added or removed, ALL subsequent workers get a new index value, causing their --i to change and triggering re-animation even for cards that didn't change. More visible when workers drop off (fading). Fix: assign a stable index based on worker.id using a useMemo lookup table (e.g., const stableIndex = useMemo(() => Object.fromEntries(workers.map((w, i) => [w.id, i])), [workers.map(w => w.id).join(',')]) ). Only new workers get a new index; existing workers keep theirs.",
+      "effort": "medium"
     },
     {
       "priority": "low",
-      "category": "feature",
-      "title": "Add worker uptime/session duration to activity log entries",
-      "description": "Currently activity log entries only show timestamp and message. For 'complete' type entries, it would be useful to show how long the worker was active (e.g., 'Completed in 45m'). This data could be computed from hire→complete timestamp pairs in the activity log.",
-      "effort": "medium",
-      "assignee": "carlos"
+      "category": "code",
+      "title": "No error boundary — bad JSON crashes the entire app silently",
+      "description": "App.jsx: fetchWorkersFromGitHub and fetchActivityFromGitHub have try/catch for fetch errors (fetchError, fetchWarn state). But if workers.json returns valid JSON with an unexpected shape (e.g., a string instead of array, or a worker missing the 'id' field), runtime errors in WorkerCard, getTeamVibe, or the office desk assignment logic will crash the React tree with a blank white screen. Add an ErrorBoundary component that wraps <App /> in main.jsx, catches render errors, and displays a friendly 'Something went wrong — try refreshing' message with the error detail. React 19 makes this straightforward with the new use() hook patterns or a classic class component boundary.",
+      "effort": "small"
     }
   ]
 }
