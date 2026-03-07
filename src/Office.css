@@ -728,6 +728,13 @@
   .office-door__icon {
     font-size: 1.2rem;
   }
+  .office-whiteboard {
+    width: 7.5%;
+    font-size: 0;
+  }
+  .office-whiteboard::before {
+    font-size: 0.7rem;
+  }
 }
 
 /* ---- Typing Dots ---- */
@@ -880,30 +887,6 @@
 
   /* sos-morse reduced for a11y */
   .desk--error .desk__monitor { animation: none; }
-}
-
-/* ── Worker tooltip on hover (Luna #7) ── */
-.char[data-tooltip]:hover::after,
-.char[data-tooltip]:focus-visible::after,
-.char[data-tooltip]:focus-within::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--surface, #1a1a2e);
-  color: var(--text, #e2e8f0);
-  border: 1px solid var(--border, #334155);
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 0.65rem;
-  white-space: nowrap;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  z-index: 20;
-  pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 /* ── Error desk SOS morse flash (Luna #7) ── */

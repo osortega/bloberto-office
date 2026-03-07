@@ -187,6 +187,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
               onClick={(e) => { e.stopPropagation(); setIsFlipped(true) }}
               aria-label={`Show activity history for ${worker.name}`}
               title="Show activity history"
+              tabIndex={isFlipped ? -1 : 0}
             >ℹ️</button>
           </div>
 
@@ -636,13 +637,12 @@ export default function App() {
               weekday: 'long',
               month: 'short',
               day: 'numeric',
-              timeZone: 'America/Los_Angeles',
             })}
           </div>
           <span className="vibe-pill" data-vibe={teamVibe.key}>
             {teamVibe.label}
           </span>
-          {vibeStreak >= 3 && <span title={`Vibe streak: ${vibeStreak} consecutive syncs at this vibe level`} style={{fontSize:'0.72rem',fontWeight:700,color:'var(--accent)',marginLeft:'0.35rem'}}>x{vibeStreak}</span>}
+          {vibeStreak >= 3 && <span title={`Vibe streak: ${vibeStreak} consecutive syncs at this vibe level`} aria-label={`Vibe streak: ${vibeStreak}`} style={{fontSize:'0.72rem',fontWeight:700,color:'var(--accent)',marginLeft:'0.35rem'}}>x{vibeStreak}</span>}
           <button className='sync-now-btn' onClick={() => syncFromGitHub()} disabled={isSyncing} aria-label='Sync now' title='Refresh data (R)'>↺</button>
           <button
             className="theme-toggle"

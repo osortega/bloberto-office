@@ -37,3 +37,32 @@ export const STATUS_EMOJIS = {
   done: '✅',
   error: '💀',
 }
+
+export const DEFAULT_ROSTER = [
+  { id: 'carlos', name: 'Carlos', role: 'Backend Engineer' },
+  { id: 'maya', name: 'Maya', role: 'Frontend Engineer' },
+  { id: 'dave', name: 'Dave', role: 'DevOps Engineer' },
+  { id: 'sofia', name: 'Sofia', role: 'QA Engineer' },
+  { id: 'luna', name: 'Luna', role: 'Creative Director', emoji: '🌙' },
+]
+
+export const DEFAULT_BLOBERTO = {
+  id: 'bloberto', name: 'Bloberto', role: 'Manager', status: 'working',
+}
+
+export const DESKS = [
+  { id: 0, left: 7,  top: 28 },
+  { id: 1, left: 32, top: 28 },
+  { id: 2, left: 57, top: 28 },
+  { id: 3, left: 7,  top: 50 },
+  { id: 4, left: 32, top: 50 },
+  { id: 5, left: 57, top: 50 },
+]
+
+export const VIBE_WHITEBOARD = {
+  'crushing':    '🏆 SHIP IT',
+  'on-fire':     '🚨 HELP',
+  'in-flow':     '⚡ FLOW',
+  'slow-day':    'TODO: ???',
+  'after-hours': '🌙 ZZZ',
+}

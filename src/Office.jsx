@@ -1,76 +1,11 @@
-import { useMemo, useState, useRef, useEffect } from 'react'
+import { useMemo, useState, useRef, useEffect, memo } from 'react'
 import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
-import { ROLE_COLORS } from './utils/constants.js'
-
-const VIBE_QUOTES = {
-  'crushing': [
-    'I knew all along this team was special.',
-    'Velocity like this doesn\'t just happen — it happens because I scheduled stand-up at 9am.',
-    'Per my roadmap from Q3, we\'re exactly on track.',
-    'Ship it. Ship all of it. I\'ll write the retro later.',
-    'This is what alignment looks like, people.',
-  ],
-  'on-fire': [
-    'Have you tried rebooting the engineers?',
-    'This is fine. This is all fine.',
-    'Ship it. What\'s the worst that could happen? (Please don\'t answer that.)',
-    'I\'m going to need a status update on the status update.',
-    'Let\'s circle back on the fire.',
-  ],
-  'in-flow': [
-    'Per my last commit…',
-    'Can we circle back on that PR?',
-    'My calendar says we are aligned.',
-    'This could have been a commit message.',
-    'Steady as she goes. I planned this.',
-  ],
-  'slow-day': [
-    'Per my last email, is anyone actively watching the metrics?',
-    'Circles. We need to circle back. Bring the circles.',
-    'I sense untapped velocity. Let me schedule a sync.',
-    'Has anyone checked the backlog? I feel like no one checks the backlog.',
-  ],
-  'after-hours': [
-    'Why are you still here? Go home. I mean... I am always here, but you shouldn\'t be.',
-    'The deploy can wait. Can it though?',
-    'Night shift gets the best commit messages.',
-    'Just me and the servers. As it should be.',
-  ],
-}
-
-const DEFAULT_ROSTER = [
-  { id: 'carlos', name: 'Carlos', role: 'Backend Engineer' },
-  { id: 'maya', name: 'Maya', role: 'Frontend Engineer' },
-  { id: 'dave', name: 'Dave', role: 'DevOps Engineer' },
-  { id: 'sofia', name: 'Sofia', role: 'QA Engineer' },
-  { id: 'luna', name: 'Luna', role: 'Creative Director', emoji: '🌙' },
-]
-
-// Desk slot positions — (left%, top%) relative to office floor
-const DESKS = [
-  { id: 0, left: 7,  top: 28 },
-  { id: 1, left: 32, top: 28 },
-  { id: 2, left: 57, top: 28 },
-  { id: 3, left: 7,  top: 50 },
-  { id: 4, left: 32, top: 50 },
-  { id: 5, left: 57, top: 50 },
-]
-
-const DEFAULT_BLOBERTO = {
-  id: 'bloberto', name: 'Bloberto', role: 'Manager', status: 'working',
-}
-
-const VIBE_WHITEBOARD = {
-  'crushing':    '🏆 SHIP IT',
-  'on-fire':     '🚨 HELP',
-  'in-flow':     '⚡ FLOW',
-  'slow-day':    'TODO: ???',
-  'after-hours': '🌙 ZZZ',
-}
+import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD } from './utils/constants.js'
+import { VIBE_QUOTES } from './utils/quotes.js'
 
 
-function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
+const CharacterAvatar = memo(function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
   const ariaLabel = name ? `${name}, ${role}` : role
 
@@ -320,7 +255,7 @@ function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
       <rect x="26" y="23" width="6" height="8" rx="3" fill={roleColor} />
     </svg>
   )
-}
+})
 
 function formatIdleDuration(updatedAt) {
   if (!updatedAt) return null
@@ -333,7 +268,7 @@ function formatIdleDuration(updatedAt) {
   return rem > 0 ? `${hours}h ${rem}m` : `${hours}h`
 }
 
-function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false }) {
+const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
   const isManager = worker.id === 'bloberto'
@@ -457,17 +392,10 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
       )}
     </div>
   )
-}
+})
 
 function WindowElement() {
-  const getHour = () => {
-    const pstStr = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'America/Los_Angeles',
-      hour: 'numeric',
-      hour12: false,
-    }).format(new Date())
-    return parseInt(pstStr, 10)
-  }
+  const getHour = () => new Date().getHours()
   const [hour, setHour] = useState(getHour)
 
   useEffect(() => {
