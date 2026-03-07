@@ -333,6 +333,17 @@ function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
   )
 }
 
+function formatIdleDuration(updatedAt) {
+  if (!updatedAt) return null
+  const diffMs = Date.now() - new Date(updatedAt).getTime()
+  const mins = Math.floor(diffMs / 60_000)
+  const hours = Math.floor(mins / 60)
+  if (mins < 1) return '<1m'
+  if (hours < 1) return `${mins}m`
+  const rem = mins % 60
+  return rem > 0 ? `${hours}h ${rem}m` : `${hours}h`
+}
+
 function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
@@ -409,6 +420,9 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
 
   const classes = ['char', `char--${variant}`]
   if (variant === 'idle' && wanderIdx) classes.push(`char--wander-${wanderIdx}`)
+  if (variant === 'working' && worker.updated_at && Date.now() - new Date(worker.updated_at).getTime() > 45 * 60 * 1000) {
+    classes.push('char--deep-work')
+  }
 
   const extraProps = tooltip ? { 'data-tooltip': tooltip } : {}
 
@@ -426,6 +440,9 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
         <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} vibeKey={vibeKey} />
         {isError && (
           <div className="char__error-badge" role="img" aria-label="Error">!</div>
+        )}
+        {variant === 'idle' && worker.updated_at && (
+          <div className="idle-duration">{formatIdleDuration(worker.updated_at)}</div>
         )}
       </div>
       <div className="char__name">{firstName}</div>

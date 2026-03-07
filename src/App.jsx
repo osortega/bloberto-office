@@ -279,6 +279,7 @@ export default function App() {
   const [lastSynced, setLastSynced] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
+  const [vibeStreak, setVibeStreak] = useState(1)
   const [tab, setTab] = useState(() => {
     const h = window.location.hash.slice(1)
     return h === 'dashboard' || h === 'office' ? h : 'office'
@@ -470,6 +471,16 @@ export default function App() {
     prevActiveWorkersRef.current = activeWorkers
   }, [activeWorkers])
 
+  // ── Vibe Streak Counter ──
+  useEffect(() => {
+    const storedKey = sessionStorage.getItem('bloberto-vibe-key')
+    const storedStreak = parseInt(sessionStorage.getItem('bloberto-vibe-streak') || '1', 10)
+    const newStreak = storedKey === teamVibe.key ? storedStreak + 1 : 1
+    sessionStorage.setItem('bloberto-vibe-key', teamVibe.key)
+    sessionStorage.setItem('bloberto-vibe-streak', String(newStreak))
+    setVibeStreak(newStreak)
+  }, [teamVibe.key])
+
   // ── Favicon vibe indicator (Luna #7) ──
   useEffect(() => {
     const vibeColors = {
@@ -530,6 +541,7 @@ export default function App() {
           <span className="vibe-pill" data-vibe={teamVibe.key}>
             {teamVibe.label}
           </span>
+          {vibeStreak >= 3 && <span style={{fontSize:'0.72rem',fontWeight:700,color:'var(--accent)',marginLeft:'0.35rem'}}>x{vibeStreak}</span>}
           <button
             className="theme-toggle"
             onClick={toggleTheme}
