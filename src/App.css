@@ -1,5 +1,5 @@
 /* ---- Layout ---- */
-.app { display: flex; flex-direction: column; min-height: 100vh; }
+.app { display: flex; flex-direction: column; min-height: 100dvh; }
 
 /* ---- Skip link ---- */
 .skip-link {
@@ -947,3 +947,22 @@
 [data-vibe='after-hours'] .ambient-particle { background: #8b5cf6; opacity: 0.1; }
 [data-vibe='in-flow'] .ambient-particle { background: #60a5fa; }
 @media (prefers-reduced-motion: reduce) { .ambient-particle { animation: none; } }
+
+/* Activity log worker emoji */
+.activity-worker-emoji { font-size: 0.95rem; width: 22px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
+
+/* Progress bar ETA */
+.progress-eta { font-size: 0.68rem; color: var(--text-muted); margin-left: auto; font-style: italic; }
+
+/* Error card glow */
+.worker-card.error { animation: error-card-glow 2s ease-in-out infinite; }
+@keyframes error-card-glow { 0%,100% { box-shadow: 0 2px 8px rgba(0,0,0,0.2); border-color: rgba(248,113,113,0.3); } 50% { box-shadow: 0 0 20px 5px rgba(248,113,113,0.35), 0 2px 8px rgba(0,0,0,0.2); border-color: rgba(248,113,113,0.7); } }
+@media (prefers-reduced-motion: reduce) { .worker-card.error { animation: none; border: 2px solid #f87171; } }
+
+/* Vibe streak escalation */
+.vibe-streak-wrap { display: inline-flex; align-items: center; gap: 0.35rem; }
+.streak-icon { font-size: 0.72rem; font-weight: 700; color: var(--accent); animation: crown-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+@keyframes crown-pop { from{transform:scale(0) rotate(-20deg);opacity:0} to{transform:none;opacity:1} }
+[data-streak-tier='hot'] .vibe-pill { box-shadow: 0 0 10px rgba(251,191,36,0.45); }
+[data-streak-tier='legendary'] .vibe-pill { animation: rainbow-shift 2s linear infinite; }
+@keyframes rainbow-shift { 0%{filter:hue-rotate(0deg)} 100%{filter:hue-rotate(360deg)} }

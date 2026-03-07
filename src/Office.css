@@ -957,3 +957,8 @@
   0%,60%,100% { transform: translateY(0); }
   30% { transform: translateY(-5px); }
 }
+
+/* Error desk glow */
+.desk--error { animation: desk-error-glow 2s ease-in-out infinite; }
+@keyframes desk-error-glow { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 10px 3px rgba(248,113,113,0.55); } }
+@media (prefers-reduced-motion: reduce) { .desk--error { animation: none; border: 2px solid #f87171; } }

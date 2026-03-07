@@ -61,9 +61,12 @@ function useTimeTick(intervalMs = 60_000) {
   }, [intervalMs])
 }
 
-function ActivityLogEntry({ entry }) {
+function ActivityLogEntry({ entry, roster }) {
+  const workerData = roster?.find(r => r.name === entry.worker)
+  const workerEmoji = workerData?.emoji ?? (entry.worker ? '🤖' : null)
   return (
     <div className={`activity-entry activity-entry--${entry.type}`}>
+      {workerEmoji && <span className="activity-worker-emoji">{workerEmoji}</span>}
       <span className="activity-icon">{ACTIVITY_ICONS[entry.type] ?? '🔧'}</span>
       <div className="activity-body">
         {entry.worker && <span className="activity-worker">{entry.worker}</span>}
@@ -74,7 +77,7 @@ function ActivityLogEntry({ entry }) {
   )
 }
 
-function ActivityLog({ entries, error }) {
+function ActivityLog({ entries, error, roster }) {
   const displayed = [...entries].reverse().slice(0, 20)
   return (
     <div className="activity-log">
@@ -83,7 +86,7 @@ function ActivityLog({ entries, error }) {
       ) : displayed.length === 0 ? (
         <div className="activity-empty">No activity yet…</div>
       ) : (
-        displayed.map((entry, i) => <ActivityLogEntry key={entry.timestamp + entry.worker + i} entry={entry} />)
+        displayed.map((entry, i) => <ActivityLogEntry key={entry.timestamp + entry.worker + i} entry={entry} roster={roster} />)
       )}
     </div>
   )
@@ -123,7 +126,7 @@ function StatusBadge({ status }) {
   )
 }
 
-function ProgressBar({ progress }) {
+function ProgressBar({ progress, updatedAt }) {
   const milestonesRef = useRef(new Set())
   const [flashClass, setFlashClass] = useState('')
 
@@ -139,11 +142,16 @@ function ProgressBar({ progress }) {
     }
   }, [progress])
 
+  const workingMs = updatedAt ? Date.now() - new Date(updatedAt).getTime() : null
+  const workingMins = workingMs ? workingMs / 60000 : 0
+  const eta = (progress > 5 && workingMins > 1) ? Math.round((workingMins / progress) * (100 - progress)) : null
+
   return (
     <div className="progress-wrapper">
       <div className="progress-header">
         <span className="progress-label">Progress</span>
         <span className="progress-pct">{progress}%</span>
+        {eta !== null && eta < 120 && <span className="progress-eta">~{eta}m left</span>}
       </div>
       <div
         className="progress-bar-bg"
@@ -229,7 +237,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
             return <div className="worker-duration" data-tier={tier}>{tier === 'stuck' ? '⚠️ ' : ''}⏱️ {formatDuration(worker.updated_at)}</div>
           })()}
 
-          <ProgressBar progress={worker.progress} />
+          <ProgressBar progress={worker.progress} updatedAt={worker.updated_at} />
         </div>
 
         <div className="worker-card__back" aria-hidden={!isFlipped || undefined} tabIndex={!isFlipped ? -1 : undefined}>
@@ -659,10 +667,12 @@ export default function App() {
               day: 'numeric',
             })}
           </div>
-          <span className="vibe-pill" data-vibe={teamVibe.key}>
-            {teamVibe.label}
+          <span className="vibe-streak-wrap" data-streak-tier={vibeStreak >= 10 ? 'legendary' : vibeStreak >= 5 ? 'hot' : vibeStreak >= 3 ? 'steady' : ''}>
+            <span className="vibe-pill" data-vibe={teamVibe.key}>
+              {teamVibe.label}
+            </span>
+            {vibeStreak >= 3 && <span className="streak-icon" key={vibeStreak} aria-label={`Vibe streak: ${vibeStreak}`}>{vibeStreak >= 10 ? '🏆' : vibeStreak >= 5 ? '🔥' : '👑'} x{vibeStreak}</span>}
           </span>
-          {vibeStreak >= 3 && <span title={`Vibe streak: ${vibeStreak} consecutive syncs at this vibe level`} aria-label={`Vibe streak: ${vibeStreak}`} style={{fontSize:'0.72rem',fontWeight:700,color:'var(--accent)',marginLeft:'0.35rem'}}>x{vibeStreak}</span>}
           <button className='sync-now-btn' onClick={() => syncFromGitHub()} disabled={isSyncing} aria-label='Sync now' title='Refresh data (R)'>↺</button>
           <button
             className="theme-toggle"
@@ -811,6 +821,7 @@ export default function App() {
                 return true
               })}
               error={activityError}
+              roster={roster}
             />
           </div>
         )}
