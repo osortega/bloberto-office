@@ -1,62 +1,62 @@
 {
   "creative_director": "Luna",
-  "review_number": 18,
-  "timestamp": "2026-03-07T20:30:00Z",
-  "theme": "Make It Personal — The Dashboard Should Remember You",
+  "review_number": 19,
+  "timestamp": "2026-03-07T21:01:00Z",
+  "theme": "Surface the Signal — Make Every Pixel Tell a Story",
   "ideas": [
     {
       "priority": "must",
       "category": "feature",
-      "title": "Keyboard Shortcut Cheat Sheet Modal",
-      "description": "The app has keyboard shortcuts (1=Office, 2=Dashboard, R=Refresh, Escape=blur) but ZERO discoverability. Users will never find them. Add a '?' key listener that opens a minimal modal listing all shortcuts. Implementation: a simple overlay with a grid of key→action pairs. Close on Escape or clicking outside. Add a tiny '⌨️' button in the header next to theme toggle that also opens it. WHY: Power users love shortcuts but only if they can discover them. A cheat sheet modal is the universal pattern (GitHub, Figma, Notion all do this). It takes 30 minutes to build and makes the app feel 10x more polished.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "storytelling",
-      "title": "Activity Log Grouping by Time Blocks",
-      "description": "The activity log is a flat reverse-chronological list. When there are 20 entries, it's a wall of text with no visual hierarchy. Group entries by time blocks: 'Just now' (< 5min), 'Earlier today', 'Yesterday', etc. Add a subtle date separator between groups — a thin line with the label centered. WHY: Every messaging app groups by date for a reason. Temporal grouping gives the log a narrative structure: 'what happened this morning vs this afternoon.' Without it, 20 entries blur together into noise.",
+      "title": "Bottleneck Beacon — Stuck Workers Surface to the Stats Bar",
+      "description": "When any worker hits the 'stuck' duration tier (>2h on same task), only the individual card shows it. The stats bar at the top of Dashboard knows nothing. Add a pulsing '⚠️ Bottleneck' stat card that appears dynamically when any worker is stuck — showing their name and duration: '⚠️ Dave · 3h 14m'. Click it to jump and focus their card. Implementation: derive a `stuckWorkers` list from `activeWorkers.filter(w => w.status === 'working' && duration > 2h)` and render a new `.stat-card--stuck` when list is non-empty. WHY: Managers scan the header, not individual cards. A problem that's only visible after scrolling isn't actionable. The stuck tier is already detected — it just needs to be promoted to where decision-makers look first.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Character Idle Animations — Unique Per Person",
-      "description": "Idle workers all use the same wander animation paths. Each character should have a unique idle behavior that reflects their personality. Maya could doodle (small pencil animation near her), Carlos could type sporadically, Dave could bob his head to music (he has headphones!), Sofia could examine things with her magnifying glass. Implementation: add character-specific CSS classes like .char--idle-maya, .char--idle-dave with unique keyframe animations. Keep them subtle — a small looping gesture, not full character animation. WHY: Personality in idle states is what makes virtual offices feel alive. The Tamagotchi effect — people check in just to see what their favorites are doing. Right now idle workers are interchangeable; they should feel like individuals.",
-      "effort": "medium",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "should",
       "category": "visual",
-      "title": "Worker Card Micro-Interactions — Hover States That Tell Stories",
-      "description": "Worker cards have zero hover feedback beyond the default cursor. Add subtle hover states: card lifts slightly (translateY -2px, stronger shadow), the progress bar pulses once, and the status badge glows. On the error state, hovering could show a brief tooltip with the error context. CSS-only implementation: .worker-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); } .worker-card:hover .progress-bar-fill { animation: progress-hover-pulse 0.6s ease; }. WHY: Hover states are the first thing that separates 'student project' from 'polished product.' They signal interactivity and make the interface feel responsive. The card already flips on click — hover should hint that interaction is possible.",
-      "effort": "small",
+      "title": "Progress Ring — Arc Around the Worker Avatar on Cards",
+      "description": "The worker avatar (the character SVG in the card's top-left) sits inside a plain rounded square. Wrap it in a thin SVG progress arc — a circular ring that fills clockwise proportional to `worker.progress`. Color maps to state: green (progressing normally), amber (warn tier), red (stuck/error), grey (idle). The ring is 3px wide, radius fits the avatar container, renders as an SVG overlay. WHY: The progress bar below is great for detail, but you already have to look at it. A ring around the avatar means status is scannable at a glance even at small sizes — the same reason health bars are circles in games. It creates a second, redundant visual encoding that makes the grid legible without reading. Effort: add an SVG wrapper around `.worker-avatar` with a computed `stroke-dashoffset`.",
+      "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "feature",
-      "title": "Roster Panel — Show the Full Team, Not Just Active Workers",
-      "description": "The dashboard only shows active workers. If all 5 team members are idle/offline, you see an empty state. Add a collapsible 'Team Roster' section below the activity log showing ALL team members (from roster data) with their role, emoji, and last-seen time. Active members get a green dot; offline ones are grayed out. This gives visitors context about team composition even when nobody's working. WHY: A visitor landing when everyone is off-clock sees an empty page and bounces. A roster says 'this is a real team of 6 people, they're just not here right now.' It's the difference between an empty restaurant and a closed restaurant with a menu in the window.",
+      "category": "delight",
+      "title": "Sync Heartbeat Ripple — The Live Dot Actually Lives",
+      "description": "The Live/Offline status dot in the stats bar is completely static. After 5 seconds, nobody can tell if it's a real live signal or a frozen green pixel. Add a CSS ripple animation: every 30s (matching POLL_INTERVAL_ACTIVE) a translucent ring expands outward and fades from the dot — sonar-style. On manual sync button click, fire a fast triple-ripple instead of just spinning the arrow. Implementation: a `::after` pseudo-element on `.live-dot.live` with a keyframe that scales from 1→2.5 and fades to 0. The sync button click adds a `is-syncing` class that plays the triple variant. WHY: Static dots lose meaning instantly. A rhythmic pulse is proof-of-life — it communicates 'I just checked and everything is fine' without any words. Users who leave the tab open should feel like the app is breathing.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "could",
+      "category": "office-life",
+      "title": "Office Wall Clock — A Ticking Analog Clock on the Floor",
+      "description": "The office window beautifully simulates time of day (sunrise → dusk → midnight stars), but there's no actual clock on the wall. Add a small analog SVG clock in the top-left area of the office floor near the 'Bloberto's HQ' corner label. Hour and minute hands only, no numbers, minimal design (circle + two lines). Update every minute by piggybacking on the existing `useTimeTick(60_000)` hook — no new intervals needed. Position it as a wall decoration (position: absolute, top 8%, left 6%). WHY: A real office has a wall clock. It's a tiny 40×40px SVG that costs almost nothing but completes the spatial illusion. Right now the time-aware window and the clock-free room feel slightly inconsistent. This closes the loop. It also gives the 'after hours' vibe a subtle melancholy — it's 1am and everyone's gone home.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Daily Sprint Digest — The TLDR Above the Stats Bar",
+      "description": "Add a single-line collapsible 'Today' strip between the tab toggle and the stats bar on Dashboard: `✅ 4 completed · ❌ 1 error · 🏆 Maya (3 tasks)`. Derived entirely from `activityLog.filter(e => isToday(e.timestamp))`. Clicking it expands an inline mini-timeline of the day's notable events (just hires and completions). Collapses on click or after 8 seconds. WHY: The activity log tells the full story in chronological detail — but casual visitors and stakeholders just want the headline. 'What happened today?' should be answerable in 2 seconds without scrolling. The data is already there; this is pure presentation work. Also acts as a status trophy for the team: seeing '12 completed today' at the top is motivating.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
-      "category": "delight",
-      "title": "Office Floor Weather Sync — Rain on the Window When It Rains IRL",
-      "description": "The office window already shows time-of-day sky. Take it further: fetch real weather for the team's location and add weather effects. Rain drops on the window when it's raining, snow particles when it's snowing, lightning flashes during thunderstorms. Use wttr.in (no API key needed) with a 30-min cache. Fallback to clear sky on error. WHY: This is the kind of detail that makes people say 'wait, is it actually raining on their window right now?!' It bridges the virtual and physical worlds in a way that feels magical. The window is already there — it's begging for weather.",
-      "effort": "medium",
-      "assigned_to": "dave"
+      "category": "visual",
+      "title": "Mobile Activity Ticker — Fill the Dead Zone Below the Floor",
+      "description": "On mobile, there is a large blank area below the office floor visualization (clearly visible in screenshots: the floor ends around 55% of the viewport height, leaving ~200px of empty dark space before the footer). Populate it with a horizontally auto-scrolling activity ticker: the last 5 activity log events scroll left as compact event pills, each showing the worker emoji + abbreviated message. Pauses on touch. Implementation: a `<marquee>`-replacement using CSS `@keyframes ticker-scroll` on a flex row of pill spans. Data from the existing `activityLog` prop. WHY: Dead screen real estate on mobile is a conversion killer. Visitors scrolling on their phone expect content to fill the frame. A live ticker in that zone reinforces that this is a real-time product, not a static page.",
+      "effort": "small",
+      "assigned_to": "maya"
     },
     {
       "priority": "wild",
-      "category": "feature",
-      "title": "Slack-Style Status Messages — Let Workers Express Themselves",
-      "description": "Add an optional 'status' field to workers.json beyond just working/idle/error. Workers could have custom status messages like '🎧 In deep focus', '☕ Coffee break', '🔥 Fixing prod', '📚 Reading docs'. Display as a small italic line under the worker name on both the card and the office floor character. The manager (Bloberto) sets these via workers.json updates. WHY: Status messages humanize workers. 'Working' is clinical. '🎧 In deep focus — do not disturb' tells a story. It's low-effort data (one extra JSON field) with high personality payoff.",
+      "category": "team",
+      "title": "Vacant Desk Lore — Empty Desks Should Tell Stories",
+      "description": "The vacant desk currently renders '📋 Vacant' and a dim monitor. It is the most sterile element on the entire floor. Instead, randomize between 3 atmospheric variants each session: (1) a sticky note on the monitor reading '📌 Hiring — apply within', (2) a forgotten coffee mug and a tiny withered plant sprite, (3) a keyboard with a sticky note '🔑 left for lunch, brb'. Pick a variant via `Math.floor(Math.random() * 3)` stable per session (seeded by desk index). WHY: Empty desks in real offices are haunting — there's always a trace of whoever sat there. Right now it's blank corporate void. Each variant takes 5 lines of JSX and zero data changes, but transforms the vacant slot from placeholder into lore. It rewards anyone who looks closely. That's the Bloberto spirit.",
       "effort": "small",
       "assigned_to": "tbd"
     }
