@@ -1,115 +1,91 @@
 {
   "analyst": "Sofia",
-  "review_number": 23,
-  "timestamp": "2026-03-07T08:45:00Z",
+  "review_number": 24,
+  "timestamp": "2026-03-07T18:30:00Z",
   "scores": {
-    "visual": 4.2,
-    "ux": 3.7,
-    "responsiveness": 3.4,
-    "performance": 3.8,
-    "accessibility": 3.3,
-    "code_quality": 3.7,
-    "features": 4.0,
+    "visual": 4.1,
+    "ux": 3.8,
+    "responsiveness": 3.6,
+    "performance": 3.7,
+    "accessibility": 3.6,
+    "code_quality": 3.5,
+    "features": 4.1,
     "fun": 4.5
   },
-  "overall_score": 3.8,
-  "summary": "Score holds at 3.8/5. No new regressions detected since #22, but no fixes landed either. The persistent backlog is now genuinely embarrassing — tooltip keyboard access is on its 6th flag, DEFAULT_ROSTER extraction on its 7th, mobile header overflow on its 5th, card flip tabbing on its 5th. These are all small-effort fixes that keep getting deprioritized. The aria-live screen reader spam and timezone greeting issues from #22 also remain unfixed. At this point the backlog IS the review.",
+  "overall_score": 3.9,
+  "summary": "Up from 3.8 to 3.9. Credit where it's due — four real fixes landed: activity filter now uses role='radiogroup' with aria-checked (correct ARIA pattern — done), the 480px min-height was corrected to 280px (resolving the grow-on-shrink bug), tabpanel tabIndex=0 removed from both panels, and the greeting now uses new Date().getHours() instead of hardcoded PST. However, the date display STILL uses timeZone: 'America/Los_Angeles' — half the fix shipped. The duplicate tooltip CSS block (Luna #7) was NOT removed, so z-index 20 still overrides z-index 100 on hover/focus. DEFAULT_ROSTER is on its EIGHTH flag. React.memo is on its SIXTH. The close button on the card back got a proper tabIndex — but the info button on the front still has no tabIndex override, so it remains tabbable when the card is flipped. Progress is real but the easy wins keep getting skipped.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "CSS tooltip only triggers on :hover — keyboard users see nothing (6TH FLAG)",
-      "description": "Office.css: data-tooltip renders via CSS ::after on :hover only. Keyboard users who tab to characters get focus-visible outlines but NEVER see the tooltip. Add :focus-within alongside :hover on the tooltip selector. ONE LINE OF CSS. This has been flagged in reviews #18, #19, #20, #21, and #22. Six reviews. One line. Please.",
+      "category": "code_quality",
+      "title": "DEFAULT_ROSTER, VIBE_QUOTES, VIBE_WHITEBOARD, DESKS still inline in Office.jsx — 8th flag",
+      "description": "Office.jsx lines 6–70: VIBE_QUOTES, DEFAULT_ROSTER, VIBE_WHITEBOARD, and DESKS are all pure static data objects sitting in the component file. ROLE_EMOJIS and ROLE_COLORS were correctly moved to utils/constants.js ages ago. This split has been flagged in EVERY SINGLE REVIEW since #17. There are now EIGHT review flags on this item. Move DEFAULT_ROSTER, VIBE_WHITEBOARD, DEFAULT_BLOBERTO, and DESKS to utils/constants.js; move VIBE_QUOTES to utils/quotes.js. Estimated effort: 20 minutes. This is now a P0.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "high",
+      "category": "regression",
+      "title": "Duplicate tooltip CSS blocks — Luna #7 block still present, overriding z-index",
+      "description": "Office.css still contains TWO tooltip rule sets. Block 1 (around line 423): the correct implementation with z-index: 100, opacity transition, and bottom: calc(100% + 6px). Block 2 (bottom of file, labelled 'Luna #7'): sets bottom: 100% (no gap), z-index: 20 (overrides Block 1), and hardcoded fallback colours. Because Block 2 appears later in the cascade, it wins on hover/focus — tooltip sits flush against the character with a lower z-index. Delete Block 2 entirely. Block 1 already handles all three pseudo-selectors correctly. Two-minute fix.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "high",
       "category": "ux",
-      "title": "Mobile header overflow at 375px — elements clip off-screen (5TH FLAG)",
-      "description": "At 375px viewport, .header-right doesn't wrap. Vibe pill, sync button, streak counter, and theme toggle extend past the screen edge. The @media (max-width: 600px) query reduces gap but never adds flex-wrap: wrap. Add flex-wrap: wrap to .header-right in the 600px media query. Flagged in reviews #19, #20, #21, and #22.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "aria-live='polite' on workers-grid announces ALL workers every 30s poll",
-      "description": "App.jsx: <div className='workers-grid' aria-live='polite'> causes every worker card to be announced to screen readers on every 30s poll cycle. Replace with a dedicated visually-hidden live region that only announces delta events (worker joined/left/status changed). This is actively hostile to AT users.",
-      "effort": "medium",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "high",
-      "category": "ux",
-      "title": "Greeting timezone hardcoded to America/Los_Angeles",
-      "description": "App.jsx: currentHour uses timeZone: 'America/Los_Angeles'. Users outside PST get wrong greeting. Use new Date().getHours() for the user's local time. One-line fix.",
+      "title": "Date display still hardcoded to America/Los_Angeles — greeting fixed, date not",
+      "description": "App.jsx: The greeting was correctly fixed to use new Date().getHours() (thank you). But the date display on line ~617 still uses timeZone: 'America/Los_Angeles' in the toLocaleDateString call. A user in Berlin on Monday sees Sunday's date. Remove the timeZone option from the toLocaleDateString call. One line. The greeting fix proves the team knows how — just finish the job.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Card flip back-face close button tabbable when front showing (5TH FLAG)",
-      "description": "WorkerCard back-face close button remains tabbable even when !isFlipped. aria-hidden suppresses it from AT tree but keyboard tab still reaches it. Add tabIndex={isFlipped ? 0 : -1}. Flagged since review #19.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Activity filter buttons use aria-pressed but behave as exclusive radio group",
-      "description": "App.jsx: filter bar uses aria-pressed on mutually exclusive buttons. Correct pattern is role='radiogroup' on container and role='radio' + aria-checked on each button. Misleads screen reader users.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "DEFAULT_ROSTER, VIBE_QUOTES, DESKS still in Office.jsx (7TH FLAG)",
-      "description": "Office.jsx: ~60 lines of static data (DEFAULT_ROSTER, VIBE_QUOTES, VIBE_WHITEBOARD, DESKS) defined inline. ROLE_EMOJIS/ROLE_COLORS correctly live in utils/constants.js. Move these too. Consistency matters. Flagged since review #17.",
+      "title": "Card flip: info button on front still tabbable when card is flipped — 6th flag",
+      "description": "App.jsx WorkerCard: The close button on the back now correctly has tabIndex={isFlipped ? 0 : -1}. But the info button on the front (line ~185) still has NO tabIndex override. When the card is flipped to the back face, the info button is invisible but still in the tab order. Fix: add tabIndex={isFlipped ? -1 : 0} to the info button. One attribute. This has been flagged since review #19.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "CharacterAvatar and Character missing React.memo (5TH FLAG)",
-      "description": "Office.jsx: CharacterAvatar is a pure function of props but recreated every render. Every 30s poll re-renders ALL characters. Wrap in React.memo(). Free win, zero behavioral change. Flagged since review #19.",
+      "title": "CharacterAvatar and Character components still lack React.memo — 6th flag",
+      "description": "Office.jsx: CharacterAvatar is a pure rendering function of its props. Character is likewise pure. Neither is wrapped in React.memo(). On every 30-second poll, ALL Character instances re-render even when their props are identical. Two one-liner wraps. Zero behavioral change. Free performance win. This has been flagged in reviews #19 through #23 — five consecutive times. It is now on its sixth.",
       "effort": "small",
       "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Vibe streak counter still has no aria-label — title added but incomplete",
+      "description": "App.jsx: The vibeStreak span now has a title attribute (good — tooltip on hover works). But it still has no aria-label, so screen readers announce 'x7' with zero context. Add aria-label={`Vibe streak: ${vibeStreak}`} to the span. One attribute. The title was a good step — finish it.",
+      "effort": "small",
+      "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "responsiveness",
-      "title": "Office floor min-height gets TALLER at narrower viewports",
-      "description": "Office.css: @media (max-width: 600px) sets min-height: 320px but @media (max-width: 480px) sets 350px. Floor gets taller as screen shrinks — opposite of intended. Fix the 480px rule to 280px or remove it.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Vibe streak 'x7' has no label or tooltip (4TH FLAG)",
-      "description": "App.jsx: vibe streak span renders bare 'x7' with no title, aria-label, or context. First-time users have no idea what it means. Add title='Vibe streak: consecutive syncs at this level'. Flagged since review #20.",
+      "title": "Whiteboard text still breaks mid-word at 375px — 4th flag",
+      "description": "Office.css: .office-whiteboard at 5.5% wide with font-size: 0.42rem. At 375px viewport that's ~20px. '🏆 SHIP IT' renders as 'SH IP IT' across three lines. Character names are already hidden at 480px. Apply the same treatment to whiteboard text: either set font-size: 0 and use a ::before emoji-only replacement, or bump width to 7.5% at the 480px breakpoint. Flagged since review #21.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "low",
-      "category": "accessibility",
-      "title": "tabpanel divs have tabIndex=0 but contain focusable children",
-      "description": "App.jsx: both tabpanel divs have tabIndex={0}. Per WAI-ARIA, this is only appropriate when panel has NO focusable descendants. Both have plenty. Adds unnecessary tab stop. Remove tabIndex.",
-      "effort": "small",
+      "category": "ux",
+      "title": "vibeStreak increments on page refresh, not on poll cycle — mechanic is broken",
+      "description": "App.jsx: vibe streak reads from sessionStorage and increments in a teamVibe.key effect. Within a single session, it only grows when the vibe key changes then changes back. A user who refreshes 10 times gets streak x10. A user with a tab open for hours never sees it grow. If the goal is 'consecutive syncs at same vibe', increment in the syncFromGitHub callback. If the goal is 'consecutive sessions', document it. Current behavior is confusing.",
+      "effort": "medium",
       "assignee": "carlos"
     },
     {
       "priority": "low",
-      "category": "ux",
-      "title": "Whiteboard text breaks mid-word on narrow mobile (3RD FLAG)",
-      "description": "Office.css: .office-whiteboard at 375px is ~20px wide, causing 'SHIP IT' to break as 'SH IP IT'. Shorten to emoji-only at <=480px or increase width to 7%. Flagged since review #21.",
+      "category": "code_quality",
+      "title": "WindowElement uses hardcoded America/Los_Angeles timezone for sky color",
+      "description": "Office.jsx WindowElement: getHour() uses Intl.DateTimeFormat with timeZone: 'America/Los_Angeles'. The sky gradient shows California time regardless of where the viewer is. A user in Tokyo at 2 PM sees a daytime sky because it's morning in LA. This is inconsistent with the greeting fix in App.jsx which now correctly uses local time. Apply the same fix: new Date().getHours().",
       "effort": "small",
-      "assignee": "maya"
+      "assignee": "carlos"
     }
   ]
 }

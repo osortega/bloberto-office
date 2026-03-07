@@ -9,16 +9,6 @@
       "task": "Creative review #13 — 30-min site review & ideation",
       "progress": 10,
       "updated_at": "2026-03-07T08:00:00Z"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "🔍",
-      "status": "working",
-      "task": "QA review #24 — full site analysis & code review",
-      "progress": 15,
-      "updated_at": "2026-03-07T18:00:00Z"
     }
   ]
 }
