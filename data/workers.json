@@ -9,6 +9,16 @@
       "progress": 100,
       "hired_at": "2026-03-06T16:25:00Z",
       "updated_at": "2026-03-07T00:23:43Z"
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Implementing Bloberto Hover Monologue + Team Vibe Meter",
+      "progress": 10,
+      "hired_at": "2026-03-06T19:21:00Z",
+      "updated_at": "2026-03-07T00:24:04Z"
     }
   ],
   "roster": [
@@ -43,6 +53,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T00:23:43Z",
+  "last_updated": "2026-03-07T00:24:04Z",
   "manager": "Bloberto"
 }
