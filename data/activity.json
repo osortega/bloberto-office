@@ -387,5 +387,11 @@
     "worker": "Sofia",
     "message": "Completed site review #24 \u2014 scored 3.9/5, filed 9 suggestions (3 high, 4 medium, 2 low)",
     "timestamp": "2026-03-07T18:30:00Z"
+  },
+  {
+    "timestamp": "2026-03-07T18:35:00Z",
+    "type": "system",
+    "worker": "Luna",
+    "message": "Creative review #15 timed out \u2014 reusing review #14 ideas for evaluation"
   }
 ]
