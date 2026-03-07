@@ -1,105 +1,106 @@
 {
-  "review_number": 17,
+  "review_number": 18,
   "reviewer": "Sofia",
-  "timestamp": "2026-03-07T05:40:00Z",
-  "overall_score": "3.7/5",
-  "summary": "Same persistent issues from reviews #14-16 remain unfixed — the timezone bug, missing tabIndex on tabpanels, missing aria-label on tablist, and deep-glow reduced-motion gap. These are all small fixes that keep getting flagged. New observation: confetti layer lacks reduced-motion handling. Code quality is solid but the accessibility debt is real.",
+  "timestamp": "2026-03-07T06:07:00Z",
+  "overall_score": 3.9,
+  "previous_score": 3.7,
+  "summary": "The 4 high-priority issues from review #17 are ALL FIXED — timezone greeting now uses Intl.DateTimeFormat, tabpanels have tabIndex={0}, tablist has aria-label='View selector', and deep-glow is in the reduced-motion block. Score up to 3.9/5. Remaining debt is mostly medium-priority accessibility and code cleanup that's been carried forward for several reviews.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Header greeting still uses viewer's local timezone — flagged since #15",
-      "description": "App.jsx: `const currentHour = new Date().getHours()`. The window sky was fixed to use America/Los_Angeles, but the greeting ('Good morning/afternoon/evening') still uses the viewer's local clock. A viewer in Tokyo sees 'Good evening' when LA is morning. Use the same Intl.DateTimeFormat approach as WindowElement.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "high",
       "category": "accessibility",
-      "title": "deep-glow keyframe missing from prefers-reduced-motion — flagged since #15",
-      "description": "Office.css reduced-motion block nullifies bob, manager-wobble, wander-*, etc. But `deep-glow` (used by .char--deep-work) is not listed. It pulses continuously — exactly the kind of animation that triggers vestibular issues. Add `@keyframes deep-glow { from {} to {} }` inside the reduced-motion block.",
+      "title": "Confetti layer still plays unconditionally for reduced-motion users",
+      "description": "App.jsx renders 30 confetti-piece spans with CSS animation. No prefers-reduced-motion check exists — either suppress confetti in CSS or add a JS matchMedia check to skip rendering entirely. This was flagged in #17 as medium but promoting to high since all other reduced-motion gaps are fixed.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "tabpanel divs still missing tabIndex={0} — flagged since #14",
-      "description": "App.jsx: both tabpanel divs (id='tabpanel-office' and 'tabpanel-dashboard') lack tabIndex. Per WAI-ARIA 1.1, tabpanels should have tabIndex={0} so keyboard users can navigate into panel content after tab switch.",
+      "title": "Bloberto speech bubbles have no keyboard/focus trigger",
+      "description": "Office.jsx Character component only uses onMouseEnter/onMouseLeave for speech bubbles. Keyboard-only users can never trigger Bloberto quotes. Add tabIndex={0} and onFocus/onBlur handlers to the manager character div.",
       "effort": "small",
-      "assignee": "carlos"
+      "assignee": "maya"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "Tab container role='tablist' still missing aria-label — flagged since #14",
-      "description": "App.jsx: the div with role='tablist' has no aria-label. Screen readers announce 'tab list' with no context. Add aria-label='View selector' or similar.",
+      "title": "Character tooltips (data-tooltip) are hover-only — no keyboard access",
+      "description": "Working characters show task info via CSS ::after on hover. No tabIndex or focus handler exists on non-manager characters. Keyboard and screen reader users get no info. Add tabIndex={0} and focus-visible styling.",
       "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Confetti layer has no reduced-motion handling — NEW",
-      "description": "The confetti burst (30 animated spans) plays unconditionally. Users with prefers-reduced-motion should not see rapidly flying particles. Add a CSS rule or JS check to suppress confetti when reduced motion is preferred.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Bloberto speech bubble has no keyboard/focus trigger — flagged since #15",
-      "description": "The manager character shows speech bubbles on mouseenter only. Keyboard-only users can never trigger quotes. Add tabIndex={0} and onFocus/onBlur handlers.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Character tooltips still hover-only — flagged since #14",
-      "description": "Characters with data-tooltip show info via CSS ::after on hover. No keyboard equivalent exists. Add tabIndex={0} and focus/blur handlers.",
-      "effort": "medium",
       "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Activity log relative timestamps never update — flagged since #14",
-      "description": "getRelativeTime() is called at render time only. If the page stays open, '2m ago' never ticks to '5m ago'. Add a tick counter updated every 60s.",
+      "title": "Activity log relative timestamps never tick",
+      "description": "getRelativeTime() is called only at render time. If the tab stays open, '2m ago' stays '2m ago' forever. Add a 60s interval to bump a tick counter that triggers re-render of timestamps.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "DEFAULT_ROSTER still in Office.jsx instead of constants.js — flagged since #15",
-      "description": "ROLE_EMOJIS and ROLE_COLORS were moved to utils/constants.js. DEFAULT_ROSTER was not. Move it for consistency.",
+      "title": "DEFAULT_ROSTER still lives in Office.jsx — should be in constants.js",
+      "description": "ROLE_EMOJIS and ROLE_COLORS were extracted to utils/constants.js. DEFAULT_ROSTER was not. Move it for consistency and reuse.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Dead CSS in App.css: .hire-form-*, .hq-badge, .btn-danger",
+      "description": "App.css still contains ~80 lines of unused CSS for hire-form, hq-badge, and btn-danger. None of these exist in App.jsx anymore. This has been flagged since review #14. Delete them.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": ".progress-bar-inner in App.css reduced-motion targets wrong class",
+      "description": "App.css reduced-motion block references .progress-bar-inner but the actual class is .progress-bar-fill. The rule does nothing.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Idle duration on characters never updates",
+      "description": "Office.jsx formatIdleDuration() is pure — called once at render. An idle worker showing '5m' will show '5m' forever if no re-render is triggered. Same pattern as the activity log timestamps.",
       "effort": "small",
       "assignee": "carlos"
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "Dead CSS still in App.css — .hire-form*, .hq-badge, .btn-danger — flagged since #14",
-      "description": "App.css still contains .hire-form-wrapper, .hire-form-title, .hire-form, .hq-badge, .btn-danger. None exist in App.jsx. Four reviews now. Delete them.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": ".progress-bar-inner in App.css reduced-motion targets wrong class — flagged since #15",
-      "description": "App.css reduced-motion block references .progress-bar-inner but the actual class is .progress-bar-fill. The rule targets nothing.",
+      "category": "ux",
+      "title": "No keyboard shortcut discovery for tab switching",
+      "description": "Pressing 1/2 switches tabs but there's no tooltip or hint. Add title attributes to tab buttons: 'Office view (press 1)' and 'Dashboard view (press 2)'.",
       "effort": "small",
       "assignee": "maya"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "No keyboard shortcut discovery — flagged since #14",
-      "description": "The 1/2 keyboard shortcuts for tab switching have no discovery path. Add title attributes to tab buttons.",
+      "title": "Date display in header uses viewer locale, not consistent",
+      "description": "Line 597: new Date().toLocaleDateString('en-US', ...) — this is fine for formatting but doesn't use the PST timezone, so date can be wrong near midnight for non-PST viewers. Minor but inconsistent with the now-fixed greeting.",
       "effort": "small",
-      "assignee": "maya"
+      "assignee": "carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "MANAGER_QUOTES array is redundant with VIBE_QUOTES",
+      "description": "Office.jsx has both MANAGER_QUOTES (line 13) and VIBE_QUOTES (line 23). MANAGER_QUOTES is only used as fallback when managerVibe is undefined, which shouldn't happen. Could be removed.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "low",
+      "category": "perf",
+      "title": "WindowElement re-renders every 60s even when hour hasn't changed",
+      "description": "The setInterval in WindowElement fires every 60s and calls setHour(getHour()). Since the hour only changes once per hour, 59 of 60 calls are no-ops. Minor but could use a smarter check.",
+      "effort": "small",
+      "assignee": "carlos"
     }
   ]
 }
