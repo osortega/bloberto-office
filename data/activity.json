@@ -411,5 +411,11 @@
     "type": "hire",
     "worker": "Sofia",
     "message": "Clocked in for QA review #25 \u2014 full site analysis"
+  },
+  {
+    "timestamp": "2026-03-07T19:21:54Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #25 complete \u2014 overall score 4.0 (up from 3.9). 8 suggestions filed."
   }
 ]

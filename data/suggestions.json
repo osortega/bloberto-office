@@ -1,90 +1,82 @@
 {
   "analyst": "Sofia",
-  "review_number": 24,
-  "timestamp": "2026-03-07T18:30:00Z",
+  "review_number": 25,
+  "timestamp": "2026-03-07T19:15:00Z",
   "scores": {
-    "visual": 4.1,
-    "ux": 3.8,
-    "responsiveness": 3.6,
-    "performance": 3.7,
-    "accessibility": 3.6,
-    "code_quality": 3.5,
+    "visual": 4.2,
+    "ux": 4.0,
+    "responsiveness": 3.7,
+    "performance": 3.9,
+    "accessibility": 3.9,
+    "code_quality": 4.0,
     "features": 4.1,
-    "fun": 4.5
+    "fun_factor": 4.5
   },
-  "overall_score": 3.9,
-  "summary": "Up from 3.8 to 3.9. Credit where it's due — four real fixes landed: activity filter now uses role='radiogroup' with aria-checked (correct ARIA pattern — done), the 480px min-height was corrected to 280px (resolving the grow-on-shrink bug), tabpanel tabIndex=0 removed from both panels, and the greeting now uses new Date().getHours() instead of hardcoded PST. However, the date display STILL uses timeZone: 'America/Los_Angeles' — half the fix shipped. The duplicate tooltip CSS block (Luna #7) was NOT removed, so z-index 20 still overrides z-index 100 on hover/focus. DEFAULT_ROSTER is on its EIGHTH flag. React.memo is on its SIXTH. The close button on the card back got a proper tabIndex — but the info button on the front still has no tabIndex override, so it remains tabbable when the card is flipped. Progress is real but the easy wins keep getting skipped.",
+  "overall_score": 4.0,
+  "summary": "Up from 3.9 to 4.0 — first time hitting 4. Major wins this round: constants fully extracted to utils/ (DEFAULT_ROSTER, DESKS, VIBE_WHITEBOARD all in constants.js, VIBE_QUOTES in quotes.js — FINALLY after 8 flags), React.memo applied to both CharacterAvatar and Character, WindowElement now uses local time correctly, date display no longer hardcoded to America/Los_Angeles, info button tabIndex properly gated by isFlipped, and aria-label added to vibeStreak span. Six long-standing issues resolved. What remains: whiteboard word-break at 375px, vibeStreak sessionStorage mechanic still broken (increments on effect re-run, not on sync), and a few polish items. The codebase is noticeably cleaner.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "code_quality",
-      "title": "DEFAULT_ROSTER, VIBE_QUOTES, VIBE_WHITEBOARD, DESKS still inline in Office.jsx — 8th flag",
-      "description": "Office.jsx lines 6–70: VIBE_QUOTES, DEFAULT_ROSTER, VIBE_WHITEBOARD, and DESKS are all pure static data objects sitting in the component file. ROLE_EMOJIS and ROLE_COLORS were correctly moved to utils/constants.js ages ago. This split has been flagged in EVERY SINGLE REVIEW since #17. There are now EIGHT review flags on this item. Move DEFAULT_ROSTER, VIBE_WHITEBOARD, DEFAULT_BLOBERTO, and DESKS to utils/constants.js; move VIBE_QUOTES to utils/quotes.js. Estimated effort: 20 minutes. This is now a P0.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "high",
-      "category": "regression",
-      "title": "Duplicate tooltip CSS blocks — Luna #7 block still present, overriding z-index",
-      "description": "Office.css still contains TWO tooltip rule sets. Block 1 (around line 423): the correct implementation with z-index: 100, opacity transition, and bottom: calc(100% + 6px). Block 2 (bottom of file, labelled 'Luna #7'): sets bottom: 100% (no gap), z-index: 20 (overrides Block 1), and hardcoded fallback colours. Because Block 2 appears later in the cascade, it wins on hover/focus — tooltip sits flush against the character with a lower z-index. Delete Block 2 entirely. Block 1 already handles all three pseudo-selectors correctly. Two-minute fix.",
+      "category": "ux",
+      "title": "Whiteboard text breaks mid-word at 375px viewport — 5th flag",
+      "description": "Office.css: .office-whiteboard is 5.5% wide with font-size 0.42rem and word-break: break-word. At 375px that's ~20px wide. '🏆 SHIP IT' renders as broken fragments. Fix: at the existing 480px media query breakpoint, either hide the text and show only the emoji via a ::before pseudo-element, or bump width to 7.5%. The text is decorative, not critical — hiding it on small screens is perfectly fine.",
       "effort": "small",
       "assignee": "maya"
     },
     {
-      "priority": "high",
-      "category": "ux",
-      "title": "Date display still hardcoded to America/Los_Angeles — greeting fixed, date not",
-      "description": "App.jsx: The greeting was correctly fixed to use new Date().getHours() (thank you). But the date display on line ~617 still uses timeZone: 'America/Los_Angeles' in the toLocaleDateString call. A user in Berlin on Monday sees Sunday's date. Remove the timeZone option from the toLocaleDateString call. One line. The greeting fix proves the team knows how — just finish the job.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "Card flip: info button on front still tabbable when card is flipped — 6th flag",
-      "description": "App.jsx WorkerCard: The close button on the back now correctly has tabIndex={isFlipped ? 0 : -1}. But the info button on the front (line ~185) still has NO tabIndex override. When the card is flipped to the back face, the info button is invisible but still in the tab order. Fix: add tabIndex={isFlipped ? -1 : 0} to the info button. One attribute. This has been flagged since review #19.",
-      "effort": "small",
+      "category": "bug",
+      "title": "vibeStreak counter increments on effect re-run, not on actual sync cycles",
+      "description": "App.jsx: The vibeStreak useEffect runs on [teamVibe.key] changes. But sessionStorage persists within a tab, so refreshing the page increments the streak even if no sync happened. A user refreshing 10 times gets streak x10. Fix: move the streak logic into syncFromGitHub callback so it only increments on actual successful poll responses. Store the previous vibe key in a ref instead of sessionStorage.",
+      "effort": "medium",
       "assignee": "carlos"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "CharacterAvatar and Character components still lack React.memo — 6th flag",
-      "description": "Office.jsx: CharacterAvatar is a pure rendering function of its props. Character is likewise pure. Neither is wrapped in React.memo(). On every 30-second poll, ALL Character instances re-render even when their props are identical. Two one-liner wraps. Zero behavioral change. Free performance win. This has been flagged in reviews #19 through #23 — five consecutive times. It is now on its sixth.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Vibe streak counter still has no aria-label — title added but incomplete",
-      "description": "App.jsx: The vibeStreak span now has a title attribute (good — tooltip on hover works). But it still has no aria-label, so screen readers announce 'x7' with zero context. Add aria-label={`Vibe streak: ${vibeStreak}`} to the span. One attribute. The title was a good step — finish it.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "responsiveness",
-      "title": "Whiteboard text still breaks mid-word at 375px — 4th flag",
-      "description": "Office.css: .office-whiteboard at 5.5% wide with font-size: 0.42rem. At 375px viewport that's ~20px. '🏆 SHIP IT' renders as 'SH IP IT' across three lines. Character names are already hidden at 480px. Apply the same treatment to whiteboard text: either set font-size: 0 and use a ::before emoji-only replacement, or bump width to 7.5% at the 480px breakpoint. Flagged since review #21.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "vibeStreak increments on page refresh, not on poll cycle — mechanic is broken",
-      "description": "App.jsx: vibe streak reads from sessionStorage and increments in a teamVibe.key effect. Within a single session, it only grows when the vibe key changes then changes back. A user who refreshes 10 times gets streak x10. A user with a tab open for hours never sees it grow. If the goal is 'consecutive syncs at same vibe', increment in the syncFromGitHub callback. If the goal is 'consecutive sessions', document it. Current behavior is confusing.",
+      "title": "Confetti layer renders 30 DOM elements on every vibe upgrade",
+      "description": "App.jsx: The confetti burst creates 30 <span> elements. These are inserted into the DOM on vibe upgrade and removed after 2.5s. Consider using CSS @keyframes with animation-fill-mode: forwards and removing the elements after animation completes, or use a canvas-based approach for smoother rendering. Current approach works but creates layout thrash.",
       "effort": "medium",
-      "assignee": "carlos"
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Office floor view has no keyboard navigation for characters",
+      "description": "Office.jsx: Characters have tabIndex={0} but no visible focus indicator in CSS. The .char class has pointer-events: none by default (overridden for some variants). Add a :focus-visible outline to .char and ensure all interactive characters (manager, ghost, working, idle) have pointer-events: auto consistently.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Ghost OOO bubble has no dismiss mechanism on mobile",
+      "description": "Office.jsx: Ghost characters show an OOO bubble on hover (onMouseEnter/onMouseLeave). On touch devices, there's no hover event. The bubble only shows on focus, which requires tapping. But there's no visual affordance indicating these are interactive. Add a subtle tap indicator or use a toggle pattern (tap to show, tap again to dismiss).",
+      "effort": "small",
+      "assignee": "maya"
     },
     {
       "priority": "low",
       "category": "code_quality",
-      "title": "WindowElement uses hardcoded America/Los_Angeles timezone for sky color",
-      "description": "Office.jsx WindowElement: getHour() uses Intl.DateTimeFormat with timeZone: 'America/Los_Angeles'. The sky gradient shows California time regardless of where the viewer is. A user in Tokyo at 2 PM sees a daytime sky because it's morning in LA. This is inconsistent with the greeting fix in App.jsx which now correctly uses local time. Apply the same fix: new Date().getHours().",
+      "title": "Ambient speech bubble interval (45s) creates subtle memory leak pattern",
+      "description": "Office.jsx Character: The ambient interval fires every 45s and sets a 4s timeout. If the component unmounts between the interval firing and the timeout resolving, the timeout still runs (setBubble on unmounted component). The cleanup only clears the interval and timerRef, but timerRef is only set for hover timeouts, not ambient ones. Store the ambient timeout ID and clear it on unmount.",
       "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Solo spotlight message could be more dynamic",
+      "description": "App.jsx: When only one worker is active, a static message 'Running solo today...' is shown. Consider rotating through 3-4 messages based on the worker's role or how long they've been solo. Small delight that makes repeated visits more engaging.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Add worker uptime/session duration to activity log entries",
+      "description": "Currently activity log entries only show timestamp and message. For 'complete' type entries, it would be useful to show how long the worker was active (e.g., 'Completed in 45m'). This data could be computed from hire→complete timestamp pairs in the activity log.",
+      "effort": "medium",
       "assignee": "carlos"
     }
   ]
