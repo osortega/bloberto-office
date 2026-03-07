@@ -485,6 +485,40 @@ export default function App() {
     prevActiveWorkersRef.current = activeWorkers
   }, [activeWorkers])
 
+  // ── Favicon vibe indicator (Luna #7) ──
+  useEffect(() => {
+    const vibeColors = {
+      crushing: '#22c55e', 'on-fire': '#ef4444', 'in-flow': '#3b82f6',
+      'slow-day': '#9ca3af', 'after-hours': '#8b5cf6',
+    }
+    const v = getTeamVibe(activeWorkers)
+    const c = document.createElement('canvas')
+    c.width = 32; c.height = 32
+    const ctx = c.getContext('2d')
+    ctx.beginPath()
+    ctx.arc(16, 16, 14, 0, Math.PI * 2)
+    ctx.fillStyle = vibeColors[v.key] || '#3b82f6'
+    ctx.fill()
+    const link = document.querySelector('link[rel="icon"]') || document.createElement('link')
+    link.rel = 'icon'
+    link.href = c.toDataURL()
+    if (!link.parentNode) document.head.appendChild(link)
+  }, [activeWorkers])
+
+  // ── Document title updates (Luna #7) ──
+  useEffect(() => {
+    const workingCount = activeWorkers.filter(w => w.status === 'working').length
+    const total = activeWorkers.length
+    const v = getTeamVibe(activeWorkers)
+    const hasError = activeWorkers.some(w => w.status === 'error')
+    const prefix = hasError ? '⚠️ ' : ''
+    if (workingCount === 0 && total === 0) {
+      document.title = "😴 Bloberto's Office — All quiet"
+    } else {
+      document.title = `${prefix}(${workingCount}/${total}) Bloberto's Office — ${v.label}`
+    }
+  }, [activeWorkers])
+
   const currentHour = new Date().getHours()
   const greeting =
     currentHour < 12

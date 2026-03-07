@@ -824,4 +824,39 @@
   .desk--active .desk__monitor { animation: none; }
 
   /* error-halo is a safety signal — intentionally kept */
+
+  /* error-pulse reduced for a11y */
+  .desk--error .desk__monitor { animation: none; }
+}
+
+/* ── Worker tooltip on hover (Luna #7) ── */
+.char[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface, #1a1a2e);
+  color: var(--text, #e2e8f0);
+  border: 1px solid var(--border, #334155);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.65rem;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 20;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* ── Error desk red pulse (Luna #7) ── */
+.desk--error .desk__monitor {
+  box-shadow: 0 0 12px rgba(239,68,68,0.6);
+  animation: error-pulse 1.2s ease-in-out infinite;
+}
+@keyframes error-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(239,68,68,0.4); }
+  50% { box-shadow: 0 0 16px rgba(239,68,68,0.8); }
 }
