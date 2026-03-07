@@ -1,56 +1,11 @@
 [
   {
-    "name": "Bloberto",
-    "role": "manager",
-    "status": "idle",
-    "emoji": "\ud83e\udee0",
-    "task": "",
-    "progress": 0,
-    "updated_at": "2026-03-07T20:20:00Z"
-  },
-  {
     "name": "Luna",
-    "role": "creative-director",
-    "status": "idle",
-    "emoji": "\ud83c\udf19",
-    "task": "",
-    "progress": 0,
-    "updated_at": "2026-03-07T20:35:00Z"
-  },
-  {
-    "name": "Maya",
-    "role": "frontend",
+    "role": "Creative Director",
+    "emoji": "🎨",
     "status": "working",
-    "emoji": "\ud83c\udfa8",
-    "task": "Luna #17: Desk lamp glow + Click-to-focus worker",
+    "task": "Creative review #19 — analyzing site for new ideas",
     "progress": 10,
-    "updated_at": "2026-03-07T20:06:00Z"
-  },
-  {
-    "name": "Carlos",
-    "role": "backend",
-    "status": "idle",
-    "emoji": "\u26a1",
-    "task": "",
-    "progress": 0,
-    "updated_at": "2026-03-07T20:38:00Z"
-  },
-  {
-    "name": "Dave",
-    "role": "devops",
-    "status": "idle",
-    "emoji": "\ud83d\udd27",
-    "task": "",
-    "progress": 0,
-    "updated_at": "2026-03-07T19:40:00Z"
-  },
-  {
-    "name": "Sofia",
-    "role": "qa",
-    "status": "idle",
-    "emoji": "\ud83e\uddea",
-    "task": "",
-    "progress": 0,
-    "updated_at": "2026-03-07T20:55:00Z"
+    "started": "2026-03-07T21:00:00Z"
   }
 ]
