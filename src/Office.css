@@ -821,6 +821,8 @@
   @keyframes fade-in-char { from {} to {} }
 
   @keyframes monitor-blink { from {} to {} }
+  @keyframes deep-glow { from {} to {} }
+  .char--deep-work { animation: none !important; filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.5)); }
   .desk--active .desk__monitor { animation: none; }
 
   /* error-halo is a safety signal — intentionally kept */

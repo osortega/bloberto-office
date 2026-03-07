@@ -568,7 +568,7 @@ export default function App() {
     }
   }, [activeWorkers, teamVibe])
 
-  const currentHour = new Date().getHours()
+  const currentHour = parseInt(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'America/Los_Angeles' }).format(new Date()), 10)
   const greeting =
     currentHour < 12
       ? '☕ Good morning'
@@ -628,7 +628,7 @@ export default function App() {
             <button className="btn btn-sm btn-ghost" onClick={syncFromGitHub}>↺ Retry</button>
           </div>
         )}
-        <div className="tab-toggle" role="tablist">
+        <div className="tab-toggle" role="tablist" aria-label="View selector">
           <button
             role="tab"
             aria-selected={tab === 'office'}
@@ -654,11 +654,11 @@ export default function App() {
         </div>
 
         {tab === 'office' ? (
-          <div role="tabpanel" id="tabpanel-office">
+          <div role="tabpanel" id="tabpanel-office" tabIndex={0}>
             <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} />
           </div>
         ) : (
-          <div role="tabpanel" id="tabpanel-dashboard">
+          <div role="tabpanel" id="tabpanel-dashboard" tabIndex={0}>
             <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} />
 
             <div className="section-header">
