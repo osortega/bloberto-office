@@ -1,14 +1,5 @@
 [
   {
-    "name": "Luna",
-    "role": "Creative Director",
-    "emoji": "🌙",
-    "status": "working",
-    "task": "Creative review #20 — site review and idea generation",
-    "progress": 10,
-    "started": "2026-03-07T21:30:00Z"
-  },
-  {
     "name": "Carlos",
     "role": "Backend Engineer",
     "emoji": "⚙️",
