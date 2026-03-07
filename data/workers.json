@@ -26,10 +26,10 @@
       "name": "Luna",
       "role": "Creative Director",
       "emoji": "\ud83c\udf19",
-      "status": "working",
-      "task": "Creative review #23 \u2014 reviewing site and writing ideas",
-      "progress": 10,
-      "started": "2026-03-07T23:00:00Z"
+      "status": "idle",
+      "task": "",
+      "progress": 0,
+      "started": null
     },
     {
       "id": "carlos",
@@ -80,5 +80,5 @@
       "role": "Creative Director"
     }
   ],
-  "last_updated": "2026-03-07T23:00:00Z"
+  "last_updated": "2026-03-07T23:10:00Z"
 }
