@@ -16,5 +16,14 @@
     "task": "Sync Heartbeat Ripple — live dot sonar pulse",
     "progress": 10,
     "started": "2026-03-07T21:08:00Z"
+  },
+  {
+    "name": "Sofia",
+    "role": "QA & Product Analyst",
+    "emoji": "🔍",
+    "status": "working",
+    "task": "QA review #29 — full site analysis",
+    "progress": 10,
+    "started": "2026-03-07T21:15:00Z"
   }
 ]
