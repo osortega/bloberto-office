@@ -1,89 +1,114 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-07T01:45:00Z",
-  "review_number": 9,
+  "review_number": 10,
+  "timestamp": "2026-03-07T02:09:01Z",
   "scores": {
     "visual": 4,
-    "ux": 3.5,
+    "ux": 3,
     "responsiveness": 3,
-    "performance": 3.5,
-    "accessibility": 3,
-    "code_quality": 3.5,
-    "features": 3.5,
-    "fun_factor": 4.5
+    "performance": 3,
+    "accessibility": 4,
+    "code_quality": 3,
+    "features": 3,
+    "fun_factor": 5
   },
-  "overall_score": 3.6,
-  "notes": "Score holding at 3.6. The CSS syntax error I flagged in review #8 is STILL there — that's the most embarrassing one, it's literally a broken selector. The office view remains the star of the show. New task tags and error halo from last cycle landed well. But we keep accumulating tech debt without fixing the fundamentals. Time to fix bugs before adding features.",
+  "overall_score": 3.5,
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "CSS syntax error — orphaned .skeleton block in App.css STILL UNFIXED",
-      "description": "This has been flagged since review #8 and is still broken. Around line 370 of App.css, there's a bare property block ('background: var(--surface2); border-radius: var(--radius); animation: shimmer...') that's missing its '.skeleton' selector. This is a CSS parse error that will cause any styles defined after it to potentially break. Fix: add '.skeleton {' before the orphaned properties. This is a 10-second fix. Please do it.",
-      "effort": "small"
+      "category": "code",
+      "title": "Duplicated getTeamVibe logic in App.jsx and Office.jsx",
+      "description": "getTeamVibe is defined twice — once in App.jsx (returns {label, key} object) and once in Office.jsx (returns a plain string key). The threshold logic is identical but the return shapes differ, creating a silent divergence risk. Extract to a shared src/utils/vibe.js module and import in both files. This is a correctness bug waiting to happen when someone updates one copy and forgets the other.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "high",
+      "category": "accessibility",
+      "title": "office-floor has role=img but contains an interactive element",
+      "description": "The .office-floor div carries role='img' (line 392 of Office.jsx), but Bloberto (.char--manager) has pointer-events: auto and triggers mouse events — it is interactive. Placing interactive elements inside role='img' violates ARIA authoring practices and will confuse screen readers. Change role='img' to role='region' with the same aria-label, and add aria-live='polite' so screen readers announce vibe changes.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "high",
+      "category": "performance",
+      "title": "getTeamVibe called twice on every render in App.jsx header",
+      "description": "Lines 510–511 of App.jsx call getTeamVibe(activeWorkers) twice in the same render pass (once for data-vibe attribute, once for the label text). This is redundant computation. Hoist the call to a const vibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers]) and reference vibe.key and vibe.label where needed.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
       "category": "ux",
-      "title": "Office tab has no loading state",
-      "description": "Dashboard tab has LoadingSkeleton but Office tab renders an empty floor with just Bloberto while data fetches. First-time visitors see a sad empty office. The isLoading state exists in App.jsx but isn't passed to or used by Office.jsx. Add a simple 'Loading team...' overlay or reuse the skeleton pattern.",
-      "effort": "medium"
+      "title": "Polling silently pauses after idle timeout with no user feedback",
+      "description": "After IDLE_TIMEOUT (10 min) of inactivity, pollTick silently stops syncing. The UI shows stale data and the Live indicator may still appear green because isLive is not reset. Users have no idea the feed is paused. Add a visual 'Paused — move mouse to resume' chip in the header or over the live-dot, and reset isLive=false when the idle timeout kicks in.",
+      "effort": "medium",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Office tab shows no loading state and no error state",
+      "description": "The Dashboard tab has LoadingSkeleton while isLoading=true, but the Office tab just renders an empty floor with only Bloberto. Similarly, if fetchError fires the error banner only appears on the Dashboard; switching to Office shows nothing wrong. Pass isLoading and hasError flags to Office and render a simple overlay or placeholder text so the Office tab communicates its state.",
+      "effort": "medium",
+      "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Tab and filter buttons lack focus-visible styles",
-      "description": ".tab-toggle button and .activity-filter-bar button have :hover styles but no :focus-visible outlines. Keyboard-only users can't see what's focused. Add: '.tab-toggle button:focus-visible, .activity-filter-bar button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }'. Two lines of CSS.",
-      "effort": "small"
+      "title": "Character data-tooltip is CSS-only and invisible to screen readers",
+      "description": "Tooltip text on worker characters is rendered via .char[data-tooltip]::after which is purely visual. Screen readers will not announce it. Working characters show their current task; ghost characters show their role — this information is entirely inaccessible. Add a title attribute matching the data-tooltip value, or implement a proper tooltip with role='tooltip' and aria-describedby. Also, Bloberto's speech bubble fades in with no ARIA announcement.",
+      "effort": "medium",
+      "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "No immediate sync after idle timeout recovery",
-      "description": "When IDLE_TIMEOUT (10 min) stops polling and the user returns, they have to wait up to 30s for the next interval tick to get fresh data. Add: check in the activity event listeners if lastActivity was beyond IDLE_TIMEOUT and if so, call syncFromGitHub() immediately.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "seenIdsRef never resets — 'new' animation only fires once per session",
-      "description": "seenIdsRef tracks all worker IDs ever seen in the session. If a worker clocks out and clocks back in, they won't get the green pulse animation because their ID is already in seenIdsRef. For a live dashboard where workers come and go repeatedly, this means returning workers look like they were always there. Consider resetting or using a time-based approach.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "feature",
-      "title": "Add a Team/Roster tab or section",
-      "description": "Roster data is fetched and used for ghost placement but there's no way to browse the full team. A 'Team' tab or section showing all members with roles, status (active/off), and hire dates would be useful. The data is already there — just needs a UI.",
-      "effort": "medium"
+      "title": "Simultaneous CSS animations with no prefers-reduced-motion guard",
+      "description": "Up to 8 concurrent animations can run at once: manager-wobble, bob, wander-1/2/3/4, vibe-crush/fire, error-halo, ghost-float, standby-pulse, pulse-live, shimmer, card-rise. On low-powered devices this is a battery and performance drain. Add @media (prefers-reduced-motion: reduce) to disable or freeze all cosmetic animations (wanders, wobble, bob, pulses) while keeping functionally meaningful ones like the error-halo.",
+      "effort": "medium",
+      "assignee": "maya"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "prevActiveWorkersRef diffing runs on every render",
-      "description": "The useEffect that diffs activeWorkers runs every time allWorkers changes, but activeWorkers is recalculated on every render (no useMemo). This means the diff logic and all the timer management runs more than necessary. Wrap activeWorkers in useMemo to prevent unnecessary diff cycles.",
-      "effort": "small"
+      "title": "Inline styles in JSX should be CSS classes",
+      "description": "WorkerCard uses style={{ flex: 1, paddingLeft: '0.75rem' }} inside JSX (line 186), and multiple section headers use style={{ marginTop: '2.5rem' }} and similar (lines 573, 608). Inline styles bypass the CSS variable system and cannot respond to theme changes or media queries. Move these to named CSS classes in App.css.",
+      "effort": "small",
+      "assignee": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "seenIdsRef never resets — returning workers never get the new-arrival animation",
+      "description": "seenIdsRef accumulates every worker ID ever seen in the current session (line 452). When a worker clocks out and returns, their ID is already in the set so firstTime is empty and the green pulse animation never fires again. For a live dashboard that cycles workers in and out, this means the visual confirmation of arrival only ever works once. Reset or expire seenIdsRef entries, or key on a session identifier from the data payload.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "low",
-      "category": "visual",
-      "title": "Rotate footer quotes like the Bloberto speech bubbles",
-      "description": "Footer permanently shows 'If it compiles, ship it.' — would be more engaging to rotate through quotes on each page load. The MANAGER_QUOTES array already exists in Office.jsx — export it or duplicate a few for the footer.",
-      "effort": "small"
+      "category": "code",
+      "title": "Empty .progress-wrapper {} ruleset is dead CSS",
+      "description": "Line 439 of App.css has '.progress-wrapper {}' with no declarations inside. This is dead code left over from a refactor. Remove it to keep the stylesheet clean. Minor, but it signals incomplete cleanup.",
+      "effort": "small",
+      "assignee": "maya"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "Suggestion history is lost — each review overwrites",
-      "description": "suggestions.json gets overwritten every review. No way to track score trends over time. Consider appending reviews to an array or using timestamped filenames. This would let us build a score chart on the dashboard eventually.",
-      "effort": "medium"
+      "title": "Activity log key is fragile — risk of React duplicate key warnings",
+      "description": "ActivityLog uses key={entry.timestamp + entry.worker + i} (line 102). The index fallback i masks potential duplicate key collisions when two events share the same timestamp and worker name (e.g. rapid re-hires). Request the API to include a stable unique id field on each activity entry, then use that as the React key.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Idle workers wander through desks — path collision",
-      "description": "The wander keyframe paths (wander-1 through wander-4) can overlap with desk positions, making idle workers appear to walk through furniture. Constrain wander paths to the lower 20% of the floor (y: 78-90%) and the coffee corner area to avoid visual clipping with desks.",
-      "effort": "small"
+      "title": "Idle wander paths overlap desk area — workers clip through furniture",
+      "description": "Wander keyframes 1–4 use top values as low as 73–74% which overlaps the second row of desks (positioned at top: 50%). An idle worker can visually slide through a desk. Clamp all wander top values to 79% or higher so idle characters stay in the unobstructed bottom corridor of the floor. Also affects the mobile view where the aspect-ratio: auto layout changes the effective desk positions.",
+      "effort": "small",
+      "assignee": "maya"
     }
   ]
 }
