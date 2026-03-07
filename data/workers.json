@@ -5,10 +5,10 @@
       "name": "Bloberto",
       "role": "Manager",
       "status": "working",
-      "task": "Managing Sofia QA #14, reviewing suggestions",
-      "progress": 20,
+      "task": "Reviewing Sofia QA #14 findings, assigning follow-ups",
+      "progress": 60,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T04:08:30Z"
+      "updated_at": "2026-03-07T04:14:45Z"
     },
     {
       "id": "maya",
@@ -54,11 +54,11 @@
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Engineer",
-      "status": "working",
-      "task": "QA review #14 \u2014 analyzing live site + code",
-      "progress": 10,
+      "status": "idle",
+      "task": "QA review #14 complete \u2014 12 suggestions filed",
+      "progress": 100,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T04:08:30Z"
+      "updated_at": "2026-03-07T04:14:45Z"
     }
   ],
   "roster": [
@@ -93,6 +93,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T04:08:30Z",
+  "last_updated": "2026-03-07T04:14:45Z",
   "manager": "Bloberto"
 }
