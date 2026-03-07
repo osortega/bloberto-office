@@ -12,6 +12,42 @@ const MANAGER_QUOTES = [
   'This could have been a commit message.',
 ]
 
+const VIBE_QUOTES = {
+  'crushing': [
+    'I knew all along this team was special.',
+    'Velocity like this doesn\'t just happen — it happens because I scheduled stand-up at 9am.',
+    'Per my roadmap from Q3, we\'re exactly on track.',
+    'Ship it. Ship all of it. I\'ll write the retro later.',
+    'This is what alignment looks like, people.',
+  ],
+  'on-fire': [
+    'Have you tried rebooting the engineers?',
+    'This is fine. This is all fine.',
+    'Ship it. What\'s the worst that could happen? (Please don\'t answer that.)',
+    'I\'m going to need a status update on the status update.',
+    'Let\'s circle back on the fire.',
+  ],
+  'in-flow': [
+    'Per my last commit…',
+    'Can we circle back on that PR?',
+    'My calendar says we are aligned.',
+    'This could have been a commit message.',
+    'Steady as she goes. I planned this.',
+  ],
+  'slow-day': [
+    'Per my last email, is anyone actively watching the metrics?',
+    'Circles. We need to circle back. Bring the circles.',
+    'I sense untapped velocity. Let me schedule a sync.',
+    'Has anyone checked the backlog? I feel like no one checks the backlog.',
+  ],
+  'after-hours': [
+    'Why are you still here? Go home. I mean... I am always here, but you shouldn\'t be.',
+    'The deploy can wait. Can it though?',
+    'Night shift gets the best commit messages.',
+    'Just me and the servers. As it should be.',
+  ],
+}
+
 const ROLE_COLORS = {
   'Frontend Engineer': '#a78bfa',
   'Backend Engineer': '#38bdf8',
@@ -45,6 +81,15 @@ const DESKS = [
 
 const DEFAULT_BLOBERTO = {
   id: 'bloberto', name: 'Bloberto', role: 'Manager', status: 'working',
+}
+
+function getTeamVibe(workers) {
+  if (workers.length === 0) return 'after-hours'
+  if (workers.some(w => w.status === 'error')) return 'on-fire'
+  const pct = workers.filter(w => w.status === 'working').length / workers.length
+  if (pct > 0.7) return 'crushing'
+  if (pct >= 0.4) return 'in-flow'
+  return 'slow-day'
 }
 
 function CharacterAvatar({ workerId, role, name, size = 40, emoji }) {
@@ -241,7 +286,7 @@ function CharacterAvatar({ workerId, role, name, size = 40, emoji }) {
   )
 }
 
-function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip }) {
+function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
 
@@ -252,7 +297,8 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
 
   const handleMouseEnter = () => {
     if (variant !== 'manager') return
-    const quote = MANAGER_QUOTES[Math.floor(Math.random() * MANAGER_QUOTES.length)]
+    const quotes = (managerVibe && VIBE_QUOTES[managerVibe]) || MANAGER_QUOTES
+    const quote = quotes[Math.floor(Math.random() * quotes.length)]
     if (timerRef.current) clearTimeout(timerRef.current)
     setBubble({ quote, show: true })
     timerRef.current = setTimeout(() => setBubble(b => ({ ...b, show: false })), 3500)
@@ -311,6 +357,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
 
 export default function Office({ workers = [], roster = [] }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
+  const vibe = getTeamVibe(workers)
 
   const bloberto = useMemo(
     () => [...workers, ...effectiveRoster].find(w => w.id === 'bloberto') ?? DEFAULT_BLOBERTO,
@@ -350,7 +397,7 @@ export default function Office({ workers = [], roster = [] }) {
 
         {/* Manager desk — top center */}
         <div className="mgr-desk">
-          <div className="mgr-desk__monitor" />
+          <div className="mgr-desk__monitor" data-vibe={vibe} />
           <div className="mgr-desk__nameplate">Manager</div>
           <span className="sr-only">Manager desk</span>
         </div>
@@ -387,7 +434,7 @@ export default function Office({ workers = [], roster = [] }) {
         </div>
 
         {/* Bloberto — always at manager desk, always visible */}
-        <Character worker={bloberto} left={46} top={4} variant="manager" />
+        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} />
 
         {/* Active workers at desks (working) or as ghosts (roster-only) */}
         {DESKS.map((desk, i) => {

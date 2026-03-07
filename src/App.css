@@ -89,6 +89,23 @@
 
 .header-badge span { color: var(--accent2); font-weight: 600; }
 
+/* ---- Vibe Pill ---- */
+.vibe-pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.vibe-pill[data-vibe='crushing']    { border-color: var(--green); color: var(--green); }
+.vibe-pill[data-vibe='on-fire']     { border-color: var(--red); color: var(--red); }
+.vibe-pill[data-vibe='in-flow']     { border-color: var(--accent); color: var(--accent); }
+.vibe-pill[data-vibe='slow-day']    { border-color: var(--yellow); color: var(--yellow); }
+.vibe-pill[data-vibe='after-hours'] { border-color: var(--text-muted); color: var(--text-muted); }
+
 /* ---- Main ---- */
 .main { flex: 1; padding: 2rem; max-width: 1280px; margin: 0 auto; width: 100%; }
 

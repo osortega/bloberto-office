@@ -174,9 +174,13 @@ function formatDuration(updatedAt) {
   return rem > 0 ? `Working for ${hours}h ${rem}m` : `Working for ${hours}h`
 }
 
-function WorkerCard({ worker }) {
+function WorkerCard({ worker, index = 0, isNew = false, isFading = false }) {
+  const classes = ['worker-card', worker.status]
+  if (isNew) classes.push('worker-card--new')
+  if (isFading) classes.push('worker-card--fading')
+
   return (
-    <div className={`worker-card ${worker.status}`}>
+    <div className={classes.join(' ')} style={{ '--i': index }}>
       <div className="worker-header">
         <div className="worker-avatar">{getRoleEmoji(worker.role)}</div>
         <div className="worker-info" style={{ flex: 1, paddingLeft: '0.75rem' }}>
@@ -311,9 +315,22 @@ export default function App() {
   const [lastSynced, setLastSynced] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
-  const [tab, setTab] = useState('office')
+  const [tab, setTab] = useState(() => {
+    const h = window.location.hash.slice(1)
+    return h === 'dashboard' || h === 'office' ? h : 'office'
+  })
 
   const lastActivity = useRef(Date.now())
+
+  // ── Worker cinematic entry / exit state ──
+  // fadingMap: { [id]: worker } — workers playing their 400ms fade-out
+  // newIds:    Set<id>          — workers currently flashing the 1.5s green pulse
+  const seenIdsRef          = useRef(new Set())
+  const prevActiveWorkersRef = useRef([])
+  const fadingTimersRef      = useRef({})   // { [id]: timeoutId }
+  const newClearTimersRef    = useRef({})   // { [id]: timeoutId }
+  const [fadingMap, setFadingMap] = useState({})
+  const [newIds,    setNewIds]    = useState(new Set())
 
   useEffect(() => {
     const touch = () => { lastActivity.current = Date.now() }
@@ -413,6 +430,58 @@ export default function App() {
     (w) => w.status === 'working' || w.status === 'idle'
   )
 
+  // ── Diff activeWorkers vs previous snapshot ──
+  useEffect(() => {
+    const currentIds = new Set(activeWorkers.map(w => w.id))
+    const prev = prevActiveWorkersRef.current
+    const prevIds = new Set(prev.map(w => w.id))
+
+    // Workers that just appeared — detect first-ever arrivals for the 'new' flash
+    const appeared = activeWorkers.filter(w => !prevIds.has(w.id))
+    const firstTime = appeared.filter(w => !seenIdsRef.current.has(w.id))
+    if (firstTime.length > 0) {
+      setNewIds(ids => new Set([...ids, ...firstTime.map(w => w.id)]))
+      for (const w of firstTime) {
+        if (newClearTimersRef.current[w.id]) clearTimeout(newClearTimersRef.current[w.id])
+        newClearTimersRef.current[w.id] = setTimeout(() => {
+          setNewIds(ids => { const next = new Set(ids); next.delete(w.id); return next })
+          delete newClearTimersRef.current[w.id]
+        }, 1500)
+      }
+    }
+    for (const w of activeWorkers) seenIdsRef.current.add(w.id)
+
+    // Workers that just disappeared — start 400ms fade-out
+    const disappeared = prev.filter(w => !currentIds.has(w.id))
+    if (disappeared.length > 0) {
+      setFadingMap(m => {
+        const next = { ...m }
+        for (const w of disappeared) {
+          if (next[w.id]) continue // already fading
+          next[w.id] = w
+        }
+        return next
+      })
+      for (const w of disappeared) {
+        if (fadingTimersRef.current[w.id]) continue
+        fadingTimersRef.current[w.id] = setTimeout(() => {
+          setFadingMap(m => { const next = { ...m }; delete next[w.id]; return next })
+          delete fadingTimersRef.current[w.id]
+        }, 400)
+      }
+    }
+
+    // Workers that came back while still fading — cancel their removal
+    const cameBack = activeWorkers.filter(w => fadingTimersRef.current[w.id])
+    for (const w of cameBack) {
+      clearTimeout(fadingTimersRef.current[w.id])
+      delete fadingTimersRef.current[w.id]
+      setFadingMap(m => { const next = { ...m }; delete next[w.id]; return next })
+    }
+
+    prevActiveWorkersRef.current = activeWorkers
+  }, [activeWorkers])
+
   const currentHour = new Date().getHours()
   const greeting =
     currentHour < 12
@@ -438,6 +507,9 @@ export default function App() {
               day: 'numeric',
             })}
           </div>
+          <span className="vibe-pill" data-vibe={getTeamVibe(activeWorkers).key}>
+            {getTeamVibe(activeWorkers).label}
+          </span>
           <button
             className="theme-toggle"
             onClick={toggleTheme}
@@ -469,7 +541,7 @@ export default function App() {
             aria-controls="tabpanel-office"
             tabIndex={tab === 'office' ? 0 : -1}
             className={tab === 'office' ? 'active' : ''}
-            onClick={() => setTab('office')}
+            onClick={() => { setTab('office'); window.location.replace('#office') }}
             onKeyDown={handleTabKeyDown}
           >
             🏢 Office
@@ -480,7 +552,7 @@ export default function App() {
             aria-controls="tabpanel-dashboard"
             tabIndex={tab === 'dashboard' ? 0 : -1}
             className={tab === 'dashboard' ? 'active' : ''}
-            onClick={() => setTab('dashboard')}
+            onClick={() => { setTab('dashboard'); window.location.replace('#dashboard') }}
             onKeyDown={handleTabKeyDown}
           >
             📊 Dashboard
@@ -509,12 +581,27 @@ export default function App() {
             <div className="workers-grid" aria-live="polite">
               {isLoading ? (
                 <LoadingSkeleton />
-              ) : activeWorkers.length === 0 ? (
+              ) : activeWorkers.length === 0 && Object.keys(fadingMap).length === 0 ? (
                 <EmptyState />
               ) : (
-                activeWorkers.map((w) => (
-                  <WorkerCard key={w.id} worker={w} />
-                ))
+                <>
+                  {activeWorkers.map((w, i) => (
+                    <WorkerCard
+                      key={w.id}
+                      worker={w}
+                      index={i}
+                      isNew={newIds.has(w.id)}
+                    />
+                  ))}
+                  {Object.values(fadingMap).map((w) => (
+                    <WorkerCard
+                      key={w.id}
+                      worker={w}
+                      index={activeWorkers.length}
+                      isFading
+                    />
+                  ))}
+                </>
               )}
             </div>
 
