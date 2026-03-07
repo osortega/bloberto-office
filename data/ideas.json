@@ -1,87 +1,87 @@
 {
   "creative_director": "Luna",
-  "timestamp": "2026-03-07T00:21:31Z",
-  "review_number": 1,
-  "theme": "The Office Is Alive — Every Pixel Should Tell a Story",
+  "timestamp": "2026-03-07T00:52:00Z",
+  "review_number": 2,
+  "theme": "The Dashboard Knows You — Make It Personal, Make It Urgent, Make It Sing",
   "ideas": [
     {
       "priority": "must",
+      "category": "feature",
+      "title": "Worker Focus Panel — Click the Floor, See the Card",
+      "description": "Right now the Office tab and the Dashboard tab are completely isolated worlds. You see a character bobbing at a desk but you have no idea their progress is at 14% and their task says 'unblock auth migration'. Fix it: clicking any character in the office view triggers a slide-up overlay panel (max 320px wide, anchored bottom-right of the office floor) showing that worker's full card — progress bar, task, status badge, duration. Clicking elsewhere or pressing Escape dismisses it. The panel is populated from the same workers array already in scope; this is zero new data fetching. WHY: The Office tab currently is scenic decoration. One click handler makes it operational. This is the highest ROI architectural change on the board — it turns the prettiest view into the most useful one.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "must",
       "category": "visual",
-      "title": "Time-of-Day Atmosphere System",
-      "description": "The office floor should breathe with the clock. Dawn (5–8am): a soft amber gradient bleeds in from the top edge, the floor-bg lightens slightly. Day (9–17): neutral and bright. Late afternoon (17–20): warm golden wash, long desk shadows. Night (20–5am): deep indigo, each desk monitor glows blue, a subtle radial ceiling-light halo appears near the manager desk. Implement as a time-derived body class ('time-dawn', 'time-day', 'time-eve', 'time-night') set once on mount and re-evaluated every 60s. WHY: The greeting line already knows the time ('Good evening 🌙') but the space ignores it entirely. The atmosphere should match the words. This is the lowest-effort emotional upgrade in the backlog — it's pure CSS and one useEffect. Luna's domain is twilight; this has my fingerprints all over it.",
-      "effort": "medium",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "storytelling",
-      "title": "Character Reaction Expressions on Status Change",
-      "description": "Status changes are currently silent and invisible in the office view — they only register on the dashboard. When a worker transitions to 'error', a small 💥 or sweat-drop SVG overlay should float above their avatar for 2s then fade. When 'done', a ✅ starburst. When first entering as 'working', a ⚡ zap blinks in. These are tiny absolutely-positioned SVG elements, rendered conditionally on a 'justChanged' flag (diffed on each poll). WHY: The office tab is decorative today. It should be diagnostic. A user should be able to glance at the floor and know if Carlos is on fire without reading a card. Expressions are the language of that signal.",
-      "effort": "medium",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "delight",
-      "title": "Bloberto Hover Monologue",
-      "description": "When you hover Bloberto (the manager), a speech bubble appears above his crown with a randomly selected manager-ism from a curated list. Examples: 'Per my last commit…', 'Can we circle back on that PR?', 'It's not a bug, it's a feature roadmap item.', 'Have you tried shipping it on Friday?', 'My calendar says we're aligned.'. The list lives in a small JSON config (public/bloberto-quotes.json) so anyone can add lines. Bubble fades after 3.5s or on mouse-leave. WHY: Bloberto is the mascot and he is completely silent. He should have personality. This is the highest delight-to-effort ratio in the entire backlog — one event handler, one absolute div, one config file.",
+      "title": "Error Urgency Halo — Make Crises Impossible to Miss",
+      "description": "Workers in 'error' state look almost identical to working workers in the office view. Add three stacked signals: (1) a slow-pulse crimson box-shadow halo behind their avatar (using the existing standby-pulse keyframe pattern but red and more intense), (2) a tiny red '!' badge absolutely positioned at the top-right of the .char__avatar circle, rendered as a 12px SVG circle with a white exclamation mark, (3) a 10% opacity red overlay on the desk element they occupy. The desk tint is a background-color on the .desk element when its occupant has status='error'. This requires passing error state down from deskOccupants which already carries the worker object. WHY: Errors are the highest-urgency state on the board. The office should alarm you. Right now a full-team error looks identical to a full-team working state at a distance. That is a dashboard safety failure.",
       "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Office Decorations Layer — Plant, Whiteboard, Couch",
-      "description": "The office floor is a grid with six identical desks, a coffee corner, and a door. Nothing else. Add three props: (1) A living plant 🌱 in the bottom-left corner. It has two SVG states: healthy (green, upright) when error count is 0, wilting (drooping, yellowed) when errors > 0. This is a real-time ambient health indicator. (2) A whiteboard on the right wall rendered as an SVG rectangle with tally marks for tasks completed today (sourced from activity log 'complete' entries). (3) A small couch near the coffee corner — a wandering target for idle characters (add a wander path node that passes through it). WHY: The space feels like a test harness. These three props cost almost nothing and make it feel like a place people inhabit. The plant in particular does double duty as ambient status display.",
-      "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Activity Log Hourly Chapter Grouping",
-      "description": "The flat activity log is a wall of identical rows. Group events into collapsible hour-blocks with an auto-generated one-line summary computed from that block's entries. Example header: '9am · 4 events — Carlos hired, Maya completed a task, 1 error'. The summary is pure client-side logic: count each event type, name the involved workers, pick a template string. Blocks default-expand the most recent hour, collapse older ones. WHY: A log tells you what happened. A story tells you why you should care. The distinction is grouping and narration. Operators currently have to read all 20 rows to understand 'a busy morning'. With chapters they scan headers and drill only when they need to. This is the single biggest UX improvement to the dashboard for zero backend changes.",
+      "title": "Progress Micro-Sparkline — Show Momentum, Not Just Position",
+      "description": "Store the last 8 progress readings per worker in a useRef map keyed by worker.id, updated on every sync cycle. Render as a tiny SVG polyline (60×10px) laid translucently behind the progress bar fill, visible as a faint trail. A flat line means the worker has been stuck at the same % for the past 8 polls. A steep line means sprint. A downward spike means something regressed. The sparkline data clears when a worker is replaced (id changes). WHY: progress% is a snapshot. Two workers both at 60% are invisible as distinct cases today — one has climbed 30 points in the last 4 minutes, one has flatlined for 20. Sparklines show momentum. Operators shouldn't need to watch a number; they should be able to see the shape of progress.",
       "effort": "medium",
       "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Office Weather Widget — Ambient Team Climate in the Floor",
+      "description": "In the top-left of the office floor, replace the static '.office-sign' text label with a compact animated SVG weather widget (48×48px) that computes 'office climate' from live worker state: ☀️ sunny with rotating rays (all working, zero errors), ⛈️ lightning bolt + falling rain drops (any errors), 🌤️ sun behind a cloud (mixed active/idle), 🌫️ soft fog waves (empty / after-hours). All states are implemented as SVG elements inside the widget with their own short CSS keyframe loops (rays rotate 360° in 8s, rain drops translate-Y in 1.2s, fog drifts left in 4s). The widget is purely decorative but diegetically meaningful — it's the literal weather of the workspace. WHY: The Team Vibe Meter on the Dashboard is a badge. The Weather Widget in the Office is an environment. One you read; the other you feel. Both are needed, and neither does the other's job.",
+      "effort": "medium",
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "feature",
-      "title": "Team Vibe Meter — One-Glance Mood Badge",
-      "description": "Add a 'Vibe' stat card to StatsBar, computed as: (working / total) with color bands: >70% = 🔥 Crushing It (green), 40–70% = ⚡ In Flow (accent purple), <40% and >0 = 😴 Slow Day (yellow), any errors present = 🚨 On Fire (red pulse animation). Render as an emoji + bold label. The entire stats bar gets a faint background color wash matching the vibe state — not loud, just a 5% opacity tint. WHY: The current stats give you four numbers and demand mental arithmetic. The Vibe meter gives the operator an emotional read in under one second. It also gives the page a narrative mood — you know what kind of day it is before you read anything else.",
+      "title": "Task Intent Auto-Tags — Scan the Grid in One Second",
+      "description": "Parse each worker's task string with a regex battery and auto-apply colored chip tags beneath the task text on WorkerCard. Tag definitions: 'fix|bug|hotfix|broken|error' → 🔴 Bug (red chip), 'deploy|ship|release|publish|ci|cd|pipeline' → 🟠 Ship (orange), 'design|ui|ux|css|layout|frontend|component' → 🟣 Design (purple), 'test|qa|spec|review|coverage|lint' → 🔵 QA (blue), 'data|migration|schema|db|database|query' → 🟤 Data (brown), 'docs|readme|changelog|write' → 🟢 Docs (green). A task can match multiple tags. Chips are small rounded-pill spans (font-size 0.65rem, padding 2px 8px). Zero backend work — pure client-side string analysis. WHY: All task text is undifferentiated prose today. Tags let you scan the workers grid and immediately perceive 'this is a bugfix sprint' or 'deployment day' without reading a single sentence.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "office-life",
+      "title": "Sync Streak Counter — Make Uptime Feel Like an Achievement",
+      "description": "Track consecutive successful sync cycles in a useRef integer (increment on both-fetches-success in syncFromGitHub, reset to 0 on any error). Persist the all-time streak best to localStorage under 'bloberto-best-streak'. Display below the sync time in the Live stat card as '🔗 47 syncs' in 0.65rem muted text. When the current streak beats the stored best, the sync stat card briefly flashes a green border for 1.5s (add/remove a 'streak-best' CSS class). WHY: Reliability is invisible until it breaks. A streak counter makes the polling engine feel alive and trustworthy rather than silent infrastructure. A new personal best is a tiny celebration that costs nothing to build but earns disproportionate affection from anyone who sees it happen.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
       "priority": "could",
-      "category": "office-life",
-      "title": "Coffee Corner — Click for an Office Fortune",
-      "description": "Make the coffee corner clickable (add pointer-events and a click handler). On click, a small popover appears above it with a randomly selected absurdist corporate-wisdom fortune. 'The merge conflict will resolve itself if you believe hard enough.' / 'Your standup will be remembered as async-friendly.' / 'Tickets don't close themselves. Or do they?' Fortune fades after 4 seconds. The fortune list lives in the same bloberto-quotes.json config as Bloberto's monologues, under a separate key. WHY: This office is read-only, which makes it passive. Adding one tiny interactive moment — even cosmetic — transforms it from dashboard to toy. Toys get revisited; dashboards get forgotten.",
+      "category": "delight",
+      "title": "Roll Call Easter Egg — All Characters Wave at Once",
+      "description": "Clicking the '🏢 Bloberto's HQ' sign in the top-left of the office floor (add pointer-events: auto to .office-sign) triggers a 'rollcall' mode: all .char elements simultaneously receive a CSS class 'char--rollcall' for 900ms, which plays a hop-and-wave keyframe (translateY -12px at 40%, then a brief rotate ±15deg, back to baseline). During the animation, Bloberto's speech bubble briefly shows 'Alright team — sound off! 📣' without requiring a hover. Implemented as a single setTimeout that adds then removes the class. No state needed — a ref suffices. WHY: Easter eggs are the signature of a product made with love. One unexpected moment of collective joy is worth more than a feature in a changelog. It's the kind of thing someone records and shares in Slack.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
       "priority": "could",
-      "category": "team",
-      "title": "Ghost Desk Away-Message Sticky Notes",
-      "description": "Ghost workers (roster members not currently clocked in) are dimmed clones sitting silently at desks. Instead, when ghost=true, render a small SVG sticky note on their desk with a character-specific away message. Carlos: 'In the DB — do not disturb 🗄️'. Maya: 'Chasing pixels 🌈'. Dave: 'Kubernetes did a thing 🚀'. Sofia: 'Writing test cases 🔍'. Luna: 'Dreaming in gradients 🌙'. These are hardcoded strings keyed by worker ID (fallback: 'BRB'). Render as a tiny colored rect + text overlaid on the desk element when the desk's occupant is ghost=true. WHY: Ghosts feel like absences. Away messages make them feel like people who stepped out — which is what they are. This is the exact storytelling move that separates a monitoring dashboard from a world.",
-      "effort": "small",
-      "assigned_to": "maya"
+      "category": "feature",
+      "title": "Keyboard Command Palette — ⌘K for Power Users",
+      "description": "Pressing ⌘K (or Ctrl+K on Windows/Linux) opens a minimal floating command palette modal centered on screen. Commands available: 'Switch to Office', 'Switch to Dashboard', 'Toggle dark/light theme', 'Refresh data now', 'Copy current status to clipboard' (formats a plain-text team summary: 'N active, N idle, vibe: X'). Arrow keys navigate the list, Enter executes, Escape closes. The modal is a simple <dialog> element with a short CSS slide-down animation. The command list is a static array of {label, action} objects — adding new commands is two lines. WHY: Power users who embed this dashboard on a second monitor shouldn't need a mouse for routine actions. A command palette also signals that this is a serious, keyboard-first product. It takes half a day to build and permanently elevates the perceived quality of the tool.",
+      "effort": "medium",
+      "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "delight",
-      "title": "Done Workers Exit Animation — Victory Lap",
-      "description": "Workers whose status flips to 'done' currently vanish silently (activeWorkers filters them out). Instead: for 2.5 seconds after a done transition, keep them in the render via a 'departingWorkers' ref (populated by diffing previous vs current worker list on each poll). During this window, play a victory-lap keyframe: a small hop, a ✅ floats upward and fades, then the character walks toward the door and shrinks out. After the timer, remove from departingWorkers. WHY: Endings are as important as beginnings. Right now task completions are invisible in the office — you only see them in the log. Making departure visible creates a genuine moment of recognition. Teams feel something different when their work is seen, even by a cartoon blob. This is the hardest idea here, but it's the one that will make someone show the dashboard to their friends.",
+      "category": "team",
+      "title": "Live Roster Presence Strip — See Who, Not Just How Many",
+      "description": "Insert a compact horizontal chip strip between the StatsBar and the section header on the Dashboard tab. Every roster member gets a 32×32px avatar chip with a colored presence ring: solid green ring (working), pulsing yellow ring (idle), dashed grey ring (offline/ghost), blinking red ring (error). Chips are ordered: working first, then idle, then offline. Each chip has a tooltip on hover showing their current task or away message. Clicking an offline chip scrolls to their ghost desk in the office view (or shows a mini popover with their away message from the Ghost Sticky Notes idea). The data source is the existing allWorkers array + roster array already in App state — no new fetching. WHY: The StatsBar tells you '3 active' — a number. The Presence Strip tells you 'Carlos, Maya, and Dave are active' — a team. Aggregate metrics erase individuals. This restores the human layer of the data without adding a single API call.",
       "effort": "large",
       "assigned_to": "tbd"
     }
   ],
   "hire_proposals": [
     {
-      "role": "Motion Designer / Creative Technologist",
-      "reason": "We have at least nine animation ideas and one frontend engineer. The animation layer of this product is its soul — it is the difference between a data table and a world. A motion specialist thinks in keyframes, easing curves, and emotional timing from the start, rather than appending them as afterthoughts to functional code. They would own the Office.css animation system, the character expressions, the atmosphere cycle, and the exit choreography. Strong candidate profile: CSS animation expert, ideally with SVG animation or GSAP background, who finds delight in the small things.",
-      "priority": "should"
+      "role": "Developer Experience Engineer / Data Pipeline Owner",
+      "reason": "The dashboard is a read-only window into JSON files that someone updates manually (or via bots we can't see). There is no write path, no schema contract, no tooling for the team to update their own status. A DX hire would own: the workers.json + activity.json schema and versioning, the CLI or webhook that bots use to push state changes, validation that prevents malformed data from breaking the UI, and potentially a lightweight admin panel for manual overrides. Without this role, every new dashboard feature is blocked by the fragility of the data layer. Every idea in Review 1 and Review 2 renders correctly only as long as the JSON is well-formed. That's a single point of failure for a product that's becoming a real team artifact.",
+      "priority": "must"
     }
   ]
 }

@@ -5,20 +5,10 @@
       "name": "Bloberto",
       "role": "Manager",
       "status": "working",
-      "task": "Managing Luna's creative review #2",
-      "progress": 50,
+      "task": "Evaluating Luna's creative review #2 ideas",
+      "progress": 80,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T00:50:00Z"
-    },
-    {
-      "id": "luna",
-      "name": "Luna",
-      "role": "Creative Director",
-      "status": "working",
-      "task": "Creative review #2 — reviewing codebase for new ideas",
-      "progress": 10,
-      "hired_at": "2026-03-06T20:00:00Z",
-      "updated_at": "2026-03-07T00:50:00Z"
+      "updated_at": "2026-03-07T00:55:00Z"
     }
   ],
   "roster": [
@@ -28,6 +18,6 @@
     { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
     { "id": "luna", "name": "Luna", "role": "Creative Director", "emoji": "🌙" }
   ],
-  "last_updated": "2026-03-07T00:50:00Z",
+  "last_updated": "2026-03-07T00:55:00Z",
   "manager": "Bloberto"
 }
