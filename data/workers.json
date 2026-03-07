@@ -29,11 +29,11 @@
   {
     "name": "Carlos",
     "role": "backend",
-    "status": "idle",
+    "status": "working",
     "emoji": "\u26a1",
-    "task": "",
-    "progress": 0,
-    "updated_at": "2026-03-07T19:30:00Z"
+    "task": "Luna #18: Activity log time grouping (Just now / Earlier today / Yesterday)",
+    "progress": 5,
+    "updated_at": "2026-03-07T20:36:00Z"
   },
   {
     "name": "Dave",
