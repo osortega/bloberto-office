@@ -5,10 +5,10 @@
       "name": "Bloberto",
       "role": "Manager",
       "status": "working",
-      "task": "Overseeing Sofia QA review #12 + Maya & Carlos on Luna ideas",
-      "progress": 75,
+      "task": "Reviewing Sofia QA #12 findings, overseeing Maya & Carlos",
+      "progress": 80,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T03:07:00Z"
+      "updated_at": "2026-03-07T03:15:00Z"
     },
     {
       "id": "maya",
@@ -29,16 +29,6 @@
       "progress": 10,
       "hired_at": "2026-03-06T16:25:00Z",
       "updated_at": "2026-03-07T02:56:00Z"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "status": "working",
-      "task": "QA & product analysis review #12 — code review, UX, accessibility, performance",
-      "progress": 10,
-      "hired_at": "2026-03-06T19:21:00Z",
-      "updated_at": "2026-03-07T03:07:00Z"
     }
   ],
   "roster": [
@@ -73,6 +63,6 @@
       "emoji": "🌙"
     }
   ],
-  "last_updated": "2026-03-07T03:07:00Z",
+  "last_updated": "2026-03-07T03:15:00Z",
   "manager": "Bloberto"
 }

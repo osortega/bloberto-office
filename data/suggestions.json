@@ -1,102 +1,101 @@
 {
   "analyst": "Sofia",
-  "review_number": 11,
-  "timestamp": "2026-03-07T02:38:58Z",
+  "review_number": 12,
+  "timestamp": "2026-03-07T03:07:00Z",
   "scores": {
-    "visual": 4.0,
+    "visual": 4,
     "ux": 3.5,
-    "responsiveness": 3.5,
-    "performance": 2.5,
+    "responsiveness": 3,
+    "performance": 3.5,
     "accessibility": 3.5,
     "code_quality": 3.5,
-    "features": 4.0,
-    "fun_factor": 5.0
+    "features": 4,
+    "fun_factor": 4.5
   },
   "overall_score": 3.7,
-  "notes": "Review #11. Solid aesthetic improvement this cycle — the SVG character portraits are genuinely charming and the vibe-reactive theming is cohesive. However, a critical CSS bug silently kills the dust-particle effect entirely, error/done workers are invisible to the dashboard, and an ever-growing animation count with zero prefers-reduced-motion support is a real accessibility and battery-life liability. The getTeamVibe duplication survived from last review — starting to feel personal. Fun factor stays at 5; no amount of bugs can ruin Bloberto.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Dust particles don't render — box-shadow percentages are invalid CSS",
-      "description": "Office.css lines 653-661: the .office-floor::before pseudo-element uses box-shadow with percentage x/y offsets (e.g. '12% 18% 0 1px rgba(...)'). CSS box-shadow offsets must be length values (px, rem, em) — percentages are not valid here. The spec rejects them silently, so the entire dust-particle effect is invisible. Replace with pixel values or switch to absolute-positioned pseudo-random <span> elements with CSS custom properties for coordinates. A canvas overlay is another clean option.",
+      "category": "performance",
+      "title": "Memoize expensive filter/map operations in App.jsx render",
+      "description": "activeWorkers is re-computed every render as a plain filter, then getTeamVibe(activeWorkers) is called 3+ times in the JSX (StatsBar, header vibe pill, inline text). Wrap activeWorkers in useMemo and compute vibe once. The workers.filter(w => w.status === 'working').length inside JSX also re-runs on every render. This matters because the 30s polling causes re-renders even when data hasn't changed.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Workers with 'done' or 'error' status are completely invisible on the dashboard",
-      "description": "App.jsx line 441: activeWorkers filters to only 'working' and 'idle'. Workers in 'done' or 'error' states never appear in the workers-grid, never contribute to StatsBar totals, and never render in the Office (since Office also receives activeWorkers). The Dashboard even has fully styled .stat-card.done and .worker-card.error CSS — but those states can never render. Add 'done' and 'error' to the activeWorkers filter (or rename it to visibleWorkers), and add a Done count to StatsBar. Error workers are especially critical — the vibe pill can say '🚨 On Fire' while the cause remains completely hidden.",
+      "title": "useEffect dependency on activeWorkers causes infinite re-render risk",
+      "description": "The cinematic entry/exit useEffect depends on [activeWorkers], but activeWorkers is a new array reference every render (created via .filter()). This means the effect fires on EVERY render, not just when workers actually change. Should use useMemo for activeWorkers or compare by value (e.g., JSON.stringify or by checking worker IDs).",
       "effort": "small"
     },
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "Zero prefers-reduced-motion support across 15+ concurrent animations",
-      "description": "At full load the app can run: manager-wobble, bob (×N working), wander-1/2/3/4 (×N idle), typing-dot ×3 (×N), plant-sway ×3, dust-drift, error-halo, vibe-crush/fire/in-flow, ghost-float, standby-pulse, pulse-live, shimmer, card-rise simultaneously. There is no @media (prefers-reduced-motion: reduce) block anywhere. This is a real issue for users with vestibular disorders and a battery drain on mobile. Add a single prefers-reduced-motion block that sets animation: none on all cosmetic animations, keeping only the error-halo (safety signal) and progress-bar transition.",
-      "effort": "medium"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "getTeamVibe still duplicated — survived from Review #10 unaddressed",
-      "description": "The function is defined in both App.jsx (returns {label, key} object) and Office.jsx (returns a plain string). The thresholds are identical so they don't diverge *yet*, but this is a maintenance trap. When someone tweaks the thresholds in one file, the vibe pill, stats bar, and office floor will disagree. Extract to src/utils/vibe.js, export the object-returning version, and import in both files. Office.jsx can destructure .key where it only needs the string.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
       "category": "ux",
-      "title": "Character tooltips are hover-only — inaccessible on touch and keyboard",
-      "description": "The data-tooltip CSS trick (.char[data-tooltip]::after) only fires on :hover. On mobile touch, working characters' task descriptions and ghost characters' role labels are completely invisible. Keyboard users focusing past the office panel also get nothing. Since the office is role='img', interactive info really belongs in the Dashboard panel — but if you want tooltips in the Office, use a small React tooltip component triggered by both mouseenter and focus, with role='tooltip' and aria-describedby wiring. At minimum add a title attribute matching data-tooltip as a low-effort fallback.",
-      "effort": "medium"
+      "title": "No loading/error state differentiation between tabs",
+      "description": "The Office tab has no loading skeleton or error state — if the fetch fails, Office just shows an empty floor with ghost characters and no indication anything went wrong. The error/warning banners only render inside the dashboard tab's parent but are actually in the main section. Move error banners above the tab toggle so they're visible on both tabs.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "Dead CSS: hire-form, hq-badge, and stat-card.done rules reference nothing in JSX",
-      "description": "App.css contains full styling blocks for .hire-form-wrapper, .hire-form, .form-group, .hq-badge, and .stat-card.done — none of these classes are rendered anywhere in App.jsx or Office.jsx. The hire form was presumably removed at some point. Dead CSS adds confusion ('is this used somewhere I missed?'), inflates bundle size, and makes future refactors harder. Remove them or, if the hire form is coming back, at least put a TODO comment on the CSS block.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Worker cards are keyboard-focusable but pressing Enter/Space does nothing",
-      "description": "WorkerCard has tabIndex={0} and a :focus-visible outline (good!) but no onKeyDown handler. A keyboard user tabbing through cards expects Enter or Space to do *something* — expand details, link to a profile, or at minimum trigger a visual acknowledgement. Either add a keydown handler that provides a meaningful action (e.g. announce the task via aria-live), or remove tabIndex and place focusable elements (like a 'View details' button) inside the card instead. Focusable elements that do nothing are worse than non-focusable ones.",
+      "title": "CharacterAvatar component is 200+ lines of inline SVG — extract to separate file",
+      "description": "Office.jsx is ~500 lines, with CharacterAvatar taking up nearly half. Each character (bloberto, carlos, maya, dave, sofia, luna) has hand-drawn SVG inline. Extract to CharacterAvatar.jsx or even individual character SVG components. Makes Office.jsx readable and characters independently testable.",
       "effort": "medium"
     },
     {
       "priority": "medium",
-      "category": "visual",
-      "title": "Character name labels in the Office view are illegibly small at default zoom",
-      "description": "Office.css: .char__name is 0.58rem (~9px). The 480px breakpoint hides them entirely. At 0.58rem on a 16px base that's ~9.3px — below the 11px minimum that most accessibility guidelines recommend even for decorative text. The names are a key wayfinding element in the office ('which blob is which?'). Bump to 0.7rem minimum. On 480px it's reasonable to hide them, but between 481-600px they should be visible and legible.",
+      "category": "accessibility",
+      "title": "Tab panel missing aria-labelledby and tab IDs",
+      "description": "The tab buttons have aria-controls pointing to tabpanel IDs, but the buttons themselves lack id attributes. For proper ARIA tab pattern, each tab button needs an id, and each tabpanel needs aria-labelledby pointing back. Also, inactive tab panels should be hidden (hidden attribute or display:none) rather than just not rendered — screen readers may announce the tabpanel container.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "getTeamVibe(activeWorkers) called 3x per render in App.jsx header with no memoization",
-      "description": "The App render calls getTeamVibe(activeWorkers) twice for the vibe-pill element (once for data-vibe, once for the label text) and StatsBar calls it a third time internally. Hoist to const vibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers]) near the top of the App component and pass vibe as a prop to StatsBar. The function itself is cheap but the pattern scales poorly as more components reference vibe state.",
+      "title": "Activity log re-reverses and re-slices on every render",
+      "description": "In ActivityLog, [...entries].reverse().slice(0, 20) creates two new arrays every render. Since entries can grow large over time, memoize this. Also the filter in the parent (activityLog.filter) runs before passing to ActivityLog, then ActivityLog reverses — the filter should be inside the memoization.",
       "effort": "small"
     },
     {
-      "priority": "low",
-      "category": "bug",
-      "title": "Idle wander paths clip through second-row desks",
-      "description": "Office.css wander-1 through wander-4 use top values as low as 73%. The second row of desks sits at top: 50% (DESKS array). Characters positioned at the desk have their avatar offset to top: 46% (desk.top - 4). The wander zones start at 73% which visually clears the desks, but on certain viewport widths where aspect-ratio: auto kicks in and the floor compresses vertically, idle characters can visually overlap the desk furniture. Set a hard floor for wander top values at 78%+ and test at 768px viewport width.",
+      "priority": "medium",
+      "category": "ux",
+      "title": "Office window time is based on viewer's local clock, not team timezone",
+      "description": "WindowElement uses new Date().getHours() which is the viewer's local time. If someone views from Tokyo while the team is in PST, the window shows Tokyo's sky. Consider using a fixed timezone (PST) or making it configurable, since the office is 'Bloberto's HQ' which has a canonical location.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "No way to see completed/done workers or historical data",
+      "description": "The dashboard only shows active workers (working/idle/error). There's no archive or 'recently completed' section. The activity log partially covers this, but a 'Recent Completions' accordion or section showing the last 5 completed workers with their final task would add useful context without cluttering the UI.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Stats bar vibe card text can overflow on mobile",
+      "description": "The vibe-value has white-space: nowrap and font-size 1rem, but labels like 'Crushing It' or 'After Hours' can overflow the stat-card on narrow screens (2-column grid at 600px). Add text overflow handling or reduce font size at small breakpoints.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Inline IIFE inside JSX for task tags is unnecessarily convoluted",
-      "description": "WorkerCard lines 196-208 use {(() => { const tags = getTaskTags(worker.task); return tags.length > 0 ? (...) : null })()} — an IIFE inside JSX. This is hard to read, harder to test, and adds no functional value over a simple extracted component. Replace with a <TaskTags task={worker.task} /> component that returns null when no tags match. This also makes the task-tag rendering independently testable.",
+      "title": "ROLE_EMOJIS duplicated between App.jsx and Office.jsx",
+      "description": "App.jsx has ROLE_EMOJIS map for worker cards, Office.jsx has ROLE_COLORS and DEFAULT_ROSTER. These role-related constants should live in a shared constants file (e.g., src/utils/constants.js) to avoid drift when adding new roles.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "No worker status filter on the Dashboard workers grid",
-      "description": "The Activity Log has a filter bar (All / Hires / Completions / Errors) but the workers grid has no equivalent. Once error/done workers are visible (see suggestion #2), users will want to quickly filter by status. A simple pill-style filter strip above the workers-grid — matching the exact pattern already used for the activity filter — would complete the UX parity. Reuse the .activity-filter-bar CSS; the component pattern is already there.",
+      "title": "Add a simple search/filter for workers in dashboard view",
+      "description": "With a growing team, being able to filter workers by name or role in the dashboard tab would be useful. A small search input above the workers grid. Low priority since team is small now, but good to have the pattern ready.",
+      "effort": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Office plants lack variety — all three use similar green palettes",
+      "description": "The three decorative plants are nice but visually samey. The cactus is slightly different but still green-on-brown. Consider giving one a flower, or varying pot colors more. Purely cosmetic but adds to the fun factor.",
       "effort": "small"
     }
   ]
