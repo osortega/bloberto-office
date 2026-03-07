@@ -1,24 +1,17 @@
 {
   "analyst": "Sofia",
   "emoji": "🔍",
-  "review_number": 27,
-  "timestamp": "2026-03-07T20:15:46Z",
+  "review_number": 28,
+  "timestamp": "2026-03-07T20:50:00Z",
   "screenshots": {
-    "desktop": "screenshot-desktop-qa27.png",
-    "mobile": "screenshot-mobile-qa27.png",
-    "office_tab": "screenshot-desktop-office-qa27.png",
+    "desktop": "screenshot-desktop-qa28.png",
+    "mobile": "screenshot-mobile-qa28.png",
     "status": "captured via Puppeteer (Chromium --single-process)"
   },
-  "confirmed_fixes_since_26": [
-    "office-floor role='img' → role='region' ✅ (was ARIA violation with focusable children)",
-    "tabpanel aria-labelledby now set on BOTH panels (tab-office, tab-dashboard) ✅",
-    "confetti-layer now has pointer-events: none in App.css ✅ (no longer blocks clicks for 2.5s)",
-    "CSS tooltip now includes :focus-visible::after and :focus-within::after ✅ (keyboard users can see tooltips)"
-  ],
   "scores": {
     "visual": 4,
-    "ux": 3,
-    "responsiveness": 4,
+    "ux": 4,
+    "responsiveness": 3,
     "performance": 3,
     "accessibility": 4,
     "code_quality": 3,
@@ -26,116 +19,114 @@
     "fun_factor": 5
   },
   "overall_score": 3.8,
-  "score_delta": "+0.2",
-  "score_explanation": "Up from 3.6 to 3.8. Four real fixes landed: tooltip keyboard access, confetti pointer-events, office-floor ARIA role, and tabpanel labelledby. Accessibility jumps from 3 to 4 — that's the first meaningful category improvement in several reviews. But workers.json is still a flat array for the 10th consecutive review, React.memo is still missing for the 8th, and we have a new set of URL hash bugs plus an empty window element that looks like a purple artifact at 8pm. Progress exists. It is slow. The app continues to be beautiful and completely fake-live.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "ESCALATE x10: workers.json flat array still kills entire live feed",
-      "description": "workers.json at https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json is still a bare JSON array. App.jsx line 471-472 does data.workers ?? [] and data.roster ?? [] — since data IS the array (not an object), both fall back to []. allWorkers = [], roster = [], so the app runs entirely on DEFAULT_ROSTER fallback. Additionally: (1) None of the 6 workers in the file have an 'id' field — CharacterAvatar's workerId matching (carlos, maya, dave, sofia, luna, bloberto) will never match, so all custom SVG avatars are skipped. (2) Roles use short lowercase format ('frontend', 'backend', 'devops', 'qa', 'creative-director') but ROLE_EMOJIS and ROLE_COLORS keys are full title-case ('Frontend Engineer', 'Backend Engineer', etc) — all getRoleEmoji() and ROLE_COLORS lookups return the fallback '🤖' / '#6b7280'. Fix: wrap workers.json in { workers: [...], roster: [...] }, add id fields matching DEFAULT_ROSTER ids, and use full role names matching constants.js keys.",
-      "effort": "small",
+      "category": "code",
+      "title": "App.jsx is 900+ lines — extract components into separate files",
+      "description": "App.jsx contains WorkerCard, ProgressBar, StatusBadge, DeltaBadge, ActivityLog, ActivityLogEntry, StatsBar, and the root App. Extract WorkerCard+ProgressBar+StatusBadge to src/components/WorkerCard.jsx and ActivityLog+ActivityLogEntry to src/components/ActivityLog.jsx. This is a maintenance timebomb that compounds with every feature.",
+      "effort": "medium",
       "assign_to": "Carlos",
-      "persistent_flags": 10
+      "persistent_flags": 4
     },
     {
       "priority": "high",
-      "category": "performance",
-      "title": "ESCALATE x8: React.memo missing on 6 App.jsx components",
-      "description": "StatsBar (line 285), WorkerCard (line 184), ActivityLog (line 80), ActivityLogEntry (line 64), EmptyState (line 335), and DeltaBadge (line 276) are all plain functions that re-render on every 30s poll tick regardless of whether their props changed. Office.jsx correctly wraps Character and CharacterAvatar in memo(). Apply React.memo() to all six. With 6 workers this triggers 180+ unnecessary re-renders per minute. Wrapping is literally a one-line change per component.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 8
-    },
-    {
-      "priority": "medium",
       "category": "bug",
-      "title": "NEW: Window element has empty hour gap 20-23 — renders as blank purple rectangle",
-      "description": "WindowElement (Office.jsx lines 413-461) has conditional content for: midnight (0-4), daytime (9-16), and golden hour (17-19). Hours 20-23 ('dusk/evening') fall through all conditions — no stars, no clouds, nothing. The sky gradient for 20-23 is linear-gradient(to bottom, #4c1d95, #312e81) — a solid dark purple-indigo rectangle with zero decorative content inside. In the desktop screenshot this looks like a rendering artifact: a large blank purple box in the bottom-right of the office floor. Fix: add an isEvening condition (hour >= 20 && hour <= 23) and render 1-2 animated star elements inside, or extend the midnight gradient and stars to cover hours 20-23.",
+      "title": "WorkerCard back-face uses key={i} — unstable React keys",
+      "description": "App.jsx workerHistory.map((e, i) => <div key={i}>) uses array index as key. If activity entries change order, React will reuse wrong DOM nodes. Use key={e.timestamp + (e.type ?? '') + (e.worker ?? '')} for stable identity.",
       "effort": "small",
       "assign_to": "Maya",
-      "persistent_flags": 0
+      "persistent_flags": 2
     },
     {
-      "priority": "medium",
+      "priority": "high",
       "category": "bug",
-      "title": "NEW: Keyboard shortcuts 1/2 add double-hash to URL (#office vs office)",
-      "description": "App.jsx lines 509-510 set window.location.hash = '#office' and window.location.hash = '#dashboard' with a literal '#' prefix. window.location.hash already prepends '#' internally — assigning '#office' results in the URL showing '##office'. All other hash assignments in the file correctly omit the prefix: line 454 uses 'dashboard', line 731 uses 'office', line 744 uses 'dashboard'. Fix: change lines 509-510 to window.location.hash = 'office' and window.location.hash = 'dashboard' to match the rest of the codebase.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "NEW: Arrow-key tab navigation doesn't sync URL hash",
-      "description": "handleTabKeyDown (App.jsx lines 441-450) calls setTab() when the user presses ArrowLeft/ArrowRight/ArrowUp/ArrowDown but never updates window.location.hash. Click handlers (lines 731, 744) and keyboard shortcut handlers (lines 509-510) all update the hash. Result: users who navigate tabs with arrow keys will have a stale hash that doesn't reflect the active tab. The hashchange listener (lines 401-408) and initial hash read (lines 392-393) set up a consistent system — arrow-key navigation breaks it silently. Fix: add window.location.hash = TABS[(currentIdx + 1) % TABS.length] inside each arrow-key branch of handleTabKeyDown.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "NEW: ProgressBar milestone useEffect returns inside for-loop — only first match gets cleanup",
-      "description": "App.jsx lines 133-143: the useEffect for milestone flash detection has a return () => clearTimeout(t) inside a for...of loop. A return statement inside a for-of loop in a useEffect body exits the loop and registers only the first matched milestone's cleanup function. If progress jumps from 0% to 100% in one render (e.g., data catches up), milestones 50, 75, and 100 are all added to milestonesRef but only milestone 25 gets a cleanup callback — the others leak their setFlashClass('') timer. Fix: collect all timers outside the loop (const timers = []) and return () => timers.forEach(clearTimeout), or process only the highest unmet milestone per render.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "NEW: activityLog.filter() in render creates new array reference on every cycle",
-      "description": "App.jsx lines 841-847: the ActivityLog call passes activityLog.filter(e => ...) inline. This creates a brand-new array reference on every render, which means ActivityLog will re-render on every 30s poll even if the log hasn't changed (and even after React.memo is added, because the prop reference always differs). Fix: wrap the filtered list in useMemo: const filteredActivity = useMemo(() => activityLog.filter(e => ...), [activityLog, activityFilter]) and pass filteredActivity to ActivityLog.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Confetti setTimeout has no cleanup ref — timer stacking on rapid vibe changes",
-      "description": "App.jsx line 614: setTimeout(() => setConfettiActive(false), 2500) stores no ref. Rapid vibe rank improvements stack multiple timers that fire out of order and toggle confetti off/on. Fix: add const confettiTimerRef = useRef(null), clear it before scheduling, and store the new id. Clear in effect cleanup.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 1
-    },
-    {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "Dashboard tabpanel only rendered when active — AT cannot discover all panels",
-      "description": "App.jsx lines 752-852 use a ternary that only renders ONE tabpanel at a time (if tab === 'office', only office panel is in the DOM; otherwise only dashboard). WAI-ARIA authoring practices recommend keeping all tabpanels in the DOM and hiding inactive ones with the HTML hidden attribute so assistive technologies can understand the complete widget structure. The current approach means a screen reader user on the office panel cannot discover the dashboard panel exists without first clicking its tab. Fix: render both panels always, add hidden={tab !== 'office'} and hidden={tab !== 'dashboard'} to the respective divs.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "key={i} on workerHistory map in WorkerCard back face",
-      "description": "App.jsx line 262: workerHistory.map((e, i) => <div key={i}>) uses array index as React key. Use key={e.timestamp + (e.type ?? '')} for stable identity.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "persistent_flags": 1
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "No React error boundary — render errors silently white-screen the app",
-      "description": "No ErrorBoundary component exists anywhere in the tree. A render-time throw (e.g., null.split in CharacterAvatar with a malformed worker object from a bad workers.json update) silently white-screens the entire app. Add a simple class-based ErrorBoundary wrapping the main content with a friendly fallback UI.",
+      "title": "No React ErrorBoundary — render errors white-screen the app",
+      "description": "A null reference in any component (e.g. malformed workers.json pushing null into CharacterAvatar) silently white-screens the entire app with no recovery. Add a class-based ErrorBoundary around the main content with a friendly fallback UI showing a reload button.",
       "effort": "medium",
       "assign_to": "Dave",
-      "persistent_flags": 3
+      "persistent_flags": 4
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Confetti setTimeout has no cleanup ref — timer stacking on rapid vibe changes",
+      "description": "App.jsx setTimeout(() => setConfettiActive(false), 2500) stores no ref. Rapid vibe rank changes stack multiple timers that toggle confetti out of order. Fix: use useRef to store timer ID, clear before scheduling new one, and clear in effect cleanup.",
+      "effort": "small",
+      "assign_to": "Maya",
+      "persistent_flags": 2
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Mobile office floor is cramped — characters overlap on 375px viewport",
+      "description": "On mobile (375px), the office floor characters overlap each other and desk labels are barely readable. The desk grid uses percentage positioning that doesn't scale well below 480px. Consider switching to a simplified list view on mobile or increasing the floor min-height.",
+      "effort": "medium",
+      "assign_to": "Maya",
+      "persistent_flags": 1
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "Activity log re-renders all entries on every poll cycle",
+      "description": "ActivityLog receives the full entries array prop which changes reference on every fetch (new array from JSON.parse). The .reverse().slice(0,20) creates new arrays each render. Memoize the displayed list with useMemo keyed on entries.length + last timestamp to avoid re-rendering 20 ActivityLogEntry components every 30s.",
+      "effort": "small",
+      "assign_to": "Carlos",
+      "persistent_flags": 1
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Dashboard tabpanel only renders active tab — AT can't discover all panels",
+      "description": "WAI-ARIA authoring practices recommend rendering both tabpanels in the DOM with hidden attribute on inactive ones, so screen readers can understand the full widget structure. Currently only one tabpanel exists at a time.",
+      "effort": "small",
+      "assign_to": "Maya",
+      "persistent_flags": 1
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Ghost workers (OOO) have no visual distinction from active workers at a glance",
+      "description": "On the office floor, ghost/OOO workers look similar to active workers until you hover. Add a subtle opacity reduction (0.4-0.5) and a dashed ring around their avatar to make OOO status immediately obvious without interaction.",
+      "effort": "small",
+      "assign_to": "Maya",
+      "persistent_flags": 0
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "No loading skeleton on initial fetch — blank cards flash before data arrives",
+      "description": "When the page first loads, there's a brief flash of empty state before workers.json loads. Add a simple skeleton/shimmer placeholder for the worker cards and activity log that shows during the initial fetch.",
+      "effort": "medium",
+      "assign_to": "Maya",
+      "persistent_flags": 0
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "App.jsx at 868 lines and App.css at 980 lines — extract components",
-      "description": "App.jsx contains 10+ component definitions plus root App. Move WorkerCard, ProgressBar, StatusBadge, DeltaBadge to src/components/WorkerCard.jsx; move ActivityLog and ActivityLogEntry to src/components/ActivityLog.jsx. App.css at 980 lines should split into per-component CSS modules. This is a maintenance issue that compounds with every new feature.",
+      "title": "App.css is 980+ lines — split into per-component CSS files",
+      "description": "App.css contains styles for every component. As the codebase grows, this becomes unmaintainable. When extracting components, co-locate their CSS (WorkerCard.css, ActivityLog.css, etc.).",
       "effort": "medium",
-      "assign_to": "Dave",
+      "assign_to": "Carlos",
       "persistent_flags": 3
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "title": "Office.jsx WindowElement polls every 60s but only changes once per hour",
+      "description": "WindowElement runs setInterval every 60s to check the hour, but the hour only changes once per hour. Calculate ms until next hour boundary and use setTimeout instead of fixed-interval polling.",
+      "effort": "small",
+      "assign_to": "Carlos",
+      "persistent_flags": 0
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Vacant desk question mark icon is barely visible on dark background",
+      "description": "The vacant desk shows a small '?' that blends into the dark office floor. Increase its opacity or add a subtle dashed border outline to make empty desks more visible as potential spaces.",
+      "effort": "small",
+      "assign_to": "Maya",
+      "persistent_flags": 0
     }
   ]
 }
