@@ -264,6 +264,8 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
     setBubble(b => ({ ...b, show: false }))
   }
 
+  const isError = worker.status === 'error'
+
   const style = {}
   if (left !== undefined) style.left = `${left}%`
   if (top  !== undefined) style.top  = `${top}%`
@@ -296,8 +298,11 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
           {bubble.quote}
         </div>
       )}
-      <div className="char__avatar">
+      <div className={`char__avatar${isError ? ' char__avatar--error' : ''}`}>
         <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} />
+        {isError && (
+          <div className="char__error-badge" role="img" aria-label="Error">!</div>
+        )}
       </div>
       <div className="char__name">{firstName}</div>
     </div>
@@ -351,15 +356,19 @@ export default function Office({ workers = [], roster = [] }) {
         </div>
 
         {/* Regular desks */}
-        {DESKS.map(desk => (
-          <div
-            key={desk.id}
-            className="desk"
-            style={{ left: `${desk.left}%`, top: `${desk.top}%` }}
-          >
-            <div className="desk__monitor" />
-          </div>
-        ))}
+        {DESKS.map(desk => {
+          const occ = deskOccupants[desk.id]
+          const hasError = occ && !occ.ghost && occ.worker.status === 'error'
+          return (
+            <div
+              key={desk.id}
+              className={`desk${hasError ? ' desk--error' : ''}`}
+              style={{ left: `${desk.left}%`, top: `${desk.top}%` }}
+            >
+              <div className="desk__monitor" />
+            </div>
+          )
+        })}
 
         {/* Coffee corner — top right */}
         <div className="coffee-corner">

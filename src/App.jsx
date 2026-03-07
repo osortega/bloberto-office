@@ -109,6 +109,27 @@ function getRoleEmoji(role) {
   return ROLE_EMOJIS[role] ?? '🤖'
 }
 
+/** @type {Array<{ pattern: RegExp, label: string, emoji: string, className: string }>} */
+const TASK_TAG_DEFS = [
+  { pattern: /fix|bug|hotfix|broken|error/i,                        label: 'Bug',    emoji: '🔴', className: 'task-tag--bug' },
+  { pattern: /deploy|ship|release|publish|ci|cd|pipeline/i,         label: 'Ship',   emoji: '🟠', className: 'task-tag--ship' },
+  { pattern: /design|ui|ux|css|layout|frontend|component/i,         label: 'Design', emoji: '🟣', className: 'task-tag--design' },
+  { pattern: /test|qa|spec|review|coverage|lint/i,                   label: 'QA',     emoji: '🔵', className: 'task-tag--qa' },
+  { pattern: /data|migration|schema|db|database|query/i,            label: 'Data',   emoji: '🟤', className: 'task-tag--data' },
+  { pattern: /docs|readme|changelog|write/i,                         label: 'Docs',   emoji: '🟢', className: 'task-tag--docs' },
+]
+
+/**
+ * Parses a task string and returns all matching intent tag objects.
+ * @param {string} taskString - The worker's current task description.
+ * @returns {Array<{ label: string, emoji: string, className: string }>}
+ */
+function getTaskTags(taskString) {
+  if (!taskString || typeof taskString !== 'string') return []
+  return TASK_TAG_DEFS.filter(({ pattern }) => pattern.test(taskString))
+    .map(({ label, emoji, className }) => ({ label, emoji, className }))
+}
+
 function StatusBadge({ status }) {
   return (
     <span className={`status-badge ${status}`}>
@@ -168,6 +189,18 @@ function WorkerCard({ worker }) {
       <div className="worker-task">
         <strong>📋 Current Task</strong>
         {worker.task}
+        {(() => {
+          const tags = getTaskTags(worker.task)
+          return tags.length > 0 ? (
+            <div className="task-tags">
+              {tags.map(({ label, emoji, className }) => (
+                <span key={label} className={`task-tag ${className}`}>
+                  {emoji} {label}
+                </span>
+              ))}
+            </div>
+          ) : null
+        })()}
       </div>
 
       {worker.status === 'working' && worker.updated_at && (
