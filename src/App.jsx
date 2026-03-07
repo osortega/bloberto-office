@@ -174,7 +174,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
   return (
     <div className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`}>
       <div className="worker-card__inner">
-        <div className="worker-card__front" aria-hidden={isFlipped || undefined}>
+        <div className="worker-card__front" aria-hidden={isFlipped || undefined} tabIndex={isFlipped ? -1 : undefined}>
           <div className="worker-header">
             <div className="worker-avatar">{getRoleEmoji(worker.role)}</div>
             <div className="worker-info" style={{ flex: 1, paddingLeft: '0.75rem' }}>
@@ -214,7 +214,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
           <ProgressBar progress={worker.progress} />
         </div>
 
-        <div className="worker-card__back" aria-hidden={!isFlipped || undefined}>
+        <div className="worker-card__back" aria-hidden={!isFlipped || undefined} tabIndex={!isFlipped ? -1 : undefined}>
           <button
             className="worker-card__back-close"
             onClick={() => setIsFlipped(false)}

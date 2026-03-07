@@ -439,7 +439,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .char[data-tooltip]:hover::after,
-.char[data-tooltip]:focus-visible::after {
+.char[data-tooltip]:focus-visible::after,
+.char[data-tooltip]:focus-within::after {
   opacity: 1;
 }
 
@@ -845,7 +846,8 @@
 
 /* ── Worker tooltip on hover (Luna #7) ── */
 .char[data-tooltip]:hover::after,
-.char[data-tooltip]:focus-visible::after {
+.char[data-tooltip]:focus-visible::after,
+.char[data-tooltip]:focus-within::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: 100%;
