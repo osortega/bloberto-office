@@ -268,7 +268,7 @@ function formatIdleDuration(updatedAt) {
   return rem > 0 ? `${hours}h ${rem}m` : `${hours}h`
 }
 
-const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [] }) {
+const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
   const isManager = worker.id === 'bloberto'
@@ -354,12 +354,15 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
 
   const extraProps = (tooltip && variant !== 'ghost') ? { 'data-tooltip': tooltip } : {}
 
+  const handleClick = onClick ? () => onClick(worker) : undefined
+
   return (
-    <div className={classes.join(' ')} style={style} {...extraProps}
+    <div className={classes.join(' ')} style={{ ...style, ...(handleClick ? { cursor: 'pointer' } : {}) }} {...extraProps}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onFocus={handleMouseEnter}
       onBlur={handleMouseLeave}
+      onClick={handleClick}
       tabIndex={0}
     >
       {variant === 'manager' && isSyncing && (
@@ -457,7 +460,7 @@ function WindowElement() {
   )
 }
 
-export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [] }) {
+export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
 
@@ -491,7 +494,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     <div className="office-wrap">
       <div
         className="office-floor"
-        role="img"
+        role="region"
         aria-label="Virtual office visualization showing team members at desks"
       >
 
@@ -528,6 +531,12 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                 ...(isWorking ? { '--role-color': ROLE_COLORS[occ.worker.role] } : {}),
               }}
             >
+              {/* Desk lamp — glows when occupied by a working character */}
+              <svg className="desk-lamp" width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
+                <ellipse cx="5" cy="4" rx="4.5" ry="2.5" fill="#fbbf24" />
+                <line x1="5" y1="6.5" x2="5" y2="12" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" />
+                <ellipse cx="5" cy="13" rx="3.5" ry="1.5" fill="#9ca3af" />
+              </svg>
               {!occ ? (
                 <>
                   <div className="desk__monitor desk__monitor--vacant" />
@@ -582,6 +591,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               delay={i * 0.12}
               tooltip={occ.ghost ? occ.worker.role : occ.worker.task}
               activityEntries={occ.ghost ? activityEntries : []}
+              onClick={!occ.ghost && onWorkerClick ? onWorkerClick : undefined}
             />
           )
         })}
@@ -603,6 +613,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               wanderIdx={wIdx}
               delay={i * 0.2}
               tooltip={wanderTooltips[wIdx]}
+              onClick={onWorkerClick || undefined}
             />
           )
         })}

@@ -181,13 +181,21 @@ function formatDuration(updatedAt) {
   return rem > 0 ? `Working for ${hours}h ${rem}m` : `Working for ${hours}h`
 }
 
-function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [] }) {
+function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false }) {
   const [isFlipped, setIsFlipped] = useState(false)
+  const cardRef = useRef(null)
 
   const classes = ['worker-card', worker.status]
   if (isNew) classes.push('worker-card--new')
   if (isFading) classes.push('worker-card--fading')
   if (isFlipped) classes.push('worker-card--flipped')
+  if (isFocused) classes.push('worker-card--focused')
+
+  useEffect(() => {
+    if (isFocused && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [isFocused])
 
   const workerHistory = activityEntries
     .filter(e => e.worker === worker.name)
@@ -195,7 +203,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
     .reverse()
 
   return (
-    <div className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`}>
+    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`}>
       <div className="worker-card__inner">
         <div className="worker-card__front" aria-hidden={isFlipped || undefined} tabIndex={isFlipped ? -1 : undefined}>
           <div className="worker-header">
@@ -408,6 +416,8 @@ export default function App() {
   const newClearTimersRef    = useRef({})   // { [id]: timeoutId }
   const [fadingMap, setFadingMap] = useState({})
   const [newIds,    setNewIds]    = useState(new Set())
+  const [focusedWorker, setFocusedWorker] = useState(null)
+  const focusedWorkerTimerRef = useRef(null)
 
   useEffect(() => {
     const touch = () => { lastActivity.current = Date.now() }
@@ -438,6 +448,17 @@ export default function App() {
       setTab(TABS[(currentIdx - 1 + TABS.length) % TABS.length])
     }
   }
+
+  const handleWorkerClick = useCallback((worker) => {
+    setTab('dashboard')
+    window.location.hash = 'dashboard'
+    setFocusedWorker(worker.id)
+    if (focusedWorkerTimerRef.current) clearTimeout(focusedWorkerTimerRef.current)
+    focusedWorkerTimerRef.current = setTimeout(() => {
+      setFocusedWorker(null)
+      focusedWorkerTimerRef.current = null
+    }, 3000)
+  }, [])
 
   const syncFromGitHub = useCallback(async () => {
     setIsSyncing(true)
@@ -701,6 +722,7 @@ export default function App() {
         <div className="tab-toggle" role="tablist" aria-label="View selector">
           <button
             role="tab"
+            id="tab-office"
             aria-selected={tab === 'office'}
             aria-controls="tabpanel-office"
             title="Office view (press 1)"
@@ -713,6 +735,7 @@ export default function App() {
           </button>
           <button
             role="tab"
+            id="tab-dashboard"
             aria-selected={tab === 'dashboard'}
             aria-controls="tabpanel-dashboard"
             title="Dashboard view (press 2)"
@@ -727,11 +750,11 @@ export default function App() {
         </div>
 
         {tab === 'office' ? (
-          <div role="tabpanel" id="tabpanel-office">
-            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} />
+          <div role="tabpanel" id="tabpanel-office" aria-labelledby="tab-office">
+            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} />
           </div>
         ) : (
-          <div role="tabpanel" id="tabpanel-dashboard">
+          <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
             <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} />
 
             <div className="section-header">
@@ -754,6 +777,7 @@ export default function App() {
                     index={0}
                     isNew={newIds.has(activeWorkers[0].id)}
                     activityEntries={activityLog}
+                    isFocused={focusedWorker === activeWorkers[0].id}
                   />
                 </div>
                 <p className="solo-spotlight-msg">🌟 Running solo today. Carrying the whole team on one pair of hands.</p>
@@ -773,6 +797,7 @@ export default function App() {
                         index={i}
                         isNew={newIds.has(w.id)}
                         activityEntries={activityLog}
+                        isFocused={focusedWorker === w.id}
                       />
                     ))}
                     {Object.values(fadingMap).map((w) => (

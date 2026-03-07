@@ -136,6 +136,26 @@
   font-weight: 700;
 }
 
+/* ── Desk lamp — glows warm yellow when occupied by a working worker ── */
+.desk-lamp {
+  position: absolute;
+  right: 5%;
+  top: 6%;
+  opacity: 0.3;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.desk--active .desk-lamp {
+  opacity: 1;
+  animation: lamp-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes lamp-pulse {
+  0%, 100% { filter: drop-shadow(0 0 3px rgba(251, 191, 36, 0.8)); }
+  50%       { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 1)) drop-shadow(0 0 16px rgba(251, 191, 36, 0.5)); }
+}
+
 /* ── Regular desks ── */
 .desk {
   position: absolute;
