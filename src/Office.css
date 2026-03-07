@@ -18,6 +18,7 @@
   --error:      #ef4444;
   --error-glow: rgba(239, 68, 68, 0.55);
   --error-tint: rgba(239, 68, 68, 0.12);
+  --red:        #ef4444;
 }
 [data-theme='light'] {
   --floor-bg:  #e6e6f0;
@@ -160,6 +161,18 @@
 [data-theme='light'] .desk__monitor {
   background: #2a2a3a;
   box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Active desk: monitor glow for working workers ── */
+.desk--active .desk__monitor {
+  box-shadow: 0 0 8px color-mix(in srgb, var(--role-color, var(--accent)) 55%, transparent);
+  background: #0d0d1a;
+  animation: monitor-blink 1.8s step-start infinite;
+}
+
+@keyframes monitor-blink {
+  0%, 89% { opacity: 1; }
+  90%, 100% { opacity: 0.85; }
 }
 
 /* ── Coffee corner (top right) ── */
@@ -370,8 +383,8 @@
     bob 2.2s ease-in-out 0.6s infinite;
 }
 .char--working .char__avatar {
-  border-color: var(--green);
-  box-shadow: 0 0 9px rgba(34, 197, 94, 0.35), 0 3px 10px rgba(0, 0, 0, 0.35);
+  border-color: var(--role-color, var(--green));
+  box-shadow: 0 0 9px color-mix(in srgb, var(--role-color, var(--green)) 45%, transparent), 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Ghost (roster-only, not active) — grayscale at desk ── */
@@ -389,8 +402,9 @@
   cursor: default;
 }
 
-/* Ghost avatar — normal border with standby pulse */
+/* Ghost avatar — role-color border with standby pulse */
 .char--ghost .char__avatar {
+  border-color: var(--role-color, var(--border));
   animation: standby-pulse 3s ease-in-out infinite;
 }
 
@@ -424,8 +438,8 @@
 
 /* ── Idle — wander paths set via char--wander-N ── */
 .char--idle .char__avatar {
-  border-color: var(--yellow);
-  box-shadow: 0 0 7px rgba(234, 179, 8, 0.3), 0 3px 10px rgba(0, 0, 0, 0.35);
+  border-color: var(--role-color, var(--yellow));
+  box-shadow: 0 0 7px color-mix(in srgb, var(--role-color, var(--yellow)) 40%, transparent), 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 .char--wander-1 {
   animation:
@@ -526,7 +540,72 @@
   100% { left: 53%; top: 85%; }
 }
 
+/* ---- Office Window ---- */
+.office-window {
+  position: absolute;
+  right: 2%;
+  top: 40%;
+  width: 7%;
+  height: 14%;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 2;
+  box-shadow:
+    inset 0 0 6px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.office-window__sky {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: background 3s ease;
+}
+
+.office-window__star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0.85;
+  animation: star-twinkle 2.5s ease-in-out infinite;
+}
+.office-window__star:nth-child(2) { animation-delay: 0.7s; }
+.office-window__star:nth-child(3) { animation-delay: 1.4s; }
+.office-window__star:nth-child(4) { animation-delay: 2.1s; }
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.6); }
+}
+
+/* ── Window clouds (daytime & golden hour) ── */
+.window-cloud {
+  position: absolute;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.65);
+  animation: cloud-drift linear infinite;
+}
+
+@keyframes cloud-drift {
+  from { left: -20%; }
+  to   { left: 115%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes star-twinkle { from {} to {} }
+  @keyframes cloud-drift  { from {} to {} }
+  .window-cloud { animation: none; }
+}
+
 @media (max-width: 600px) {
+  .office-window {
+    width: 9%;
+    height: 12%;
+  }
   .office-floor {
     min-height: 320px;
   }
@@ -680,7 +759,37 @@
   75% { transform: translateY(-5px) translateX(3px); }
 }
 
-/* ---- Accessibility: Reduced Motion ---- */
+/* ── Vibe Whiteboard ── */
+.office-whiteboard {
+  position: absolute;
+  left: 1%;
+  top: 38%;
+  width: 5.5%;
+  height: 16%;
+  background: #f0f0e8;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 3px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.42rem;
+  text-align: center;
+  color: #333;
+  line-height: 1.3;
+  z-index: 2;
+  pointer-events: none;
+  word-break: break-word;
+  padding: 2px;
+  transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+.office-whiteboard--urgent {
+  background: #fff0f0;
+  border-color: var(--red);
+}
+
+/* ---- Accessibility: Reduced Motion ── */
 @media (prefers-reduced-motion: reduce) {
   /* Disable all cosmetic animations */
   .office-worker,
@@ -689,7 +798,8 @@
   .office-plant,
   .office-floor::before,
   .speech-bubble span,
-  .worker-standby {
+  .worker-standby,
+  .office-whiteboard {
     animation: none !important;
     transition: none !important;
   }
@@ -709,6 +819,9 @@
   @keyframes ghost-enter { from {} to {} }
   @keyframes enter-office { from {} to {} }
   @keyframes fade-in-char { from {} to {} }
+
+  @keyframes monitor-blink { from {} to {} }
+  .desk--active .desk__monitor { animation: none; }
 
   /* error-halo is a safety signal — intentionally kept */
 }

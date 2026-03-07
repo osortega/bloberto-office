@@ -1,101 +1,101 @@
 {
   "analyst": "Sofia",
-  "review_number": 12,
-  "timestamp": "2026-03-07T03:07:00Z",
+  "review_number": 13,
+  "timestamp": "2026-03-07T03:40:00Z",
   "scores": {
-    "visual": 4,
-    "ux": 3.5,
-    "responsiveness": 3,
-    "performance": 3.5,
-    "accessibility": 3.5,
-    "code_quality": 3.5,
-    "features": 4,
+    "visual": 4.2,
+    "ux": 3.8,
+    "responsiveness": 3.5,
+    "performance": 3.4,
+    "accessibility": 3.8,
+    "code_quality": 3.6,
+    "features": 3.5,
     "fun_factor": 4.5
   },
-  "overall_score": 3.7,
+  "overall_score": 3.8,
   "suggestions": [
     {
       "priority": "high",
       "category": "performance",
-      "title": "Memoize expensive filter/map operations in App.jsx render",
-      "description": "activeWorkers is re-computed every render as a plain filter, then getTeamVibe(activeWorkers) is called 3+ times in the JSX (StatsBar, header vibe pill, inline text). Wrap activeWorkers in useMemo and compute vibe once. The workers.filter(w => w.status === 'working').length inside JSX also re-runs on every render. This matters because the 30s polling causes re-renders even when data hasn't changed.",
+      "title": "getTeamVibe called 3+ times per render in App.jsx",
+      "description": "In App.jsx, getTeamVibe(activeWorkers) is called inline in the JSX at least 3 times: once for the vibe-pill, once for the StatsBar, and once for the greeting area. Each call re-filters and re-computes. Memoize this with useMemo or compute once at the top of the render and pass the result down.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "useEffect dependency on activeWorkers causes infinite re-render risk",
-      "description": "The cinematic entry/exit useEffect depends on [activeWorkers], but activeWorkers is a new array reference every render (created via .filter()). This means the effect fires on EVERY render, not just when workers actually change. Should use useMemo for activeWorkers or compare by value (e.g., JSON.stringify or by checking worker IDs).",
+      "title": "Office window sky uses viewer's local timezone, not team timezone",
+      "description": "WindowElement uses new Date().getHours() — the viewer's local time. A viewer in Tokyo sees Tokyo sky while the 'office' is in PST. This was flagged in review #12 and is still unfixed. Use a fixed timezone offset or Intl.DateTimeFormat with timeZone option.",
       "effort": "small"
     },
     {
       "priority": "high",
-      "category": "ux",
-      "title": "No loading/error state differentiation between tabs",
-      "description": "The Office tab has no loading skeleton or error state — if the fetch fails, Office just shows an empty floor with ghost characters and no indication anything went wrong. The error/warning banners only render inside the dashboard tab's parent but are actually in the main section. Move error banners above the tab toggle so they're visible on both tabs.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
       "category": "code",
-      "title": "CharacterAvatar component is 200+ lines of inline SVG — extract to separate file",
-      "description": "Office.jsx is ~500 lines, with CharacterAvatar taking up nearly half. Each character (bloberto, carlos, maya, dave, sofia, luna) has hand-drawn SVG inline. Extract to CharacterAvatar.jsx or even individual character SVG components. Makes Office.jsx readable and characters independently testable.",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Tab panel missing aria-labelledby and tab IDs",
-      "description": "The tab buttons have aria-controls pointing to tabpanel IDs, but the buttons themselves lack id attributes. For proper ARIA tab pattern, each tab button needs an id, and each tabpanel needs aria-labelledby pointing back. Also, inactive tab panels should be hidden (hidden attribute or display:none) rather than just not rendered — screen readers may announce the tabpanel container.",
+      "title": "ROLE_EMOJIS in App.jsx and ROLE_COLORS + DEFAULT_ROSTER in Office.jsx should be in shared constants",
+      "description": "Role-related constants are scattered across files. Adding a new role requires editing multiple files. Extract to src/utils/constants.js. This was also flagged previously and remains unfixed.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "Activity log re-reverses and re-slices on every render",
-      "description": "In ActivityLog, [...entries].reverse().slice(0, 20) creates two new arrays every render. Since entries can grow large over time, memoize this. Also the filter in the parent (activityLog.filter) runs before passing to ActivityLog, then ActivityLog reverses — the filter should be inside the memoization.",
+      "title": "ActivityLog creates 2 new arrays every render",
+      "description": "[...entries].reverse().slice(0, 20) allocates two arrays per render. The parent also filters before passing entries. Memoize the reversed+sliced result with useMemo. Small win now, bigger win as activity log grows.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Office window time is based on viewer's local clock, not team timezone",
-      "description": "WindowElement uses new Date().getHours() which is the viewer's local time. If someone views from Tokyo while the team is in PST, the window shows Tokyo's sky. Consider using a fixed timezone (PST) or making it configurable, since the office is 'Bloberto's HQ' which has a canonical location.",
+      "title": "No loading state for Office tab — just empty floor on first load",
+      "description": "Dashboard tab has LoadingSkeleton but Office tab shows an empty office floor during initial fetch. Add a subtle loading indicator or skeleton state for the office view to avoid the 'ghost office' moment.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Tab state not synced with URL hash on browser back/forward",
+      "description": "Clicking tabs updates location.hash, but there's no hashchange/popstate listener. Browser back button doesn't switch tabs. Add a useEffect listening for hashchange events.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "feature",
-      "title": "No way to see completed/done workers or historical data",
-      "description": "The dashboard only shows active workers (working/idle/error). There's no archive or 'recently completed' section. The activity log partially covers this, but a 'Recent Completions' accordion or section showing the last 5 completed workers with their final task would add useful context without cluttering the UI.",
+      "title": "No 'recently completed' section in dashboard",
+      "description": "Dashboard only shows active workers. Workers that finish just vanish (with a nice fade, granted). A small 'Recently Completed' collapsed section showing the last 3-5 done workers would give better context without cluttering the UI.",
       "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "visual",
-      "title": "Stats bar vibe card text can overflow on mobile",
-      "description": "The vibe-value has white-space: nowrap and font-size 1rem, but labels like 'Crushing It' or 'After Hours' can overflow the stat-card on narrow screens (2-column grid at 600px). Add text overflow handling or reduce font size at small breakpoints.",
+      "title": "Vibe whiteboard text could be more dynamic",
+      "description": "The whiteboard shows static text per vibe state. It would be more fun if it rotated through a few messages (like Bloberto's speech bubbles do). Maybe show the current sprint focus or a random motivational/sarcastic message.",
       "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "Activity filter buttons use aria-pressed but should use aria-selected with role=tab pattern",
+      "description": "The filter bar uses role='group' with aria-pressed on buttons, but it behaves like a tab/segmented control. Either switch to proper tab pattern or keep as toggle buttons — but the current mix is semantically ambiguous for screen readers.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Office plants still lack variety — flagged in review #12",
+      "description": "All three plants use similar green palettes. Give the third plant a small flower or use a different pot color. Purely cosmetic but adds personality. This has been flagged multiple times now.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Add subtle sound effects toggle for worker arrivals/departures",
+      "description": "A tiny optional 'ding' when a new worker appears or a 'door close' when one leaves would make the office feel alive. Default OFF, toggled via a small speaker icon. Fun factor boost.",
+      "effort": "medium"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "ROLE_EMOJIS duplicated between App.jsx and Office.jsx",
-      "description": "App.jsx has ROLE_EMOJIS map for worker cards, Office.jsx has ROLE_COLORS and DEFAULT_ROSTER. These role-related constants should live in a shared constants file (e.g., src/utils/constants.js) to avoid drift when adding new roles.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "Add a simple search/filter for workers in dashboard view",
-      "description": "With a growing team, being able to filter workers by name or role in the dashboard tab would be useful. A small search input above the workers grid. Low priority since team is small now, but good to have the pattern ready.",
-      "effort": "medium"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Office plants lack variety — all three use similar green palettes",
-      "description": "The three decorative plants are nice but visually samey. The cactus is slightly different but still green-on-brown. Consider giving one a flower, or varying pot colors more. Purely cosmetic but adds to the fun factor.",
+      "title": "Ambient broadcast interval (45s) is hardcoded magic number",
+      "description": "The 45000ms interval in Office.jsx Character component should be a named constant at the top of the file for clarity and easy tuning.",
       "effort": "small"
     }
   ]

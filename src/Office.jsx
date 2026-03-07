@@ -84,12 +84,82 @@ const DEFAULT_BLOBERTO = {
   id: 'bloberto', name: 'Bloberto', role: 'Manager', status: 'working',
 }
 
+const VIBE_WHITEBOARD = {
+  'crushing':    '🏆 SHIP IT',
+  'on-fire':     '🚨 HELP',
+  'in-flow':     '⚡ FLOW',
+  'slow-day':    'TODO: ???',
+  'after-hours': '🌙 ZZZ',
+}
 
-function CharacterAvatar({ workerId, role, name, size = 40, emoji }) {
+
+function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
   const ariaLabel = name ? `${name}, ${role}` : role
 
   if (workerId === 'bloberto') {
+    const v = vibeKey || 'in-flow'
+
+    const blobFace = () => {
+      if (v === 'crushing') return (
+        <>
+          {/* Wide eyes */}
+          <circle cx="17" cy="16" r="2" fill="#2e1065" />
+          <circle cx="23" cy="16" r="2" fill="#2e1065" />
+          {/* Big grin */}
+          <path d="M 14 19 Q 20 26 26 19" stroke="#c4b5fd" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          {/* Star sparkles */}
+          <text x="9" y="11" fontSize="5" fill="#fbbf24" aria-hidden="true">✦</text>
+          <text x="26" y="9" fontSize="4" fill="#fbbf24" aria-hidden="true">✦</text>
+        </>
+      )
+      if (v === 'on-fire') return (
+        <>
+          {/* Eyes */}
+          <circle cx="17" cy="16" r="1.5" fill="#2e1065" />
+          <circle cx="23" cy="16" r="1.5" fill="#2e1065" />
+          {/* Worried brow arcs */}
+          <line x1="15" y1="12" x2="18.5" y2="13.5" stroke="#2e1065" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="21.5" y1="13.5" x2="25" y2="12" stroke="#2e1065" strokeWidth="1.2" strokeLinecap="round" />
+          {/* Flat mouth */}
+          <line x1="16" y1="21" x2="24" y2="21" stroke="#c4b5fd" strokeWidth="1.5" strokeLinecap="round" />
+          {/* Sweat droplet */}
+          <path d="M 29 13 L 27.2 17 Q 26.5 19.5 28.5 19.5 Q 30.5 19.5 29.8 17 Z" fill="#93c5fd" />
+        </>
+      )
+      if (v === 'slow-day') return (
+        <>
+          {/* Eyes */}
+          <circle cx="17" cy="16" r="1.5" fill="#2e1065" />
+          <circle cx="23" cy="16" r="1.5" fill="#2e1065" />
+          {/* Heavy droopy eyelids */}
+          <path d="M 15.5 16 Q 17 14.5 18.5 16 Z" fill="#8b5cf6" />
+          <path d="M 21.5 16 Q 23 14.5 24.5 16 Z" fill="#8b5cf6" />
+          {/* Drooped frown */}
+          <path d="M 16 20 Q 20 23 24 20" stroke="#c4b5fd" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        </>
+      )
+      if (v === 'after-hours') return (
+        <>
+          {/* Sleeping dash eyes */}
+          <line x1="15" y1="16" x2="19" y2="16" stroke="#2e1065" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="21" y1="16" x2="25" y2="16" stroke="#2e1065" strokeWidth="1.8" strokeLinecap="round" />
+          {/* Melty smile */}
+          <path d="M 15 20 Q 17 23 20 21 Q 23 19 25 22" stroke="#c4b5fd" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          {/* ZZZ above head */}
+          <text x="24" y="8" fontSize="5" fill="#c4b5fd" opacity="0.85" aria-hidden="true">zzz</text>
+        </>
+      )
+      // in-flow — default face
+      return (
+        <>
+          <circle cx="17" cy="16" r="1.5" fill="#2e1065" />
+          <circle cx="23" cy="16" r="1.5" fill="#2e1065" />
+          <path d="M 15 20 Q 17 23 20 21 Q 23 19 25 22" stroke="#c4b5fd" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        </>
+      )
+    }
+
     return (
       <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         {/* Crown */}
@@ -100,11 +170,7 @@ function CharacterAvatar({ workerId, role, name, size = 40, emoji }) {
         <circle cx="20" cy="16" r="9" fill="#8b5cf6" />
         {/* Shine */}
         <ellipse cx="16" cy="12" rx="2.5" ry="1.5" fill="rgba(255,255,255,0.25)" />
-        {/* Eyes */}
-        <circle cx="17" cy="16" r="1.5" fill="#2e1065" />
-        <circle cx="23" cy="16" r="1.5" fill="#2e1065" />
-        {/* Melty smile */}
-        <path d="M 15 20 Q 17 23 20 21 Q 23 19 25 22" stroke="#c4b5fd" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        {blobFace()}
       </svg>
     )
   }
@@ -279,17 +345,46 @@ function CharacterAvatar({ workerId, role, name, size = 40, emoji }) {
   )
 }
 
-function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe }) {
+function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
+  const isManager = worker.id === 'bloberto'
+  const roleColor = !isManager ? (ROLE_COLORS[worker.role] ?? '#6b7280') : null
 
   const [bubble, setBubble] = useState({ quote: null, show: false })
-  const timerRef = useRef(null)
+  const timerRef = useRef(null)      // hover auto-hide timeout
+  const ambientRef = useRef(null)    // ambient broadcast interval
+  const isHoveringRef = useRef(false) // prevents ambient overlap with hover
 
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current) }, [])
+  // Cleanup both timer and interval on unmount
+  useEffect(() => () => {
+    if (timerRef.current)  clearTimeout(timerRef.current)
+    if (ambientRef.current) clearInterval(ambientRef.current)
+  }, [])
+
+  // Ambient broadcast loop — fires every 45s, resets on vibe change
+  useEffect(() => {
+    if (variant !== 'manager') return
+
+    const id = setInterval(() => {
+      if (isHoveringRef.current) return  // hover takes priority
+      const quotes = (managerVibe && VIBE_QUOTES[managerVibe]) || MANAGER_QUOTES
+      const quote = quotes[Math.floor(Math.random() * quotes.length)]
+      setBubble({ quote, show: true })
+      if (timerRef.current) clearTimeout(timerRef.current)
+      timerRef.current = setTimeout(() => setBubble(b => ({ ...b, show: false })), 4000)
+    }, 45000)
+
+    ambientRef.current = id
+    return () => {
+      clearInterval(id)
+      ambientRef.current = null
+    }
+  }, [variant, managerVibe])
 
   const handleMouseEnter = () => {
     if (variant !== 'manager') return
+    isHoveringRef.current = true
     const quotes = (managerVibe && VIBE_QUOTES[managerVibe]) || MANAGER_QUOTES
     const quote = quotes[Math.floor(Math.random() * quotes.length)]
     if (timerRef.current) clearTimeout(timerRef.current)
@@ -299,6 +394,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
 
   const handleMouseLeave = () => {
     if (variant !== 'manager') return
+    isHoveringRef.current = false
     if (timerRef.current) clearTimeout(timerRef.current)
     setBubble(b => ({ ...b, show: false }))
   }
@@ -308,6 +404,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
   const style = {}
   if (left !== undefined) style.left = `${left}%`
   if (top  !== undefined) style.top  = `${top}%`
+  if (roleColor) style['--role-color'] = roleColor
 
   // Stagger animation delays for multi-animation variants
   if (delay > 0) {
@@ -338,7 +435,7 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
         </div>
       )}
       <div className={`char__avatar${isError ? ' char__avatar--error' : ''}`}>
-        <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} />
+        <CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={avatarSize} emoji={worker.emoji} vibeKey={vibeKey} />
         {isError && (
           <div className="char__error-badge" role="img" aria-label="Error">!</div>
         )}
@@ -349,6 +446,53 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
           <span /><span /><span />
         </div>
       )}
+    </div>
+  )
+}
+
+function WindowElement() {
+  const getHour = () => new Date().getHours()
+  const [hour, setHour] = useState(getHour)
+
+  useEffect(() => {
+    const id = setInterval(() => setHour(getHour()), 60000)
+    return () => clearInterval(id)
+  }, [])
+
+  const getGradient = (h) => {
+    if (h >= 5 && h <= 8)  return 'linear-gradient(to bottom, #f97316, #f472b6)'
+    if (h >= 9 && h <= 16) return 'linear-gradient(to bottom, #bae6fd, #f0f9ff)'
+    if (h >= 17 && h <= 19) return 'linear-gradient(to bottom, #f59e0b, #f87171)'
+    if (h >= 20 && h <= 23) return 'linear-gradient(to bottom, #4c1d95, #312e81)'
+    return 'linear-gradient(to bottom, #050510, #1e1b4b)'  // midnight 0-4
+  }
+
+  const isMidnight = hour >= 0 && hour <= 4
+  const isDaytime = hour >= 9 && hour <= 16
+  const isGoldenHour = hour >= 17 && hour <= 19
+  const timeLabel = hour < 5 ? 'midnight' : hour <= 8 ? 'sunrise' : hour <= 16 ? 'daylight' : hour <= 19 ? 'golden hour' : 'dusk'
+
+  return (
+    <div className="office-window" role="img" aria-label={`Office window showing ${timeLabel} sky`}>
+      <div className="office-window__sky" style={{ background: getGradient(hour) }}>
+        {isMidnight && (
+          <>
+            <span className="office-window__star" style={{ left: '18%', top: '20%' }} aria-hidden="true" />
+            <span className="office-window__star" style={{ left: '58%', top: '12%' }} aria-hidden="true" />
+            <span className="office-window__star" style={{ left: '38%', top: '55%' }} aria-hidden="true" />
+            <span className="office-window__star" style={{ left: '78%', top: '38%' }} aria-hidden="true" />
+          </>
+        )}
+        {isDaytime && (
+          <>
+            <div className="window-cloud" style={{ width: '14px', top: '28%', animationDuration: '11s' }} aria-hidden="true" />
+            <div className="window-cloud" style={{ width: '9px', top: '55%', animationDuration: '16s', animationDelay: '-5s' }} aria-hidden="true" />
+          </>
+        )}
+        {isGoldenHour && (
+          <div className="window-cloud" style={{ width: '12px', top: '40%', animationDuration: '14s', background: 'rgba(251,191,36,0.4)' }} aria-hidden="true" />
+        )}
+      </div>
     </div>
   )
 }
@@ -393,7 +537,14 @@ export default function Office({ workers = [], roster = [] }) {
 
         <div className="office-sign">🏢 Bloberto&apos;s HQ</div>
 
-        {/* Manager desk — top center */}
+        {/* Whiteboard — left wall, vibe-reactive */}
+        <div
+          className={`office-whiteboard${vibe === 'on-fire' ? ' office-whiteboard--urgent' : ''}`}
+          aria-label={`Whiteboard: ${VIBE_WHITEBOARD[vibe] ?? VIBE_WHITEBOARD['in-flow']}`}
+          role="img"
+        >
+          {VIBE_WHITEBOARD[vibe] ?? VIBE_WHITEBOARD['in-flow']}
+        </div>
         <div className="mgr-desk">
           <div className="mgr-desk__monitor" data-vibe={vibe} />
           <div className="mgr-desk__nameplate">Manager</div>
@@ -404,11 +555,16 @@ export default function Office({ workers = [], roster = [] }) {
         {DESKS.map(desk => {
           const occ = deskOccupants[desk.id]
           const hasError = occ && !occ.ghost && occ.worker.status === 'error'
+          const isWorking = occ && !occ.ghost && occ.worker.status === 'working'
           return (
             <div
               key={desk.id}
-              className={`desk${hasError ? ' desk--error' : ''}`}
-              style={{ left: `${desk.left}%`, top: `${desk.top}%` }}
+              className={`desk${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}`}
+              style={{
+                left: `${desk.left}%`,
+                top: `${desk.top}%`,
+                ...(isWorking ? { '--role-color': ROLE_COLORS[occ.worker.role] } : {}),
+              }}
             >
               <div className="desk__monitor" />
             </div>
@@ -432,7 +588,7 @@ export default function Office({ workers = [], roster = [] }) {
         </div>
 
         {/* Bloberto — always at manager desk, always visible */}
-        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} />
+        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} />
 
         {/* Active workers at desks (working) or as ghosts (roster-only) */}
         {DESKS.map((desk, i) => {
@@ -461,6 +617,9 @@ export default function Office({ workers = [], roster = [] }) {
             delay={i * 0.2}
           />
         ))}
+
+        {/* Office window — time-aware sky view */}
+        <WindowElement />
 
         {/* Decorative plants */}
         <div className="office-plant" style={{ left: '85%', top: '55%' }}>
