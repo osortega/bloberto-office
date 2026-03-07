@@ -591,5 +591,11 @@
     "type": "hire",
     "worker": "Dave",
     "message": "Assigned: Vibe-reactive boss honorific + floor grid glow (Luna review #22, must priority)"
+  },
+  {
+    "timestamp": "2026-03-07T22:40:00Z",
+    "type": "complete",
+    "worker": "Dave",
+    "message": "Shipped: Vibe-reactive boss honorific + floor grid glow (Luna review #22, 2 must-priority items)"
   }
 ]

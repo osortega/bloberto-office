@@ -493,7 +493,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   return (
     <div className="office-wrap">
       <div
-        className="office-floor"
+        className="office-floor" data-vibe={vibe}
         role="region"
         aria-label="Virtual office visualization showing team members at desks"
       >

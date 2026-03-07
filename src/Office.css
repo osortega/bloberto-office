@@ -55,6 +55,12 @@
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
+.office-floor[data-vibe="crushing"] { --grid-line: rgba(139,92,246,0.18); }
+.office-floor[data-vibe="on-fire"] { --grid-line: rgba(249,115,22,0.15); }
+.office-floor[data-vibe="in-flow"] { --grid-line: rgba(20,184,166,0.12); }
+.office-floor[data-vibe="slow-day"] { --grid-line: rgba(156,163,175,0.06); }
+.office-floor[data-vibe="after-hours"] { --grid-line: rgba(99,102,241,0.12); }
+
 /* ── Corner room label ── */
 .office-sign {
   position: absolute;

@@ -775,6 +775,8 @@ export default function App() {
       ? '🌤️ Good afternoon'
       : '🌙 Good evening'
 
+  const HONORIFICS = { crushing: 'LEGEND 🔥', 'on-fire': 'captain 🚨', 'in-flow': 'boss', 'slow-day': 'chief... you still there? 😐', 'after-hours': 'night owl 🌙' }
+
   return (
     <div className="app">
       <div className="ambient-particles" data-vibe={teamVibe.key} aria-hidden="true">
@@ -833,7 +835,7 @@ export default function App() {
         </div>
         <div className="header-right">
           <div className="header-badge">
-            {greeting}, <span>boss</span> &nbsp;&middot;&nbsp;{' '}
+            {greeting}, <span>{HONORIFICS[teamVibe.key] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
             {new Date().toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'short',
