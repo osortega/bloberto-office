@@ -1,70 +1,62 @@
 {
   "creative_director": "Luna",
-  "review_number": 17,
-  "timestamp": "2026-03-07T20:00:00Z",
-  "theme": "Make It Breathe — The Office Should Feel Alive Even When Nobody's Working",
+  "review_number": 18,
+  "timestamp": "2026-03-07T20:30:00Z",
+  "theme": "Make It Personal — The Dashboard Should Remember You",
   "ideas": [
     {
       "priority": "must",
-      "category": "office-life",
-      "title": "Ambient Office Sounds Toggle — Silence Is Uncanny",
-      "description": "The office floor is visually rich but totally silent. Add a mute/unmute button to the header that plays subtle ambient office sounds: keyboard clicks when someone is 'working', a soft hum for idle, a coffee machine gurgle on status change. Use the Web Audio API with small base64-encoded samples (no external deps). Implementation: add a 🔇/🔊 toggle button next to theme toggle. Store preference in localStorage. When unmuted, play a looping low ambient track (white noise at 0.03 volume). On worker status change to 'working', play a short keyboard-click sound. On 'error', play a soft alert tone. Keep total audio assets under 50KB by using oscillator-generated tones for alerts and a tiny noise buffer for ambiance. WHY: Sound is the missing sense. A visual-only dashboard feels like a screenshot. Even at 3% volume, ambient audio transforms 'I'm looking at a page' into 'I'm in the office.' This is the single biggest immersion upgrade possible with minimal code.",
-      "effort": "medium",
+      "category": "feature",
+      "title": "Keyboard Shortcut Cheat Sheet Modal",
+      "description": "The app has keyboard shortcuts (1=Office, 2=Dashboard, R=Refresh, Escape=blur) but ZERO discoverability. Users will never find them. Add a '?' key listener that opens a minimal modal listing all shortcuts. Implementation: a simple overlay with a grid of key→action pairs. Close on Escape or clicking outside. Add a tiny '⌨️' button in the header next to theme toggle that also opens it. WHY: Power users love shortcuts but only if they can discover them. A cheat sheet modal is the universal pattern (GitHub, Figma, Notion all do this). It takes 30 minutes to build and makes the app feel 10x more polished.",
+      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "must",
       "category": "storytelling",
-      "title": "Worker Status Timeline — Show the Day's Story at a Glance",
-      "description": "Each WorkerCard shows current status but has zero historical context. Add a thin horizontal timeline bar (height: 4px) at the bottom of each worker card that visualizes the last 8 hours of status changes. Pull from activity.json entries for that worker. Implementation: in WorkerCard, filter activityLog entries for this worker's name. Map timestamps to a 0-100% scale across 8 hours. Render colored segments: green for working periods, gray for idle, red for error. JSX: <div className='worker-timeline'>{segments.map(s => <div key={s.start} className='timeline-seg' style={{left: s.startPct+'%', width: s.widthPct+'%', background: s.color}} />)}</div>. CSS: .worker-timeline { position: relative; height: 4px; background: var(--surface3); border-radius: 2px; margin-top: 8px; overflow: hidden; } .timeline-seg { position: absolute; top: 0; height: 100%; border-radius: 2px; transition: width 0.3s ease; }. WHY: A timeline turns a status card into a story card. '🟢 Working' tells you now. A green-gray-green-red bar tells you: they worked this morning, took a break, came back, hit an error. That's a narrative. Managers don't just want current state — they want trajectory.",
-      "effort": "medium",
+      "title": "Activity Log Grouping by Time Blocks",
+      "description": "The activity log is a flat reverse-chronological list. When there are 20 entries, it's a wall of text with no visual hierarchy. Group entries by time blocks: 'Just now' (< 5min), 'Earlier today', 'Yesterday', etc. Add a subtle date separator between groups — a thin line with the label centered. WHY: Every messaging app groups by date for a reason. Temporal grouping gives the log a narrative structure: 'what happened this morning vs this afternoon.' Without it, 20 entries blur together into noise.",
+      "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "delight",
-      "title": "Desk Lamp Glow — Working Desks Should Light Up",
-      "description": "The office floor desks all look the same whether occupied or vacant. Add a small desk lamp SVG to each desk that glows when the occupant is working. In Office.jsx desk render: add a <g className='desk-lamp'> with a simple lamp shape (small trapezoid shade + stick + circle base). CSS: .desk-lamp { opacity: 0.3; } .desk--working .desk-lamp { opacity: 1; } .desk--working .desk-lamp .lamp-glow { fill: #fbbf24; filter: drop-shadow(0 0 8px rgba(251,191,36,0.6)); animation: lamp-pulse 3s ease-in-out infinite; } @keyframes lamp-pulse { 0%,100% { filter: drop-shadow(0 0 8px rgba(251,191,36,0.4)); } 50% { filter: drop-shadow(0 0 14px rgba(251,191,36,0.7)); } }. The lamp SVG: <circle cx='8' cy='2' r='6' className='lamp-glow' /> <rect x='7' y='8' width='2' height='6' fill='#9ca3af' /> <rect x='4' y='14' width='8' height='2' rx='1' fill='#6b7280' />. WHY: In a real office, you can tell who's working from across the room by whose desk lamp is on. This is that exact signal, digitized. The warm yellow glow on active desks creates an instant visual hierarchy — your eye goes to the lit desks first. The pulse animation adds life without being distracting.",
-      "effort": "small",
+      "title": "Character Idle Animations — Unique Per Person",
+      "description": "Idle workers all use the same wander animation paths. Each character should have a unique idle behavior that reflects their personality. Maya could doodle (small pencil animation near her), Carlos could type sporadically, Dave could bob his head to music (he has headphones!), Sofia could examine things with her magnifying glass. Implementation: add character-specific CSS classes like .char--idle-maya, .char--idle-dave with unique keyframe animations. Keep them subtle — a small looping gesture, not full character animation. WHY: Personality in idle states is what makes virtual offices feel alive. The Tamagotchi effect — people check in just to see what their favorites are doing. Right now idle workers are interchangeable; they should feel like individuals.",
+      "effort": "medium",
       "assigned_to": "dave"
     },
     {
       "priority": "should",
-      "category": "feature",
-      "title": "Click-to-Focus Worker Card from Office Floor",
-      "description": "The office floor characters and dashboard cards are two separate worlds. Clicking a character on the office floor does nothing. Add click handlers to office floor characters that switch to the Dashboard tab and scroll to / highlight that worker's card. Implementation: Office.jsx characters already render with worker data. Add onClick={() => onWorkerClick?.(worker.name)} to each character group. In App.jsx, add a focusedWorker state. When set, switch to dashboard tab and add a 'worker-card--focused' class to the matching card. CSS: .worker-card--focused { outline: 2px solid var(--accent); outline-offset: 2px; animation: card-focus-pulse 1s ease; } @keyframes card-focus-pulse { 0% { outline-color: transparent; } 50% { outline-color: var(--accent); } }. Clear focus after 3 seconds via setTimeout. Also add cursor:pointer to office characters: .office-character { cursor: pointer; } .office-character:hover { filter: brightness(1.1); }. WHY: The office floor is a beautiful spatial view but it's read-only — a painting you can look at but not touch. Making characters clickable bridges the two tabs into one coherent experience. It's the interaction that makes people go 'oh this is actually a real app, not just a demo.'",
+      "category": "visual",
+      "title": "Worker Card Micro-Interactions — Hover States That Tell Stories",
+      "description": "Worker cards have zero hover feedback beyond the default cursor. Add subtle hover states: card lifts slightly (translateY -2px, stronger shadow), the progress bar pulses once, and the status badge glows. On the error state, hovering could show a brief tooltip with the error context. CSS-only implementation: .worker-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); } .worker-card:hover .progress-bar-fill { animation: progress-hover-pulse 0.6s ease; }. WHY: Hover states are the first thing that separates 'student project' from 'polished product.' They signal interactivity and make the interface feel responsive. The card already flips on click — hover should hint that interaction is possible.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "visual",
-      "title": "Notification Badge on Tab Switcher — Unseen Changes Should Announce Themselves",
-      "description": "The tab switcher (Office / Dashboard) has no indication of activity on the other tab. If you're watching the office floor, you don't know 3 new activity entries appeared in the dashboard. Add a notification dot to the inactive tab when new data arrives. Implementation: track lastSeenActivityCount per tab. When activityEntries.length > lastSeenForDashboard and activeTab !== 'dashboard', show a dot. JSX in tab button: {unseenCount > 0 && <span className='tab-badge'>{unseenCount > 9 ? '9+' : unseenCount}</span>}. CSS: .tab-badge { position: absolute; top: -4px; right: -8px; background: var(--red); color: white; font-size: 0.55rem; min-width: 14px; height: 14px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 700; }. Clear on tab switch. WHY: Notification badges are the universal 'something happened' signal. Without them, the inactive tab is a black box. With them, users switch tabs because they're curious, not because they're checking. Curiosity-driven navigation > habit-driven navigation.",
-      "effort": "small",
+      "category": "feature",
+      "title": "Roster Panel — Show the Full Team, Not Just Active Workers",
+      "description": "The dashboard only shows active workers. If all 5 team members are idle/offline, you see an empty state. Add a collapsible 'Team Roster' section below the activity log showing ALL team members (from roster data) with their role, emoji, and last-seen time. Active members get a green dot; offline ones are grayed out. This gives visitors context about team composition even when nobody's working. WHY: A visitor landing when everyone is off-clock sees an empty page and bounces. A roster says 'this is a real team of 6 people, they're just not here right now.' It's the difference between an empty restaurant and a closed restaurant with a menu in the window.",
+      "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "Easter Egg: Konami Code Activates Party Mode",
-      "description": "Add a Konami code listener (↑↑↓↓←→←→BA). When triggered, activate a 10-second 'party mode': confetti falls from top of screen, all character avatars bounce, the vibe text changes to '🎉 PARTY MODE', and background shifts to a subtle rainbow gradient. Implementation: useEffect with keydown listener tracking a sequence buffer. On match, set partyMode state for 10s. CSS: .party-mode .office-floor { background: linear-gradient(135deg, rgba(239,68,68,0.05), rgba(59,130,246,0.05), rgba(16,185,129,0.05)); animation: party-bg 2s linear infinite; } @keyframes party-bg { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }. For confetti: render 30 absolute-positioned divs with random colors, sizes, and fall animations. Auto-cleanup after 10s. WHY: Easter eggs are the soul of personality-driven products. The Konami code is universally known by the exact demographic that would love this dashboard. Nobody needs it. Everyone loves finding it. It's the feature people tweet about.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "could",
-      "category": "storytelling",
-      "title": "Daily Summary Card — Yesterday's Highlights",
-      "description": "The activity log shows raw entries but has no synthesis. Add a collapsible 'Daily Summary' card above the activity log that auto-generates from activity.json: total tasks completed, total errors, busiest worker, longest working streak. Implementation: compute from activity entries filtered to last 24h. JSX: <div className='daily-summary'><h3>📊 Last 24h</h3><div className='summary-stats'><div>{completedCount} completed</div><div>{errorCount} errors</div><div>⭐ {busiestWorker} (MVP)</div></div></div>. CSS: .daily-summary { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; } .summary-stats { display: flex; gap: 16px; font-size: 0.8rem; color: var(--text-secondary); }. WHY: Raw logs are for debugging. Summaries are for understanding. A daily summary card transforms the activity log from 'here's everything that happened' into 'here's what matters.' It's the difference between reading a newspaper and reading every wire service dispatch.",
-      "effort": "small",
-      "assigned_to": "carlos"
+      "title": "Office Floor Weather Sync — Rain on the Window When It Rains IRL",
+      "description": "The office window already shows time-of-day sky. Take it further: fetch real weather for the team's location and add weather effects. Rain drops on the window when it's raining, snow particles when it's snowing, lightning flashes during thunderstorms. Use wttr.in (no API key needed) with a 30-min cache. Fallback to clear sky on error. WHY: This is the kind of detail that makes people say 'wait, is it actually raining on their window right now?!' It bridges the virtual and physical worlds in a way that feels magical. The window is already there — it's begging for weather.",
+      "effort": "medium",
+      "assigned_to": "dave"
     },
     {
       "priority": "wild",
       "category": "feature",
-      "title": "Visitor Counter — Show This Office Has Guests",
-      "description": "Add a small 'visitors today' counter in the footer using a free hit counter API (e.g., countapi.xyz or a simple Cloudflare Worker). Display as: '👀 12 visitors today'. On hover, show 'X total visits'. This makes the dashboard feel like a real place that people visit, not a private tool. Implementation: fetch count on load, increment via POST. Cache in sessionStorage to avoid double-counting. Render in footer next to the tagline. WHY: Social proof is powerful. Seeing '47 visitors today' makes one person feel like they found something cool. Seeing '0 visitors' is honest. Either way, it adds a layer of reality — this office exists in a world where people come and go.",
+      "title": "Slack-Style Status Messages — Let Workers Express Themselves",
+      "description": "Add an optional 'status' field to workers.json beyond just working/idle/error. Workers could have custom status messages like '🎧 In deep focus', '☕ Coffee break', '🔥 Fixing prod', '📚 Reading docs'. Display as a small italic line under the worker name on both the card and the office floor character. The manager (Bloberto) sets these via workers.json updates. WHY: Status messages humanize workers. 'Working' is clinical. '🎧 In deep focus — do not disturb' tells a story. It's low-effort data (one extra JSON field) with high personality payoff.",
       "effort": "small",
       "assigned_to": "tbd"
     }
