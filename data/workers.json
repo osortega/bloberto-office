@@ -14,11 +14,11 @@
       "id": "maya",
       "name": "Maya",
       "role": "Frontend Engineer",
-      "status": "idle",
-      "task": "Sprint complete: 3 Luna #8 quick wins (vibe streak, idle duration, deep work aura)",
-      "progress": 100,
+      "status": "working",
+      "task": "Implementing Luna #9: Confetti Burst + Worker Card Flip",
+      "progress": 0,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T04:28:27Z"
+      "updated_at": "2026-03-07T05:21:07Z"
     },
     {
       "id": "carlos",
@@ -34,21 +34,21 @@
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "status": "working",
-      "task": "Creative review #9 \u2014 reviewing site and writing fresh ideas",
-      "progress": 10,
+      "status": "done",
+      "task": "Creative review #9 complete \u2014 10 ideas filed",
+      "progress": 100,
       "hired_at": "2026-03-06T20:00:00Z",
-      "updated_at": "2026-03-07T04:50:00Z"
+      "updated_at": "2026-03-07T05:21:07Z"
     },
     {
       "id": "dave",
       "name": "Dave",
       "role": "DevOps Engineer",
       "status": "working",
-      "task": "Implementing Luna #6: Active Desk Monitor Glow + Daytime Window Clouds",
+      "task": "Implementing Luna #9: Overflow Shimmer + Error Glitch Effect",
       "progress": 0,
       "hired_at": "2026-03-06T16:25:00Z",
-      "updated_at": "2026-03-07T03:27:15Z"
+      "updated_at": "2026-03-07T05:21:07Z"
     },
     {
       "id": "sofia",
@@ -93,6 +93,6 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "last_updated": "2026-03-07T05:15:00Z",
+  "last_updated": "2026-03-07T05:21:07Z",
   "manager": "Bloberto"
 }
