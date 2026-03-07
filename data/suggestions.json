@@ -1,114 +1,118 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-07T19:50:00Z",
+  "emoji": "🔍",
+  "timestamp": "2026-03-07T19:45:44Z",
   "review_number": 26,
+  "screenshot_note": "Puppeteer blocked by thread limits in sandbox; analysis based on full source review + curl of live HTML + existing screenshots from prior sessions",
   "scores": {
     "visual": 4,
-    "ux": 4,
+    "ux": 3,
     "responsiveness": 4,
     "performance": 3,
     "accessibility": 3,
-    "code_quality": 4,
+    "code_quality": 3,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.9,
+  "overall_score": 3.6,
+  "score_delta": -0.2,
+  "score_explanation": "Score drops from 3.8 to 3.6. Features and visual polish keep climbing (ghost roster, time-aware window, confetti, ambient particles are genuinely great). But the workers.json structural mismatch, now flagged 9 consecutive times, means the live API returns zero workers every single page load. React.memo still missing on 6 components after 7 flags. Two accessibility bugs from #25 remain unpatched. A beautiful app held hostage by unfixed infrastructure.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "Tabpanels missing aria-labelledby",
-      "description": "Both tabpanel divs (tabpanel-office, tabpanel-dashboard) have role='tabpanel' and id but no aria-labelledby linking them to their tab buttons. Add id='tab-office' and id='tab-dashboard' to the tab buttons, then aria-labelledby='tab-office' / 'tab-dashboard' on the panels.",
-      "effort": "small",
-      "persistent_flags": 0
-    },
-    {
-      "priority": "high",
-      "category": "code",
-      "title": "App.jsx is 850+ lines — needs component splitting",
-      "description": "App.jsx contains WorkerCard, StatsBar, ActivityLog, ProgressBar, EmptyState, LoadingSkeleton, and App all in one file. Extract at least WorkerCard and StatsBar into their own files. This is a maintainability issue that gets worse every review cycle.",
-      "effort": "medium",
-      "persistent_flags": 3
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "office-floor role='img' wraps interactive children",
-      "description": "The office-floor div has role='img' but contains Character components with tabIndex={0}. Screen readers will skip interactive elements inside role='img'. Change to role='region' with an aria-label, or remove role='img' entirely.",
-      "effort": "small",
-      "persistent_flags": 2
-    },
-    {
-      "priority": "high",
       "category": "bug",
-      "title": "workers.json is a flat array — DEFAULT_ROSTER id mismatch",
-      "description": "workers.json is a flat array of objects with 'name' fields but no 'id' fields. App.jsx expects { workers: [...], roster: [...] } with id fields. The code falls back to DEFAULT_ROSTER which uses ids like 'carlos', 'maya' etc. but the actual JSON has no ids. This means ghost detection, desk assignment, and CharacterAvatar matching all rely on DEFAULT_ROSTER fallback rather than actual data. Add 'id' fields to workers.json entries and wrap in { workers: [...], roster: [...] } structure.",
-      "effort": "medium",
+      "title": "ESCALATE: workers.json flat array breaks entire live feed",
+      "description": "workers.json is a bare JSON array. App.jsx line 451 does `data.workers ?? []` and `data.roster ?? []` on the parsed result. Since the file is an array (not an object), both fall back to []. No live worker is ever displayed. Fix: wrap workers.json in { workers: [...], roster: [...] }. Also add 'id' fields matching DEFAULT_ROSTER ids (carlos, maya, dave, sofia, luna, bloberto) and use full role names matching ROLE_EMOJIS keys (e.g. 'Frontend Engineer' not 'frontend'). Without this the entire app runs on DEFAULT_ROSTER fallback only and all live-data features (CharacterAvatar ID matching, ghost detection, desk assignment) are silently broken.",
+      "effort": "small",
       "persistent_flags": 9
     },
     {
-      "priority": "medium",
+      "priority": "high",
       "category": "performance",
-      "title": "ActivityLog reverses array inline every render",
-      "description": "In ActivityLog, [...entries].reverse().slice(0, 20) creates a new reversed copy on every render. Wrap in useMemo keyed on entries to avoid unnecessary allocations.",
-      "effort": "small",
-      "persistent_flags": 2
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "WorkerCard, StatsBar, ProgressBar not memoized",
-      "description": "Office.jsx correctly uses React.memo on Character and CharacterAvatar, but App.jsx components re-render on every 30s poll even when data hasn't changed. Wrap WorkerCard and StatsBar in React.memo.",
+      "title": "ESCALATE: React.memo missing on 6 major components",
+      "description": "StatsBar (App.jsx line 277), WorkerCard (line 184), ActivityLog (line 80), ActivityLogEntry (line 64), EmptyState (line 327), and DeltaBadge (line 268) are plain functions that re-render every 30 seconds on every poll cycle regardless of whether their props changed. Office.jsx already wraps Character and CharacterAvatar in memo(). Apply the same pattern: wrap each in React.memo(). With 6+ workers this causes 6 x 30s = 180+ unnecessary re-renders per minute.",
       "effort": "small",
       "persistent_flags": 7
     },
     {
-      "priority": "medium",
-      "category": "ux",
-      "title": "CSS data-tooltip not keyboard accessible",
-      "description": "Tooltips on desk occupants use CSS [data-tooltip]::after which only appears on :hover. Characters have tabIndex={0} but no :focus-within tooltip display. Add [data-tooltip]:focus-within::after with same styles as hover.",
+      "priority": "high",
+      "category": "accessibility",
+      "title": "office-floor role='img' contains focusable children -- ARIA violation",
+      "description": "Office.jsx line 492: the office-floor div has role='img' aria-label='Virtual office visualization...' but the element contains Character components (line 569+) each with tabIndex={0}. Per ARIA spec, role='img' must be a leaf node -- assistive technologies skip all descendants including interactive ones. Screen reader users cannot reach any character. Fix: change to role='region' aria-label='Virtual office...'.",
       "effort": "small",
-      "persistent_flags": 3
+      "persistent_flags": 2
+    },
+    {
+      "priority": "high",
+      "category": "accessibility",
+      "title": "tabpanel elements missing aria-labelledby -- incomplete ARIA tab pattern",
+      "description": "App.jsx lines 730 and 734: both tabpanel divs have role='tabpanel' and id but NO aria-labelledby. The WAI-ARIA tabs pattern requires tabpanel elements to reference their controlling tab via aria-labelledby. Fix: add id='tab-btn-office' to the Office tab button (line 702) and id='tab-btn-dashboard' to Dashboard tab button (line 714), then add aria-labelledby='tab-btn-office' and aria-labelledby='tab-btn-dashboard' to the respective tabpanel divs.",
+      "effort": "small",
+      "persistent_flags": 1
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "Ghost bubble uses IIFE inside JSX",
-      "description": "In Office.jsx, the ghost bubble renders via an immediately-invoked function expression inside JSX (variant === 'ghost' && ghostBubble && (() => { ... })()). Extract to a small GhostBubble component or at minimum a named function for readability.",
+      "category": "bug",
+      "title": "Confetti setTimeout has no cleanup ref -- stacked timers cause blinking",
+      "description": "App.jsx line 593: setTimeout(() => setConfettiActive(false), 2500) stores no ref. If vibe rank improves multiple times rapidly (e.g. slow-day to in-flow to crushing during a burst), timers pile up and may fire out of order, toggling confetti off and back on. Fix: add const confettiTimerRef = useRef(null), then before scheduling do if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current), and store the new timeout in the ref. Clear in effect cleanup.",
       "effort": "small",
       "persistent_flags": 0
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "Vibe streak resets on every page reload",
-      "description": "sessionStorage resets when tab closes. The streak counter effectively never reaches high tiers for real users. Consider localStorage or remove the feature if it can't meaningfully persist.",
+      "category": "performance",
+      "title": "ActivityLog copies+reverses entries array on every render without useMemo",
+      "description": "App.jsx line 81: const displayed = [...entries].reverse().slice(0, 20) runs on every render of ActivityLog. Since ActivityLog is not memoized, this runs every 30s. Wrap in useMemo: const displayed = useMemo(() => [...entries].slice().reverse().slice(0, 20), [entries]). Note: use .slice().reverse() instead of directly calling .reverse() on the spread copy for clarity.",
       "effort": "small",
-      "persistent_flags": 1
+      "persistent_flags": 2
     },
     {
-      "priority": "low",
-      "category": "feature",
-      "title": "No loading state for Office tab",
-      "description": "Dashboard tab shows LoadingSkeleton during initial fetch, but Office tab shows an empty floor with no indication data is loading. Add a subtle loading indicator or skeleton to the office view.",
+      "priority": "medium",
+      "category": "code",
+      "title": "App.jsx is 843 lines -- extract WorkerCard and ActivityLog components",
+      "description": "App.jsx contains 10+ component definitions plus the root App function. Minimum viable split: move WorkerCard, ProgressBar, StatusBadge, and DeltaBadge to src/components/WorkerCard.jsx (~130 lines); move ActivityLog and ActivityLogEntry to src/components/ActivityLog.jsx (~60 lines). This reduces App.jsx to ~600 lines and makes future per-component CSS modules viable. App.css at 950+ lines has the same problem.",
+      "effort": "medium",
+      "persistent_flags": 2
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "CSS data-tooltip invisible to keyboard users",
+      "description": "Office.jsx line 355 sets data-tooltip on Character divs with tabIndex={0}. The tooltip is CSS-only via [data-tooltip]::after (Office.css) and only appears on :hover. Keyboard users can focus a character but never see the tooltip. Fix: (1) add [data-tooltip]:focus-within::after, [data-tooltip]:focus::after { /* same styles as hover */ } to Office.css; (2) add title={tooltip} to the div as a native browser fallback for screen readers.",
       "effort": "small",
-      "persistent_flags": 1
+      "persistent_flags": 2
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "No error boundary — bad JSON crashes entire app",
-      "description": "If workers.json returns malformed JSON, the entire app white-screens. Add a React error boundary around the main content area with a friendly fallback UI.",
+      "title": "key={i} on workerHistory map in WorkerCard back face",
+      "description": "App.jsx line 255: workerHistory.map((e, i) => <div key={i}>) uses array index as React key. If activity entries are prepended or reordered, React will unnecessarily unmount/remount DOM nodes. Use key={e.timestamp + (e.type ?? '')} for stable identity.",
+      "effort": "small",
+      "persistent_flags": 0
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "confetti-layer missing pointer-events:none -- blocks header clicks for 2.5s",
+      "description": "App.jsx line 649: the confetti-layer div renders on top of the entire viewport for 2.5s. During the confetti animation any click on the theme toggle, sync button, or tab bar is absorbed by the overlay. Add pointer-events: none to .confetti-layer in App.css. Confetti is purely decorative and should never intercept input.",
+      "effort": "small",
+      "persistent_flags": 0
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "No React error boundary -- render error silently white-screens",
+      "description": "If a worker object has an unexpected shape and causes a render-time throw (e.g. null.split call in CharacterAvatar name handling), there is no ErrorBoundary and the entire app white-screens with no user-facing message. Wrap the main content in a simple class-based ErrorBoundary component with a friendly 'Something went wrong -- try refreshing' fallback UI.",
       "effort": "medium",
       "persistent_flags": 2
     },
     {
       "priority": "low",
-      "category": "visual",
-      "title": "Confetti z-index blocks header interactions briefly",
-      "description": "The confetti-layer div overlays the entire viewport during the 2.5s animation. If a user tries to click the theme toggle or sync button during confetti, clicks are swallowed. Add pointer-events: none to .confetti-layer.",
+      "category": "ux",
+      "title": "Office tab shows empty floor with no loading indicator during initial fetch",
+      "description": "Dashboard tab shows LoadingSkeleton during isLoading (App.jsx line 763). The Office tab just shows Bloberto alone on an empty floor with zero indication data is loading. Thread isSyncing or isLoading into Office.jsx and add a subtle 'Loading team...' label or faint shimmer on desks during the initial load cycle.",
       "effort": "small",
-      "persistent_flags": 0
+      "persistent_flags": 2
     }
   ]
 }
