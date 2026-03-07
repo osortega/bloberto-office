@@ -393,5 +393,11 @@
     "type": "system",
     "worker": "Luna",
     "message": "Creative review #15 timed out \u2014 reusing review #14 ideas for evaluation"
+  },
+  {
+    "timestamp": "2026-03-07T18:50:00Z",
+    "type": "complete",
+    "worker": "Bloberto",
+    "message": "Fixed 7 Sofia #24 issues: extracted DEFAULT_ROSTER/DESKS/VIBE_WHITEBOARD to constants.js, VIBE_QUOTES to quotes.js, React.memo on CharacterAvatar+Character, removed duplicate tooltip CSS, fixed date+window timezone, card flip tabIndex, whiteboard 480px breakpoint, streak aria-label"
   }
 ]
