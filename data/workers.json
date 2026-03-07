@@ -47,11 +47,11 @@
       "name": "Sofia",
       "role": "QA Engineer",
       "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA Review #34 \u2014 code analysis & site audit",
-      "progress": 10,
-      "started": "2026-03-07T23:45:00Z",
-      "updated_at": "2026-03-07T23:45:00Z"
+      "status": "idle",
+      "task": "",
+      "progress": 0,
+      "started": null,
+      "updated_at": "2026-03-07T23:50:00Z"
     }
   ],
   "roster": [

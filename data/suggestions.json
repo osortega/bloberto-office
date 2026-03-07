@@ -1,111 +1,106 @@
 {
   "analyst": "Sofia",
-  "review_number": 33,
-  "timestamp": "2026-03-07T23:15:51Z",
-  "screenshot_note": "Live screenshot attempt failed due to environment thread exhaustion (pthread_create: Resource temporarily unavailable). Visual analysis based on QA-29 reference screenshots (same codebase, no visual commits since). Code analysis performed against current /workspace/src/.",
+  "review_number": 34,
+  "timestamp": "2026-03-07T23:47:00Z",
+  "screenshot_note": "Code-level review — focused on bugs, performance, and UX issues identified from source analysis",
   "scores": {
     "visual": 4,
-    "ux": 3,
+    "ux": 3.5,
     "responsiveness": 3,
     "performance": 3,
     "accessibility": 3,
-    "code_quality": 2,
+    "code_quality": 3.5,
     "features": 4,
-    "fun_factor": 5
+    "fun_factor": 4.5
   },
-  "overall_score": 3.4,
-  "visual_observations": "Desktop: Dark theme renders cleanly. Office floor shows 5 workers (Carlos, Maya, Dave, Sofia, Luna) as ghosts at desks — all OOO since it's after-hours vibe. Bloberto's nameplate correctly reads 'NIGHT WATCH'. One vacant desk visible (bottom-right). A white rectangle is visible to the left of the office floor boundary — this is a ghost OOO bubble escaping the overflow:hidden clip boundary, likely caused by a CSS transform stacking context on the character div. Purple decorative rectangle on the right edge of the office. Mobile: Office floor compresses well but Bloberto's vibe label truncates ('WATCH' instead of 'NIGHT WATCH'). Large dead zone of ~250px below the office floor before footer. Ghost OOO bubble escape is also visible on mobile.",
+  "overall_score": 3.6,
+  "visual_observations": [
+    "Office view is charming — SVG characters with vibe-reactive Bloberto face is genuinely delightful",
+    "Dashboard cards, activity log, stats bar all feel polished. Good use of color coding",
+    "Confetti + completion toast on task ship is a nice touch",
+    "The whiteboard and coffee corner add personality without clutter",
+    "Maya and Carlos currently working on Luna's ideas — live site should show them at desks"
+  ],
   "suggestions": [
     {
       "priority": "high",
-      "category": "code",
-      "title": "App.jsx is 1025 lines — extract components NOW (9th flag)",
-      "description": "App.jsx contains WorkerCard, StatsBar, ActivityLog, ActivityLogEntry, ProgressBar, DeltaBadge, StatusBadge, EmptyState, LoadingSkeleton, plus all 7 useEffect hooks in a single 1025-line App() function. This has been flagged 8 previous times. Extract at minimum: src/components/WorkerCard.jsx, src/components/StatsBar.jsx, src/components/ActivityLog.jsx, src/components/ProgressBar.jsx. The remaining App.jsx should be under 300 lines. Each extraction also enables proper React.memo placement.",
-      "effort": "medium"
-    },
-    {
-      "priority": "high",
       "category": "bug",
-      "title": "NEW: Keyboard shortcuts 1/2 use '#office' (with hash) causing double-hash URL bug",
-      "description": "App.jsx line 604: `window.location.hash = '#office'` and `window.location.hash = '#dashboard'` include the leading '#'. The setter for window.location.hash already adds the '#', so this produces URLs like '...##office'. Every other call site (lines 543, 885, 898) correctly uses 'office' and 'dashboard' without '#'. With ##office in the URL, the hashchange listener on line 487 reads hash.slice(1) = '#office' which fails the equality check against 'office', breaking browser back/forward navigation when keyboard shortcuts were used. Fix: remove the '#' prefix on lines 604-605.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "NEW: StatsBar grid overflow — 7 possible cards in a 5-column grid",
-      "description": "stats-bar uses `grid-template-columns: repeat(5, 1fr)`. StatsBar renders 5 base cards (Total, Active, Idle, Live, Vibe) plus conditionally: stat-card--error (when errorCount > 0) and stat-card--stuck (when stuckWorkers.length > 0). When both conditions are true, 7 cards render into a 5-column grid, causing 2 orphaned cards to wrap to a misaligned second row that breaks the visual layout completely. Fix: change to `grid-template-columns: repeat(auto-fill, minmax(140px, 1fr))` or use `repeat(7, 1fr)` with a responsive clamp.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "performance",
-      "title": "React.memo missing on hot-path components (12th flag)",
-      "description": "WorkerCard, ActivityLogEntry, StatusBadge, ProgressBar, StatsBar, and ActivityLog all re-render on every 30s poll cycle even when their data hasn't changed. WorkerCard is the worst offender — each render recomputes task tags via TASK_TAG_DEFS.filter (6 regex tests per worker), getRelativeTime, formatDuration, and scrollIntoView checks. Wrapping with React.memo and memoizing callbacks prevents all of this churn. This has been flagged 11 previous times with no action.",
-      "effort": "small"
+      "title": "ProgressBar milestone Set never resets when worker restarts a task",
+      "description": "ProgressBar uses milestonesRef = useRef(new Set()) to track which milestones (25/50/75/100) have flashed. This ref persists across task changes because it's never cleared. When a worker completes (progress=100) then starts a new task (progress resets to 0), the Set still has {25,50,75,100}, so no flash animations fire for the new task. Fix: add a useEffect that clears milestonesRef.current when progress drops below 25 or when updatedAt changes significantly (indicating new task). Small fix, big visual impact — milestones are a key feedback loop.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "No ErrorBoundary anywhere in the tree (9th flag)",
-      "description": "Zero ErrorBoundary components exist. If workers.json returns malformed data (e.g., missing 'status' field), worker.status.toLowerCase() in CSS class logic or STATUS_LABELS[worker.status] lookups throw synchronously and white-screen the entire app with no recovery path. Add at minimum: <ErrorBoundary fallback={<ErrorFallback />}> wrapping tabpanel-office and tabpanel-dashboard. A simple class component with componentDidCatch that renders a 'Something went wrong — click to retry' button calling syncFromGitHub is sufficient.",
-      "effort": "small"
+      "title": "WORKER_ROLE_COLORS duplicates and diverges from ROLE_COLORS in constants.js",
+      "description": "App.jsx lines 14-20 define WORKER_ROLE_COLORS keyed by worker NAME (Maya: '#a855f7'). constants.js defines ROLE_COLORS keyed by ROLE ('Frontend Engineer': '#a78bfa'). The hex values have silently diverged (Maya's purple is #a855f7 vs Frontend's #a78bfa). More critically, WORKER_ROLE_COLORS is keyed by name — renaming a worker silently breaks confetti colors. Fix: delete WORKER_ROLE_COLORS entirely and use `ROLE_COLORS[worker.role] || '#a855f7'` at line 697 where confetti color is computed. Single source of truth.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "vibeStreak fires on initial mount and double-counts on data load",
-      "description": "The vibeStreak useEffect (line 708) depends on teamVibe.key. On initial mount, allWorkers=[] so teamVibe='after-hours'. After the first fetch resolves (~200ms), allWorkers populates and teamVibe changes — firing the effect AGAIN within the same session. If the new vibe matches the stored sessionStorage key, storedStreak increments by 1. This means every page load with workers clocks +1 extra streak tick before the user has done anything. The streak number shown is inflated by 1 per page load. Fix: initialize teamVibe from actual data, or skip streak logic until isLoading=false.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "NEW: ProgressBar milestone Set never resets when worker task resets",
-      "description": "ProgressBar uses milestonesRef = useRef(new Set()) to track which progress milestones (25/50/75/100) have flashed. This ref is created once and never cleared. If a worker completes a task (progress hits 100) then starts a new task (progress resets to 0), the milestones Set still contains {25, 50, 75, 100}, so no milestone flashes will fire for the new task. Fix: clear milestonesRef.current when progress drops below the lowest already-fired milestone, or when updatedAt changes (new task started).",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "visual",
-      "title": "NEW: Ghost OOO bubble escapes office-floor overflow:hidden boundary",
-      "description": "Ghost character OOO bubbles (position:absolute, bottom:calc(100% + 8px), z-index:150) escape the office-floor's overflow:hidden clip on characters positioned at the leftmost desks (left:7%). CSS transforms on animated character divs create new stacking contexts that can interfere with overflow clipping in Chrome/Safari. Seen in QA-29 screenshot: white rectangle visible to the left of the office floor border. Fix: add `overflow: clip` (not hidden) to .office-floor which is not affected by stacking context interactions, OR render the OOO bubble as a portal outside the floor entirely.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
       "category": "accessibility",
-      "title": "Character components missing role='button' and keyboard activation",
-      "description": "Character divs in Office.jsx have tabIndex={0} and onClick but no role attribute and no onKeyDown handler. Screen readers announce them as generic 'group' elements, not interactive buttons. Pressing Enter or Space while focused does nothing. Add role='button' to the Character div and onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick?.() } }}. This applies to working, idle, and manager variants that have onClick.",
-      "effort": "small"
+      "title": "Character divs have onClick + tabIndex but no role='button' or keyboard handler",
+      "description": "Office.jsx Character components with onClick have tabIndex={0} but no role attribute and no onKeyDown handler. Screen readers announce them as generic groups, not interactive elements. Pressing Enter/Space while focused does nothing. Fix: add role='button' and onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(worker) } }} to the Character div when onClick is provided. Affects all working and idle characters with click handlers.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "ActivityLog time-group filtering runs 80 iterations every 60s tick with no memoization",
+      "description": "ActivityLog (App.jsx ~line 112) computes 'groups' by running TIME_GROUP_ORDER.map → displayed.filter for each of 4 groups × 20 entries = 80 filter calls. This runs on every render including the 60s useTimeTick. Wrap the groups computation in useMemo keyed on [entries]. Also: the IIFE inside WorkerCard's task tag render (lines ~272-292) creates a closure every render — extract to a variable.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "completionToast disappears with no exit animation — jarring UX",
+      "description": "The completion toast (App.jsx ~line 805) has a badge-pop entry animation but vanishes abruptly after 3s via setTimeout → setCompletionToast(null). No fade-out transition. Fix: at 2700ms, add a CSS class with opacity:0 transition (300ms), then unmount at 3000ms. Or use a single keyframe with animation-fill-mode:forwards that includes entry + exit.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "responsiveness",
       "title": "Mobile: ~250px dead zone below office floor before footer",
-      "description": "On 375×812 mobile, .main has flex:1 which expands the container beyond the office floor's content height, creating an empty dark gap before the footer. The office floor uses aspect-ratio:4/3 which at 375px renders at ~320px height, leaving ~380px of unused space. Fix: add `@media (max-width: 600px) { .office-wrap { padding-bottom: 0.5rem; } .main { flex: none; } }` so the page fits content without artificial stretch.",
-      "effort": "small"
+      "description": "On 375×812 mobile, .main has flex:1 which expands beyond the office floor's content height (aspect-ratio:4/3 at 375px = ~320px), creating a dark empty gap before the footer. Fix: @media (max-width: 600px) { .main { flex: none; } .office-wrap { padding-bottom: 0.5rem; } } — content-fit instead of flex stretch.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "medium",
-      "category": "performance",
-      "title": "NEW: ActivityLog time-group computation has no useMemo",
-      "description": "The ActivityLog component (App.jsx line 112) computes 'groups' on every render: TIME_GROUP_ORDER.map(label => ({ label, items: displayed.filter(e => getTimeGroup(e.timestamp) === label) })). With 20 entries and 4 time groups, this runs 80 filter iterations on every render tick, including the 60s clock tick (useTimeTick). Wrap with useMemo(() => ..., [displayed]) or better yet [entries] since displayed is also derived. Also, the IIFE inside WorkerCard's task tag render block (lines 272-292) creates a new function closure on every render — extract as a variable.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "WORKER_ROLE_COLORS in App.jsx duplicates ROLE_COLORS in constants.js with diverging values",
-      "description": "App.jsx line 14-20 defines WORKER_ROLE_COLORS keyed by worker NAME (Maya: '#a855f7'). constants.js defines ROLE_COLORS keyed by ROLE ('Frontend Engineer': '#a78bfa'). These serve different purposes but the hex values have silently diverged. More critically: WORKER_ROLE_COLORS uses names which are brittle — renaming a worker breaks confetti colors silently. Fix: derive confetti color from ROLE_COLORS[worker.role] at the call site (line 697: `const color = ROLE_COLORS[worker.role] || '#a855f7'`) and delete WORKER_ROLE_COLORS.",
-      "effort": "small"
+      "category": "visual",
+      "title": "Ghost OOO bubble escapes office-floor overflow boundary on leftmost desks",
+      "description": "Ghost character OOO bubbles use position:absolute with bottom:calc(100% + 8px). On characters at left:7% desks, the bubble clips outside the office-floor's overflow:hidden due to CSS transform stacking contexts. Fix: use overflow:clip (not hidden) on .office-floor which isn't affected by stacking context interactions, or render OOO bubbles as a portal.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "low",
-      "category": "visual",
-      "title": "completionToast appears and vanishes with no exit animation",
-      "description": "The completion toast (App.jsx line 805) has a badge-pop entry animation but disappears abruptly after 3s with no fade-out. setTimeout(() => setCompletionToast(null), 3000) instantly unmounts the element with no transition. Add a CSS fade-out: set a CSS class with opacity:0 animation 300ms before the 3s timeout fires (at 2700ms), then unmount at 3000ms. Alternatively use animation-fill-mode:forwards with a combined enter+exit keyframe sequence.",
-      "effort": "small"
+      "category": "code",
+      "title": "stuckWorkers useMemo uses worker.started but some workers only have updated_at",
+      "description": "StatsBar line ~370 filters stuck workers by checking `Date.now() - new Date(w.started).getTime() > 7_200_000`. But some workers have started:null and only updated_at. This silently NaN's the comparison and those workers are never detected as stuck even if they've been working forever with only updated_at set. Fix: use `w.started || w.updated_at` as the timestamp source.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "No keyboard shortcut hint or help modal",
+      "description": "The app has keyboard shortcuts (1=Office, 2=Dashboard, R=Refresh, Escape=blur) but there's no discoverable UI for them. A small '?' button or footer hint showing 'Press ? for shortcuts' would improve power-user experience. Low priority but adds polish.",
+      "effort": "medium",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "title": "Favicon canvas regenerates on every activeWorkers change even if color hasn't changed",
+      "description": "The favicon useEffect runs on [activeWorkers, fetchError] which changes frequently (every 30s poll). It regenerates the canvas even when the computed color hasn't changed. Fix: compute color first, store in a ref, and only regenerate canvas when color actually changes.",
+      "effort": "small",
+      "assign_to": "Maya"
     }
   ]
 }
