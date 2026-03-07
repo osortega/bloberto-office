@@ -982,3 +982,43 @@
 .desk--error { animation: desk-error-glow 2s ease-in-out infinite; }
 @keyframes desk-error-glow { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 10px 3px rgba(248,113,113,0.55); } }
 @media (prefers-reduced-motion: reduce) { .desk--error { animation: none; border: 2px solid #f87171; } }
+
+/* ── Coffee Break — char walks toward coffee corner ── */
+.char--coffee-break {
+  animation: coffee-break-walk 2s ease-in-out forwards;
+  z-index: 20;
+}
+
+@keyframes coffee-break-walk {
+  to { left: 92%; top: 8%; }
+}
+
+/* ── Coffee Corner — visited state with steam effect ── */
+.coffee-corner--visited {
+  position: relative;
+}
+
+.coffee-corner--visited::after {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 2px;
+  animation: steam-rise 1.4s ease-out infinite;
+  box-shadow: 8px 2px 0 rgba(255,255,255,0.3), -8px 4px 0 rgba(255,255,255,0.25);
+}
+
+@keyframes steam-rise {
+  0%   { opacity: 0;   transform: translateX(-50%) translateY(0)    scaleX(1);   }
+  30%  { opacity: 0.8; transform: translateX(-50%) translateY(-4px)  scaleX(1.3); }
+  100% { opacity: 0;   transform: translateX(-50%) translateY(-18px) scaleX(0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .char--coffee-break { animation: none; left: 92%; top: 8%; }
+  .coffee-corner--visited::after { animation: none; opacity: 0.5; }
+}

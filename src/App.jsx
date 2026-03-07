@@ -11,6 +11,14 @@ const ACTIVITY_API_URL =
 const POLL_INTERVAL_ACTIVE = 30_000
 const POLL_INTERVAL_HIDDEN = 60_000
 
+const WORKER_ROLE_COLORS = {
+  Maya:   '#a855f7',
+  Carlos: '#3b82f6',
+  Dave:   '#f97316',
+  Sofia:  '#22c55e',
+  Luna:   '#8b5cf6',
+}
+
 async function fetchWorkersFromGitHub() {
   const res = await fetch(GITHUB_API_URL + '?t=' + Date.now())
   if (!res.ok) throw new Error(`Fetch error ${res.status}`)
@@ -216,7 +224,7 @@ function formatDuration(updatedAt) {
   return rem > 0 ? `Working for ${hours}h ${rem}m` : `Working for ${hours}h`
 }
 
-function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false }) {
+function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false, selectedTag = null, onTagClick = null, isDimmed = false }) {
   const [isFlipped, setIsFlipped] = useState(false)
   const cardRef = useRef(null)
 
@@ -225,6 +233,7 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
   if (isFading) classes.push('worker-card--fading')
   if (isFlipped) classes.push('worker-card--flipped')
   if (isFocused) classes.push('worker-card--focused')
+  if (isDimmed) classes.push('worker-card--dimmed')
 
   useEffect(() => {
     if (isFocused && cardRef.current) {
@@ -264,11 +273,20 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
               const tags = getTaskTags(worker.task)
               return tags.length > 0 ? (
                 <div className="task-tags">
-                  {tags.map(({ label, emoji, className }) => (
-                    <span key={label} className={`task-tag ${className}`}>
-                      {emoji} {label}
-                    </span>
-                  ))}
+                  {tags.map(({ label, emoji, className }) => {
+                    const isActive = selectedTag === label
+                    return (
+                      <span
+                        key={label}
+                        className={`task-tag ${className}${isActive ? ' task-tag--active' : ''}`}
+                        style={{ cursor: onTagClick ? 'pointer' : undefined }}
+                        onClick={onTagClick ? (e) => { e.stopPropagation(); onTagClick(label) } : undefined}
+                        title={isActive ? `Clear filter: ${label}` : `Filter by: ${label}`}
+                      >
+                        {emoji} {label}{isActive ? ' ×' : ''}
+                      </span>
+                    )
+                  })}
                 </div>
               ) : null
             })()}
@@ -294,8 +312,8 @@ function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activi
           {workerHistory.length === 0 ? (
             <div className="worker-card__back-empty">No activity on record.</div>
           ) : (
-            workerHistory.map((e, i) => (
-              <div key={i} className="worker-card__back-entry">
+            workerHistory.map((e) => (
+              <div key={e.timestamp + e.type + (e.worker || '')} className="worker-card__back-entry">
                 <span style={{ marginRight: '0.35rem' }}>{ACTIVITY_ICONS[e.type] ?? '🔧'}</span>
                 {e.message}
               </div>
@@ -429,6 +447,14 @@ const TABS = ['office', 'dashboard']
 
 const IDLE_TIMEOUT = 10 * 60_000
 
+const FOOTER_TAGLINES = {
+  crushing: 'productivity charts are going vertical. don\'t look down.',
+  'on-fire': 'if it deploys, that\'s someone else\'s problem.',
+  'in-flow': 'if it compiles, ship it.',
+  'slow-day': 'maybe it works? nobody knows.',
+  'after-hours': 'the servers are watching. go home.',
+}
+
 export default function App() {
   useTimeTick(60_000) // keep relative timestamps fresh
   const [allWorkers, setAllWorkers] = useState([])
@@ -452,6 +478,8 @@ export default function App() {
   const lastActivity = useRef(Date.now())
   const previousVibeKeyRef = useRef(null)
   const [confettiActive, setConfettiActive] = useState(false)
+  const [workerConfetti, setWorkerConfetti] = useState(null) // { name, color }
+  const [completionToast, setCompletionToast] = useState(null) // { name, color }
 
   // ── Hash-based tab sync (browser back/forward) ──
   useEffect(() => {
@@ -474,6 +502,11 @@ export default function App() {
   const [newIds,    setNewIds]    = useState(new Set())
   const [focusedWorker, setFocusedWorker] = useState(null)
   const focusedWorkerTimerRef = useRef(null)
+  const [selectedTag, setSelectedTag] = useState(null)
+
+  const handleTagClick = useCallback((tag) => {
+    setSelectedTag(prev => prev === tag ? null : tag)
+  }, [])
 
   useEffect(() => {
     const touch = () => { lastActivity.current = Date.now() }
@@ -567,7 +600,7 @@ export default function App() {
   // ── Keyboard shortcuts ──
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable || e.isComposing) return
       if (e.key === '1') { setTab('office'); window.location.hash = '#office' }
       else if (e.key === '2') { setTab('dashboard'); window.location.hash = '#dashboard' }
       else if (e.key === 'Escape') document.activeElement?.blur()
@@ -656,6 +689,18 @@ export default function App() {
       setFadingMap(m => { const next = { ...m }; delete next[w.id]; return next })
     }
 
+    // Workers that just transitioned working → idle (task shipped!)
+    const prevMap = new Map(prev.map(w => [w.id, w]))
+    const justShipped = activeWorkers.filter(w => prevMap.get(w.id)?.status === 'working' && w.status === 'idle')
+    if (justShipped.length > 0 && prev.length > 0) {
+      const worker = justShipped[0]
+      const color = WORKER_ROLE_COLORS[worker.name] || '#a855f7'
+      setWorkerConfetti({ name: worker.name, color })
+      setCompletionToast({ name: worker.name, color })
+      setTimeout(() => setWorkerConfetti(null), 2500)
+      setTimeout(() => setCompletionToast(null), 3000)
+    }
+
     prevActiveWorkersRef.current = activeWorkers
   }, [activeWorkers])
 
@@ -742,6 +787,42 @@ export default function App() {
           {Array.from({ length: 30 }, (_, i) => (
             <span key={i} className="confetti-piece" style={{ '--i': i }} />
           ))}
+        </div>
+      )}
+      {workerConfetti && (
+        <div className="confetti-layer" aria-hidden="true">
+          {Array.from({ length: 30 }, (_, i) => (
+            <span
+              key={i}
+              className="confetti-piece"
+              style={{ '--i': i, ...(i < 18 ? { background: workerConfetti.color } : {}) }}
+            />
+          ))}
+        </div>
+      )}
+      {completionToast && (
+        <div
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'var(--surface2)',
+            border: `2px solid ${completionToast.color}`,
+            borderRadius: '12px',
+            padding: '0.6rem 1.2rem',
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            color: 'var(--text)',
+            boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 12px ${completionToast.color}55`,
+            zIndex: 9999,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            animation: 'badge-pop 0.3s cubic-bezier(0.34,1.56,0.64,1) both',
+          }}
+        >
+          🎉 {completionToast.name} shipped it!
         </div>
       )}
       <a href="#main-content" className="skip-link">Skip to content</a>
@@ -849,6 +930,9 @@ export default function App() {
                     isNew={newIds.has(activeWorkers[0].id)}
                     activityEntries={activityLog}
                     isFocused={focusedWorker === activeWorkers[0].id}
+                    selectedTag={selectedTag}
+                    onTagClick={handleTagClick}
+                    isDimmed={selectedTag !== null && !getTaskTags(activeWorkers[0].task).some(t => t.label === selectedTag)}
                   />
                 </div>
                 <p className="solo-spotlight-msg">🌟 Running solo today. Carrying the whole team on one pair of hands.</p>
@@ -869,6 +953,9 @@ export default function App() {
                         isNew={newIds.has(w.id)}
                         activityEntries={activityLog}
                         isFocused={focusedWorker === w.id}
+                        selectedTag={selectedTag}
+                        onTagClick={handleTagClick}
+                        isDimmed={selectedTag !== null && !getTaskTags(w.task).some(t => t.label === selectedTag)}
                       />
                     ))}
                     {Object.values(fadingMap).map((w) => (
@@ -878,6 +965,9 @@ export default function App() {
                         index={activeWorkers.length}
                         isFading
                         activityEntries={activityLog}
+                        selectedTag={selectedTag}
+                        onTagClick={handleTagClick}
+                        isDimmed={selectedTag !== null && !getTaskTags(w.task).some(t => t.label === selectedTag)}
                       />
                     ))}
                   </>
@@ -925,13 +1015,7 @@ export default function App() {
 
       <footer className="footer">
         Built with 💜 and mild existential dread by <span>🫠 Bloberto</span>
-        &nbsp;&middot;&nbsp; <span key={teamVibe.key} className="footer-tagline">&ldquo;{({
-          crushing: 'productivity charts are going vertical. don\'t look down.',
-          'on-fire': 'if it deploys, that\'s someone else\'s problem.',
-          'in-flow': 'if it compiles, ship it.',
-          'slow-day': 'maybe it works? nobody knows.',
-          'after-hours': 'the servers are watching. go home.',
-        })[teamVibe.key] ?? 'if it compiles, ship it.'}&rdquo;</span> &nbsp;&middot;&nbsp;
+        &nbsp;&middot;&nbsp; <span key={teamVibe.key} className="footer-tagline">&ldquo;{FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.'}&rdquo;</span> &nbsp;&middot;&nbsp;
         <span>v1.0.0-chaos</span>
       </footer>
     </div>
