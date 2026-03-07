@@ -431,6 +431,9 @@ function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, toolt
     <div className={classes.join(' ')} style={style} {...extraProps}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onFocus={handleMouseEnter}
+      onBlur={handleMouseLeave}
+      tabIndex={0}
     >
       {variant === 'manager' && isSyncing && (
         <div className="bloberto-typing">

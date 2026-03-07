@@ -633,6 +633,7 @@ export default function App() {
             role="tab"
             aria-selected={tab === 'office'}
             aria-controls="tabpanel-office"
+            title="Office view (press 1)"
             tabIndex={tab === 'office' ? 0 : -1}
             className={tab === 'office' ? 'active' : ''}
             onClick={() => { setTab('office'); window.location.hash = 'office' }}
@@ -644,6 +645,7 @@ export default function App() {
             role="tab"
             aria-selected={tab === 'dashboard'}
             aria-controls="tabpanel-dashboard"
+            title="Dashboard view (press 2)"
             tabIndex={tab === 'dashboard' ? 0 : -1}
             className={tab === 'dashboard' ? 'active' : ''}
             onClick={() => { setTab('dashboard'); window.location.hash = 'dashboard' }}
