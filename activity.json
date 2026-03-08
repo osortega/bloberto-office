@@ -1,6 +1,18 @@
 {
-  "last_updated": "2026-03-08T17:35:00Z",
+  "last_updated": "2026-03-08T18:05:00Z",
   "recent_activity": [
+    {
+      "timestamp": "2026-03-08T18:00:00Z",
+      "type": "creative-review",
+      "actor": "luna",
+      "details": "Review #50 — Worker timed out. Evaluated remaining #49 ideas. All MUST/SHOULD already shipped."
+    },
+    {
+      "timestamp": "2026-03-08T18:05:00Z",
+      "type": "implementation",
+      "actor": "bloberto",
+      "details": "🟣 Whiteboard vibe history dots — shows last 2 vibes as colored dots (COULD from #49)"
+    },
     {
       "timestamp": "2026-03-08T17:30:00Z",
       "type": "creative-review",
