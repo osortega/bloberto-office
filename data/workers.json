@@ -21,6 +21,28 @@
       "progress": 100,
       "started": "2026-03-08T01:06:00Z",
       "updated_at": "2026-03-08T01:06:00Z"
+    },
+    {
+      "id": "sofia-worker-filter",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "\ud83d\udd0d",
+      "status": "working",
+      "task": "Add per-worker filter chips to Activity Log",
+      "progress": 10,
+      "started": "2026-03-08T01:36:00Z",
+      "updated_at": "2026-03-08T01:36:00Z"
+    },
+    {
+      "id": "maya-conference-table",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "emoji": "\ud83e\udde9",
+      "status": "working",
+      "task": "Build vibe-reactive conference table in lower office floor",
+      "progress": 10,
+      "started": "2026-03-08T01:36:00Z",
+      "updated_at": "2026-03-08T01:36:00Z"
     }
   ],
   "roster": [
