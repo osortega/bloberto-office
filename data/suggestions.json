@@ -1,6 +1,7 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-08T08:45:00Z",
+  "review_number": 12,
+  "timestamp": "2026-03-08T09:25:00Z",
   "scores": {
     "visual": 4,
     "ux": 4,
@@ -12,139 +13,126 @@
     "fun_factor": 5
   },
   "overall_score": 3.9,
-  "screenshot_sources": {
-    "desktop": "screenshot-desktop.png (1280x800, captured from live site)",
-    "mobile": "screenshot-mobile.png (375x812, captured from live site)"
-  },
+  "previous_score": 3.9,
   "what_is_genuinely_good": [
-    "prefers-reduced-motion is handled comprehensively across both CSS files — almost every animation has a matching reduce override. Rare and appreciated.",
-    "ARIA is unusually thorough: skip link, tablist with arrow-key nav, progressbar role with aria-valuenow/min/max, aria-live on sync banner, role=alert on error banners, sr-only labels on decorative elements. This is clearly intentional and well-executed.",
-    "Polling is smart: visibility-aware interval switching (30s active / 60s hidden), plus a 10-minute idle timeout that halts polls when the user is away. No unnecessary hammering.",
-    "The vibe system is cohesive end-to-end — the same vibe key drives avatar faces, whiteboard text, stats bar tint, grid line color, manager nameplate, conference table chairs, and speech bubble quotes. Impressive data-attribute-driven theming.",
-    "Custom SVG characters are delightful and well-labeled with aria-label. Each character has personality (Dave's headphones, Sofia's magnifying glass, Luna's moon). The bloberto face variants per vibe are excellent.",
-    "Light/dark theme is correctly implemented with CSS custom properties + data-theme attribute + localStorage persistence. The theme toggle aria-label correctly announces the target state, not current.",
-    "Worker click → tab switch → focused card scroll is a satisfying UX detail. The 3s auto-clear is appropriate.",
-    "stableActivityLog intent is smart: avoid re-rendering all WorkerCards on every log append by memoizing on length. The intent is right even if execution has a bug."
+    "prefers-reduced-motion coverage is comprehensive — nearly every animation has a fallback. Rare.",
+    "The vibe system is genuinely delightful — shockwave, sparkline, streak counter, ficus growth. Cohesive worldbuilding.",
+    "Accessibility is surprisingly solid for a fun project — aria-labels, role attributes, skip-link, keyboard shortcuts, tab roving.",
+    "The office visualization is packed with personality — away signs, ghost OOO bubbles, coffee corner chat, door animations.",
+    "Tab title cycling and dynamic favicon are great polish details most dashboards never bother with."
   ],
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Side effect inside useMemo breaks stableActivityLog",
-      "description": "App.jsx line 764-767: `const stableActivityLog = useMemo(() => { activityLogLenRef.current = activityLog.length; return activityLog }, [activityLog.length])`. Two problems: (1) Setting a ref inside useMemo is a React anti-pattern — useMemo is not guaranteed to run only once per dep change and can be discarded by concurrent React. (2) Memoizing on `activityLog.length` but returning `activityLog` means if entries are mutated in-place or replaced with the same count, the memo returns stale data silently. Fix: move the ref update to a separate `useEffect(() => { activityLogLenRef.current = activityLog.length }, [activityLog.length])` and memo the log on the array reference itself — or just pass `activityLog` directly if the optimization isn't measurably necessary.",
-      "effort": "small"
+      "category": "code",
+      "title": "useMemo side-effect in activityLogLenRef",
+      "description": "In App.jsx, stableActivityLog uses useMemo with a side-effect (activityLogLenRef.current = activityLog.length). React docs explicitly warn against side-effects in useMemo — it may skip execution in concurrent mode. Move the ref assignment to a useEffect instead.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "performance",
+      "title": "Massive CSS file — Office.css is 1500+ lines",
+      "description": "Office.css is enormous and monolithic. Many animations (@keyframes) are defined but only used conditionally. Consider code-splitting or using CSS modules per component. At minimum, group related blocks and add section comments for maintainability.",
+      "effort": "large",
+      "assignee": "Maya"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Mobile: whiteboard text clips to 'FL\\nOW' at 375px",
-      "description": "Confirmed visually in the mobile screenshot: the whiteboard text '⚡ FLOW' wraps and clips mid-word, displaying as 'FL / OW' due to the `.office-whiteboard` having `overflow: hidden` combined with an insufficient width at small viewports. The `.wb-vibe-text` lacks `white-space: nowrap`. Fix: add `white-space: nowrap` to `.wb-vibe-text` in Office.css, and/or increase the whiteboard min-width in the `@media (max-width: 480px)` block. Cross-check all other vibe labels ('🚨 HELP', 'TODO: ???', '🙏 ZZZ') for similar wrapping.",
-      "effort": "small"
+      "title": "Conference table renders outside visible area on mobile",
+      "description": "ConferenceTable has no explicit positioning (no left/top in CSS class .conference-table). On narrow screens it may overlap with desks or be invisible. Needs position: absolute with responsive coordinates.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Mobile: shortcut toast overlaps footer, making both unreadable",
-      "description": "Confirmed in mobile screenshot: at 375px the shortcut toast (fixed, bottom: 1rem) renders directly over the footer, producing an overlapping text mess of 'Built with 💜 and mild existential dread / 1 Office · 2 Dashboard · R Refresh · Esc Clear / it. v1.0.0-chaos'. The toast `z-index: 9999` wins, partially covering the footer. Fix: add a `@media (max-width: 600px)` rule to `.shortcut-toast` that sets `bottom: 4rem` to clear the footer height, or render the toast above the tab bar instead of at the page bottom on mobile.",
-      "effort": "small"
+      "category": "performance",
+      "title": "Multiple setInterval timers per Character instance",
+      "description": "Each Character component (manager variant) creates a 45-second ambient quote interval plus hover timeouts. With 6+ characters rendered, this creates multiple concurrent intervals. Consider lifting the ambient broadcast to a single interval in the parent Office component.",
+      "effort": "medium",
+      "assignee": "Carlos"
     },
     {
-      "priority": "high",
+      "priority": "medium",
+      "category": "ux",
+      "title": "Mobile whiteboard text clips at 480px",
+      "description": "At 480px breakpoint, .office-whiteboard sets font-size: 0 and relies on ::before pseudo-element (which has no content defined in Office.css). The whiteboard appears blank on small screens. Either add content to the ::before or keep a minimum readable font-size.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
       "category": "bug",
-      "title": "ProgressBar milestone effect exits loop on first match, skipping later milestones",
-      "description": "App.jsx lines 183-190: the `useEffect` loops over `[25, 50, 75, 100]`, and when a milestone is hit it calls `return () => clearTimeout(t)` — this `return` exits the for-loop immediately. If progress jumps from 0% to 80% in a single update, only the 25% milestone fires; 50% and 75% are skipped entirely. Fix: collect all newly-crossed milestones first, then trigger only the highest (or all in sequence with staggered timeouts): `const newMilestones = MILESTONES.filter(m => progress >= m && !milestonesRef.current.has(m)); for (const m of newMilestones) milestonesRef.current.add(m); if (newMilestones.length > 0) { setFlashClass(...); ... }`",
-      "effort": "small"
+      "title": "Completion toast can overlap error banner",
+      "description": "The '🎉 shipped it!' toast is position:fixed at bottom:2rem with z-index:9999. The fetch-error-banner is at the top. But if multiple toasts fire rapidly (2+ workers ship simultaneously), only the last one shows. Consider a toast queue or stacking.",
+      "effort": "medium",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "completionToast uses 20 lines of inline styles — breaks light mode theming",
-      "description": "App.jsx lines 952-972: the completion toast is rendered with a full inline `style={{}}` block including hardcoded `borderRadius: '12px'`, `padding: '0.6rem 1.2rem'`, `fontSize: '0.95rem'`, `zIndex: 9999`, dynamic boxShadow with rgba glow, etc. This prevents CSS-variable overrides from `[data-theme='light']` from applying (the `background: 'var(--surface2)'` works, but the `boxShadow` with `rgba(0,0,0,0.4)` looks wrong in light mode). Extract a `.completion-toast` class to App.css with `--toast-color` as a CSS variable, then pass `style={{ '--toast-color': completionToast.color }}` only.",
-      "effort": "small"
+      "title": "Vibe history stored in both localStorage AND sessionStorage",
+      "description": "vibeStreak uses sessionStorage while vibeHistory uses localStorage. The streak resets on new tabs but history persists. This is inconsistent — if streak is meaningful, it should persist across tabs too. Pick one storage strategy.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "WORKER_ROLE_COLORS in App.jsx duplicates and diverges from ROLE_COLORS in constants.js",
-      "description": "App.jsx lines 14-20 define `WORKER_ROLE_COLORS` keyed by worker *name* (Maya, Carlos, Dave...) while constants.js has `ROLE_COLORS` keyed by *role*. The hex values differ: ROLE_COLORS has Maya as `#a78bfa` but WORKER_ROLE_COLORS has Maya as `#a855f7`. WORKER_ROLE_COLORS is only used for the completion confetti color (line 831). If a new team member is added, two separate files need updating with potentially inconsistent values. Fix: derive from `ROLE_COLORS` via the worker's role at the call site: `const color = ROLE_COLORS[worker.role] ?? '#a855f7'`. Delete WORKER_ROLE_COLORS.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Tab title rotation resets every 30s because activeWorkers is a new array reference on every poll",
-      "description": "App.jsx lines 888-910: the `useEffect` that cycles `document.title` every 8s depends on `[activeWorkers, teamVibe]`. Since `activeWorkers` is computed via `useMemo` from `allWorkers` (which is replaced via `setAllWorkers` on every successful fetch), a new array is produced every 30s. This clears and restarts the interval before it can cycle through all 3 frames, meaning the title always resets to frame 0 and effectively never rotates. Fix: extract stable primitives as deps: `[workingCount, idleCount, errCount, total, teamVibe.label]`.",
-      "effort": "small"
+      "category": "ux",
+      "title": "Keyboard shortcut '1' and '2' conflict with number input",
+      "description": "The keyboard handler checks for e.target.tagName INPUT/TEXTAREA but not number keys in contentEditable. Also, pressing 'R' to refresh could be confusing — consider requiring a modifier key (Ctrl+R is already browser refresh).",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "LoadingSkeleton is entirely inline-styled — extract to CSS classes",
-      "description": "App.jsx lines 484-493: the three skeleton cards each contain multiple `style={{ width: 44, height: 44, borderRadius: 10 }}`, `style={{ width: '55%', height: 14 }}` etc. inline style objects. React allocates a new object per render per prop. These are static values that never change — they belong in CSS modifier classes like `.skeleton--avatar`, `.skeleton--title`, `.skeleton--subtitle`, `.skeleton--badge`. This also makes it trivially easy to update skeleton sizing across all cards.",
-      "effort": "small"
+      "title": "fetchWorkersFromGitHub cache-busts every request",
+      "description": "Adding ?t=Date.now() defeats GitHub's CDN cache entirely. raw.githubusercontent.com already has short TTLs (~5 min). Remove the cache-buster or use If-None-Match/ETag headers to reduce bandwidth.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "Ghost/non-interactive Character components get tabIndex={0} with no keyboard action",
-      "description": "Office.jsx line 419: `tabIndex={0}` is applied unconditionally to all Character components. Ghost characters (OOO roster members) show an OOO bubble on hover but have no `onClick` and no keyboard equivalent. Keyboard users will tab onto these elements, focus them, press Enter/Space, and nothing happens — no feedback, no action. `role` is only set when `handleClick` is defined, leaving ghost chars as unfocusable divs pretending to be interactive. Fix: only set `tabIndex={0}` when `handleClick` is defined OR when the ghost bubble behavior is explicitly made keyboard-accessible with an onKeyDown handler.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Coffee corner renders as oversized orange/gradient block on desktop",
-      "description": "Confirmed visually in the desktop screenshot: the coffee corner in the top-right of the office floor appears as a large solid orange-pink rectangle (roughly 60×80px) rather than a compact coffee cup icon. The surrounding 'CHATTING' and 'COFFEE' labels are visible but the block dominates. This appears to be `.coffee-corner__body` inheriting or computing an unexpectedly large size — possibly the `.coffee-corner[data-vibe='in-flow']` background color rule bleeding into the body container. Inspect and add an explicit max-width/max-height to `.coffee-corner__body` to constrain it.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Tag filter has no accessible announcement when applied",
-      "description": "When a task tag (Bug/QA/Design/etc.) is clicked and `selectedTag` is set, worker cards are dimmed/filtered silently. Screen reader users get no feedback that the view has changed. Fix: add an `aria-live='polite'` status element to the Dashboard panel that announces: 'Showing workers tagged [tag]' or 'Filter cleared'. This is a one-line addition: `<div aria-live='polite' className='sr-only'>{selectedTag ? `Showing workers tagged ${selectedTag}` : 'All workers shown'}</div>`",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "Activity log key construction risks collision — missing separator",
-      "description": "App.jsx line 130: `key={entry.timestamp + entry.worker + i}`. JavaScript coerces all operands to string then concatenates. `timestamp=1234, worker='', i=5` → '12345' and `timestamp=123, worker='4', i=5` → '12345' are identical keys. React will silently reuse the wrong DOM node. Fix: use a separator: `` key={`${entry.timestamp}::${entry.worker ?? ''}::${i}`} ``",
-      "effort": "small"
+      "category": "feature",
+      "title": "No error recovery UI for individual workers",
+      "description": "When a worker has status 'error', there's a red badge and SOS morse but no way for a viewer to see WHAT the error is. Add an error message field to the worker data and show it in the hover card or a detail panel.",
+      "effort": "medium",
+      "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "WallClock static transformOrigin applied as inline style — move to CSS",
-      "description": "Office.jsx lines 685 and 692: `style={{ transformOrigin: '11px 11px', transform: 'rotate(...)' }}`. The `transformOrigin` value is always `'11px 11px'` (the clock center) and never changes. Only the `transform` rotate value is dynamic. Fix: define `.office-wall-clock g { transform-origin: 11px 11px; }` in Office.css and only pass `style={{ transform: 'rotate(...)' }}` inline.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "vibeHistory read/write is split across App and StatsBar — hard to trace",
-      "description": "The vibe history is written to localStorage in App's useEffect (line 861) but read back from localStorage inside StatsBar's useEffect (line 400). This split ownership means the full data lifecycle spans two components with no shared abstraction. If the key or format changes, two separate effects must be updated. Fix: extract a `useVibeHistory(vibeKey)` custom hook that handles both read and write, returning the history array.",
-      "effort": "medium"
-    },
-    {
-      "priority": "low",
-      "category": "performance",
-      "title": "Two overlapping confetti layers can fire simultaneously — 60 animated elements",
-      "description": "App.jsx renders both `confettiActive` (vibe rank increase, 30 pieces) and `workerConfetti` (task completion, 30 pieces) as separate layers. Both can be truthy simultaneously — a worker shipping a task while the team vibe improves will create 60 animated confetti elements at once. On low-end mobile this can cause jank. Fix: use a single confetti layer and merge the two triggers with a priority system, or limit total confetti count to 20 per layer with `@media (prefers-reduced-motion: no-preference)` gating.",
-      "effort": "small"
+      "title": "AwaySign line-splitting logic is fragile",
+      "description": "The reduce-based line splitter in AwaySign puts only the first word on line1 and everything else on line2. For 'Taking a lap' → line1='Taking', line2='a lap'. This works by accident but isn't intentional word-wrapping. Use a simpler split approach.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Decorative plant positions hardcoded as inline styles in JSX — use CSS or constants",
-      "description": "Office.jsx lines 985, 995, 1003, 1012: decorative plants use `style={{ left: '87%', top: '72%' }}` etc. directly in JSX. This makes layout adjustments require touching JSX structure instead of CSS. These are static positions that will never change at runtime. Fix: add `.office-plant--ficus`, `.office-plant--cactus`, and position variants as CSS rules, removing the inline style props entirely.",
-      "effort": "small"
+      "title": "Light theme barely tested — several hardcoded dark colors",
+      "description": "Office.css has a few [data-theme='light'] overrides but most colors (floor, monitor, particles) use hardcoded dark values. The light theme works but feels like an afterthought. Need a pass to make light mode feel intentional.",
+      "effort": "large",
+      "assignee": "Maya"
     },
     {
       "priority": "low",
-      "category": "ux",
-      "title": "Sync button wraps ↺ character without aria-hidden, possibly double-announced",
-      "description": "App.jsx line 996: `<button aria-label='Sync now' ...>↺</button>`. The ↺ (U+21BA) character is a Unicode symbol that some screen readers announce as 'anticlockwise open circle arrow'. Since `aria-label` overrides the inner text on the button element itself, this is technically fine — but it's safer to explicitly silence the symbol: `<span aria-hidden='true'>↺</span>` inside the button. Same pattern applies to the retry buttons (↺ Retry) in error banners at lines 1012 and 1018 which do NOT have aria-label and will be read as '↺ Retry'.",
-      "effort": "small"
+      "category": "feature",
+      "title": "No notification/sound when workers ship",
+      "description": "The completion toast and confetti are visual-only. Consider an optional browser notification or subtle sound effect when a worker finishes. Could be toggled in settings.",
+      "effort": "medium",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "CharacterAvatar has growing if/else chain for worker IDs",
+      "description": "Each worker (bloberto, carlos, maya, dave, sofia, luna) has a dedicated SVG block in CharacterAvatar. This doesn't scale — adding a new team member means adding 30+ lines of JSX. Consider a data-driven approach with SVG templates.",
+      "effort": "large",
+      "assignee": "Maya"
     }
   ]
 }
