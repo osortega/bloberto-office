@@ -888,7 +888,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   }, [vibe])
 
   // Roster members not currently active → ghost at empty desk
-  const activeIds   = useMemo(() => new Set(workers.map(w => w.id)), [workers])
+  const activeIds   = useMemo(() => new Set(workers.map(w => w.id || w.name?.toLowerCase().replace(/\s+/g, '-'))), [workers])
   const ghostRoster = effectiveRoster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id))
 
   // Assign working workers first, then idle workers, then ghosts, to desk slots

@@ -2016,7 +2016,8 @@
     font-size: 0.55rem;
   }
   .desk__nameplate {
-    font-size: 0.28rem;
+    font-size: 0.38rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   }
   .desk-lamp {
     transform: scale(0.8);
