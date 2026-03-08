@@ -1,6 +1,24 @@
 [
   {
     "type": "complete",
+    "worker": "Luna",
+    "message": "Creative review #53 \u2014 8 ideas across delight, storytelling, visual, office-life",
+    "timestamp": "2026-03-08T21:00:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Maya",
+    "message": "Footer sparkle easter egg, honorific blur-in animation, conference label animation",
+    "timestamp": "2026-03-08T21:05:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "Vibe-reactive VACANT desk job ad hover cards",
+    "timestamp": "2026-03-08T21:05:00Z"
+  },
+  {
+    "type": "complete",
     "worker": "Sofia",
     "message": "\ud83d\udd0d QA review #23 complete \u2014 overall score 3.8/5 (-0.3) \u2014 4 high-priority bugs found, 15 total suggestions",
     "timestamp": "2026-03-08T20:25:00Z"
