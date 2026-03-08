@@ -1,18 +1,6 @@
 {
-  "lastUpdated": "2026-03-08T10:45:00Z",
-  "workers": [
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "🔍",
-      "status": "working",
-      "task": "QA review #14 — analyzing live site and source code",
-      "progress": 10,
-      "updated_at": "2026-03-08T10:45:00Z",
-      "startedAt": "2026-03-08T10:45:00Z"
-    }
-  ],
+  "lastUpdated": "2026-03-08T10:55:00Z",
+  "workers": [],
   "roster": [
     {
       "id": "bloberto",
