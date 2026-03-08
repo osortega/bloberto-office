@@ -1921,3 +1921,97 @@
   height: 16px;
   border-width: 1px;
 }
+
+/* === After-Hours Starfield Floor (Luna Review #41) === */
+.office-floor[data-vibe='after-hours']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle 1.5px at 7% 14%, rgba(255,255,255,0.55) 1px, transparent 1px),
+    radial-gradient(circle 1px at 19% 38%, rgba(255,255,255,0.4) 1px, transparent 1px),
+    radial-gradient(circle 1.5px at 34% 9%, rgba(200,200,255,0.5) 1px, transparent 1px),
+    radial-gradient(circle 1px at 52% 22%, rgba(255,255,255,0.45) 1px, transparent 1px),
+    radial-gradient(circle 1.5px at 68% 47%, rgba(200,200,255,0.5) 1px, transparent 1px),
+    radial-gradient(circle 1px at 81% 11%, rgba(255,255,255,0.4) 1px, transparent 1px),
+    radial-gradient(circle 1px at 12% 61%, rgba(255,255,255,0.35) 1px, transparent 1px),
+    radial-gradient(circle 1.5px at 43% 72%, rgba(200,200,255,0.5) 1px, transparent 1px),
+    radial-gradient(circle 1px at 74% 68%, rgba(255,255,255,0.4) 1px, transparent 1px),
+    radial-gradient(circle 1px at 91% 33%, rgba(255,255,255,0.45) 1px, transparent 1px);
+  background-size: 100% 100%;
+  animation: starfield-twinkle 4s ease-in-out infinite;
+}
+@keyframes starfield-twinkle {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* === Ghost Desk Dust Aura (Luna Review #41) === */
+.desk--ghost::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 8px;
+  background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(148,163,184,0.12), transparent 70%);
+  animation: ghost-dust 5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes ghost-dust {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.04); }
+}
+.desk--ghost::after {
+  content: '···';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.4rem;
+  color: rgba(148,163,184,0.35);
+  letter-spacing: 0.3em;
+  animation: desk-dust-float 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes desk-dust-float {
+  0%, 80%, 100% { opacity: 0; transform: translateX(-50%) translateY(0); }
+  40% { opacity: 0.7; transform: translateX(-50%) translateY(-6px); }
+}
+
+/* === Mobile Office Scale Fix (Luna Review #41) === */
+@media (max-width: 480px) {
+  .office-wrap {
+    padding: 0.3rem;
+  }
+  .office-floor {
+    border-radius: 8px;
+    min-height: 65vh;
+  }
+  .char__name {
+    font-size: 0.32rem;
+  }
+  .idle-duration {
+    font-size: 0.26rem;
+  }
+  .wb-vibe-text {
+    font-size: 0.55rem;
+  }
+  .desk__nameplate {
+    font-size: 0.28rem;
+  }
+  .desk-lamp {
+    transform: scale(0.8);
+  }
+  .office-sign {
+    font-size: 0.4rem;
+  }
+  .vibe-weather {
+    font-size: 0.6rem;
+  }
+  .coffee-corner__label,
+  .office-door__label {
+    font-size: 0.25rem;
+  }
+}
