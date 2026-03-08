@@ -1,5 +1,28 @@
 {
-  "workers": [],
+  "workers": [
+    {
+      "id": "dave-plant-ghost",
+      "name": "Dave",
+      "role": "DevOps Engineer",
+      "emoji": "🚀",
+      "status": "working",
+      "task": "Implement Growing Office Plant + Ghost Desk CSS features",
+      "progress": 10,
+      "started": "2026-03-08T01:06:00Z",
+      "updated_at": "2026-03-08T01:06:00Z"
+    },
+    {
+      "id": "carlos-xp-badges",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "⚙️",
+      "status": "working",
+      "task": "Implement Session XP Badges on worker cards",
+      "progress": 10,
+      "started": "2026-03-08T01:06:00Z",
+      "updated_at": "2026-03-08T01:06:00Z"
+    }
+  ],
   "roster": [
     { "name": "Maya", "role": "Frontend Engineer", "emoji": "🧩" },
     { "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
