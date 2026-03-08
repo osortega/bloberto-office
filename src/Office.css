@@ -64,6 +64,19 @@
 
 .office-floor[data-vibe="crushing"] { --grid-line: rgba(139,92,246,0.18); }
 .office-floor[data-vibe="on-fire"] { --grid-line: rgba(249,115,22,0.15); }
+.office-floor[data-vibe="on-fire"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(0deg, rgba(249,115,22,0.06) 0%, transparent 40%);
+  animation: heat-shimmer 3s ease-in-out infinite;
+}
+@keyframes heat-shimmer {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50% { opacity: 0.7; transform: translateY(-2px); }
+}
 .office-floor[data-vibe="in-flow"] { --grid-line: rgba(20,184,166,0.12); }
 .office-floor[data-vibe="slow-day"] { --grid-line: rgba(156,163,175,0.06); }
 .office-floor[data-vibe="after-hours"] { --grid-line: rgba(99,102,241,0.12); }
