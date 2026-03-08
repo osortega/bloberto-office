@@ -338,6 +338,12 @@
       "worker": "Maya",
       "message": "Assigned to fix ShortcutToast timer leak + Office.css broken brace structure (QA #8 high-priority)",
       "timestamp": "2026-03-08T05:22:04Z"
+    },
+    {
+      "type": "hire",
+      "worker": "Sofia",
+      "message": "Clocked in for QA review #9",
+      "timestamp": "2026-03-08T17:15:36Z"
     }
   ]
 }
