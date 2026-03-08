@@ -1,27 +1,27 @@
 {
-  "lastUpdated": "2026-03-08T08:10:00Z",
+  "lastUpdated": "2026-03-08T08:11:00Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
-      "status": "idle",
-      "task": "Shipped: Deep Work Focus Halo + Error Room Tint",
-      "startedAt": "2026-03-08T07:35:00Z",
+      "status": "working",
+      "task": "Away sign timer escalation",
+      "startedAt": "2026-03-08T08:11:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T07:40:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T08:11:00Z",
+      "progress": 5
     },
     {
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
-      "status": "idle",
-      "task": "Ambient dust motes task stalled (no container found)",
-      "startedAt": "2026-03-08T03:36:00Z",
+      "status": "working",
+      "task": "Full-Sync Aura implementation",
+      "startedAt": "2026-03-08T08:11:00Z",
       "id": "dave",
-      "updated_at": "2026-03-08T05:00:48Z",
-      "progress": 0
+      "updated_at": "2026-03-08T08:11:00Z",
+      "progress": 5
     },
     {
       "name": "Luna",
