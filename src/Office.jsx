@@ -821,7 +821,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
   const nonMgr        = workers.filter(w => w.id !== 'bloberto')
   const workingWorkers = nonMgr.filter(w => w.status === 'working')
-  const idleWorkers    = nonMgr.filter(w => w.status !== 'working')
+  const idleWorkers    = nonMgr.filter(w => w.status === 'idle')
   const meetingWorkers = idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : []
   const hasAnyError    = nonMgr.some(w => w.status === 'error')
   const isFullSync     = nonMgr.length > 0 && idleWorkers.length === 0 && workingWorkers.length === nonMgr.length

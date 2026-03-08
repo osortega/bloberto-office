@@ -370,7 +370,7 @@ function DeltaBadge({ delta }) {
   )
 }
 
-function StatsBar({ workers, vibe, lastSynced, isLive }) {
+function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory }) {
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
   const idle = workers.filter((w) => w.status === 'idle').length
@@ -388,21 +388,6 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
   useEffect(() => {
     prevCountsRef.current = { active, idle, error: errorCount }
   }, [active, idle, errorCount])
-
-  const [vibeHistory, setVibeHistory] = useState([])
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(VIBE_HISTORY_KEY)
-      const stored = raw ? JSON.parse(raw) : []
-      if (stored.length === 0) {
-        setVibeHistory([{ key: vibe.key, ts: Date.now() }])
-      } else {
-        setVibeHistory(stored)
-      }
-    } catch {
-      setVibeHistory([{ key: vibe.key, ts: Date.now() }])
-    }
-  }, [vibe.key])
 
   const syncLabel = lastSynced
     ? lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -591,6 +576,9 @@ export default function App() {
   const [confettiActive, setConfettiActive] = useState(false)
   const [workerConfetti, setWorkerConfetti] = useState(null) // { name, color }
   const [completionToast, setCompletionToast] = useState(null) // { name, color }
+  const workerConfettiTimerRef = useRef(null)
+  const completionToastTimerRef = useRef(null)
+  const [vibeHistory, setVibeHistory] = useState([])
 
   // ── Hash-based tab sync (browser back/forward) ──
   useEffect(() => {
@@ -823,8 +811,10 @@ export default function App() {
       const color = ROLE_COLORS[worker.role] || ROLE_COLORS['Other']
       setWorkerConfetti({ name: worker.name, color })
       setCompletionToast({ name: worker.name, color })
-      setTimeout(() => setWorkerConfetti(null), 2500)
-      setTimeout(() => setCompletionToast(null), 3000)
+      if (workerConfettiTimerRef.current) clearTimeout(workerConfettiTimerRef.current)
+      workerConfettiTimerRef.current = setTimeout(() => setWorkerConfetti(null), 2500)
+      if (completionToastTimerRef.current) clearTimeout(completionToastTimerRef.current)
+      completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3000)
     }
 
     prevActiveWorkersRef.current = activeWorkers
@@ -856,6 +846,7 @@ export default function App() {
       history.push({ key: teamVibe.key, ts: Date.now() })
       if (history.length > VIBE_HISTORY_MAX) history.splice(0, history.length - VIBE_HISTORY_MAX)
       localStorage.setItem(VIBE_HISTORY_KEY, JSON.stringify(history))
+      setVibeHistory(history)
     } catch { /* ignore */ }
   }, [teamVibe.key])
 
@@ -1046,7 +1037,7 @@ export default function App() {
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
-            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} />
+            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} />
 
             <div className="section-header">
               <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>

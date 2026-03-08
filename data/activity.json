@@ -388,5 +388,11 @@
     "type": "hire",
     "worker": "Carlos",
     "message": "Assigned to fix 3 high-priority bugs from Sofia QA #14: error workers in meeting, toast timer leak, vibe history race"
+  },
+  {
+    "timestamp": "2026-03-08T10:58:00Z",
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "Fixed 3 HIGH bugs from Sofia QA #14: error workers in meeting (filter fix), toast timer leak (refs + cleanup), vibe history race (lifted state to App)"
   }
 ]
