@@ -2,12 +2,20 @@
   "workers": [
     {
       "name": "Carlos",
-      "emoji": "⚡",
+      "emoji": "\u26a1",
       "role": "Backend Engineer",
       "status": "working",
       "task": "Conference table remembers last huddle",
       "started_at": "2026-03-08T20:37:00Z"
+    },
+    {
+      "name": "Sofia",
+      "emoji": "\ud83d\udd0d",
+      "role": "QA Engineer",
+      "status": "working",
+      "task": "30-min QA review #24 \u2014 analyzing review #23 findings",
+      "started_at": "2026-03-08T21:15:00Z"
     }
   ],
-  "updated_at": "2026-03-08T20:37:00Z"
+  "updated_at": "2026-03-08T21:15:00Z"
 }
