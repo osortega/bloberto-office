@@ -1375,6 +1375,34 @@
 
 /* ── Conference table ── */
 .conference-table {
+
+/* ── Office Aisle Marker ── */
+.office-aisle {
+  position: absolute;
+  left: 4%;
+  width: 92%;
+  top: 52%;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 8px, transparent 8px, transparent 16px);
+  z-index: 1;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.aisle-arrow {
+  font-size: 0.45rem;
+  color: rgba(255,255,255,0.12);
+  line-height: 1;
+}
+
+[data-vibe='crushing'] .office-aisle { opacity: 1; }
+[data-vibe='crushing'] .aisle-arrow { color: rgba(255,255,255,0.18); }
+[data-vibe='slow-day'] .office-aisle { opacity: 0.4; }
+[data-vibe='after-hours'] .aisle-arrow { font-size: 0; }
+[data-vibe='after-hours'] .office-aisle::after { content: '▾'; font-size: 0.45rem; color: rgba(255,255,255,0.08); }
   position: absolute;
   left: 38%;
   top: 68%;

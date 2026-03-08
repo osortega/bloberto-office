@@ -778,6 +778,12 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {/* Conference table — lower center */}
         <ConferenceTable vibeKey={vibe} />
 
+        {/* Office aisle marker between desk rows */}
+        <div className="office-aisle" aria-hidden="true">
+          <span className="aisle-arrow">▸</span>
+          <span className="aisle-arrow">◂</span>
+        </div>
+
         {/* Coffee corner — top right */}
         <div className={`coffee-corner${idleWorkers.length >= 2 ? ' coffee-corner--chatting' : ''}`} data-vibe={vibe}>
           <div className="coffee-corner__chat-badge" aria-hidden="true">
