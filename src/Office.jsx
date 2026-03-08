@@ -722,6 +722,16 @@ function ConferenceTable({ vibeKey, meetingWorkers = [] }) {
         )}
       </svg>
 
+      {meetingWorkers.length === 0 && (
+        <div className="conf-ambient-label">
+          {vibe === 'crushing' ? 'everyone is at their desk' :
+           vibe === 'on-fire' ? 'no meetings. fix it.' :
+           vibe === 'in-flow' ? 'reserve the table' :
+           vibe === 'slow-day' ? 'open office hours' :
+           'locked up'}
+        </div>
+      )}
+
       {meetingWorkers.length >= 2 && (
         <>
           <div className="conf-meeting-badge">Huddle</div>

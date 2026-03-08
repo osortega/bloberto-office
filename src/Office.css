@@ -1823,7 +1823,7 @@
 .desk-keystrokes span {
   position: absolute;
   font-size: 7px;
-  color: rgba(255, 255, 255, 0.25);
+  color: color-mix(in srgb, var(--role-color, rgba(255,255,255,0.25)) 35%, transparent);
   font-family: monospace;
   animation: keystroke-float 3.6s ease-out infinite;
   white-space: nowrap;
@@ -2112,4 +2112,16 @@
 
 @media (hover: none) {
   .char-hover-card { pointer-events: auto; }
+}
+
+.conf-ambient-label {
+  position: absolute;
+  top: 108%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.5rem;
+  color: var(--text-muted, rgba(255,255,255,0.4));
+  white-space: nowrap;
+  opacity: 0.45;
+  letter-spacing: 0.04em;
 }
