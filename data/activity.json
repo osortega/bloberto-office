@@ -286,5 +286,17 @@
     "action": "Creative review #38 \u2014 7 ideas, 0 hires",
     "timestamp": "2026-03-08T08:07:00Z",
     "type": "review"
+  },
+  {
+    "timestamp": "2026-03-08T08:45:00Z",
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #11"
+  },
+  {
+    "timestamp": "2026-03-08T08:55:00Z",
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #11 complete \u2014 17 findings (4 high, 7 medium, 6 low). Overall: 3.9/5. Score UP from 3.1. useMemo side-effect, mobile whiteboard clip, toast overlap, milestone loop bug."
   }
 ]

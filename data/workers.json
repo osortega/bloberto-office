@@ -38,12 +38,12 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #11 \u2014 analyzing live site + code",
+      "status": "idle",
+      "task": "Shipped: QA review #11 \u2014 17 findings (4 high, 7 med, 6 low). Score: 3.9/5",
       "startedAt": "2026-03-08T08:45:00Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T08:45:00Z",
-      "progress": 10
+      "updated_at": "2026-03-08T08:55:00Z",
+      "progress": 100
     },
     {
       "name": "Maya",
