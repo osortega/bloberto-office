@@ -1,48 +1,14 @@
 {
   "workers": [
     {
-      "name": "Maya",
-      "role": "frontend",
-      "emoji": "🎨",
-      "status": "working",
-      "task": "Footer tagline discoverability + honorific animation",
-      "started_at": "2026-03-08T22:06:00Z"
-    },
-    {
-      "name": "Carlos",
-      "role": "backend",
-      "emoji": "⚙️",
-      "status": "working",
-      "task": "VACANT desk vibe-based job ads",
-      "started_at": "2026-03-08T22:06:00Z"
-    }
-  ],
-  "roster": [
-    {
-      "name": "Sofia",
-      "emoji": "🔍",
-      "role": "QA Analyst"
-    },
-    {
-      "name": "Maya",
-      "emoji": "🎨",
-      "role": "Frontend Dev"
-    },
-    {
-      "name": "Carlos",
-      "emoji": "⚙️",
-      "role": "Backend Dev"
-    },
-    {
-      "name": "Dave",
-      "emoji": "🔧",
-      "role": "DevOps"
-    },
-    {
       "name": "Luna",
+      "role": "Creative Director",
       "emoji": "🌙",
-      "role": "Creative Director"
+      "status": "working",
+      "task": "Creative review #55 — visual audit & ideation",
+      "started_at": "2026-03-08T22:30:00Z",
+      "progress": 10
     }
   ],
-  "updated_at": "2026-03-08T22:23:29Z"
+  "updated_at": "2026-03-08T22:30:00Z"
 }
