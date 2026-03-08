@@ -491,6 +491,17 @@ const FOOTER_TAGLINES = {
   'after-hours': 'the servers are watching. go home.',
 }
 
+const BONUS_TAGLINES = [
+  'technically it deploys if you squint',
+  'sprint velocity is just vibes with a spreadsheet',
+  'the standup is 15 minutes. the anxiety is forever',
+  'we ship on sundays because calendars are social constructs',
+  'the backlog is not a to-do list. it is a graveyard of ambition',
+  'git blame is just therapy with extra steps',
+  'the CI is green. the humans are not',
+  'agile is a vibe. waterfall is a cry for help'
+]
+
 const SHORTCUT_KEYS = new Set(['1', '2', 'r', 'R', 'Escape'])
 
 function ShortcutToast() {
@@ -604,6 +615,8 @@ export default function App() {
   const [focusedWorker, setFocusedWorker] = useState(null)
   const focusedWorkerTimerRef = useRef(null)
   const [selectedTag, setSelectedTag] = useState(null)
+  const [quoteBonus, setQuoteBonus] = useState(0)
+  const [showBonus, setShowBonus] = useState(false)
 
   const handleTagClick = useCallback((tag) => {
     setSelectedTag(prev => prev === tag ? null : tag)
@@ -1201,7 +1214,13 @@ export default function App() {
 
       <footer className="footer">
         Built with 💜 and mild existential dread by <span>🫠 Bloberto</span>
-        &nbsp;&middot;&nbsp; <span key={teamVibe.key} className="footer-tagline">&ldquo;{FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.'}&rdquo;</span> &nbsp;&middot;&nbsp;
+        &nbsp;&middot;&nbsp; <span
+          key={teamVibe.key}
+          className="footer-tagline"
+          style={{ cursor: 'pointer' }}
+          title="tap for another thought"
+          onClick={() => { setShowBonus(prev => !prev); setQuoteBonus(prev => prev + 1) }}
+        >&ldquo;{showBonus ? BONUS_TAGLINES[quoteBonus % BONUS_TAGLINES.length] : (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.')}&rdquo;</span><span style={{ opacity: 0.3, fontSize: '0.7em' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
         <span>v1.0.0-chaos</span>
       </footer>
     </div>
