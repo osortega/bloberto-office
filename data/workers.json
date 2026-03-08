@@ -1,87 +1,22 @@
 {
   "workers": [
     {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "started": null,
-      "updated_at": "2026-03-08T00:35:00Z"
-    },
-    {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "started": null,
-      "updated_at": "2026-03-08T00:40:00Z"
-    },
-    {
-      "id": "luna",
+      "id": "luna-creative-review-27",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "started": null,
-      "updated_at": "2026-03-08T00:35:00Z"
-    },
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\ud83d\udd27",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "started": null,
-      "updated_at": "2026-03-08T00:40:00Z"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "QA Review #36 complete \u2014 13 findings (4 high, 6 medium, 2 low, 1 new)",
-      "progress": 100,
-      "started": "2026-03-08T00:45:00Z",
-      "updated_at": "2026-03-08T00:50:00Z"
+      "emoji": "🎨",
+      "status": "working",
+      "task": "Creative review #27 — reviewing site and writing fresh ideas",
+      "progress": 10,
+      "started": "2026-03-08T01:00:00Z",
+      "updated_at": "2026-03-08T01:00:00Z"
     }
   ],
   "roster": [
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer"
-    },
-    {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer"
-    },
-    {
-      "id": "luna",
-      "name": "Luna",
-      "role": "Creative Director"
-    }
-  ],
-  "last_updated": "2026-03-08T00:50:00Z"
+    { "name": "Maya", "role": "Frontend Engineer", "emoji": "🧩" },
+    { "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
+    { "name": "Dave", "role": "DevOps Engineer", "emoji": "🔧" },
+    { "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
+    { "name": "Luna", "role": "Creative Director", "emoji": "🎨" }
+  ]
 }
