@@ -657,5 +657,17 @@
     "worker": "Luna",
     "message": "Completed Creative Review #25 \u2014 7 ideas filed (2 must, 3 should, 1 could, 1 wild)",
     "timestamp": "2026-03-08T00:07:20Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA Review #35",
+    "timestamp": "2026-03-08T00:15:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "Completed QA Review #35 \u2014 11 suggestions filed (4 high, 5 medium, 2 low). 5 recurring from #34.",
+    "timestamp": "2026-03-08T00:25:00Z"
   }
 ]

@@ -1,8 +1,8 @@
 {
   "analyst": "Sofia",
-  "review_number": 34,
-  "timestamp": "2026-03-07T23:47:00Z",
-  "screenshot_note": "Code-level review — focused on bugs, performance, and UX issues identified from source analysis",
+  "review_number": 35,
+  "timestamp": "2026-03-08T00:25:00Z",
+  "screenshot_note": "Code-level review — worker timed out on Puppeteer; Bloberto completed analysis from source",
   "scores": {
     "visual": 4,
     "ux": 3.5,
@@ -14,91 +14,99 @@
     "fun_factor": 4.5
   },
   "overall_score": 3.6,
-  "visual_observations": [
-    "Office view is charming — SVG characters with vibe-reactive Bloberto face is genuinely delightful",
-    "Dashboard cards, activity log, stats bar all feel polished. Good use of color coding",
-    "Confetti + completion toast on task ship is a nice touch",
-    "The whiteboard and coffee corner add personality without clutter",
-    "Maya and Carlos currently working on Luna's ideas — live site should show them at desks"
-  ],
+  "previous_review_check": "Review #34 had 10 suggestions (3 high, 4 medium, 3 low). Checking which are still unfixed.",
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "ProgressBar milestone Set never resets when worker restarts a task",
-      "description": "ProgressBar uses milestonesRef = useRef(new Set()) to track which milestones (25/50/75/100) have flashed. This ref persists across task changes because it's never cleared. When a worker completes (progress=100) then starts a new task (progress resets to 0), the Set still has {25,50,75,100}, so no flash animations fire for the new task. Fix: add a useEffect that clears milestonesRef.current when progress drops below 25 or when updatedAt changes significantly (indicating new task). Small fix, big visual impact — milestones are a key feedback loop.",
+      "title": "ProgressBar milestone Set never resets — STILL UNFIXED from #34",
+      "description": "milestonesRef = useRef(new Set()) persists across task changes. When a worker completes (progress=100) then starts new task (progress=0), the Set still has {25,50,75,100}, so milestones never flash again. Fix: useEffect that clears the Set when progress drops below 25.",
       "effort": "small",
-      "assign_to": "Maya"
+      "assign_to": "Maya",
+      "status": "recurring"
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "WORKER_ROLE_COLORS duplicates and diverges from ROLE_COLORS in constants.js",
-      "description": "App.jsx lines 14-20 define WORKER_ROLE_COLORS keyed by worker NAME (Maya: '#a855f7'). constants.js defines ROLE_COLORS keyed by ROLE ('Frontend Engineer': '#a78bfa'). The hex values have silently diverged (Maya's purple is #a855f7 vs Frontend's #a78bfa). More critically, WORKER_ROLE_COLORS is keyed by name — renaming a worker silently breaks confetti colors. Fix: delete WORKER_ROLE_COLORS entirely and use `ROLE_COLORS[worker.role] || '#a855f7'` at line 697 where confetti color is computed. Single source of truth.",
+      "title": "WORKER_ROLE_COLORS duplicates ROLE_COLORS — STILL UNFIXED from #34",
+      "description": "App.jsx has WORKER_ROLE_COLORS keyed by NAME with diverged hex values from ROLE_COLORS in constants.js. Delete WORKER_ROLE_COLORS, use ROLE_COLORS[worker.role] everywhere.",
       "effort": "small",
-      "assign_to": "Maya"
+      "assign_to": "Maya",
+      "status": "recurring"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "Character divs have onClick + tabIndex but no role='button' or keyboard handler",
-      "description": "Office.jsx Character components with onClick have tabIndex={0} but no role attribute and no onKeyDown handler. Screen readers announce them as generic groups, not interactive elements. Pressing Enter/Space while focused does nothing. Fix: add role='button' and onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(worker) } }} to the Character div when onClick is provided. Affects all working and idle characters with click handlers.",
+      "title": "Clickable characters missing role='button' and keyboard handler — STILL UNFIXED from #34",
+      "description": "Character divs with onClick have tabIndex={0} but no role='button' and no onKeyDown. Screen readers can't interact. Add role='button' and Enter/Space key handler.",
+      "effort": "small",
+      "assign_to": "Maya",
+      "status": "recurring"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Maya and Dave show progress: 0 despite being active — workers.json stale progress",
+      "description": "Maya and Dave were clocked in at 00:07 but their progress is still 0. Either the Docker workers aren't updating progress, or there's no mechanism to update it. The dashboard shows 0% with spinning typing dots, which looks broken to users. This is a process/tooling issue — workers need to write progress updates to workers.json periodically, or Bloberto needs to estimate progress based on elapsed time.",
+      "effort": "medium",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Tab hash sync doesn't handle initial load with no hash",
+      "description": "App initializes tab from window.location.hash but doesn't SET the hash on initial load. If user loads the bare URL, hash is empty, tab is 'office', but clicking browser back does nothing because there's no history entry. Set window.location.hash = 'office' on mount.",
       "effort": "small",
       "assign_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "ActivityLog time-group filtering runs 80 iterations every 60s tick with no memoization",
-      "description": "ActivityLog (App.jsx ~line 112) computes 'groups' by running TIME_GROUP_ORDER.map → displayed.filter for each of 4 groups × 20 entries = 80 filter calls. This runs on every render including the 60s useTimeTick. Wrap the groups computation in useMemo keyed on [entries]. Also: the IIFE inside WorkerCard's task tag render (lines ~272-292) creates a closure every render — extract to a variable.",
+      "title": "ActivityLog time-groups not memoized — STILL UNFIXED from #34",
+      "description": "TIME_GROUP_ORDER.map + filter runs 80 iterations per render cycle (every 60s). Wrap in useMemo keyed on entries array.",
       "effort": "small",
-      "assign_to": "Maya"
+      "assign_to": "Maya",
+      "status": "recurring"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "completionToast disappears with no exit animation — jarring UX",
-      "description": "The completion toast (App.jsx ~line 805) has a badge-pop entry animation but vanishes abruptly after 3s via setTimeout → setCompletionToast(null). No fade-out transition. Fix: at 2700ms, add a CSS class with opacity:0 transition (300ms), then unmount at 3000ms. Or use a single keyframe with animation-fill-mode:forwards that includes entry + exit.",
+      "title": "completionToast has no exit animation — STILL UNFIXED from #34",
+      "description": "Toast vanishes abruptly after 3s. Add fade-out CSS transition before unmount.",
       "effort": "small",
-      "assign_to": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "responsiveness",
-      "title": "Mobile: ~250px dead zone below office floor before footer",
-      "description": "On 375×812 mobile, .main has flex:1 which expands beyond the office floor's content height (aspect-ratio:4/3 at 375px = ~320px), creating a dark empty gap before the footer. Fix: @media (max-width: 600px) { .main { flex: none; } .office-wrap { padding-bottom: 0.5rem; } } — content-fit instead of flex stretch.",
-      "effort": "small",
-      "assign_to": "Maya"
+      "assign_to": "Maya",
+      "status": "recurring"
     },
     {
       "priority": "medium",
       "category": "visual",
-      "title": "Ghost OOO bubble escapes office-floor overflow boundary on leftmost desks",
-      "description": "Ghost character OOO bubbles use position:absolute with bottom:calc(100% + 8px). On characters at left:7% desks, the bubble clips outside the office-floor's overflow:hidden due to CSS transform stacking contexts. Fix: use overflow:clip (not hidden) on .office-floor which isn't affected by stacking context interactions, or render OOO bubbles as a portal.",
+      "title": "Worker card flip animation has no backface-visibility",
+      "description": "WorkerCard has front/back faces but neither .worker-card__front nor .worker-card__back set backface-visibility:hidden. On some browsers, both faces render simultaneously during the flip. Add backface-visibility: hidden to both faces and transform-style: preserve-3d to .worker-card__inner.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Solo spotlight message hardcoded for 1 worker — doesn't account for Bloberto",
+      "description": "The solo spotlight check (activeWorkers.length === 1) triggers when only Bloberto's manager entry is filtered out and 1 non-manager is active. But it says 'Carrying the whole team on one pair of hands' which is cute — however, it also shows when that single worker is IDLE, which is weird. Should only show when the solo worker is actually working.",
       "effort": "small",
       "assign_to": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "stuckWorkers useMemo uses worker.started but some workers only have updated_at",
-      "description": "StatsBar line ~370 filters stuck workers by checking `Date.now() - new Date(w.started).getTime() > 7_200_000`. But some workers have started:null and only updated_at. This silently NaN's the comparison and those workers are never detected as stuck even if they've been working forever with only updated_at set. Fix: use `w.started || w.updated_at` as the timestamp source.",
+      "title": "stuckWorkers uses worker.started which can be null — STILL UNFIXED from #34",
+      "description": "Use `w.started || w.updated_at` as fallback. NaN comparison silently skips stuck workers.",
       "effort": "small",
-      "assign_to": "Maya"
+      "assign_to": "Maya",
+      "status": "recurring"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "No keyboard shortcut hint or help modal",
-      "description": "The app has keyboard shortcuts (1=Office, 2=Dashboard, R=Refresh, Escape=blur) but there's no discoverable UI for them. A small '?' button or footer hint showing 'Press ? for shortcuts' would improve power-user experience. Low priority but adds polish.",
-      "effort": "medium",
-      "assign_to": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "performance",
-      "title": "Favicon canvas regenerates on every activeWorkers change even if color hasn't changed",
-      "description": "The favicon useEffect runs on [activeWorkers, fetchError] which changes frequently (every 30s poll). It regenerates the canvas even when the computed color hasn't changed. Fix: compute color first, store in a ref, and only regenerate canvas when color actually changes.",
+      "title": "Activity log doesn't show worker emoji for Bloberto/system events",
+      "description": "ActivityLogEntry looks up workerData from roster but Bloberto isn't in the roster array. System events also have no emoji. Add Bloberto to roster or handle the fallback case.",
       "effort": "small",
       "assign_to": "Maya"
     }
