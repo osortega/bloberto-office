@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T04:47:04Z",
+  "lastUpdated": "2026-03-08T05:00:48Z",
   "workers": [
     {
       "name": "Carlos",
@@ -16,23 +16,23 @@
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
-      "status": "working",
-      "task": "Implementing ambient dust motes on office floor",
+      "status": "idle",
+      "task": "Ambient dust motes task stalled (no container found)",
       "startedAt": "2026-03-08T03:36:00Z",
       "id": "dave",
-      "updated_at": "2026-03-08T03:36:00Z",
-      "progress": 10
+      "updated_at": "2026-03-08T05:00:48Z",
+      "progress": 0
     },
     {
       "name": "Luna",
       "role": "Creative Director",
       "emoji": "\ud83c\udf19",
-      "status": "idle",
-      "task": "Creative review #33 complete \u2014 7 ideas submitted, 3 flagged as duplicates by manager",
-      "startedAt": "2026-03-08T04:00:00Z",
+      "status": "working",
+      "task": "Creative review #34",
+      "startedAt": "2026-03-08T05:00:48Z",
       "id": "luna",
-      "updated_at": "2026-03-08T04:35:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T05:00:48Z",
+      "progress": 0
     },
     {
       "name": "Sofia",
