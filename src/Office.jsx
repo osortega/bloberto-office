@@ -573,6 +573,9 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
             </div>
           )}
           <div>{STATUS_EMOJIS[worker.status]} {STATUS_LABELS[worker.status]}</div>
+          {worker.updated_at && (
+            <div className="hover-time">⏱ {formatIdleDuration(worker.updated_at)}</div>
+          )}
         </div>
       )}
     </div>

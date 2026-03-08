@@ -63,6 +63,6 @@ export const VIBE_WHITEBOARD = {
   'crushing':    '🏆 SHIP IT',
   'on-fire':     '🚨 HELP',
   'in-flow':     '⚡ FLOW',
-  'slow-day':    'TODO: ???',
+  'slow-day':    '🐢 BACKLOG',
   'after-hours': '🌙 ZZZ',
 }
