@@ -1,4 +1,25 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-08T11:06:00Z"
+  "workers": [
+    {
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "⚡",
+      "status": "working",
+      "task": "After-hours starfield + ghost desk dust CSS",
+      "progress": 0,
+      "started_at": "2026-03-08T11:07:00Z"
+    },
+    {
+      "id": "dave",
+      "name": "Dave",
+      "role": "DevOps Engineer",
+      "emoji": "🔧",
+      "status": "working",
+      "task": "Mobile office scale fix CSS",
+      "progress": 0,
+      "started_at": "2026-03-08T11:07:00Z"
+    }
+  ],
+  "updated_at": "2026-03-08T11:07:00Z"
 }
