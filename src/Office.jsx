@@ -371,6 +371,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   const [bubble, setBubble] = useState({ quote: null, show: false })
   const [ghostBubble, setGhostBubble] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const [pinnedCard, setPinnedCard] = useState(false)
   const [justCompleted, setJustCompleted] = useState(false)
   const [idleBubble, setIdleBubble] = useState(false)
   const timerRef = useRef(null)      // hover auto-hide timeout
@@ -442,6 +443,15 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
     }
   }, [variant, managerVibe])
 
+  useEffect(() => {
+    if (!pinnedCard) return
+    const handler = (e) => {
+      if (!e.target.closest('.char')) setPinnedCard(false)
+    }
+    document.addEventListener('click', handler, true)
+    return () => document.removeEventListener('click', handler, true)
+  }, [pinnedCard])
+
   const handleMouseEnter = () => {
     if (variant === 'ghost') { setGhostBubble(true); return }
     if (variant === 'working' || variant === 'idle') { setHovered(true) }
@@ -493,7 +503,14 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
 
   const extraProps = (tooltip && variant !== 'ghost') ? { 'data-tooltip': tooltip } : {}
 
-  const handleClick = onClick ? () => onClick(worker) : undefined
+  const handleClick = onClick ? (e) => {
+    if (window.matchMedia('(hover: none)').matches) {
+      e.stopPropagation()
+      setPinnedCard(p => !p)
+    } else {
+      onClick(worker)
+    }
+  } : undefined
 
   return (
     <div className={classes.join(' ')} style={{ ...style, ...(handleClick ? { cursor: 'pointer' } : {}) }} {...extraProps}
@@ -563,7 +580,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
           <span /><span /><span />
         </div>
       )}
-      {hovered && (variant === 'working' || variant === 'idle') && (
+      {(hovered || pinnedCard) && (variant === 'working' || variant === 'idle') && (
         <div className="char-hover-card">
           <strong>{worker.name}</strong>
           <span className="hover-role">{worker.role}</span>
