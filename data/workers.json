@@ -1,5 +1,17 @@
 {
-  "workers": [],
+  "workers": [
+    {
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review #51 — reviewing site for new ideas",
+      "progress": 10,
+      "updated_at": "2026-03-08T19:30:00Z",
+      "startedAt": "2026-03-08T19:30:00Z"
+    }
+  ],
   "roster": [
     { "id": "carlos", "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
     { "id": "maya", "name": "Maya", "role": "Frontend Engineer", "emoji": "🎨" },
@@ -7,5 +19,5 @@
     { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
     { "id": "luna", "name": "Luna", "role": "Creative Director", "emoji": "🌙" }
   ],
-  "updated_at": "2026-03-08T19:16:00Z"
+  "updated_at": "2026-03-08T19:30:00Z"
 }
