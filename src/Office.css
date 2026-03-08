@@ -585,6 +585,13 @@
   font-weight: 400;
   letter-spacing: 0.04em;
 }
+@media (hover: none) {
+  .desk__nameplate--vacant::after {
+    content: ' · tap';
+    font-size: 0.5rem;
+    opacity: 0.5;
+  }
+}
 
 /* ── Vacant desk job-posting hover card ── */
 .vacant-job-card {
@@ -614,10 +621,12 @@
   transform: translateX(-50%);
   font-size: 0.85rem;
 }
-.desk--vacant:hover .vacant-job-card {
+.desk--vacant:hover .vacant-job-card,
+.desk--vacant:focus-within .vacant-job-card {
   display: block;
 }
-.desk--vacant:hover {
+.desk--vacant:hover,
+.desk--vacant:focus-within {
   animation: none;
   opacity: 0.9;
 }
@@ -2227,6 +2236,15 @@
   0%, 80%, 100% { opacity: 0; transform: translateX(-50%) translateY(0); }
   40% { opacity: 0.7; transform: translateX(-50%) translateY(-6px); }
 }
+
+/* === Ghost Desk Time Tiers === */
+.desk--ghost[data-ghost-tier='stale'] { border-color: rgba(245, 158, 11, 0.4); }
+.desk--ghost[data-ghost-tier='stale'] .desk-monitor-screen { filter: brightness(0.7) sepia(0.5); }
+.desk--ghost[data-ghost-tier='stale']::before { background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(245, 158, 11, 0.15), transparent 70%); animation: ghost-dust 6s ease-in-out infinite; }
+
+.desk--ghost[data-ghost-tier='abandoned'] { border-color: rgba(239, 68, 68, 0.4); animation: abandoned-pulse 1.5s ease-in-out infinite; }
+.desk--ghost[data-ghost-tier='abandoned'] .desk-monitor-screen { filter: brightness(0.5) sepia(0.3) hue-rotate(-30deg); }
+@keyframes abandoned-pulse { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 8px 2px rgba(239,68,68,0.25); } }
 
 /* === Mobile Office Scale Fix (Luna Review #41) === */
 @media (max-width: 480px) {

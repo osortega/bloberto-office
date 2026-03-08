@@ -1190,11 +1190,18 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             const hours = Math.floor(diff / 3600000)
             return `Last seen: ${mins < 60 ? `${mins}m ago` : `${hours}h ago`}`
           })() : undefined
+          let ghostDeskTier
+          if (isGhostDesk) {
+            const diffMs = Date.now() - new Date(occ.worker.updated_at).getTime()
+            const ghostMins = Math.floor(diffMs / 60000)
+            ghostDeskTier = ghostMins < 60 ? 'fresh' : ghostMins < 180 ? 'stale' : 'abandoned'
+          }
           return (
             <div
               key={desk.id}
               className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}${isGhostDesk ? ' desk--ghost' : ''}${isIdle ? ' desk--idle' : ''}`}
               title={ghostDeskTitle}
+              data-ghost-tier={isGhostDesk ? ghostDeskTier : undefined}
               style={{
                 left: `${desk.left}%`,
                 top: `${desk.top}%`,
