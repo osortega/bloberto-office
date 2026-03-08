@@ -1,21 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Sofia",
-      "emoji": "🔍",
-      "role": "QA Engineer",
-      "status": "working",
-      "task": "Adding wall clock vibe-reactive tooltip with time display",
-      "started_at": "2026-03-08T21:32:00Z"
-    },
-    {
-      "name": "Carlos",
-      "emoji": "⚙️",
-      "role": "Backend Engineer",
-      "status": "working",
-      "task": "Adding click-to-inspect affordance on office characters",
-      "started_at": "2026-03-08T21:32:00Z"
-    }
-  ],
-  "updated_at": "2026-03-08T21:32:00Z"
+  "workers": [],
+  "updated_at": "2026-03-08T21:35:00Z"
 }

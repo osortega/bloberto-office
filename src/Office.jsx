@@ -587,7 +587,8 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   if (isError) classes.push('char--glitch')
   if (isPinged) classes.push('char--pinged')
 
-  const extraProps = (tooltip && variant !== 'ghost') ? { 'data-tooltip': tooltip } : {}
+  const tooltipText = tooltip && onClick ? `${tooltip} · click to inspect` : tooltip
+  const extraProps = (tooltipText && variant !== 'ghost') ? { 'data-tooltip': tooltipText } : {}
 
   const handleClick = onClick ? (e) => {
     if (window.matchMedia('(hover: none)').matches) {
@@ -916,6 +917,14 @@ function WallClock({ vibeKey }) {
   const displayH = h % 12 || 12
   const displayM = String(m).padStart(2, '0')
 
+  const CLOCK_COMMENTS = {
+    'crushing': 'Peak hours. Nobody watches the clock except the clock.',
+    'on-fire': 'Time has no meaning during an incident.',
+    'slow-day': 'You have checked this three times in the last hour.',
+    'in-flow': 'Do not look. It breaks the flow.',
+    'after-hours': 'Still here? So am I. I am a clock. That is fine for me.',
+  }
+
   return (
     <svg
       className="office-wall-clock"
@@ -923,8 +932,9 @@ function WallClock({ vibeKey }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-label={`Wall clock showing ${displayH}:${displayM}`}
       role="img"
-      style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'none' }}
+      style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'auto' }}
     >
+      <title>{`${displayH}:${displayM} ${h >= 12 ? 'PM' : 'AM'} — ${CLOCK_COMMENTS[vibeKey] || CLOCK_COMMENTS['in-flow']}`}</title>
       {/* Clock face */}
       <circle cx="11" cy="11" r="9" fill={faceFill} stroke="var(--border)" strokeWidth="1" />
 
