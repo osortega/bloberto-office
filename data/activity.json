@@ -1,6 +1,12 @@
 [
   {
     "type": "complete",
+    "worker": "Sofia",
+    "message": "\ud83d\udd0d QA review #24 complete \u2014 reviewed #23 findings, 4 high-priority bugs confirmed, assigning Maya for fixes",
+    "timestamp": "2026-03-08T21:20:00Z"
+  },
+  {
+    "type": "complete",
     "worker": "Luna",
     "message": "Creative review #53 \u2014 8 ideas across delight, storytelling, visual, office-life",
     "timestamp": "2026-03-08T21:00:00Z"
