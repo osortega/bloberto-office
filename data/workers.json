@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T02:15:00Z",
+  "lastUpdated": "2026-03-08T02:45:00Z",
   "workers": [
     {
       "name": "Maya",
@@ -8,14 +8,6 @@
       "status": "working",
       "task": "Implementing Away Signs for idle desks",
       "startedAt": "2026-03-08T02:06:00Z"
-    },
-    {
-      "name": "Sofia",
-      "role": "QA & Product Analyst",
-      "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #2 \u2014 analyzing live site and codebase",
-      "startedAt": "2026-03-08T02:15:00Z"
     }
   ]
 }
