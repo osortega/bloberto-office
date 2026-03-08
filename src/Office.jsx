@@ -782,6 +782,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
         {/* Whiteboard — left wall, vibe-reactive */}
         <div
+          key={vibe}
           className={`office-whiteboard${vibe === 'on-fire' ? ' office-whiteboard--urgent' : ''}${showDone ? ' office-whiteboard--done' : ''}`}
           aria-label={`Whiteboard: ${showDone ? 'DONE!' : (VIBE_WHITEBOARD[vibe] ?? VIBE_WHITEBOARD['in-flow'])}${workingWorkers.length > 0 ? ` ${avgProgress}%` : ''}`}
           role="img"
