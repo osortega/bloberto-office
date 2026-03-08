@@ -666,6 +666,15 @@
 }
 
 /* ── Idle — wander paths set via char--wander-N ── */
+.char--idle .char__name {
+  font-size: 0.32rem;
+  opacity: 0.55;
+  letter-spacing: 0.1em;
+  transition: opacity 0.2s ease;
+}
+.char--idle:hover .char__name {
+  opacity: 1;
+}
 .char--idle .char__avatar {
   border-color: var(--role-color, var(--yellow));
   box-shadow: 0 0 7px color-mix(in srgb, var(--role-color, var(--yellow)) 40%, transparent), 0 3px 10px rgba(0, 0, 0, 0.35);
