@@ -675,5 +675,17 @@
     "worker": "Luna",
     "message": "Completed Creative Review #26 \u2014 7 ideas filed (2 must, 3 should, 1 could, 1 wild). Theme: Ambient Intelligence.",
     "timestamp": "2026-03-08T00:35:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Dave",
+    "message": "Shipped desk-pulse glow animation for active desks (Luna #26 idea #5)",
+    "timestamp": "2026-03-08T00:40:00Z"
+  },
+  {
+    "type": "system",
+    "worker": "Carlos",
+    "message": "Role-color confetti (Luna #26 idea #2) \u2014 already implemented in prior code. Skipped.",
+    "timestamp": "2026-03-08T00:40:00Z"
   }
 ]

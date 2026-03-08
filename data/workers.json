@@ -16,11 +16,11 @@
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
-      "status": "working",
-      "task": "Pulsing Glow on Active Desks (Luna #26 idea #5)",
+      "status": "idle",
+      "task": "",
       "progress": 0,
-      "started": "2026-03-08T00:36:00Z",
-      "updated_at": "2026-03-08T00:36:00Z"
+      "started": null,
+      "updated_at": "2026-03-08T00:40:00Z"
     },
     {
       "id": "luna",
@@ -38,11 +38,11 @@
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\ud83d\udd27",
-      "status": "working",
-      "task": "Role-Color Confetti (Luna #26 idea #2)",
+      "status": "idle",
+      "task": "",
       "progress": 0,
-      "started": "2026-03-08T00:36:00Z",
-      "updated_at": "2026-03-08T00:36:00Z"
+      "started": null,
+      "updated_at": "2026-03-08T00:40:00Z"
     },
     {
       "id": "sofia",
