@@ -350,6 +350,18 @@
       "worker": "Sofia",
       "message": "QA review #9 complete \u2014 10 findings (3 high, 4 medium, 3 low). Overall: 3.5/5. 7 of 10 issues persist from #19. New: confetti timer leak, dead activityLogLenRef.",
       "timestamp": "2026-03-08T17:24:38Z"
+    },
+    {
+      "type": "hire",
+      "worker": "Carlos",
+      "message": "Assigned 3 fixes from QA #10: confetti timer leak, Luna gradient ID collision, dead activityLogLenRef",
+      "timestamp": "2026-03-08T17:45:43Z"
+    },
+    {
+      "type": "hire",
+      "worker": "Maya",
+      "message": "Assigned 2 fixes from QA #10: stableActivityLog useMemo + hover card time bug",
+      "timestamp": "2026-03-08T17:45:43Z"
     }
   ]
 }
