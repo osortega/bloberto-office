@@ -1041,7 +1041,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             >
               {/* Desk lamp — glows when occupied by a working character */}
               <svg className={`desk-lamp${isWorking ? ' desk-lamp--working' : isIdle ? ' desk-lamp--idle' : hasError ? ' desk-lamp--error' : ''}`} width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
-                <ellipse cx="5" cy="4" rx="4.5" ry="2.5" fill="#fbbf24" />
+                <ellipse cx="5" cy="4" rx="4.5" ry="2.5" fill={isWorking && occ ? (ROLE_COLORS[occ.worker.role] ?? '#fbbf24') : '#fbbf24'} />
                 <line x1="5" y1="6.5" x2="5" y2="12" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" />
                 <ellipse cx="5" cy="13" rx="3.5" ry="1.5" fill="#9ca3af" />
               </svg>
@@ -1060,9 +1060,16 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               ) : (
                 <div className="desk-character">
                   <div className="desk__monitor" />
-                  {isWorking && DESK_SCREEN_SVG[occ.worker.id] && (
+                  {isWorking && (DESK_SCREEN_SVG[occ.worker.id] || true) && (
                     <div className="desk-monitor-screen">
-                      {DESK_SCREEN_SVG[occ.worker.id]}
+                      {DESK_SCREEN_SVG[occ.worker.id] || (
+                        <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <rect width="38" height="18" fill="#05050f" />
+                          <rect x="2" y="3" width="28" height="2" rx="1" fill={ROLE_COLORS[occ.worker.role] ?? '#6b7280'} opacity="0.9" />
+                          <rect x="2" y="8" width="20" height="2" rx="1" fill={ROLE_COLORS[occ.worker.role] ?? '#6b7280'} opacity="0.7" />
+                          <rect x="2" y="13" width="24" height="2" rx="1" fill={ROLE_COLORS[occ.worker.role] ?? '#6b7280'} opacity="0.8" />
+                        </svg>
+                      )}
                     </div>
                   )}
                   {!occ.ghost && !occ.idle && (
