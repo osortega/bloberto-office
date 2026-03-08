@@ -1,15 +1,15 @@
 {
-  "lastUpdated": "2026-03-08T07:06:00Z",
+  "lastUpdated": "2026-03-08T07:07:00Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
       "status": "working",
-      "task": "Whiteboard Team Progress Thermometer (Luna idea #34.2)",
-      "startedAt": "2026-03-08T06:06:00Z",
+      "task": "Mobile Viewport Fill \u2014 Kill the Dead Zone (Luna #36.1)",
+      "startedAt": "2026-03-08T07:07:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T06:06:00Z",
+      "updated_at": "2026-03-08T07:07:00Z",
       "progress": 0
     },
     {
@@ -50,10 +50,10 @@
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
       "status": "working",
-      "task": "Office Wall Clock \u2014 SVG analog clock component (Luna idea #34.1)",
-      "startedAt": "2026-03-08T06:06:00Z",
+      "task": "Window Vibe Tint \u2014 Sky Reflects Team Energy (Luna #36.2)",
+      "startedAt": "2026-03-08T07:07:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T06:06:00Z",
+      "updated_at": "2026-03-08T07:07:00Z",
       "progress": 0
     }
   ],
