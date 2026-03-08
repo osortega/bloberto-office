@@ -1,48 +1,48 @@
 {
-  "lastUpdated": "2026-03-08T08:15:00Z",
+  "lastUpdated": "2026-03-08T08:30:00Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
-      "status": "working",
-      "task": "Away sign timer escalation",
+      "status": "idle",
+      "task": "Container crashed \u2014 needs reassignment",
       "startedAt": "2026-03-08T08:11:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T08:11:00Z",
+      "updated_at": "2026-03-08T08:30:00Z",
       "progress": 5
     },
     {
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
-      "status": "working",
-      "task": "Full-Sync Aura implementation",
+      "status": "idle",
+      "task": "Container crashed \u2014 needs reassignment",
       "startedAt": "2026-03-08T08:11:00Z",
       "id": "dave",
-      "updated_at": "2026-03-08T08:11:00Z",
+      "updated_at": "2026-03-08T08:30:00Z",
       "progress": 5
     },
     {
       "name": "Luna",
       "role": "Creative Director",
       "emoji": "\ud83c\udf19",
-      "status": "idle",
-      "task": "Creative review #38 complete",
-      "startedAt": "2026-03-08T08:00:00Z",
+      "status": "working",
+      "task": "Creative review #39",
+      "startedAt": "2026-03-08T08:30:00Z",
       "id": "luna",
-      "updated_at": "2026-03-08T08:07:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T08:30:00Z",
+      "progress": 0
     },
     {
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #11 \u2014 full site analysis",
+      "status": "idle",
+      "task": "Container crashed \u2014 needs reassignment",
       "startedAt": "2026-03-08T08:15:00Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T08:15:00Z",
+      "updated_at": "2026-03-08T08:30:00Z",
       "progress": 15
     },
     {
