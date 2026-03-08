@@ -1,15 +1,4 @@
 {
-  "workers": [
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "status": "working",
-      "task": "QA review #19 — site analysis, code quality, UX, accessibility audit",
-      "progress": 10,
-      "updated_at": "2026-03-08T16:45:00Z",
-      "startedAt": "2026-03-08T16:45:00Z"
-    }
-  ],
-  "updated_at": "2026-03-08T16:45:00Z"
+  "workers": [],
+  "updated_at": "2026-03-08T16:50:00Z"
 }

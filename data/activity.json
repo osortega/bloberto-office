@@ -1,9 +1,16 @@
 {
   "entries": [
     {
+      "type": "complete",
+      "worker": "Sofia",
+      "emoji": "🔍",
+      "message": "QA review #19 complete — 19 findings (4 high, 9 medium, 6 low). Overall: 3.1/5. CRITICAL: activity log permanently empty on live site (entries wrapper bug), workers.json missing id field, role name mismatch.",
+      "timestamp": "2026-03-08T16:50:00Z"
+    },
+    {
       "type": "system",
       "worker": null,
-      "message": "Luna review #47 re-evaluated \u2014 must/should items already implemented",
+      "message": "Luna review #47 re-evaluated — must/should items already implemented",
       "timestamp": "2026-03-08T16:40:00Z"
     },
     {
@@ -21,72 +28,72 @@
     {
       "type": "deploy",
       "worker": "Dave",
-      "message": "Nameplate Reveal Animation \u2014 pop animation on vibe change",
+      "message": "Nameplate Reveal Animation — pop animation on vibe change",
       "timestamp": "2026-03-08T16:09:30Z"
     },
     {
       "type": "deploy",
       "worker": "Carlos",
-      "message": "Vibe Aura on Office Border \u2014 CSS vibe-reactive borders added",
+      "message": "Vibe Aura on Office Border — CSS vibe-reactive borders added",
       "timestamp": "2026-03-08T16:09:00Z"
     },
     {
       "type": "review",
       "worker": "Luna",
-      "message": "Creative review #47 complete \u2014 7 ideas proposed",
+      "message": "Creative review #47 complete — 7 ideas proposed",
       "timestamp": "2026-03-08T16:05:00Z"
     },
     {
       "type": "system",
       "worker": null,
-      "message": "\ud83c\udf19 Luna completed creative review #47",
+      "message": "🌙 Luna completed creative review #47",
       "timestamp": "2026-03-08T15:05:00Z"
     },
     {
       "type": "complete",
       "worker": "dave",
-      "message": "\ud83d\udd27 Dave shipped: mobile tap-to-pin hover cards",
+      "message": "🔧 Dave shipped: mobile tap-to-pin hover cards",
       "timestamp": "2026-03-08T15:10:00Z"
     },
     {
       "type": "complete",
       "worker": "carlos",
-      "message": "\ud83d\udd35 Bloberto shipped: role-colored desk lamps + fallback desk screens",
+      "message": "🔵 Bloberto shipped: role-colored desk lamps + fallback desk screens",
       "timestamp": "2026-03-08T15:11:00Z"
     },
     {
       "type": "complete",
       "worker": "Bloberto",
-      "emoji": "\ud83e\udee0",
+      "emoji": "🫠",
       "message": "Implemented Luna #45 MUSTs: hover card time-on-task + slow-day whiteboard text",
       "timestamp": "2026-03-08T13:08:00Z"
     },
     {
       "type": "complete",
       "worker": "Bloberto",
-      "emoji": "\ud83e\udee0",
-      "message": "Filled all 20 vibe transition quotes (was 10/20) \u2014 Bloberto never goes silent again",
+      "emoji": "🫠",
+      "message": "Filled all 20 vibe transition quotes (was 10/20) — Bloberto never goes silent again",
       "timestamp": "2026-03-08T13:08:00Z"
     },
     {
       "type": "complete",
       "worker": "Luna",
-      "emoji": "\ud83c\udf19",
-      "message": "Creative review #45 complete \u2014 6 ideas filed (2 must, 2 should, 1 could, 1 wild)",
+      "emoji": "🌙",
+      "message": "Creative review #45 complete — 6 ideas filed (2 must, 2 should, 1 could, 1 wild)",
       "timestamp": "2026-03-08T13:04:00Z"
     },
     {
       "type": "complete",
       "worker": "Sofia",
-      "emoji": "\ud83d\udd0d",
-      "message": "QA review #18 complete \u2014 11 findings (3 high, 4 medium, 4 low). Overall: 3.7/5. Score STABLE. Animation budget bloat (118 keyframes), CSS splitting needed, WorkerCard memo still defeated.",
+      "emoji": "🔍",
+      "message": "QA review #18 complete — 11 findings (3 high, 4 medium, 4 low). Overall: 3.7/5. Score STABLE. Animation budget bloat (118 keyframes), CSS splitting needed, WorkerCard memo still defeated.",
       "timestamp": "2026-03-08T12:50:00Z"
     },
     {
       "type": "completion",
       "worker": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19",
+      "emoji": "🌙",
       "task": "Creative review cycle #44",
       "timestamp": "2026-03-08T12:42:00Z",
       "result": "6 ideas proposed (1 must, 2 should, 2 could, 1 wild). Key finding: workers.json missing id field causing dual-render bug."
@@ -124,7 +131,7 @@
     {
       "type": "complete",
       "worker": "Luna",
-      "message": "Creative review #30 complete \u2014 8 ideas submitted (theme: reward the curious)",
+      "message": "Creative review #30 complete — 8 ideas submitted (theme: reward the curious)",
       "timestamp": "2026-03-08T02:35:00Z"
     },
     {
@@ -136,13 +143,13 @@
     {
       "type": "complete",
       "worker": "Luna",
-      "message": "Creative review #27 complete \u2014 7 fresh ideas written (theme: The Office Has Memory)",
+      "message": "Creative review #27 complete — 7 fresh ideas written (theme: The Office Has Memory)",
       "timestamp": "2026-03-08T01:05:00Z"
     },
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "QA review complete \u2014 14 suggestions, 5 high-priority bugs found (overall: 3.6/5)",
+      "message": "QA review complete — 14 suggestions, 5 high-priority bugs found (overall: 3.6/5)",
       "timestamp": "2026-03-08T01:45:00Z"
     },
     {
@@ -166,19 +173,19 @@
     {
       "type": "complete",
       "worker": "Luna",
-      "message": "Creative review #28 complete \u2014 8 fresh ideas written (theme: Give every surface a pulse)",
+      "message": "Creative review #28 complete — 8 fresh ideas written (theme: Give every surface a pulse)",
       "timestamp": "2026-03-08T01:35:00Z"
     },
     {
       "type": "complete",
       "worker": "Luna",
-      "message": "Creative review #29 complete \u2014 8 fresh ideas (theme: Every corner narrates)",
+      "message": "Creative review #29 complete — 8 fresh ideas (theme: Every corner narrates)",
       "timestamp": "2026-03-08T02:05:00Z"
     },
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "QA review #2 complete \u2014 16 findings (4 high, 8 medium, 4 low). Overall score: 3.75/5. Fun factor: 5/5 \ud83c\udf89",
+      "message": "QA review #2 complete — 16 findings (4 high, 8 medium, 4 low). Overall score: 3.75/5. Fun factor: 5/5 🎉",
       "timestamp": "2026-03-08T02:45:00Z"
     },
     {
@@ -190,25 +197,25 @@
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "QA review #3 complete \u2014 21 findings (4 high, 10 medium, 7 low). Schema bugs fixed inline. Overall: 3.75/5",
+      "message": "QA review #3 complete — 21 findings (4 high, 10 medium, 7 low). Schema bugs fixed inline. Overall: 3.75/5",
       "timestamp": "2026-03-08T02:45:53Z"
     },
     {
       "type": "complete",
       "worker": "Luna",
-      "message": "Creative review #31 complete \u2014 7 fresh ideas (theme: Every static element is a sleeping story)",
+      "message": "Creative review #31 complete — 7 fresh ideas (theme: Every static element is a sleeping story)",
       "timestamp": "2026-03-08T03:05:00Z"
     },
     {
       "type": "complete",
       "worker": "Maya",
-      "message": "Shipped Coffee Corner Conversation Cluster \u2014 idle workers now trigger a chatting badge with glow",
+      "message": "Shipped Coffee Corner Conversation Cluster — idle workers now trigger a chatting badge with glow",
       "timestamp": "2026-03-08T03:10:00Z"
     },
     {
       "type": "complete",
       "worker": "Carlos",
-      "message": "Shipped Vibe History Sparkline \u2014 StatsBar now shows last 12 vibe changes as a color-coded sparkline",
+      "message": "Shipped Vibe History Sparkline — StatsBar now shows last 12 vibe changes as a color-coded sparkline",
       "timestamp": "2026-03-08T03:10:00Z"
     },
     {
@@ -220,7 +227,7 @@
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "QA review #4 complete \u2014 12 findings (3 high, 6 medium, 3 low). Overall: 3.5/5. Fern bug, roster filter, sparkline clip identified.",
+      "message": "QA review #4 complete — 12 findings (3 high, 6 medium, 3 low). Overall: 3.5/5. Fern bug, roster filter, sparkline clip identified.",
       "timestamp": "2026-03-08T03:25:00Z"
     },
     {
@@ -232,7 +239,7 @@
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "QA review #5 complete \u2014 11 findings (3 high, 5 medium, 3 low). Overall: 3.6/5. Key finds: inline style perf issue, role mismatch bug, a11y tab gaps.",
+      "message": "QA review #5 complete — 11 findings (3 high, 5 medium, 3 low). Overall: 3.6/5. Key finds: inline style perf issue, role mismatch bug, a11y tab gaps.",
       "timestamp": "2026-03-08T03:55:00Z"
     },
     {
@@ -244,7 +251,7 @@
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "QA review #6 complete \u2014 11 findings (3 high, 5 medium, 3 low). Overall: 3.6/5. 3 high-priority bugs STILL unfixed from #4/#5.",
+      "message": "QA review #6 complete — 11 findings (3 high, 5 medium, 3 low). Overall: 3.6/5. 3 high-priority bugs STILL unfixed from #4/#5.",
       "timestamp": "2026-03-08T04:25:00Z"
     },
     {
@@ -268,31 +275,31 @@
     {
       "type": "complete",
       "worker": "Carlos",
-      "message": "Fixed roster key in workers.json + stuck worker .started \u2192 .startedAt bug",
+      "message": "Fixed roster key in workers.json + stuck worker .started → .startedAt bug",
       "timestamp": "2026-03-08T04:30:00Z"
     },
     {
       "type": "complete",
       "worker": "Luna",
-      "message": "Creative review #33 complete \u2014 7 ideas (2 must, 2 should, 1 could, 1 wild). Manager flagged 3 as duplicates/invalid.",
+      "message": "Creative review #33 complete — 7 ideas (2 must, 2 should, 1 could, 1 wild). Manager flagged 3 as duplicates/invalid.",
       "timestamp": "2026-03-08T04:35:00Z"
     },
     {
       "type": "complete",
       "worker": "Maya",
-      "message": "Implemented vibe-change radial shockwave \u2014 blooms from Bloberto desk on vibe transitions",
+      "message": "Implemented vibe-change radial shockwave — blooms from Bloberto desk on vibe transitions",
       "timestamp": "2026-03-08T04:40:00Z"
     },
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "Implemented coffee machine steam animation \u2014 vibe-reactive speed (fast on crushing, paused after-hours)",
+      "message": "Implemented coffee machine steam animation — vibe-reactive speed (fast on crushing, paused after-hours)",
       "timestamp": "2026-03-08T04:40:00Z"
     },
     {
       "type": "complete",
       "worker": "Carlos",
-      "message": "Implemented office aisle marker \u2014 dashed line between desk rows, vibe-reactive opacity",
+      "message": "Implemented office aisle marker — dashed line between desk rows, vibe-reactive opacity",
       "timestamp": "2026-03-08T04:42:00Z"
     },
     {
@@ -304,7 +311,7 @@
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "QA review #7 complete \u2014 11 findings (3 high, 6 medium, 2 low). Overall: 3.4/5. ShortcutToast leak, ProgressBar ETA bug, memo defeat still unfixed.",
+      "message": "QA review #7 complete — 11 findings (3 high, 6 medium, 2 low). Overall: 3.4/5. ShortcutToast leak, ProgressBar ETA bug, memo defeat still unfixed.",
       "timestamp": "2026-03-08T04:47:04Z"
     },
     {
@@ -316,7 +323,7 @@
     {
       "type": "complete",
       "worker": "Sofia",
-      "message": "QA review #8 complete \u2014 11 findings (4 high, 5 medium, 2 low). Overall: 3.5/5. 3 HIGH-PRIORITY bugs STILL UNFIXED from #7. New: CSS brace breakage in Office.css.",
+      "message": "QA review #8 complete — 11 findings (4 high, 5 medium, 2 low). Overall: 3.5/5. 3 HIGH-PRIORITY bugs STILL UNFIXED from #7. New: CSS brace breakage in Office.css.",
       "timestamp": "2026-03-08T05:21:53Z"
     },
     {
