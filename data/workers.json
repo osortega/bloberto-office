@@ -4,7 +4,7 @@
       "id": "dave-plant-ghost",
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "🚀",
+      "emoji": "\ud83d\ude80",
       "status": "working",
       "task": "Implement Growing Office Plant + Ghost Desk CSS features",
       "progress": 10,
@@ -15,19 +15,50 @@
       "id": "carlos-xp-badges",
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "⚙️",
+      "emoji": "\u2699\ufe0f",
       "status": "working",
       "task": "Implement Session XP Badges on worker cards",
       "progress": 10,
       "started": "2026-03-08T01:06:00Z",
       "updated_at": "2026-03-08T01:06:00Z"
+    },
+    {
+      "id": "sofia-qa-review",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "\ud83d\udd0d",
+      "status": "working",
+      "task": "QA & Product Analysis review of the live dashboard",
+      "progress": 5,
+      "started": "2026-03-08T01:15:00Z",
+      "updated_at": "2026-03-08T01:15:00Z"
     }
   ],
   "roster": [
-    { "name": "Maya", "role": "Frontend Engineer", "emoji": "🧩" },
-    { "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
-    { "name": "Dave", "role": "DevOps Engineer", "emoji": "🔧" },
-    { "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
-    { "name": "Luna", "role": "Creative Director", "emoji": "🎨" }
+    {
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "emoji": "\ud83e\udde9"
+    },
+    {
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "\u2699\ufe0f"
+    },
+    {
+      "name": "Dave",
+      "role": "DevOps Engineer",
+      "emoji": "\ud83d\udd27"
+    },
+    {
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "\ud83d\udd0d"
+    },
+    {
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "\ud83c\udfa8"
+    }
   ]
 }
