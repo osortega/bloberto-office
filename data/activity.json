@@ -376,5 +376,17 @@
     "worker": "Bloberto",
     "message": "Implemented nameplate idle guard fix (Office.jsx) + away glyph + whiteboard dark mode fix (Office.css)",
     "timestamp": "2026-03-08T12:10:00Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #17",
+    "timestamp": "2026-03-08T12:15:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #17 complete \u2014 11 findings (3 high, 5 medium, 3 low). Overall: 3.7/5. Score UP from 3.3. Coffee corner CSS bug still broken (carried from #16), focus indicators missing, animation performance concerns.",
+    "timestamp": "2026-03-08T12:20:00Z"
   }
 ]

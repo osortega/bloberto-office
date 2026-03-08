@@ -1,17 +1,5 @@
 {
-  "workers": [
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #17 \u2014 analyzing site code and live dashboard",
-      "progress": 10,
-      "updated_at": "2026-03-08T12:15:22Z",
-      "startedAt": "2026-03-08T12:15:22Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     {
       "id": "bloberto",
@@ -50,5 +38,5 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "updated_at": "2026-03-08T12:15:22Z"
+  "updated_at": "2026-03-08T12:20:00Z"
 }
