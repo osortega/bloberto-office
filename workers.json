@@ -1,21 +1,21 @@
 {
   "workers": [
     {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
       "status": "working",
-      "task": "Ghost desk time tiers - visual escalation",
-      "started_at": "2026-03-08T23:30:00Z"
+      "task": "Bloberto ping reactions on worker click",
+      "started_at": "2026-03-08T23:32:00Z"
     },
     {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer",
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
       "status": "working",
-      "task": "Vacant desk job card touch accessibility fix",
-      "started_at": "2026-03-08T23:30:00Z"
+      "task": "Sparkline accessibility and hover legend",
+      "started_at": "2026-03-08T23:32:00Z"
     }
   ],
-  "updated_at": "2026-03-08T23:30:00Z"
+  "updated_at": "2026-03-08T23:32:00Z"
 }
