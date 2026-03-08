@@ -1,27 +1,27 @@
 {
-  "lastUpdated": "2026-03-08T08:33:00Z",
+  "lastUpdated": "2026-03-08T08:36:00Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
-      "status": "working",
-      "task": "Away Sign Timer Escalation",
+      "status": "idle",
+      "task": "Shipped: Away Sign Timer Escalation",
       "startedAt": "2026-03-08T08:33:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T08:33:00Z",
-      "progress": 0
+      "updated_at": "2026-03-08T08:36:00Z",
+      "progress": 100
     },
     {
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
       "status": "idle",
-      "task": "Container crashed \u2014 needs reassignment",
+      "task": "Shipped: Full-Sync Aura",
       "startedAt": "2026-03-08T08:11:00Z",
       "id": "dave",
-      "updated_at": "2026-03-08T08:30:00Z",
-      "progress": 5
+      "updated_at": "2026-03-08T08:36:00Z",
+      "progress": 100
     },
     {
       "name": "Luna",
@@ -38,12 +38,12 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "Ficus Milestone Burst implementation",
+      "status": "idle",
+      "task": "Shipped: Ficus Milestone Burst",
       "startedAt": "2026-03-08T08:33:00Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T08:33:00Z",
-      "progress": 0
+      "updated_at": "2026-03-08T08:36:00Z",
+      "progress": 100
     },
     {
       "name": "Maya",

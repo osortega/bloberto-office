@@ -280,7 +280,7 @@ function AwaySign({ workerId, idleMinutes }) {
   )
 
   return (
-    <div className="desk-away-sign" aria-label={`Away: ${message}`} role="img" title={message}>
+    <div className="desk-away-sign" data-tier={idleMinutes >= 60 ? 'long' : idleMinutes >= 30 ? 'mid' : 'short'} aria-label={`Away: ${message}`} role="img" title={message}>
       <svg
         className="desk-away-sign__note"
         width="12" height="14"
@@ -717,10 +717,23 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming']
   const plantStage = plantStageNames[Math.min(Math.floor(vibeStreak / 5), 4)]
 
+  // Ficus milestone burst
+  const prevPlantStageRef = useRef(plantStage)
+  const [plantMilestone, setPlantMilestone] = useState(false)
+  useEffect(() => {
+    if (prevPlantStageRef.current !== plantStage && plantStage !== 'seedling') {
+      setPlantMilestone(true)
+      const t = setTimeout(() => setPlantMilestone(false), 1600)
+      return () => clearTimeout(t)
+    }
+    prevPlantStageRef.current = plantStage
+  }, [plantStage])
+
   const nonMgr        = workers.filter(w => w.id !== 'bloberto')
   const workingWorkers = nonMgr.filter(w => w.status === 'working')
   const idleWorkers    = nonMgr.filter(w => w.status !== 'working')
   const hasAnyError    = nonMgr.some(w => w.status === 'error')
+  const isFullSync     = nonMgr.length > 0 && idleWorkers.length === 0 && workingWorkers.length === nonMgr.length
 
   const avgProgress = Math.round(
     workingWorkers.reduce((s, w) => s + (w.progress || 0), 0) / Math.max(workingWorkers.length, 1)
@@ -769,13 +782,14 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   return (
     <div className="office-wrap">
       <div
-        className="office-floor" data-vibe={vibe} data-has-error={hasAnyError || undefined}
+        className="office-floor" data-vibe={vibe} data-has-error={hasAnyError || undefined} data-full-sync={isFullSync || undefined}
         role="region"
         aria-label="Virtual office visualization showing team members at desks"
       >
 
         <VibeShockwave vibeKey={vibe} />
         <div className="office-sign">🏢 Bloberto&apos;s HQ</div>
+        {isFullSync && <div className="full-sync-banner" aria-label="Full team sync" aria-live="polite">⚡ Full sync</div>}
 
         {/* Wall clock — top wall, between sign and manager area */}
         <WallClock vibeKey={vibe} />
@@ -967,6 +981,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {/* Fern the office ficus — grows with vibeStreak */}
         <div
           className={`office-plant office-plant--ficus office-plant--${plantStage}`}
+          data-milestone={plantMilestone || undefined}
           style={{ left: '87%', top: '72%' }}
           title="Fern the office ficus"
           aria-hidden="true"
