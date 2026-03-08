@@ -1,3 +1,29 @@
+/* ── Global reduced-motion: respect vestibular preferences (WCAG 2.1 SC 2.3.3) ── */
+@media (prefers-reduced-motion: reduce) {
+  .char, .char--manager, .char--working, .char--idle, .char--ghost,
+  .desk-lamp, .mgr-desk__candle, .mgr-desk__coffee, .mgr-desk__trophy,
+  .coffee-steam span, .typing-dots span, .ambient-particle,
+  .office-door, .vibe-shockwave, .clock-minute-hand--frantic,
+  .idle-micro-bubble, .confetti-piece, .mgr-desk__monitor,
+  .desk--active .desk__monitor, .office-floor::before,
+  .mgr-desk__nameplate, .char--wander-1, .char--wander-2,
+  .char--wander-3, .char--wander-4, .desk--error,
+  .desk-away-sign {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Focus rings for keyboard navigation on office characters ── */
+.char:focus-visible {
+  pointer-events: auto;
+}
+.char:focus-visible .char__avatar {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 12px rgba(124, 106, 247, 0.4);
+}
+
 /* ── Screen-reader only utility ── */
 .sr-only {
   position: absolute;
