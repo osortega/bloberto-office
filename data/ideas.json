@@ -1,65 +1,73 @@
 {
   "creative_director": "Luna",
-  "review_number": 31,
-  "timestamp": "2026-03-08T03:01:00Z",
-  "theme": "Every static element is a sleeping story — make the monitors glow, the sync narrate, and the whiteboard advise",
+  "review_number": 32,
+  "timestamp": "2026-03-08T03:30:00Z",
+  "theme": "The floor should breathe — ambient motion, environmental awareness, and spatial storytelling",
   "ideas": [
     {
       "priority": "must",
       "category": "office-life",
-      "title": "Coffee Corner Conversation Cluster",
-      "description": "The coffee corner is purely decorative — an emoji and a label. But idle workers already have wander tooltips saying 'Heading to the coffee corner', implying social dynamics that the corner itself never acknowledges. When idleWorkers.length >= 2, render a small badge on the coffee-corner element: a speech-bubble cluster SVG (two overlapping rounded rects, 18×10px each, slight rotation) with a '☕ chatting' label. When idleWorkers.length drops to 0 or 1, the badge fades out. No new data or state — idleWorkers is already computed in Office.jsx. The badge sits above the coffee-corner div, z-index above the floor, with a 0.3s fade-in/out CSS transition. Add a faint radial glow around the corner element during the clustered state using a CSS filter. WHY: The wandering system already tells the story of workers drifting toward the coffee machine — the corner itself staying mute breaks the narrative. A crowd badge makes the coffee corner the office's de facto social dashboard: you can tell at a glance whether it's a heads-down sprint day or a chatty, low-energy afternoon, without reading a single number.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "visual",
-      "title": "Vibe History Sparkline in StatsBar",
-      "description": "The StatsBar shows the current vibe as a label but has no memory. On every vibe change (detected in the vibeStreak useEffect in App.jsx where previousVibeKeyRef.current updates), append {key, ts: Date.now()} to a localStorage array under 'bloberto-vibe-history', capped at 12 entries. In the StatsBar vibe card, render a 64×14px inline SVG sparkline to the right of the vibe label: each entry is a filled circle (r=3) color-coded by key (crushing=#a78bfa, in-flow=#2dd4bf, on-fire=#ef4444, slow-day=#9ca3af, after-hours=#6366f1), connected by a thin polyline (stroke: var(--text-muted), width 0.8). The circles are evenly spaced horizontally. Wrap each circle in a <title> for hover tooltip: vibe label + relative timestamp. Read from localStorage on mount; if empty, seed with the current vibe. WHY: Vibe is currently a scalar — you see only now. The sparkline makes it a story arc. You can see in 2 seconds whether the team has been stuck in on-fire all morning or whether they have been cycling. It converts passive monitoring into temporal awareness with zero new fetches and about 30 lines of code.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Desk Monitor Active Glow",
-      "description": "The desk monitors (desk__monitor) are static gray rectangles — the same visual whether the desk is vacant, occupied-working, or occupied-idle. The desk element already has --role-color set as a CSS custom property when a working worker occupies it (Office.jsx line 703). Add a desk__monitor--active class when the occupant is working, with a CSS @keyframes monitor-glow animation: 0%,100% { box-shadow: 0 0 3px var(--role-color, #6b7280); } 50% { box-shadow: 0 0 10px var(--role-color, #6b7280); } — 3s ease-in-out infinite. Add desk__monitor--idle for idle occupants: same animation in #9ca3af at 40% opacity, 6s cycle. Vacant desks get a dim slowly-drifting white screensaver dot via a translate keyframe. Also add a 2px horizontal scan-line pseudo-element on active monitors that drifts top-to-bottom on a 4s loop. WHY: Monitors are the single most natural readout of desk engagement. Right now a working desk and a vacant desk look nearly identical at floor zoom level. Glowing role-colored monitors make the floor legible at a glance — you can read the team energy state without parsing name labels or visiting the Dashboard.",
+      "title": "Ambient Dust Motes / Floating Particles",
+      "description": "The office floor is spatially rich (desks, plants, coffee corner, window, door) but the air between objects is dead space. Add 6-8 tiny semi-transparent circles (r=2px, opacity 0.08-0.15) that drift slowly across the floor using CSS keyframe animations — random start positions, slow translateX/translateY over 20-40s loops, slightly different speeds. Use a single .ambient-particles container with spans inside, each with randomized animation-delay and animation-duration via inline styles. No JS state needed — pure CSS animation. WHY: Ambient particles are the single cheapest way to make a static scene feel alive. They create depth, suggest air movement, and make the floor feel like a real space rather than a flat SVG. Every game and visualization uses this trick because it works.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
-      "priority": "should",
-      "category": "delight",
-      "title": "Sync-Reactive Bloberto Narration",
-      "description": "Bloberto shows typing dots while isSyncing is true, but the moment sync resolves he goes silent — a missed storytelling beat. After each syncFromGitHub() call resolves, derive a syncResultKey from the outcome: 'new-arrivals' (appeared.length > 0), 'errors' (errorCount > 0 and was 0 before), 'vibe-up' (vibeRanking increased), 'vibe-down', or 'steady'. Pass this as a new prop syncResultKey to Office then to Bloberto's Character. In the Character useEffect that watches managerVibe, also watch syncResultKey: when it changes to a non-null value, immediately fire a priority speech bubble with a curated one-liner — 'oh good, reinforcements 📥' for new-arrivals, 'who broke it this time 🫠' for errors, 'told you we would turn it around 💅' for vibe-up, 'we had a good run' for vibe-down, 'carrying on as planned' for steady. This quote gets a 5s display window and preempts the ambient 45s loop. Reset syncResultKey to null after the quote fires. WHY: Every 30-second poll is a narrative beat that currently happens invisibly. Bloberto as a live post-sync narrator converts a background fetch into a tiny story moment — he stops being a decorative blob and becomes an actual manager who notices when things change.",
+      "priority": "must",
+      "category": "visual",
+      "title": "Desk Lamp Glow Reflects Worker Status",
+      "description": "The desk lamp SVG exists but its glow is binary — on when working, off otherwise. Extend it: working = warm yellow glow (box-shadow: 0 0 8px #fbbf24), idle = dim amber flicker (opacity oscillates 0.3-0.6 on a 4s ease-in-out loop), error = red pulse (0 0 6px #ef4444, 1.5s pulse), vacant = off. The lamp already renders in the desk loop — just add conditional CSS classes: desk-lamp--working, desk-lamp--idle, desk-lamp--error. Three small CSS blocks, zero JS changes beyond adding the class. WHY: Desk lamps are the most natural office readability signal. In a real office you can tell who's working by whose desk light is on. This maps perfectly — it makes status readable from across the floor without needing to read labels.",
       "effort": "small",
-      "assigned_to": "sofia"
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Error Worker Office Ticker",
-      "description": "When workers are in error state the office floor currently shows only a glitch animation and a red ! badge on the avatar — easy to miss at a glance. Add an ErrorTicker component in Office.jsx that receives errorWorkers (workers filtered to status === 'error'). When errorWorkers.length > 0, render a fixed strip at the very bottom of the office-floor div above the door: height 18px, background rgba(239,68,68,0.12), border-top: 1px solid #ef444455. The inner content is a wide div (width: fit-content, min-width: 200%) containing concatenated entries: '⚠️ Carlos: Deploy pipeline failed · ⚠️ Maya: Component crash · ' (task text truncated at 38 chars, content duplicated for seamless loop). This inner div animates with @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } } over 18s linear infinite. When errorWorkers.length drops to zero, the strip fades out over 0.4s and unmounts. On initial appearance it badge-pops in from the bottom. WHY: Errors are the most urgent office state but the floor is where most eyes are. The ticker broadcasts the crisis as ambient background information — operators watching the floor passively get alerted without needing to open the Dashboard. It makes the office floor a real monitoring surface.",
+      "title": "Window Weather Sync — Rain/Clouds/Sun",
+      "description": "The office window already shows time-of-day sky gradients (midnight/sunrise/daylight/golden hour/dusk) and stars at night. Add weather: fetch a simple weather condition from Open-Meteo for a hardcoded location (or use a random weather cycle every 30min if no API). Render: sunny = yellow circle behind sky, cloudy = 2-3 gray ellipses drifting across, rainy = CSS rain streaks on the window glass (thin vertical lines, translateY animation). The OfficeWindow component already accepts hour — add a weather prop. In App.jsx, fetch weather on mount and every 30min, pass as prop. For rain, add a .office-window__rain overlay with 4-6 animated line elements. WHY: The window is the office's connection to the outside world. Right now it only knows time. Adding weather makes it feel connected to reality — when it's raining outside IRL and raining in the Bloberto office, that's a moment of delight that makes people smile.",
       "effort": "medium",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "delight",
+      "title": "Keyboard Typing Sound Visualization on Active Desks",
+      "description": "Working characters bob (typing animation) but there's no visual 'sound'. Add tiny keyboard keystroke indicators: when a desk is in working state, render 2-3 small text elements ('tap', 'clack', 'click') that pop up from the desk area, float up 10px, and fade out over 0.8s. Use CSS @keyframes with translateY and opacity. Stagger them with random animation-delay (0-3s range). Use a single .desk__keystrokes container with 3 spans, each running the animation on an infinite loop with different delays. WHY: It's the visual equivalent of hearing your coworker typing in a quiet office — ambient proof of work happening. It adds energy to the floor without being distracting, and it reinforces the typing bob animation with a complementary visual.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "feature",
+      "title": "Mini Meeting Room with Collaboration Indicator",
+      "description": "The office has desks, coffee corner, door, plants, and window — but no meeting room. Add a small meeting room area (top-right of floor, 15% width) with a glass-wall aesthetic (border: 1px solid rgba(255,255,255,0.2), subtle blur backdrop). When 2+ workers are working on related tasks (same repo/branch, or task descriptions containing matching keywords), show them as 'in a meeting' — their avatars cluster in the meeting room instead of at desks, with a 'Sync' label. If no meetings are happening, the room shows 'Available' with an empty table. WHY: Collaboration is invisible right now — you can't tell if workers are coordinating or working independently. A meeting room makes teamwork spatial and visible.",
+      "effort": "large",
       "assigned_to": "tbd"
     },
     {
       "priority": "could",
       "category": "office-life",
-      "title": "Whiteboard Rotating Advice Lines",
-      "description": "The office whiteboard renders a single static string all day (VIBE_WHITEBOARD[vibe]). Add a second rotating advisory line below the vibe label — a VIBE_WHITEBOARD_TIPS export in constants.js with 3-4 short strings per vibe. Examples: crushing: ['Merge it.', 'Deploy window: NOW', 'Sprint velocity: ∞'], on-fire: ['Stop. Breathe. Rollback?', 'Who has prod access?', 'ETA on the fix?'], in-flow: ['No meetings til 4pm.', 'PRs need review.', 'Hydrate.'], slow-day: ['Backlog grooming?', 'One ticket. One focus.', 'Write the docs.'], after-hours: ['Go home.', 'The deploy can wait.', 'This is a commit crime.']. In Office.jsx maintain a tipIndex state that increments every 20s via setInterval (reset to 0 on vibe change). The tip renders in a smaller font below the main label with a CSS fade+slide-up keyframe transition between rotations (opacity 0→1, translateY 4px→0, 0.4s ease). WHY: The whiteboard is the highest-attention fixed element on the floor and it currently says the same thing all day. Rotating micro-advice transforms it into a living team pulse display — something worth glancing at every few minutes, like a real shared whiteboard that someone keeps updating.",
-      "effort": "small",
-      "assigned_to": "dave"
+      "title": "Plant Growth Tied to Team Productivity",
+      "description": "The ficus plant already has growth stages (plantStage in Office.jsx). But the stage seems static. Tie it to a productivity metric: calculate a 'green score' from the last 24h of activity.json — tasks completed, low error rate, good vibe streaks. Map 0-100 to seedling/small/medium/large/flowering stages. Store the score in localStorage and update on each sync. Add a tooltip on the plant showing the score: 'Office Plant Health: 78/100 🌱'. WHY: Gamification through environmental storytelling — the plant becomes a team health indicator that rewards sustained good work. People will want to keep the plant alive. It's the office equivalent of a Tamagotchi.",
+      "effort": "medium",
+      "assigned_to": "carlos"
     },
     {
       "priority": "wild",
       "category": "delight",
-      "title": "Progress Ring Milestone Burst on Floor",
-      "description": "Worker cards on the Dashboard already fire a flash animation at progress milestones (25/50/75/100%) via the flashClass logic in ProgressBar. But the office floor progress ring around active worker avatars is visually silent even when someone just crossed 50% or finished. In the Character component (Office.jsx), add prevProgressRef = useRef(worker.progress). On each render where worker.progress !== prevProgressRef.current, compare against milestones [50, 100]. At 50% crossing: fire a CSS class ring-burst on the progress-ring SVG — @keyframes ring-burst { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.3); } 100% { opacity: 1; transform: scale(1); } } 0.5s ease-out. At 100%: ring-burst plus briefly overlay a centered checkmark text element inside the SVG (font-size 10px, fill #22c55e, fade out over 1.2s). The burst state is a boolean useState, cleared after the animation duration via setTimeout. WHY: The floor is where most observers spend their time, but it is currently disconnected from work progress data beyond a static ring fill. Milestone bursts make progress legible from the floor — you see someone just shipped without opening the Dashboard. It closes the gap between the floor as decoration and the floor as monitoring surface.",
-      "effort": "small",
-      "assigned_to": "carlos"
+      "title": "Ambient Lo-Fi Music Toggle",
+      "description": "Add a tiny speaker icon in the bottom-right corner of the office floor. Clicking it toggles lo-fi ambient office sounds (keyboard typing, gentle hum, occasional coffee machine). Use the Web Audio API to generate simple procedural sounds — no external audio files needed. A soft sine wave hum (200Hz, very low volume), occasional random 'click' sounds (short noise bursts), and a coffee machine gurgle every 2 minutes. Muted by default, with a volume slider on hover. WHY: Sound completes immersion. The office looks alive but sounds dead. Even procedural audio at barely-audible levels transforms the experience from 'monitoring dashboard' to 'virtual office you're sitting in'. This is the single feature most likely to make someone keep the tab open.",
+      "effort": "medium",
+      "assigned_to": "tbd"
     }
   ],
-  "hire_proposals": []
+  "hire_proposals": [
+    {
+      "name": "Rex",
+      "role": "Animation & Motion Engineer",
+      "emoji": "🎬",
+      "justification": "Multiple reviews now have animation-heavy ideas (particle systems, progress bursts, ambient motion, keystroke viz). Maya and Dave can implement CSS animations, but a dedicated motion engineer would own the entire ambient layer — particles, transitions, micro-interactions — as a cohesive system rather than ad-hoc additions. This role would prevent the 'animation soup' problem where each idea gets implemented independently without a unified motion language.",
+      "status": "pending-approval"
+    }
+  ]
 }
