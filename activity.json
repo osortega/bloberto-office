@@ -1,0 +1,35 @@
+{
+  "last_updated": "2026-03-08T17:35:00Z",
+  "recent_activity": [
+    {
+      "timestamp": "2026-03-08T17:30:00Z",
+      "type": "creative-review",
+      "actor": "luna",
+      "details": "Review #49 — 7 ideas, 0 hire proposals. Theme: After Hours storytelling."
+    },
+    {
+      "timestamp": "2026-03-08T17:32:00Z",
+      "type": "implementation",
+      "actor": "carlos",
+      "details": "🪟 Added visible time caption to office window (MUST)"
+    },
+    {
+      "timestamp": "2026-03-08T17:32:00Z",
+      "type": "implementation",
+      "actor": "dave",
+      "details": "🔒 Locked office door during after-hours vibe (MUST)"
+    },
+    {
+      "timestamp": "2026-03-08T17:34:00Z",
+      "type": "implementation",
+      "actor": "maya",
+      "details": "🕯️ Added flickering candle to manager desk during after-hours (SHOULD)"
+    },
+    {
+      "timestamp": "2026-03-08T17:34:00Z",
+      "type": "implementation",
+      "actor": "sofia",
+      "details": "💬 Bloberto speaks on page load after 3 seconds (SHOULD)"
+    }
+  ]
+}
