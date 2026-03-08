@@ -427,6 +427,14 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
     }
     prevVibeRef.current = managerVibe
 
+    const mountQuoteId = setTimeout(() => {
+      if (!isHoveringRef.current) {
+        const qs = VIBE_QUOTES[managerVibe] || VIBE_QUOTES['in-flow'];
+        setBubble({ quote: qs[Math.floor(Math.random() * qs.length)], show: true });
+        timerRef.current = setTimeout(() => setBubble(b => ({ ...b, show: false })), 4000);
+      }
+    }, 3000);
+
     const id = setInterval(() => {
       if (isHoveringRef.current) return  // hover takes priority
       const quotes = VIBE_QUOTES[managerVibe] || VIBE_QUOTES['in-flow']
@@ -438,6 +446,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
 
     ambientRef.current = id
     return () => {
+      clearTimeout(mountQuoteId)
       clearInterval(id)
       ambientRef.current = null
     }
