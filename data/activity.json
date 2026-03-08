@@ -382,5 +382,11 @@
     "type": "complete",
     "worker": "Sofia",
     "message": "QA review #14 complete — 12 findings (3 high, 6 medium, 3 low). Overall: 3.7/5. Key: error workers in meeting bug, completion toast leak, vibe history race condition."
+  },
+  {
+    "timestamp": "2026-03-08T10:56:00Z",
+    "type": "hire",
+    "worker": "Carlos",
+    "message": "Assigned to fix 3 high-priority bugs from Sofia QA #14: error workers in meeting, toast timer leak, vibe history race"
   }
 ]

@@ -1,6 +1,18 @@
 {
-  "lastUpdated": "2026-03-08T10:55:00Z",
-  "workers": [],
+  "lastUpdated": "2026-03-08T10:56:00Z",
+  "workers": [
+    {
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "⚙️",
+      "status": "working",
+      "task": "Fix 3 high-priority bugs from Sofia QA #14: error workers in meeting, toast timer leak, vibe history race",
+      "progress": 10,
+      "updated_at": "2026-03-08T10:56:00Z",
+      "startedAt": "2026-03-08T10:56:00Z"
+    }
+  ],
   "roster": [
     {
       "id": "bloberto",
