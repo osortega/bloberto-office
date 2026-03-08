@@ -500,6 +500,82 @@ function WindowElement() {
   )
 }
 
+// Chair positions around the table (angle in degrees, radius from center)
+const CHAIR_ANGLES = [0, 60, 120, 180, 240, 300]
+
+function ConferenceTable({ vibeKey }) {
+  const vibe = vibeKey || 'in-flow'
+
+  // How many chairs are visible per vibe
+  const visibleCount = vibe === 'crushing' ? 6 : vibe === 'in-flow' ? 4 : 1
+
+  // Chair fill color per vibe
+  const chairColor =
+    vibe === 'crushing' ? '#a78bfa' :
+    vibe === 'in-flow'  ? '#2dd4bf' :
+    vibe === 'on-fire'  ? '#fb923c' :
+    vibe === 'after-hours' ? '#6366f1' :
+    '#9ca3af'
+
+  const tableFill   = vibe === 'after-hours' ? '#1e1b4b' : '#1e293b'
+  const tableStroke = vibe === 'crushing' ? '#a78bfa' : vibe === 'on-fire' ? '#ef4444' : vibe === 'in-flow' ? '#2dd4bf' : '#475569'
+  const tableOpacity = vibe === 'after-hours' ? 0.55 : 1
+
+  // on-fire: red glow filter
+  const glowFilter = vibe === 'on-fire' ? 'url(#conf-fire-glow)' : undefined
+
+  const cx = 52, cy = 52, tableR = 28, chairR = 6, orbitR = 38
+
+  return (
+    <div className="conference-table" aria-label="Conference table" role="img">
+      <svg width="104" height="104" viewBox="0 0 104 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: tableOpacity }}>
+        <defs>
+          <filter id="conf-fire-glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+
+        {/* Chairs */}
+        {CHAIR_ANGLES.map((angle, i) => {
+          const rad = (angle * Math.PI) / 180
+          const x = cx + orbitR * Math.sin(rad)
+          const y = cy - orbitR * Math.cos(rad)
+          const isVisible = i < visibleCount
+          // after-hours: single chair rotated 45°
+          const rotate = vibe === 'after-hours' && i === 0 ? `rotate(45 ${x} ${y})` : undefined
+
+          return isVisible ? (
+            <circle
+              key={i}
+              cx={x}
+              cy={y}
+              r={chairR}
+              fill={chairColor}
+              opacity={vibe === 'after-hours' ? 0.7 : 0.9}
+              transform={rotate}
+            />
+          ) : null
+        })}
+
+        {/* Table surface */}
+        <circle
+          cx={cx} cy={cy} r={tableR}
+          fill={tableFill}
+          stroke={tableStroke}
+          strokeWidth="2.5"
+          filter={glowFilter}
+        />
+
+        {/* slow-day: coffee cup on table */}
+        {vibe === 'slow-day' && (
+          <text x={cx} y={cy + 5} textAnchor="middle" fontSize="14" role="img" aria-label="coffee">☕</text>
+        )}
+      </svg>
+    </div>
+  )
+}
+
 export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0 }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
@@ -609,6 +685,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             </div>
           )
         })}
+
+        {/* Conference table — lower center */}
+        <ConferenceTable vibeKey={vibe} />
 
         {/* Coffee corner — top right */}
         <div className="coffee-corner" data-vibe={vibe}>

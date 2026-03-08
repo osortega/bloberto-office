@@ -1,114 +1,140 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-08T01:15:00Z",
+  "timestamp": "2026-03-08T01:45:00Z",
+  "screenshot_desktop": "screenshot-desktop.png",
+  "screenshot_mobile": "screenshot-mobile.png",
   "scores": {
     "visual": 4,
     "ux": 3,
     "responsiveness": 3,
     "performance": 4,
     "accessibility": 3,
-    "code_quality": 3,
+    "code_quality": 4,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.6,
+  "overall_score": 3.75,
+  "score_rationale": {
+    "visual": "Cohesive dark theme, lovely purple gradient title, charming hand-drawn SVG characters (Sofia even has a magnifying glass — someone pays attention to details). Vibe-reactive elements (grid color, whiteboard, conference table chairs) are a genuinely nice touch. Loses a point because the whiteboard text is rendered at 0.42rem — basically invisible without a microscope — and the office view has a lot of structural dead space in its lower half.",
+    "ux": "Two-tab navigation is clear, the card flip for history is discoverable via the ℹ️ button, and the tag filtering is a smart feature. However: keyboard shortcuts (1/2/R) have zero UI hints, clicking a character to jump to the Dashboard tab is utterly non-obvious, the sync button shows no loading state beyond being disabled, and the 10-minute idle timeout silently stops data from refreshing without any indicator to the user.",
+    "responsiveness": "The stats bar correctly reflows to 3→2 columns on smaller screens. But the office floor on 375px mobile is tiny and cramped, character names disappear at 480px (gone, just gone), and there is ~200px of dark empty void below the floor before the footer. Also, the stats bar can dynamically render 6–7 items while the CSS is hard-wired for 5 columns — extra cards spill to a second row and look orphaned.",
+    "performance": "Smart polling (active 30s / backgrounded 60s), idle timeout to stop polling, React.memo and useMemo used throughout, canvas-based dynamic favicon is an elegant lightweight trick, proper cleanup of timers on unmount. Deducted one point because appending ?t=Date.now() to every fetch request defeats HTTP/CDN caching entirely — these are static JSON files that could safely use a short cache-control window.",
+    "accessibility": "Skip link ✓, ARIA roles and labels on most elements ✓, tabIndex management on card flip ✓, reduced-motion support attempted ✓. BUT: the prefers-reduced-motion block in Office.css targets old class names (.office-worker, etc.) that no longer exist in the DOM — the actual .char elements still animate. The char--glitch animation on error workers is the worst offender and has no motion guard at all. CSS-only data-tooltip is not readable by screen readers. The stuck-workers stat card has onClick but no keyboard handler.",
+    "code_quality": "Well-structured React with appropriate patterns (memo, useMemo, useCallback), proper effect cleanup, JSDoc on utilities. Solid overall. Issues: App.jsx is ~1027 lines and contains 9 distinct components — it needs to be split up. getRelativeTime is defined in App.jsx and then identically re-inlined in Office.jsx's ghost bubble logic. WORKER_ROLE_COLORS in App.jsx is keyed by worker name and diverges in hex values from the canonical ROLE_COLORS in constants.js. The vibeStreak state is never passed as a prop to <Office>, so the plant always stays a seedling.",
+    "features": "This is a read-only status monitor and it has live polling, dual views, team vibe system, confetti, dark/light theme, activity log with filters, card flip history, tag filtering, keyboard shortcuts, dynamic favicon, cycling tab title, streak tracker, ambient speech bubbles, and a ficus that grows with vibe streaks. Genuinely impressive scope. Missing: no search/filter by worker name, no load-more on activity log (hard-capped at 20), no deep-linkable worker URL.",
+    "fun_factor": "The highest possible score and it's not close. Custom SVG characters with real personalities (Sofia has a magnifying glass, Dave has headphones and a beard, Luna has a crescent moon), Bloberto the passive-aggressive manager blob who quotes 'Per my last commit…', a whiteboard that says SHIP IT or 🚨 HELP depending on team state, a growing office ficus, a time-of-day window with clouds and stars. This is the most characterful team monitor I've ever reviewed. Whoever built this has a sense of humor and actually likes their job."
+  },
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Keyboard shortcut sets ##office double-hash in URL",
-      "description": "In App.jsx lines 604–605, the keyboard handler assigns `window.location.hash = '#office'` and `window.location.hash = '#dashboard'` — strings that already include '#'. The browser prepends another '#', producing '##office' in the URL. The hashchange listener then reads `window.location.hash.slice(1)` → '#office', which fails the equality check against 'office', breaking browser back/forward tab restoration. The tab-button click handlers on lines 887 and 900 correctly use plain strings without '#'. Fix: remove the '#' prefix from both keyboard shortcut assignments to match the click handlers.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "task-tag spans are mouse-only — keyboard users cannot filter by tag",
-      "description": "Task-tag spans in WorkerCard (App.jsx lines 278–290) have onClick and cursor:pointer styling but no tabIndex, no role='button', and no onKeyDown handler. Keyboard-only users and screen reader users cannot activate tag filters at all. Fix: add tabIndex={0}, role='button', and an onKeyDown handler that calls onTagClick on Enter and Space. Also add a focus-visible outline style in App.css for .task-tag to match the hover appearance.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "Clickable Character divs in Office.jsx lack role and keyboard activation",
-      "description": "The Character component (Office.jsx line 374) renders a <div> with tabIndex={0} and an onClick when onWorkerClick is provided, but has no role attribute and no onKeyDown handler. Screen readers announce it as a generic group with no hint that it is interactive, and pressing Enter or Space does nothing. Fix: when handleClick is defined, add role='button' to the div and an onKeyDown that calls handleClick on Enter/Space. The aria-label could reuse the worker name + role string.",
+      "title": "vibeStreak is never passed to <Office> — Fern the ficus is permanently a seedling",
+      "description": "App.jsx line 922 renders <Office workers={...} roster={...} isSyncing={...} activityEntries={...} onWorkerClick={...} /> with no vibeStreak prop. Office.jsx accepts vibeStreak with a default of 0, so plantStage is always plantStageNames[0] = 'seedling'. The growing plant feature (Office.jsx lines 588–589) is completely broken — Fern will never sprout past its first stage regardless of how long the office has been crushing it. Fix: add vibeStreak={vibeStreak} to the <Office> call in App.jsx.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "ProgressBar milestone Set never resets — flash won't fire on task restart",
-      "description": "In ProgressBar (App.jsx ~line 173), milestonesRef holds a Set that accumulates milestones (25, 50, 75, 100) but is never cleared. When a worker's progress resets to 0 for a new task, all milestones are already in the Set so the flash animations never trigger again for the lifetime of the component. Fix: add a second effect (or extend the existing one) that detects when progress drops below a previously-seen milestone — compare against a prevProgressRef — and clears milestonesRef when a reset is detected.",
+      "title": "stuckWorkers display uses w.started (undefined) — stuck card label is always broken",
+      "description": "StatsBar line 408: `stuckWorkers[0].emoji ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].started)}`. Worker objects have no 'started' field, only 'updated_at'. formatDuration(undefined) returns null, producing a label like 'undefined Carlos · null'. The stuckWorkers filter at line 353 correctly uses w.updated_at, so detection works — only the display string is wrong. Fix: replace stuckWorkers[0].started with stuckWorkers[0].updated_at in the display string. Also note stuckWorkers[0].emoji is not guaranteed to exist either; fall back to getRoleEmoji(stuckWorkers[0].role).",
       "effort": "small"
     },
     {
       "priority": "high",
+      "category": "accessibility",
+      "title": "prefers-reduced-motion block in Office.css targets deleted class names — char animations still play",
+      "description": "The @media (prefers-reduced-motion: reduce) block in Office.css lines 906–945 applies animation:none to .office-worker, .office-worker--ghost, .office-worker--manager, etc. None of these class names exist in the current DOM — the real classes are .char, .char--working, .char--idle, .char--manager, .char--ghost. The keyframe overrides (bob, wander-1 through wander-4, etc.) ARE effective since they're global, but .char--glitch's animation is notably absent from the empty-keyframe list, meaning glitch effects on error workers still flash at full intensity for users who've opted out of motion. Fix: replace the selector list with .char, .char--working, .char--idle, .char--ghost, .char--manager, .char--deep-work, .office-plant and add char-glitch to the empty keyframe list.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "ux",
+      "title": "10-minute idle timeout silently stops data from refreshing — no user feedback",
+      "description": "App.jsx line 628: if (Date.now() - lastActivity.current > IDLE_TIMEOUT) return — polling silently stops after 10 minutes of no mouse/keyboard interaction. A passive viewer watching dashboards on a second monitor will see stale data with no indication that updates have stopped. The live-dot stays green and the sync time stays unchanged even though no syncs are happening. Fix: either remove the idle timeout (the polling interval is already 30s; it's not expensive), or show a visible staleness indicator — e.g., dim the live-dot to amber and add a 'Paused — move mouse to resume' tooltip when idle.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
       "category": "bug",
-      "title": "w.started is undefined — stuck-worker detection never triggers in StatsBar",
-      "description": "In StatsBar (App.jsx line 345), stuckWorkers filters by `w.started` but worker objects from the API use `updated_at`, not `started`. `new Date(undefined).getTime()` returns NaN, making the `> 7_200_000` comparison always false — the Stuck stat card never appears. Line 400 then calls formatDuration(stuckWorkers[0].started) which returns null, producing an empty label. Fix: replace `w.started` with `w.updated_at` throughout the stuck-worker logic, or add a `started` field to the worker data schema.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "performance",
-      "title": "activeWorkers array is not memoized — triggers 5+ effects on every render",
-      "description": "In App.jsx (line 637), activeWorkers is computed with a plain .filter() call outside of useMemo, creating a new array reference on every render. Five downstream useEffects (cinematic entry/exit diff, vibe streak, favicon, tab title, and the confetti logic) and multiple child component props all depend on this reference, causing unnecessary re-renders and effect re-executions whenever any unrelated state (e.g. theme, tab, focusedWorker) changes. Fix: wrap in useMemo with [allWorkers] as the dependency.",
+      "title": "Stats bar CSS is hardwired to 5 columns but can render 6–7 items",
+      "description": "App.css line 118: grid-template-columns: repeat(5, 1fr). StatsBar renders 5 static cards (total, active, idle, sync, vibe) plus up to 2 conditional cards (errorCount and stuckWorkers). When both extras are visible, 7 items in a 5-column grid produce a second row of 2 orphaned cards that look like a broken layout. The responsive breakpoints (3-column at 900px, 2-column at 600px) don't solve this since they still use repeat(N, 1fr) with a fixed column count. Fix: change to grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) so the grid adapts naturally to any number of stat cards.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Keyboard shortcuts (1, 2, R) are completely undiscoverable",
-      "description": "The keyboard shortcuts 1 (Office tab), 2 (Dashboard tab), and R (refresh) are implemented but only surfaced as tooltip `title` attributes on the tab buttons and sync button. There is no help tooltip, legend, or any visible hint that these shortcuts exist. Power users who discover them by accident love them; everyone else never knows. Fix: add a small '?' help icon in the header-right area that, on click or focus, shows a keyboard shortcut popover. Alternatively, append the shortcut hint directly to the tab button label in parentheses, e.g. 'Office (1)'.",
+      "title": "Keyboard shortcuts 1, 2, R have zero visual hint — they might as well not exist",
+      "description": "The shortcuts are only surfaced as `title` attributes on the tab buttons and sync button (visible on desktop hover as a browser tooltip). There's no legend, no help icon, no footer note, nothing. Discovered by accident or not at all. The character personalities and vibe system show this project values delight — keyboard shortcuts are part of that delight and deserve to be shown off. Fix: add a small keyboard icon (⌨️) or '?' button in the header-right that reveals a compact popover listing the three shortcuts. This is a 30-minute fix with outsized discoverability payoff.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Whiteboard text at 0.42rem is effectively illegible — it's decorative at best",
+      "description": "The .office-whiteboard CSS sets font-size: 0.42rem. At standard screen resolution this renders the vibe message (e.g. '🏆 SHIP IT') at roughly 6.7px — below the browser's minimum readable threshold and smaller than most tooltips. The whiteboard is one of the most charming reactive elements in the whole interface; it deserves to be read. Fix: increase font-size to at least 0.6rem, use word-break or adjust line-height, or switch the emoji + text to a two-line layout inside the whiteboard element.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Mobile layout has large dead space below the office floor",
-      "description": "On 375px wide screens (see screenshot-mobile.png), the office floor renders at roughly 335x251px due to the aspect-ratio:4/3 constraint, leaving over 200px of empty dark background below the floor before the footer. The idle-worker wandering area and plants are too small to read. The lower third of the office floor itself is also mostly empty (no desks, just entrance icon and scattered plants). Fix: on mobile breakpoints (<480px), either switch the office-floor to a taller aspect-ratio (e.g. 3/4 or 1/1) and redistribute desk positions, or show a condensed 'roster list' view instead of the spatial layout.",
-      "effort": "large"
+      "title": "Clicking an office character to jump to Dashboard is completely undiscoverable",
+      "description": "Characters in the Office view are clickable and navigate to the Dashboard tab with that worker focused. This is a great feature. But the characters have cursor: pointer only when onWorkerClick is defined (a conditional inline style), there's no hover label, no tooltip, and nothing in the UI hints that clicking them does anything. Most users will never discover it. Fix: add a visible tooltip to working/idle characters (e.g. 'Click to view Carlos's dashboard') and ensure the pointer cursor is always applied for clickable chars via a CSS class rather than a conditional inline style.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "App.jsx is 1027 lines — monolithic file should be split into components",
-      "description": "App.jsx contains at least 8 distinct components (ActivityLogEntry, ActivityLog, StatusBadge, ProgressBar, WorkerCard, DeltaBadge, StatsBar, EmptyState, LoadingSkeleton) plus the main App, all utility functions, and all constants — 1027 lines total. This makes the file hard to navigate, increases cognitive load for contributors, and slows IDE tooling. Fix: extract each component into its own file under src/components/ (e.g., WorkerCard.jsx, StatsBar.jsx, ActivityLog.jsx) and move getRelativeTime/formatFullDateTime/getTaskTags to src/utils/format.js.",
+      "category": "responsiveness",
+      "title": "Mobile office floor has ~200px of dead space below it and is too small to read",
+      "description": "On 375×812 (see screenshot-mobile.png), the office floor renders at 4:3 aspect ratio (~335×251px) and then there's a large empty dark area before the footer. The floor itself is cramped: character avatars are 24–30px, names are hidden at 480px (display:none in Office.css line 750), and desk details are unreadable. The idle wandering area in the lower third of the floor is too small for meaningful use. Fix: on mobile, switch the tab default to 'dashboard' (which renders the worker cards in a full-width 1-column grid — much more readable), or apply a taller aspect-ratio (1:1) to the office floor at ≤480px and add a min-height:none override to let it fill the viewport.",
       "effort": "medium"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "WORKER_ROLE_COLORS in App.jsx duplicates and diverges from ROLE_COLORS in constants.js",
-      "description": "App.jsx (line 14) defines WORKER_ROLE_COLORS keyed by worker name (e.g. Maya: '#a855f7'), while constants.js ROLE_COLORS is keyed by role string (e.g. 'Frontend Engineer': '#a78bfa'). Both are used for colors, but they assign different hex values — Maya's confetti uses #a855f7 while her worker card accent uses #a78bfa — creating subtle but real visual inconsistency. WORKER_ROLE_COLORS also needs manual updating whenever the roster changes. Fix: remove WORKER_ROLE_COLORS from App.jsx; derive confetti color from ROLE_COLORS using the worker's role field, falling back to a default accent color.",
+      "category": "accessibility",
+      "title": "CSS-only data-tooltip is invisible to screen readers",
+      "description": "Characters in Office.jsx use `data-tooltip={tooltip}` and Office.css renders it via `.char[data-tooltip]::after { content: attr(data-tooltip) }`. This is purely visual — assistive technologies do not read ::after pseudo-element content set via attr(). The tooltip strings ('☕ Heading to the coffee corner', task text, etc.) are meaningful and lost entirely. Fix: for characters with a tooltip, add aria-label={tooltip} or aria-description={tooltip} to the div in addition to the data-tooltip attribute.",
       "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "completionToast should use role=alert instead of aria-live=polite",
-      "description": "The completion toast (App.jsx line 809) uses aria-live='polite', which defers screen reader announcements until the current interaction is idle. For a transient 3-second celebration notification, this means screen reader users may miss it entirely if they are actively interacting with the page. The equivalent sighted UX is seeing confetti + toast simultaneously — the announcement should be equally immediate. Fix: change aria-live='polite' to role='alert' (which implies aria-live='assertive') so the announcement is made immediately on insertion.",
+      "category": "code",
+      "title": "vibeStreak uses sessionStorage — plant and streak reset on every new tab or browser restart",
+      "description": "App.jsx lines 721–728 read/write bloberto-vibe-streak from sessionStorage, which is scoped to a single tab and cleared when the browser closes. The plant growth feature (vibeStreak / 5 → plant stage) requires a streak of 20+ polls to reach 'blooming' — about 10 minutes at 30s intervals — but any tab switch or restart wipes it. Fix: migrate to localStorage with the same keys. Add a stale-check: if the stored timestamp is more than 2 hours old, reset the streak. This preserves intent (streak tracks current session's vibe consistency) while surviving tab reloads.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "App.jsx is a 1027-line monolith — nine components in one file",
+      "description": "App.jsx defines ActivityLogEntry, ActivityLog, StatusBadge, ProgressBar, WorkerCard, DeltaBadge, StatsBar, EmptyState, LoadingSkeleton, and the main App component — plus utility functions and local constants — in a single 1027-line file. This is a maintenance hazard: finding any component requires scrolling through the entire file, and the file size slows IDE features. Fix: extract each component to src/components/{ComponentName}.jsx, move getRelativeTime/formatFullDateTime/formatDuration/getTaskTags to src/utils/format.js, and import as needed. App.jsx should shrink to ~150 lines.",
+      "effort": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "WORKER_ROLE_COLORS duplicates ROLE_COLORS with divergent hex values — visual inconsistency",
+      "description": "App.jsx line 14 defines WORKER_ROLE_COLORS keyed by worker name: { Maya: '#a855f7', Carlos: '#3b82f6', ... }. constants.js defines ROLE_COLORS keyed by role: { 'Frontend Engineer': '#a78bfa', 'Backend Engineer': '#38bdf8', ... }. They're used for different purposes (confetti vs. card accents) but assign different shades — Maya's confetti is #a855f7 while her card role color is #a78bfa. When the roster changes with new worker names, WORKER_ROLE_COLORS silently falls back to the default purple for the new hire's confetti. Fix: delete WORKER_ROLE_COLORS; derive confetti color from ROLE_COLORS[worker.role] ?? '#a855f7' at the point of use.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "getRelativeTime duplicated — defined in App.jsx and re-inlined in Office.jsx",
-      "description": "App.jsx defines getRelativeTime at line 34. Office.jsx (lines 394–403) contains an identical inline implementation inside the ghost-bubble IIFE instead of importing the shared function. Two sources of truth means any bug fix or format change (e.g. adding 'weeks ago') must be applied in two places. Fix: move getRelativeTime (and formatFullDateTime) to src/utils/time.js, export them, and import in both App.jsx and Office.jsx.",
+      "title": "getRelativeTime duplicated in App.jsx and inlined identically in Office.jsx",
+      "description": "getRelativeTime is defined at App.jsx line 34. Office.jsx lines 395–405 contain a byte-for-byte identical implementation as an anonymous IIFE inside the ghost-bubble render. Two copies means any format change (adding 'weeks ago', changing 'just now' threshold) must be applied in both places — and one will inevitably get missed. Fix: move getRelativeTime and formatFullDateTime to src/utils/format.js (or the existing src/utils/ directory), export them, and import in both files.",
       "effort": "small"
     },
     {
       "priority": "low",
-      "category": "ux",
-      "title": "Vibe streak persists in sessionStorage only — resets on every new browser tab",
-      "description": "The vibe streak counter (App.jsx line 710) reads and writes to sessionStorage, which is scoped to a single browser tab. Opening a new tab or restarting the browser resets the streak to 1 regardless of how many consecutive polls have kept the same vibe. The streak-based office plant growth (Office.jsx line 511) is therefore never seen beyond the 'seedling' stage in practice. Fix: switch to localStorage (with the same key 'bloberto-vibe-streak') so the streak persists across sessions, and add a streak expiry mechanism (e.g. reset if last-updated timestamp is more than 2 hours ago).",
+      "category": "performance",
+      "title": "Cache-busting every fetch request prevents HTTP caching of static JSON files",
+      "description": "fetchWorkersFromGitHub and fetchActivityFromGitHub append ?t=Date.now() to their URLs (App.jsx lines 23 and 29). This generates a unique URL on every poll, defeating browser cache and any CDN edge cache. The GitHub raw content CDN does support cache headers — a stale-while-revalidate strategy with a 30-second TTL would let repeat loads within the poll interval be served instantly from cache while background revalidation keeps data fresh. Fix: remove the cache-busting query param; instead, rely on the existing 30-second poll interval to keep data fresh. If stale data is a concern, add appropriate Cache-Control headers server-side.",
       "effort": "small"
     },
     {
       "priority": "low",
-      "category": "accessibility",
-      "title": "Office.css character animations lack prefers-reduced-motion guard",
-      "description": "App.css has a @media (prefers-reduced-motion: reduce) block that correctly disables card/skeleton animations. However, Office.css defines at least 8 animations (enter-office, char-bob, wander-1 through wander-4, char-glitch, fade-in-char, deep-work-pulse) with no equivalent reduced-motion guard. Users who have requested reduced motion in their OS settings will still see all character movements, bobbing, glitch effects, and wander paths. Fix: add a @media (prefers-reduced-motion: reduce) block to Office.css that sets animation: none !important and transition: none !important on .char, .char--working, .char--idle, .char--glitch, and .char--deep-work.",
+      "category": "feature",
+      "title": "Activity log is hard-capped at 20 entries with no way to see older events",
+      "description": "ActivityLog (App.jsx line 113): const displayed = [...entries].reverse().slice(0, 20). The raw log is passed in full but only 20 items are ever shown and there is no 'Load more' or pagination control. The section header shows 'Last {min(activityLog.length, 20)} events' which at least signals the cap exists, but there is no way to investigate older events. Fix: add a 'Show more' button below the log that increments the visible count by 20, or implement virtualized rendering if the log grows large.",
       "effort": "small"
     }
   ]

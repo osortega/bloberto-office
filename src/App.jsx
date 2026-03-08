@@ -472,6 +472,7 @@ export default function App() {
   const [fetchError, setFetchError] = useState(null)
   const [fetchWarn, setFetchWarn] = useState(null)
   const [activityFilter, setActivityFilter] = useState('all')
+  const [workerFilter, setWorkerFilter] = useState(null)
   const [isLive, setIsLive] = useState(false)
   const [lastSynced, setLastSynced] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -996,7 +997,7 @@ export default function App() {
                 Last {Math.min(activityLog.length, 20)} events
               </span>
             </div>
-            <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log">
+            <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log by type">
               {[
                 { key: 'all', label: 'All' },
                 { key: 'hires', label: '🟢 Hires' },
@@ -1014,11 +1015,35 @@ export default function App() {
                 </button>
               ))}
             </div>
+            <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log by worker">
+              <button
+                role="radio"
+                className={workerFilter === null ? 'active' : ''}
+                onClick={() => setWorkerFilter(null)}
+                aria-checked={workerFilter === null}
+              >
+                All Workers
+              </button>
+              {roster.map(member => (
+                <button
+                  key={member.name}
+                  role="radio"
+                  className={workerFilter === member.name ? 'active' : ''}
+                  onClick={() => setWorkerFilter(workerFilter === member.name ? null : member.name)}
+                  aria-checked={workerFilter === member.name}
+                >
+                  {member.emoji ?? '🤖'} {member.name}
+                </button>
+              ))}
+            </div>
             <ActivityLog
               entries={activityLog.filter(e => {
                 if (activityFilter === 'hires') return e.type === 'hire'
                 if (activityFilter === 'completions') return e.type === 'complete'
                 if (activityFilter === 'errors') return e.type === 'error'
+                return true
+              }).filter(e => {
+                if (workerFilter !== null) return e.worker === workerFilter
                 return true
               })}
               error={activityError}
