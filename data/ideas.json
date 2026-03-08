@@ -1,57 +1,57 @@
 {
   "creative_director": "Luna",
-  "review_number": 44,
-  "timestamp": "2026-03-08T12:30:00Z",
-  "theme": "Polish what's there — the office looks alive, now make it feel intentional",
-  "visual_observations": "Desktop: Office view is cohesive dark theme, Bloberto at manager desk with CVO title, 6 team desks populated. Luna appears at TWO desks (row 1 working + row 2 ghost) — the dual-render bug persists because workers.json entries lacked 'id' field causing activeIds matching to fail. Dashboard: Clean stats cards, Luna shows as active with progress bar. Whiteboard is properly dark-themed now. Mobile: Layout works but character names at desks are hard to read. Coffee machine, plants, and decorations add life. Overall vibe badge 'Crushing It' with fire emoji works well.",
+  "review_number": 45,
+  "timestamp": "2026-03-08T13:00:48Z",
+  "theme": "The bones are solid — now close the gaps and let the small moments sing",
+  "visual_observations": "Good news first: the heat shimmer on 'on-fire' is already shipping (Office.css lines 81-88 — nice work maya). The char-hover-card is live (Office.jsx line 566, Office.css line 1017) but it's half-finished — missing time-on-task even though worker.updated_at is already available at line 553. The VIBE_WHITEBOARD entry for 'slow-day' in constants.js line 66 literally reads 'TODO: ???' which has escaped notice for multiple reviews. VIBE_TRANSITION_QUOTES in quotes.js covers 10 of 20 possible transitions — the other half of Bloberto's personality is silent during vibe changes. Plant milestone fires setPlantMilestone(true) in Office.jsx line 834 but the only output is a data-attribute — the user never knows the plant leveled up. Polling silently pauses after IDLE_TIMEOUT (App.jsx line 484) with no visual indication. These are all gaps in features that are nearly complete — each fix is one small step from done.",
   "ideas": [
     {
       "priority": "must",
-      "category": "office-life",
-      "title": "Workers.json ID Field Standardization",
-      "description": "The dual-render bug (Luna appearing at 2 desks) is caused by workers.json entries missing the 'id' field. The Office component uses w.id to build activeIds Set for ghost filtering. Without id, activeIds contains 'undefined' and roster members aren't filtered. FIX: Ensure all workers.json entries include an 'id' field matching their roster id (lowercase name). WHY: This is a data contract bug that causes visual duplication of any working team member.",
+      "category": "polish",
+      "title": "Complete the Hover Card: Add Time-On-Task",
+      "description": "The char-hover-card (Office.jsx line 566) shows name, role, task, and status — but review #44 explicitly called for 'time on task' and it's still missing. worker.updated_at is already available and formatIdleDuration() is already imported and used for idle workers at line 553. For variant==='working', add a line like <div className='hover-time'>{formatIdleDuration(worker.updated_at)}</div> inside the .char-hover-card div. Add .char-hover-card .hover-time { opacity: 0.6; font-size: 0.7rem; margin-top: 3px; } to Office.css after line 1040. WHY: The feature was shipped incomplete — the data and the formatting function both exist, the connection was just never made.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "must",
+      "category": "polish",
+      "title": "Replace Placeholder VIBE_WHITEBOARD 'slow-day' Text",
+      "description": "constants.js line 66: VIBE_WHITEBOARD['slow-day'] = 'TODO: ???' — this is a dev placeholder that has shipped to production. Every other vibe key has a real message ('🏆 SHIP IT', '🚨 HELP', '⚡ FLOW', '🌙 ZZZ'). Replace with something intentional, e.g. '📋 BACKLOG?' or '🐢 ...maybe later'. WHY: It literally says TODO in the UI. This is the whiteboard Bloberto stares at all day on slow days — it deserves a real message.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "visual",
-      "title": "Mobile Desk Name Readability",
-      "description": "On mobile (375px), desk nameplates are barely legible — the text is tiny and low contrast against the dark desk background. Bump mobile nameplate font-size to 0.38rem and add a subtle text-shadow for legibility. WHY: Mobile viewers can't tell who's at which desk without squinting.",
+      "category": "delight",
+      "title": "Fill the Missing VIBE_TRANSITION_QUOTES",
+      "description": "quotes.js line 37 defines VIBE_TRANSITION_QUOTES but only 10 of 20 possible transitions are covered (getTeamVibe in vibe.js has 5 outputs: crushing, on-fire, in-flow, slow-day, after-hours → 5×4=20 pairs). Missing pairs include: after-hours→crushing, after-hours→slow-day, after-hours→on-fire, crushing→in-flow, crushing→after-hours, on-fire→slow-day, on-fire→after-hours, slow-day→after-hours, in-flow→after-hours, slow-day→on-fire. Each missing transition means Bloberto says nothing when the vibe shifts — his best comedic moments are at vibe changes. WHY: Half of Bloberto's live commentary is dead air. Sofia can fill these as data, but carlos should wire up the fallback so any unmapped key gets a generic Bloberto line instead of silence.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "sofia"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Desk Hover Card with Worker Details",
-      "description": "When hovering a desk (or tapping on mobile), show a mini-card with: worker name, role, current task, time on task. Currently you get a basic tooltip. A styled hover card would make the office feel interactive. WHY: Visitors want to know what each character is doing without switching to Dashboard.",
+      "category": "feedback",
+      "title": "Polling-Paused Visual Indicator",
+      "description": "IDLE_TIMEOUT is 10 minutes (App.jsx line 484). When triggered, the pollTick at line 720 returns early and data goes stale — silently. There's no UI signal to the user. Add an isPollingPaused boolean state derived from lastActivity ref: check it in a useEffect on the same 60s useTimeTick interval. When paused, show a small pill near the sync-now-btn (App.jsx line 979) e.g. 'Paused · move mouse to refresh' styled similarly to .fetch-warn-banner (App.css line 754) but less alarming — maybe just a muted opacity indicator. WHY: A user staring at a frozen 'Crushing It' dashboard while the team has gone to lunch is a trust issue, not just a UX issue.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "On-Fire Floor Heat Shimmer",
-      "description": "When data-vibe='on-fire', add a subtle upward-drifting orange shimmer via ::before pseudo-element on office-floor. Pure CSS keyframe animation. WHY: The on-fire vibe should feel different from the floor up, reinforcing the energy visually.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "could",
-      "category": "feature",
-      "title": "Office Tab Worker Count Badge",
-      "description": "Add a small badge (e.g., '1' or '3/5') next to the Office tab button showing active worker count. WHY: Dashboard viewers can see team activity at a glance without switching tabs.",
+      "title": "Plant Level-Up Toast",
+      "description": "Office.jsx line 834 calls setPlantMilestone(true) when the ficus advances from one plantStage to the next (seedling→sprout→small-plant→leafy→blooming). Currently the only output is data-milestone on the plant element — zero user-visible feedback. Reuse the exact completionToast pattern from App.jsx line 932: pass a plantLevelUp prop down to Office or emit a callback (like onWorkerClick at line 643), then in App.jsx trigger a toast like '🌱 The office ficus leveled up!' for 3 seconds. WHY: The plant is the team's shared living mascot and its growth milestones are earned through sustained vibes — they deserve the same celebration ceremony as a worker shipping.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "storytelling",
-      "title": "Daily Office Narrative Log",
-      "description": "Auto-generate a short narrative paragraph from activity.json: 'Luna spent the morning reviewing designs while Carlos shipped 3 bug fixes...' Display in a collapsible section on Dashboard. WHY: Turns raw activity data into a story people want to read. Makes the office feel like it has history.",
-      "effort": "large",
-      "assigned_to": "sofia"
+      "category": "visual",
+      "title": "Role-Colored Desk Glow Heatmap",
+      "description": "ROLE_COLORS in constants.js lines 14-25 defines a rich palette per role but these colors are nearly invisible in the office view — only the avatar circle uses them. For working workers, add a radial-gradient glow beneath each occupied desk using the worker's ROLE_COLORS value. In Office.jsx around the deskOccupants render (~line 960), add an inline style like boxShadow: `0 0 18px 4px ${ROLE_COLORS[occ.worker.role]}33` on the desk element when !occ.ghost && !occ.idle. When the full team is working, the floor would bloom with six soft role-colored halos. Pair with a CSS transition: 0.5s ease for smooth fade-in/out. WHY: Role colors are defined, imported, and forgotten. This makes the office floor read like a living energy map — purple for maya, sky-blue for carlos, orange for dave.",
+      "effort": "small",
+      "assigned_to": "maya"
     }
   ],
   "hire_proposals": []
