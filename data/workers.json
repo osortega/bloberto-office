@@ -1,42 +1,15 @@
 {
-  "lastUpdated": "2026-03-08T10:58:00Z",
-  "workers": [],
-  "roster": [
-    {
-      "id": "bloberto",
-      "name": "Bloberto",
-      "role": "Manager",
-      "emoji": "🫠"
-    },
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨"
-    },
-    {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "🚀"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "🔍"
-    },
+  "workers": [
     {
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙"
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review #41",
+      "progress": 0,
+      "started_at": "2026-03-08T11:00:00Z"
     }
-  ]
+  ],
+  "updated_at": "2026-03-08T11:00:00Z"
 }
