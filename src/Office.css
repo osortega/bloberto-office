@@ -19,11 +19,18 @@
   --error-glow: rgba(239, 68, 68, 0.55);
   --error-tint: rgba(239, 68, 68, 0.12);
   --red:        #ef4444;
+  --away-note-bg:     #fef08a;
+  --away-note-border: #ca8a04;
+  --away-note-fold:   #fde047;
+  --away-note-line:   #fbbf24;
 }
 [data-theme='light'] {
   --floor-bg:  #e6e6f0;
   --grid-line: rgba(0, 0, 0, 0.05);
   --error-tint: rgba(239, 68, 68, 0.08);
+  --away-note-bg:     #fef9c3;
+  --away-note-border: #a16207;
+  --away-note-fold:   #fde047;
 }
 
 /* ── Wrapper ── */
@@ -222,7 +229,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .coffee-corner__emoji { font-size: 1.4rem; }
 .coffee-corner__label {
@@ -230,6 +237,34 @@
   color: var(--text-muted);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+/* ── Coffee corner chat badge ── */
+.coffee-corner__chat-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.coffee-corner--chatting .coffee-corner__chat-badge {
+  opacity: 1;
+}
+.coffee-corner__bubbles {
+  display: block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+.coffee-corner__chat-label {
+  font-size: 0.45rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.coffee-corner--chatting .coffee-corner__body {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 14px 5px rgba(251, 191, 36, 0.3);
 }
 
 /* ── Door (bottom center) ── */
@@ -252,6 +287,37 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   opacity: 0.65;
+}
+
+/* ── Door animation ── */
+@keyframes door-swing-arrive {
+  0%   { transform: translateX(-50%) perspective(200px) rotateY(0deg); }
+  30%  { transform: translateX(-50%) perspective(200px) rotateY(-35deg); }
+  100% { transform: translateX(-50%) perspective(200px) rotateY(0deg); }
+}
+@keyframes door-swing-depart {
+  0%   { transform: translateX(-50%) perspective(200px) rotateY(0deg); }
+  60%  { transform: translateX(-50%) perspective(200px) rotateY(-25deg); }
+  100% { transform: translateX(-50%) perspective(200px) rotateY(0deg); }
+}
+
+.office-door--arrive {
+  animation: door-swing-arrive 1.5s ease-out forwards;
+  transform-origin: left center;
+}
+.office-door--depart {
+  animation: door-swing-depart 2s ease-in-out forwards;
+  transform-origin: left center;
+}
+.office-door__notify-dot {
+  position: absolute;
+  top: -4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 5px #4ade80;
 }
 
 /* ── Character base ── */
@@ -377,6 +443,33 @@
 /* ── Manager nameplate vibe fade ── */
 @keyframes vibe-title-fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 .mgr-desk__nameplate--vibe { animation: vibe-title-fade 0.35s ease forwards; }
+
+/* ── Idle desk — dim lamp, no monitor glow ── */
+.desk--idle .desk-lamp ellipse:first-child { opacity: 0.3; }
+
+/* ── Away sign — sticky note floating above desk monitor ── */
+@keyframes desk-away-fadein {
+  from { opacity: 0; transform: translateX(-50%) rotate(-8deg) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) rotate(-8deg) translateY(0); }
+}
+.desk-away-sign {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-8deg);
+  pointer-events: none;
+  animation: desk-away-fadein 300ms ease forwards;
+  z-index: 3;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+.desk-away-sign__note {
+  display: block;
+  width: 12px;
+  height: 14px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .desk-away-sign { animation: none; opacity: 1; }
+}
 .char__name {
   font-size: 0.58rem;
   color: var(--text-muted);

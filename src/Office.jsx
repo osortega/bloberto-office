@@ -268,6 +268,42 @@ function formatIdleDuration(updatedAt) {
   return rem > 0 ? `${hours}h ${rem}m` : `${hours}h`
 }
 
+const AWAY_MESSAGES = ['☕ Coffee run', '🧠 Deep think', '📞 On a call', '🚶 Taking a lap', '🥪 Lunch', '🎧 Headphones in']
+
+function AwaySign({ workerId, idleMinutes }) {
+  const seed = workerId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
+  const idx = (seed + Math.floor(idleMinutes / 10)) % AWAY_MESSAGES.length
+  const message = AWAY_MESSAGES[idx]
+  const [line1, line2] = message.split(' ').reduce(
+    ([a, b], word) => (a.length === 0 ? [word, b] : [a, b ? `${b} ${word}` : word]),
+    ['', ''],
+  )
+
+  return (
+    <div className="desk-away-sign" aria-label={`Away: ${message}`} role="img" title={message}>
+      <svg
+        className="desk-away-sign__note"
+        width="12" height="14"
+        viewBox="0 0 44 52"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <rect x="1" y="1" width="42" height="50" rx="2" fill="var(--away-note-bg, #fef08a)" stroke="var(--away-note-border, #ca8a04)" strokeWidth="0.8" />
+        {/* Fold corner */}
+        <path d="M 33 1 L 43 11 L 33 11 Z" fill="var(--away-note-fold, #fde047)" />
+        <path d="M 33 1 L 43 11 L 33 11 Z" fill="none" stroke="var(--away-note-border, #ca8a04)" strokeWidth="0.8" />
+        {/* Ruled lines */}
+        <line x1="6" y1="22" x2="38" y2="22" stroke="var(--away-note-line, #fbbf24)" strokeWidth="0.6" opacity="0.6" />
+        <line x1="6" y1="32" x2="38" y2="32" stroke="var(--away-note-line, #fbbf24)" strokeWidth="0.6" opacity="0.6" />
+        <line x1="6" y1="42" x2="38" y2="42" stroke="var(--away-note-line, #fbbf24)" strokeWidth="0.6" opacity="0.6" />
+        {/* Message text */}
+        <text x="22" y="15" textAnchor="middle" fontSize="9" fill="#92400e" fontFamily="sans-serif" fontWeight="700">{line1}</text>
+        <text x="22" y="27" textAnchor="middle" fontSize="8" fill="#92400e" fontFamily="sans-serif">{line2}</text>
+      </svg>
+    </div>
+  )
+}
+
 const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
@@ -576,7 +612,7 @@ function ConferenceTable({ vibeKey }) {
   )
 }
 
-export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0 }) {
+export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0, doorEvent = null }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
 
@@ -596,18 +632,21 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const activeIds   = useMemo(() => new Set(workers.map(w => w.id)), [workers])
   const ghostRoster = effectiveRoster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id))
 
-  // Assign working workers first, then ghosts, to desk slots
+  // Assign working workers first, then idle workers, then ghosts, to desk slots
   const deskOccupants = useMemo(() => {
     const map = {}
     let i = 0
     for (const w of workingWorkers) {
-      if (i < DESKS.length) map[DESKS[i++].id] = { worker: w, ghost: false }
+      if (i < DESKS.length) map[DESKS[i++].id] = { worker: w, ghost: false, idle: false }
+    }
+    for (const w of idleWorkers) {
+      if (i < DESKS.length) map[DESKS[i++].id] = { worker: w, ghost: false, idle: true }
     }
     for (const w of ghostRoster) {
-      if (i < DESKS.length) map[DESKS[i++].id] = { worker: w, ghost: true }
+      if (i < DESKS.length) map[DESKS[i++].id] = { worker: w, ghost: true, idle: false }
     }
     return map
-  }, [workingWorkers, ghostRoster])
+  }, [workingWorkers, idleWorkers, ghostRoster])
 
   return (
     <div className="office-wrap">
@@ -640,6 +679,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           const occ = deskOccupants[desk.id]
           const hasError = occ && !occ.ghost && occ.worker.status === 'error'
           const isWorking = occ && !occ.ghost && occ.worker.status === 'working'
+          const isIdle = occ && occ.idle
+          const idleMinutes = isIdle && occ.worker.updated_at
+            ? Math.floor((Date.now() - new Date(occ.worker.updated_at).getTime()) / 60000)
+            : 0
+          const showAwaySign = isIdle && idleMinutes >= 10
           const isGhostDesk = isWorking && occ.worker.updated_at &&
             (Date.now() - new Date(occ.worker.updated_at).getTime()) > 900000
           const ghostDeskTitle = isGhostDesk ? (() => {
@@ -651,7 +695,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           return (
             <div
               key={desk.id}
-              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}${isGhostDesk ? ' desk--ghost' : ''}`}
+              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}${isGhostDesk ? ' desk--ghost' : ''}${isIdle ? ' desk--idle' : ''}`}
               title={ghostDeskTitle}
               style={{
                 left: `${desk.left}%`,
@@ -680,6 +724,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                       {occ.worker.name.split(' ')[0]}
                     </div>
                   )}
+                  {showAwaySign && (
+                    <AwaySign workerId={occ.worker.id} idleMinutes={idleMinutes} />
+                  )}
                 </div>
               )}
             </div>
@@ -690,17 +737,27 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         <ConferenceTable vibeKey={vibe} />
 
         {/* Coffee corner — top right */}
-        <div className="coffee-corner" data-vibe={vibe}>
+        <div className={`coffee-corner${idleWorkers.length >= 2 ? ' coffee-corner--chatting' : ''}`} data-vibe={vibe}>
+          <div className="coffee-corner__chat-badge" aria-hidden="true">
+            <svg className="coffee-corner__bubbles" width="28" height="18" viewBox="0 0 28 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="0" y="2" width="18" height="11" rx="4" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1"/>
+              <polygon points="4,13 4,17 8,13" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1" strokeLinejoin="round"/>
+              <rect x="9" y="0" width="18" height="11" rx="4" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1"/>
+              <polygon points="23,11 23,15 19,11" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1" strokeLinejoin="round"/>
+            </svg>
+            <span className="coffee-corner__chat-label">☕ chatting</span>
+          </div>
           <div className="coffee-corner__body">
             <span className="coffee-corner__emoji">☕</span>
           </div>
           <span className="coffee-corner__label">Coffee</span>
-          <span className="sr-only">Coffee corner</span>
+          <span className="sr-only">Coffee corner{idleWorkers.length >= 2 ? ' — people chatting' : ''}</span>
         </div>
 
         {/* Door — bottom center */}
-        <div className="office-door">
-          <span className="office-door__icon">🚪</span>
+        <div className={`office-door${doorEvent ? ` office-door--${doorEvent}` : ''}`}>
+          {doorEvent === 'arrive' && <span className="office-door__notify-dot" aria-hidden="true" />}
+          <span className="office-door__icon">{doorEvent === 'arrive' ? '🚪✨' : '🚪'}</span>
           <span className="office-door__label">Entrance</span>
           <span className="sr-only">Exit and entrance</span>
         </div>
@@ -708,10 +765,10 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {/* Bloberto — always at manager desk, always visible */}
         <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} />
 
-        {/* Active workers at desks (working) or as ghosts (roster-only) */}
+        {/* Active workers at desks (working) or as ghosts (roster-only) — skip idle, they wander */}
         {DESKS.map((desk, i) => {
           const occ = deskOccupants[desk.id]
-          if (!occ) return null
+          if (!occ || occ.idle) return null
           return (
             <Character
               key={occ.worker.id}
