@@ -1031,6 +1031,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           {vibe === 'crushing' && (
             <div className="mgr-desk__trophy" aria-hidden="true">🏆</div>
           )}
+          {vibe === 'after-hours' && <div className="mgr-desk__candle" aria-hidden="true">🕯️</div>}
           <span className="sr-only">Manager desk</span>
         </div>
 

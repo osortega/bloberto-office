@@ -216,6 +216,21 @@
   animation: coffee-wobble 2.5s ease-in-out infinite;
 }
 
+.mgr-desk__candle {
+  position: absolute;
+  bottom: 3%;
+  right: 4%;
+  font-size: 0.42rem;
+  opacity: 0.6;
+  animation: candle-flicker 1.8s ease-in-out infinite;
+}
+
+@keyframes candle-flicker {
+  0%, 100% { opacity: 0.5; transform: translateY(0); }
+  45% { opacity: 0.85; }
+  65% { opacity: 0.4; transform: translateY(-1px); }
+}
+
 /* ── Desk lamp — glows warm yellow when occupied by a working worker ── */
 .desk-lamp {
   position: absolute;
