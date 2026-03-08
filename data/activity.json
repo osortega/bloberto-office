@@ -310,5 +310,41 @@
     "worker": "Sofia",
     "message": "QA review #15 complete \u2014 18 findings (5 high, 9 medium, 4 low). Overall: 3.4/5. Score UP from 3.1. Dead code + useless useMemo + keyboard a11y remain top issues.",
     "timestamp": "2026-03-08T11:25:00Z"
+  },
+  {
+    "timestamp": "2026-03-08T11:30:00Z",
+    "type": "hire",
+    "worker": "Luna",
+    "message": "Clocked in for creative review #42 (timed out \u2014 using #41 ideas)"
+  },
+  {
+    "timestamp": "2026-03-08T11:36:00Z",
+    "type": "hire",
+    "worker": "Carlos",
+    "message": "Assigned: Luna dedup bug + vibe weather widget visibility"
+  },
+  {
+    "timestamp": "2026-03-08T11:36:00Z",
+    "type": "hire",
+    "worker": "Dave",
+    "message": "Assigned: mobile dead space fix"
+  },
+  {
+    "timestamp": "2026-03-08T11:38:00Z",
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "Fixed worker dedup (working > idle priority) + vibe weather opacity/size"
+  },
+  {
+    "timestamp": "2026-03-08T11:39:00Z",
+    "type": "complete",
+    "worker": "Dave",
+    "message": "Fixed mobile dead space: calc(100vw * 0.75) + tighter padding"
+  },
+  {
+    "timestamp": "2026-03-08T11:39:00Z",
+    "type": "complete",
+    "worker": "Maya",
+    "message": "Idle char name shrunk to 0.32rem with hover reveal (applied by manager)"
   }
 ]
