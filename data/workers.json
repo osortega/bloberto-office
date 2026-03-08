@@ -1,13 +1,13 @@
 {
   "workers": [
     {
-      "name": "Maya",
-      "emoji": "🎨",
-      "role": "Frontend Engineer",
+      "name": "Carlos",
+      "emoji": "⚡",
+      "role": "Backend Engineer",
       "status": "working",
-      "task": "Kill keyboard shortcut toast on mobile + whiteboard label",
-      "started_at": "2026-03-08T20:35:00Z"
+      "task": "Conference table remembers last huddle",
+      "started_at": "2026-03-08T20:37:00Z"
     }
   ],
-  "updated_at": "2026-03-08T20:35:00Z"
+  "updated_at": "2026-03-08T20:37:00Z"
 }
