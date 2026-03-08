@@ -1,23 +1,4 @@
 {
-  "lastUpdated": "2026-03-08T10:05:00Z",
-  "workers": [
-    {
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨",
-      "status": "working",
-      "task": "Implementing whiteboard mobile fix, ficus milestone burst, vibe caption bar",
-      "startedAt": "2026-03-08T10:05:00Z",
-      "progress": 10
-    },
-    {
-      "name": "Dave",
-      "role": "DevOps",
-      "emoji": "🔧",
-      "status": "working",
-      "task": "Implementing full-sync aura, away sign timer escalation",
-      "startedAt": "2026-03-08T10:05:00Z",
-      "progress": 10
-    }
-  ]
+  "lastUpdated": "2026-03-08T10:10:00Z",
+  "workers": []
 }
