@@ -1,23 +1,15 @@
 {
   "creative_director": "Luna",
-  "review_number": 46,
-  "timestamp": "2026-03-08T14:00:00Z",
-  "theme": "The office has a heartbeat — now let it speak, breathe, and remember",
-  "visual_observations": "Desktop (1280×800): Vibe is 🔥 Crushing It, greeting says 'Good morning, LEGEND 🔥'. Bloberto's nameplate correctly reads 'CVO' — the vibe-reactive title is live and brilliant. The whiteboard shows '🏆 SHIP IT' with a tiny progress bar track and '14%' floating beneath it — at this size the bar is invisible and the percentage reads as an orphaned metric. Five richly illustrated desk screens are visible (code lines, wireframes, terminal cursor, charts, color blocks). The 'tap / clack / click' keystroke floats are visible over working desks — charming. Conference table in the bottom-left has no seated workers (all workers are working = 0 idle = empty table). Wall clock is live in the top area. '⚡ Full sync' banner visible at top-center. Plants scattered around the floor. No role-colored desk glows present (review #45 wild idea not yet shipped). Mobile (375×812): Entire office fits in ~350px — desks are tiny rectangles, character avatars are ~25px, names barely readable. '⚡ TEAM LOCKED IN' vibe caption banner captured mid-animation at bottom. Conference table appears as just a ring of faint dots. A character in the bottom center has sparkle animation (crushing it effect). All code review confirms: review #45 items fully shipped — hover card time-on-task live (line 577), slow-day whiteboard fixed ('🐢 BACKLOG'), all 20 transition quotes populated, polling-paused pill live (line 993), plant toast live (line 940).",
+  "review_number": 47,
+  "timestamp": "2026-03-08T15:00:00Z",
+  "theme": "Give the office a memory — the best dashboards reward repeat visitors",
+  "visual_observations": "Review #46 visual notes still current. Whiteboard label fix from #46 already shipped (code confirms wb-progress-label exists). DESK_SCREEN_SVG covers 5 workers. Vibe transitions still only show in speech bubbles, not activity log. Mobile hover cards still unreachable on touch. Previous cycle shipped: hover card time-on-task, slow-day whiteboard, 20 transition quotes, polling-paused pill, plant toast.",
   "ideas": [
-    {
-      "priority": "must",
-      "category": "polish",
-      "title": "Label the Whiteboard Percentage",
-      "description": "The whiteboard renders VIBE_WHITEBOARD text + a thin progress bar + a bare '14%' number (Office.jsx line 976). The progress bar fill is a 2px-tall stripe — at glance it looks invisible, and '14%' reads as an orphaned metric. Fix: below the wb-progress-pct span, add a micro-label '<span className=\"wb-progress-label\">avg task progress</span>' styled at 0.55rem, opacity 0.5. Also increase wb-progress-track height from whatever it is now to 4px in Office.css so the fill bar is actually legible. WHY: A metric without units is noise. The whiteboard is the most-glanced surface in the office — it earns its space by being instantly readable, not cryptic.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
     {
       "priority": "should",
       "category": "storytelling",
       "title": "Log Vibe Transitions in the Activity Feed",
-      "description": "The activity log (Dashboard tab) records hire, complete, error, system events — but vibe transitions are invisible there. They only trigger Bloberto's speech bubbles, which disappear in 4s. The previousVibeKeyRef useEffect in App.jsx (line 836) already knows exactly when a transition happens (prevKey !== null && prevKey !== teamVibe.key). Fix: when a transition fires, push a synthetic entry to activityLog state: { type: 'system', worker: null, message: '🌡️ Vibe: ${prevLabel} → ${teamVibe.label}', timestamp: new Date().toISOString() }. In ActivityLogEntry, add a --vibe variant for system entries that shows a purple-left-border tint. WHY: The team's emotional arc across the day — from slow-day to crushing it and back — is the actual story this app tells. The activity log is the permanent record. Vibe shifts belong there.",
+      "description": "Carried from review #46 — still unshipped. The activity log records hire/complete/error/system events but vibe transitions are invisible there. They only appear in Bloberto's speech bubbles which vanish in 4s. When a vibe transition fires (prevKey !== null && prevKey !== teamVibe.key in App.jsx), push a synthetic entry to activityLog: { type: 'system', worker: null, message: '🌡️ Vibe: prevLabel → newLabel', timestamp: now }. WHY: The team's emotional arc across the day IS the story. The activity log is the permanent record — vibe shifts belong there.",
       "effort": "small",
       "assigned_to": "carlos"
     },
@@ -25,41 +17,41 @@
       "priority": "should",
       "category": "feature",
       "title": "Mobile Tap-to-Pin Worker Hover Cards",
-      "description": "On mobile (375px) the hover card (Office.jsx line 566) with name, role, task, status, and on-task time is completely unreachable — onMouseEnter never fires on touch devices. The 'handleClick' prop exists but routes directly to onWorkerClick which opens a different panel. Fix: In the Character component, add a 'pinnedCard' boolean state. On click (touch), if window.matchMedia('(hover: none)').matches, toggle pinnedCard instead of firing handleClick. Render the hover card when hovered || pinnedCard. Close on outside tap via a useEffect listening for clicks on document (like a modal dismiss). On mobile, also show a small pulsing '👆' badge on the first worker's avatar to hint at interactivity (hide after first tap via localStorage). WHY: Mobile is the screen most likely to be propped up near a coffee machine. Task context and on-task time being invisible on touch makes half the app's meaning vanish on the dominant screen size.",
+      "description": "Carried from review #46 — still unshipped. On mobile, hover cards with name/role/task/status/on-task-time are unreachable (onMouseEnter never fires on touch). Add pinnedCard state to Character component. On click, if window.matchMedia('(hover: none)').matches, toggle pinnedCard instead of firing handleClick. Show hover card when hovered || pinnedCard. Close on outside tap. WHY: Mobile is the screen most likely to be propped up near a coffee machine. Half the app's meaning vanishes on touch devices.",
       "effort": "medium",
       "assigned_to": "dave"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "Bloberto Composes Before Speaking",
-      "description": "The bloberto-typing three-dot indicator (Office.jsx line 511) is only shown during isSyncing. When a vibe transition occurs, Bloberto's quote appears immediately (line 422) — zero anticipation. Fix: In the vibe transition handler, before setting the speech bubble quote, first show a 1200ms 'isPreTyping' state where the typing dots appear but quote is null. Chain: setPreTyping(true) → setTimeout 1200ms → setPreTyping(false), setBubble({quote, show:true}). Extract the typing dots into a shared condition: variant==='manager' && (isSyncing || isPreTyping). WHY: The 1.2-second pause transforms Bloberto from a notification system into a character. He's not just displaying state — he's choosing his words. Anticipation is the soul of comedy timing, and Bloberto deserves the beat.",
+      "title": "Desk Lamp Color Matches Worker Role",
+      "description": "The desk lamp SVG (Office.jsx) always glows yellow (#fbbf24) regardless of who sits there. When isWorking, tint the lamp ellipse fill to ROLE_COLORS[occ.worker.role] with 60% opacity overlay. WHY: Subtle role-color reinforcement without adding clutter. Walking into an office and seeing different colored desk lamps instantly tells you who's where.",
       "effort": "small",
-      "assigned_to": "dave"
+      "assigned_to": "carlos"
     },
     {
       "priority": "could",
       "category": "visual",
       "title": "Fallback Desk Screen for Unlisted Workers",
-      "description": "DESK_SCREEN_SVG covers exactly 5 IDs: carlos, maya, dave, sofia, luna (Office.jsx line 7-55). Any other active working worker — a new hire, a worker with a different ID — renders a completely dark blank monitor (line 1043: DESK_SCREEN_SVG[occ.worker.id] &&). Fix: Add a DESK_SCREEN_SVG['default'] entry — a procedurally simple SVG using ROLE_COLORS[occ.worker.role] as the line fill color: three horizontal lines at 30/50/70% width, mimicking the carlos code screen but in the worker's own role color. In the render, change the condition to: DESK_SCREEN_SVG[occ.worker.id] ?? DESK_SCREEN_SVG['default']. WHY: A dead-black screen next to five rich illustrated monitors looks like a bug. With ROLE_COLORS already available, a role-colored fallback feels intentional and scales the feature forward without touching each new hire's onboarding.",
+      "description": "Carried from review #46. DESK_SCREEN_SVG covers 5 IDs. Any new hire renders a blank black monitor. Add a 'default' entry using ROLE_COLORS as line fill. WHY: A dead-black screen next to five rich monitors looks like a bug.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "feedback",
-      "title": "Freshness Ring Around the Sync Button",
-      "description": "The '↺' sync button (App.jsx line 992) gives no indication of when the next auto-poll fires. lastSynced state and the POLL_INTERVAL_ACTIVE (30s) constant both exist. Fix: Wrap the sync button in a position:relative container and render a small SVG ring behind it — a circle stroke with strokeDashoffset that counts down from full to 0 over 30 seconds, updating on the useTimeTick 60s tick (or a dedicated 5s tick for smoother motion). When IDLE_TIMEOUT is hit and polling is paused, the ring fills completely and turns amber (matching the existing polling-paused-pill color). On isSyncing, the ring pulses. WHY: Right now the dashboard could be showing data from 2 seconds ago or 28 seconds ago with no visual cue. The countdown ring makes the refresh rhythm visible — turning 'trust me it's live' into 'watch it refresh in 5s'.",
+      "category": "storytelling",
+      "title": "Daily Stats Ticker on the Whiteboard",
+      "description": "Below the vibe text and progress bar, show a rotating stat every 10s: 'Tasks shipped today: N' → 'Team uptime: Xh' → 'Vibe changes: N'. Pull from activityLog entries filtered to today. WHY: The whiteboard has real estate and is the focal point of the office. A slowly rotating stat ticker gives repeat visitors something new to glance at.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "storytelling",
-      "title": "Overheard Chatter: Workers Talk to Each Other",
-      "description": "Workers animate (typing dots, bob, wander) but never interact. The only voice is Bloberto's, every 45s. Fix: Every ~3 minutes, randomly select two workers in working or idle state and surface a 4-second floating text exchange above their desk areas simultaneously. Add WORKER_CHATTER in quotes.js keyed by role, 4 lines each: 'Backend Engineer': ['PR up, needs review 👀', 'tests passing? lol', 'rebasing again �', 'just deployed — fingers crossed 🤞'], 'Frontend Engineer': ['px vs rem discourse incoming', 'the mockup moved again', 'Safari did something', 'z-index: 9999 is fine'], 'QA Engineer': ['found a new edge case', 'this only breaks on Tuesdays', 'regression in prod', 'feature works, the tests are lying'], etc. Render as <div className=\"chatter-bubble\"> absolutely positioned over the desk, fading in/out via CSS opacity animation. One setInterval in Office.jsx, shuffled picks. WHY: Two lines of ambient dialogue — 'PR up, needs review' from Carlos, 'on it after standup' from Maya — transforms Bloberto's Office from a status board into a world.",
-      "effort": "large",
-      "assigned_to": "sofia"
+      "category": "feature",
+      "title": "Visitor Counter — You Are Not Alone",
+      "description": "Add a subtle 'N people watching the office right now' indicator using a free analytics ping (e.g., a simple counter service or localStorage-simulated for demo). Even if faked with a plausible random number, it creates social proof and makes the experience feel communal. WHY: Knowing others are watching transforms a dashboard into a shared experience.",
+      "effort": "medium",
+      "assigned_to": "tbd"
     }
   ],
   "hire_proposals": []
