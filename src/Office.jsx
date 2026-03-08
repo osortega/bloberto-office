@@ -1110,7 +1110,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                 </>
               ) : (
                 <div className="desk-character">
-                  <div className="desk__monitor" />
+                  <div className="desk__monitor" title={isWorking && occ.worker.task ? `${occ.worker.task}${typeof occ.worker.progress === 'number' ? ` — ${occ.worker.progress}%` : ''}` : undefined} />
                   {occ.ghost && (
                     <div className="desk-monitor-screen">
                       <div className="desk-monitor-screen--sleep" />
