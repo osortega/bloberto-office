@@ -1,65 +1,57 @@
 {
   "creative_director": "Luna",
-  "review_number": 49,
-  "timestamp": "2026-03-08T17:01:15Z",
-  "theme": "After Hours is a story the office is not fully telling yet -- lock the door, light the candle, let Bloberto speak first",
-  "visual_observations": "Desktop (1280x800): Vibe is After Hours, Sunday Mar 8, 'Good afternoon, night owl'. Bloberto anchors the center as NIGHT WATCH inside a purple-glow speech bubble. Coffee corner is labeled 'COFFEE (DECAF? JK)' -- the gold standard for floor copy. Five workers at desks (Carlos, Maya, Dave, Sofia, Luna). The office-window at right: 2%, top: 40% renders a prominent ORANGE RECTANGLE -- it is the golden-hour sky gradient (hour >= 17 per WindowElement line 620) with zero label. WindowElement already computes timeLabel ('golden hour') but renders nothing visible. Bottom-center door says '🚪 Entrance' -- entirely ignoring that the vibe is After Hours. The manager desk shows NIGHT WATCH nameplate but has NO desk accessory (on-fire gets ☕, crushing gets 🏆 at Office.jsx lines 1017-1023, after-hours gets nothing). The conference table dark circle sits in the lower-left with one chair rotated 45 degrees -- ambient but unlabeled. The quotes system (quotes.js) has only 4 after-hours lines that loop every 45 seconds -- exhausted in under 3 minutes for a user who keeps the tab open. Bloberto is silent for the first 44 seconds of every page load because the ambient broadcast fires on a 45-second interval. Mobile (375x812): Same state, compressed. Footer tagline 'the servers are watching. go home.' is visible at the bottom.",
+  "review_number": 50,
+  "timestamp": "2026-03-08T18:45:00Z",
+  "theme": "The office breathes — now teach it to remember, adapt, and surprise",
+  "visual_observations": "Desktop (1280x800): After-hours vibe active. All #49 improvements confirmed live — door shows 🔒 Locked, candle flickers on manager desk, window displays 'golden hour' caption, whiteboard has history dots, Bloberto speaks on mount ~3s after load. After-hours quote pool now has 8 entries (doubled). The office is atmospherically rich but interaction-poor on mobile — characters overlap below 480px, conference table clips. prefers-reduced-motion only applies to desk-away-sign. The idle wander paths feel samey after 2 minutes. No keyboard focus indicators on office-floor characters despite tabIndex={0}.",
   "ideas": [
     {
       "priority": "must",
-      "category": "visual",
-      "title": "Window Gets Its Time Caption",
-      "description": "WindowElement (Office.jsx lines 602-651) computes `timeLabel` on line 625 -- 'midnight', 'sunrise', 'daylight', 'golden hour', or 'dusk' -- but this string is only used in aria-label on the .office-window div. Nothing visible. In the desktop screenshot the window is an opaque orange rectangle at right: 2%, top: 40% with zero context. Fix: inside WindowElement's return, add a <span className=\"office-window__time-caption\">{timeLabel}</span> as a direct child inside .office-window, absolutely positioned. CSS to add at the end of the .office-window block in Office.css: .office-window__time-caption { position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); font-size: 0.38rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.28); white-space: nowrap; pointer-events: none; z-index: 1; }. WHY: The window is the only real-world time artifact on the floor -- WallClock shows vibe-themed hands, but the window literally shows the sky at this hour. Without a label it is decoration. 'GOLDEN HOUR' in tiny ALLCAPS completes the metaphor and earns the element's pixels -- same energy as 'COFFEE (DECAF? JK)' which proves the pattern works.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "must",
-      "category": "office-life",
-      "title": "After-Hours Door Locks",
-      "description": "Office.jsx lines 1144-1149: the .office-door div always renders the icon as `doorEvent === 'arrive' ? '🚪✨' : '🚪'` and the label as the static string 'Entrance'. The vibe prop is available in the Office component (line 842). Fix: change the icon expression to `vibe === 'after-hours' ? '🔒' : doorEvent === 'arrive' ? '🚪✨' : '🚪'` and the label string to `{vibe === 'after-hours' ? 'Locked' : 'Entrance'}`. Add one CSS rule in Office.css after .office-door__label (line 382): [data-vibe='after-hours'] .office-door__label { color: rgba(99,102,241,0.45); letter-spacing: 0.14em; }. Also add data-vibe={vibe} to the .office-door div. WHY: The door is the only element on the floor with absolutely zero vibe reactivity. The whiteboard reacts, the coffee reacts, the conference chairs react, Bloberto's nameplate reacts -- but the door always says 'Entrance'. A locked door at midnight makes the After Hours atmosphere narratively complete. This is a 2-line JSX change and 3-line CSS change.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "should",
-      "category": "office-life",
-      "title": "Manager Desk Gets an After-Hours Candle",
-      "description": "Office.jsx lines 1017-1023: the manager desk renders a ☕ coffee accessory for on-fire vibe and a 🏆 trophy for crushing. The pattern is established via .mgr-desk__coffee and .mgr-desk__trophy (Office.css lines 199-218). But after-hours gets nothing -- the desk is empty on its right side while on-fire and crushing both have a bottom-right accent. Fix: add `{vibe === 'after-hours' && <div className=\"mgr-desk__candle\" aria-hidden=\"true\">🕯️</div>}` to the manager desk JSX block (after line 1023). In Office.css, add the class after .mgr-desk__trophy: .mgr-desk__candle { position: absolute; bottom: 3%; right: 4%; font-size: 0.42rem; opacity: 0.6; animation: candle-flicker 1.8s ease-in-out infinite; } @keyframes candle-flicker { 0%, 100% { opacity: 0.5; transform: translateY(0); } 45% { opacity: 0.85; } 65% { opacity: 0.4; transform: translateY(-1px); } }. WHY: 'Burning the midnight oil' is already in the vibe-caption copy (line 919). A flickering candle on Bloberto's desk makes that metaphor literal and tangible. 2 JSX lines and 5 CSS lines. After-hours is now the most atmospheric vibe state in the office.",
+      "category": "delight",
+      "title": "Respect prefers-reduced-motion Globally",
+      "description": "Office.css only has ONE @media (prefers-reduced-motion: reduce) rule (for desk-away-sign). But the office has 20+ animations: manager-wobble, bob, enter-office, ghost-float, idle-wander, lamp-pulse, candle-flicker, coffee-wobble, typing-dots, ambient-particle, heat-shimmer, vibe-shockwave, door-swing, clock-frantic-tick, etc. Users who enable reduced motion preferences get ALL of these. Fix: add a global rule at the top of Office.css: @media (prefers-reduced-motion: reduce) { .char, .char--manager, .char--working, .char--idle, .char--ghost, .desk-lamp, .mgr-desk__candle, .mgr-desk__coffee, .mgr-desk__trophy, .coffee-steam span, .typing-dots span, .ambient-particle, .office-door, .vibe-shockwave, .clock-minute-hand--frantic, .idle-micro-bubble, .confetti-piece { animation: none !important; transition: none !important; } }. WHY: This is an accessibility requirement (WCAG 2.1 SC 2.3.3). The office is a vestibular trigger nightmare with its current animation density. One CSS block fixes it for all current and future animations. Zero JS changes needed.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "storytelling",
-      "title": "Bloberto Speaks on Mount",
-      "description": "In Office.jsx, the Character component's ambient broadcast (line ~432) fires on a 45-second interval starting from mount. This means Bloberto is completely silent for the first 44 seconds of every page load. The speech bubble only appears after nearly a minute. Fix: in the manager variant's ambient broadcast useEffect (starting at Office.jsx line ~420), add a mount-time quote trigger before the setInterval. After prevVibeRef.current = managerVibe (line ~428), add: `const mountQuoteId = setTimeout(() => { if (!isHoveringRef.current) { const qs = VIBE_QUOTES[managerVibe] || VIBE_QUOTES['in-flow']; setBubble({ quote: qs[Math.floor(Math.random() * qs.length)], show: true }); timerRef.current = setTimeout(() => setBubble(b => ({ ...b, show: false })), 4000); } }, 3000); return () => { clearTimeout(mountQuoteId); clearInterval(id); ambientRef.current = null; };`. WHY: First impressions matter. A user who lands on the page during after-hours sees NIGHT WATCH but Bloberto is silent for nearly a minute. A quote appearing 3 seconds after load -- 'Why are you still here? Go home. I mean... I am always here, but you shouldn't be.' -- immediately establishes that the product is alive and opinionated, not just a static dashboard.",
+      "category": "delight",
+      "title": "Focus Ring on Office Characters",
+      "description": "Every Character component has tabIndex={0} (Office.jsx Character component) and role='button' when clickable, but there's only one CSS rule for focus: .char:focus-visible .char__avatar { outline: 2px solid var(--accent); outline-offset: 2px; }. However, the .char itself has pointer-events: none as the base state (Office.css .char rule), which means keyboard focus technically works but the visual ring is invisible behind the pointer-events: none layer. Fix: ensure .char:focus-visible has pointer-events: auto and add a subtle glow: .char:focus-visible { pointer-events: auto; } .char:focus-visible .char__avatar { outline: 2px solid var(--accent); outline-offset: 3px; box-shadow: 0 0 12px var(--accent-glow); }. WHY: Keyboard users tabbing through the office can't see where they are. The office view is the hero feature — making it keyboard-navigable completes the accessibility story started by the dashboard's proper aria roles.",
       "effort": "small",
-      "assigned_to": "sofia"
+      "assigned_to": "maya"
     },
     {
-      "priority": "could",
-      "category": "storytelling",
-      "title": "Expand the After-Hours Quote Pool",
-      "description": "src/utils/quotes.js line ~35: the after-hours array has exactly 4 quotes. The ambient broadcast fires every 45 seconds (Office.jsx line ~432). A user with the tab open for 3 minutes will have heard all 4. The other vibes have 4-5 quotes. Fix: append 4 new entries to the `'after-hours'` array in quotes.js: `'Who approved this deploy at this hour? (It was me. I approved it.)'`, `'Technically tomorrow is a fresh start.'`, `'The on-call rotation shows: everyone. As it should.'`, `'I told the team to go home. I lied to the team.'`. No component changes. WHY: After-hours is the rarest and most emotionally resonant vibe -- somebody is genuinely working late on a Sunday. That deserves the richest quote pool, not the thinnest one. Doubling from 4 to 8 entries keeps the ambient loop feeling fresh through a full work session. This is a pure quotes.js edit with zero risk.",
-      "effort": "small",
-      "assigned_to": "sofia"
-    },
-    {
-      "priority": "could",
-      "category": "visual",
-      "title": "Whiteboard Trails Last Two Vibes as Dots",
-      "description": "The office-whiteboard (Office.jsx lines 988-1011) currently shows only the current vibe text and progress bar. It has no memory. Vibe transitions are visually dramatic (shockwave, caption, nameplate pop) but leave zero trace. Fix: in Office.jsx, add `const vibeHistoryRef = useRef([vibe])` near line 842 (after vibe is computed). Add a useEffect that pushes vibe to vibeHistoryRef when it changes: `useEffect(() => { vibeHistoryRef.current = [...vibeHistoryRef.current.slice(-2), vibe]; }, [vibe])`. Inside the whiteboard JSX (after .wb-progress-label, ~line 1007), add: `<div className=\"wb-history-dots\" aria-hidden=\"true\">{vibeHistoryRef.current.slice(0, -1).map((v, i) => <span key={i} className=\"wb-history-dot\" data-vibe={v} />)}</div>`. In Office.css: .wb-history-dots { display: flex; gap: 3px; justify-content: center; margin-top: 4px; } .wb-history-dot { width: 4px; height: 4px; border-radius: 50%; opacity: 0.3; } [data-vibe='crushing'].wb-history-dot { background: #a78bfa; } [data-vibe='on-fire'].wb-history-dot { background: #ef4444; } [data-vibe='in-flow'].wb-history-dot { background: #2dd4bf; } [data-vibe='slow-day'].wb-history-dot { background: #9ca3af; } [data-vibe='after-hours'].wb-history-dot { background: #6366f1; }. WHY: The whiteboard is the largest surface area of text on the floor. Right now it shows zero history. Two colored dots below the progress bar tell a story: 'we were in-flow (teal) then on-fire (red), now crushing (purple).' Each dot is 4x4px -- the information density per pixel ratio is exceptional.",
+      "priority": "should",
+      "category": "office-life",
+      "title": "Idle Workers Get Unique Wander Personalities",
+      "description": "Currently idle workers all use the same 4 wander patterns (char--wander-1 through char--wander-4) and the same IDLE_BUBBLE_EMOJIS map ({1:'☕', 2:'💬', 3:'🪟', 4:'🧘'}). The wander CSS paths are fixed sine-wave translations. When 3+ workers are idle, they all drift in the same rhythm. Fix: in Office.css, give each wander variant a different animation-duration and path shape. wander-1: 12s, circular. wander-2: 16s, figure-8. wander-3: 20s, diagonal drift. wander-4: 14s, small circle near desk. Also: tie IDLE_BUBBLE_EMOJIS to the worker's role instead of wander index — Carlos (Backend) gets 🔧, Maya (Frontend) gets 🎨, Dave (DevOps) gets 🔥, Sofia (QA) gets 🔍. WHY: Idle characters are on screen longest (they're not doing tasks). If they all wander identically, the illusion breaks. Unique movement + role-aware thought bubbles make each character feel like a person, not a sprite clone.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
+      "priority": "could",
+      "category": "feature",
+      "title": "Conference Table Shows Meeting Timer",
+      "description": "ConferenceTable (Office.jsx) shows a 'Huddle' badge when 2+ idle workers are present, but there's no sense of duration. Fix: track when the meeting started by storing a ref in the Office component: const meetingStartRef = useRef(null). When meetingWorkers goes from 0 to 2+, set meetingStartRef.current = Date.now(). When it drops to <2, clear it. Pass the start time to ConferenceTable. Display a small elapsed timer under the Huddle badge: '2m'. Style it dimly to avoid visual noise. WHY: Meetings in real offices have duration anxiety. A tiny '14m' counter under the huddle badge is funny (oh god they've been 'meeting' for 14 minutes and nobody is even working) and adds life to an otherwise static element.",
+      "effort": "medium",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Activity Log Entry Animations",
+      "description": "In the dashboard tab, ActivityLog entries appear instantly when new data arrives. There's no transition. The worker cards have enter/exit animations (worker-card--new, worker-card--fading) but the activity log has none. Fix: add a CSS animation to .activity-entry: @keyframes entry-slide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } } .activity-entry { animation: entry-slide 0.3s ease both; }. Use animation-delay based on index for stagger: style={{ animationDelay: `${i * 0.05}s` }}. WHY: The activity log is the narrative spine of the dashboard. Static entries feel like a database dump. Staggered slide-in makes each event feel like it's 'arriving' — matching the real-time nature of the data.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
       "priority": "wild",
       "category": "delight",
-      "title": "Night-Owl Header Greeting Rotates Every Three Minutes",
-      "description": "App.jsx line ~480 (the greeting area in the header): The text 'Good afternoon, night owl 🌙' is entirely static for the duration of the session. The 'night owl' label is hardcoded to display when vibe is after-hours or when the user's hour is late. Fix: in App.jsx, add a NIGHT_OWL_LABELS array near the FOOTER_TAGLINES const: `const NIGHT_OWL_LABELS = ['night owl', 'still here?', 'burning the midnight oil', 'technically tomorrow', 'moonlighter', 'the servers see you', 'no shame tho']`. Add `const [owlIdx, setOwlIdx] = useState(0)`. Add a useEffect that only runs when the vibe is after-hours: `useEffect(() => { if (teamVibe.key !== 'after-hours') return; const id = setInterval(() => setOwlIdx(i => i + 1), 180000); return () => clearInterval(id); }, [teamVibe.key])`. Replace the static 'night owl' span with `{NIGHT_OWL_LABELS[owlIdx % NIGHT_OWL_LABELS.length]}` and add a CSS key-reset via `key={owlIdx}` to trigger the existing greeting fade animation. WHY: The header is in frame 100% of the time. A greeting that evolves during an after-hours session -- 'night owl' fading to 'still here?' fading to 'the servers see you' -- plays the user's own marathon back at them. It makes Bloberto feel like a real-time observer, not a dashboard. It fires only during after-hours and only every 3 minutes -- zero noise, maximum delight for the one person who earned it.",
-      "effort": "medium",
-      "assigned_to": "tbd"
+      "title": "Bloberto's Mood Board — ASCII Art Desk Doodle",
+      "description": "Add a tiny 'doodle' area below the whiteboard (or as a hover reveal on the whiteboard). It shows a 3-line ASCII art that changes with vibe. crushing: '╰(*°▽°*)╯', on-fire: '(╯°□°)╯︵ ┻━┻', in-flow: '(⌐■_■)', slow-day: '(._. )', after-hours: '(∪.∪ )...zzz'. Render it as a <pre> element inside the whiteboard div, below the history dots, with font-size: 0.3rem and opacity: 0.3. On hover, opacity jumps to 0.7. WHY: This is pure personality. It costs 5 lines of JSX and tells the user 'someone with taste made this.' Doodles on a whiteboard are universally human — they bridge the gap between 'data dashboard' and 'someone's actual office.' The hover reveal makes it feel like a discovered secret, not a decoration.",
+      "effort": "small",
+      "assigned_to": "maya"
     }
   ],
   "hire_proposals": []
