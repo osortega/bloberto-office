@@ -1,140 +1,163 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-08T01:45:00Z",
-  "screenshot_desktop": "screenshot-desktop.png",
-  "screenshot_mobile": "screenshot-mobile.png",
+  "timestamp": "2026-03-08T02:15:00Z",
   "scores": {
     "visual": 4,
     "ux": 3,
     "responsiveness": 3,
     "performance": 4,
     "accessibility": 3,
-    "code_quality": 4,
+    "code_quality": 3,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.75,
-  "score_rationale": {
-    "visual": "Cohesive dark theme, lovely purple gradient title, charming hand-drawn SVG characters (Sofia even has a magnifying glass — someone pays attention to details). Vibe-reactive elements (grid color, whiteboard, conference table chairs) are a genuinely nice touch. Loses a point because the whiteboard text is rendered at 0.42rem — basically invisible without a microscope — and the office view has a lot of structural dead space in its lower half.",
-    "ux": "Two-tab navigation is clear, the card flip for history is discoverable via the ℹ️ button, and the tag filtering is a smart feature. However: keyboard shortcuts (1/2/R) have zero UI hints, clicking a character to jump to the Dashboard tab is utterly non-obvious, the sync button shows no loading state beyond being disabled, and the 10-minute idle timeout silently stops data from refreshing without any indicator to the user.",
-    "responsiveness": "The stats bar correctly reflows to 3→2 columns on smaller screens. But the office floor on 375px mobile is tiny and cramped, character names disappear at 480px (gone, just gone), and there is ~200px of dark empty void below the floor before the footer. Also, the stats bar can dynamically render 6–7 items while the CSS is hard-wired for 5 columns — extra cards spill to a second row and look orphaned.",
-    "performance": "Smart polling (active 30s / backgrounded 60s), idle timeout to stop polling, React.memo and useMemo used throughout, canvas-based dynamic favicon is an elegant lightweight trick, proper cleanup of timers on unmount. Deducted one point because appending ?t=Date.now() to every fetch request defeats HTTP/CDN caching entirely — these are static JSON files that could safely use a short cache-control window.",
-    "accessibility": "Skip link ✓, ARIA roles and labels on most elements ✓, tabIndex management on card flip ✓, reduced-motion support attempted ✓. BUT: the prefers-reduced-motion block in Office.css targets old class names (.office-worker, etc.) that no longer exist in the DOM — the actual .char elements still animate. The char--glitch animation on error workers is the worst offender and has no motion guard at all. CSS-only data-tooltip is not readable by screen readers. The stuck-workers stat card has onClick but no keyboard handler.",
-    "code_quality": "Well-structured React with appropriate patterns (memo, useMemo, useCallback), proper effect cleanup, JSDoc on utilities. Solid overall. Issues: App.jsx is ~1027 lines and contains 9 distinct components — it needs to be split up. getRelativeTime is defined in App.jsx and then identically re-inlined in Office.jsx's ghost bubble logic. WORKER_ROLE_COLORS in App.jsx is keyed by worker name and diverges in hex values from the canonical ROLE_COLORS in constants.js. The vibeStreak state is never passed as a prop to <Office>, so the plant always stays a seedling.",
-    "features": "This is a read-only status monitor and it has live polling, dual views, team vibe system, confetti, dark/light theme, activity log with filters, card flip history, tag filtering, keyboard shortcuts, dynamic favicon, cycling tab title, streak tracker, ambient speech bubbles, and a ficus that grows with vibe streaks. Genuinely impressive scope. Missing: no search/filter by worker name, no load-more on activity log (hard-capped at 20), no deep-linkable worker URL.",
-    "fun_factor": "The highest possible score and it's not close. Custom SVG characters with real personalities (Sofia has a magnifying glass, Dave has headphones and a beard, Luna has a crescent moon), Bloberto the passive-aggressive manager blob who quotes 'Per my last commit…', a whiteboard that says SHIP IT or 🚨 HELP depending on team state, a growing office ficus, a time-of-day window with clouds and stars. This is the most characterful team monitor I've ever reviewed. Whoever built this has a sense of humor and actually likes their job."
-  },
+  "overall_score": 3.6,
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "vibeStreak is never passed to <Office> — Fern the ficus is permanently a seedling",
-      "description": "App.jsx line 922 renders <Office workers={...} roster={...} isSyncing={...} activityEntries={...} onWorkerClick={...} /> with no vibeStreak prop. Office.jsx accepts vibeStreak with a default of 0, so plantStage is always plantStageNames[0] = 'seedling'. The growing plant feature (Office.jsx lines 588–589) is completely broken — Fern will never sprout past its first stage regardless of how long the office has been crushing it. Fix: add vibeStreak={vibeStreak} to the <Office> call in App.jsx.",
+      "title": "workers.json missing `id` field -- breaks character identity across the entire app",
+      "description": "Workers fetched from workers.json have no `id` field. Cascading failures: (1) activeIds becomes Set([undefined]), so ALL DEFAULT_ROSTER members pass the ghost filter -- Maya and Sofia appear TWICE on the office floor, once working and once as a ghost. Visible in the live screenshot. (2) fadingMap, seenIdsRef, newIds, and focusedWorker all key on w.id, so new-arrival animations, fade-outs, and click-to-focus are broken. (3) React key={w.id} on WorkerCard renders all cards with key undefined, causing silent DOM reconciliation errors. (4) CharacterAvatar never renders the named custom SVG avatars for active workers -- they all fall through to the emoji/generic fallback. Fix: add an id field to each worker in workers.json matching the lowercase first name (e.g. id: maya).",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "stuckWorkers display uses w.started (undefined) — stuck card label is always broken",
-      "description": "StatsBar line 408: `stuckWorkers[0].emoji ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].started)}`. Worker objects have no 'started' field, only 'updated_at'. formatDuration(undefined) returns null, producing a label like 'undefined Carlos · null'. The stuckWorkers filter at line 353 correctly uses w.updated_at, so detection works — only the display string is wrong. Fix: replace stuckWorkers[0].started with stuckWorkers[0].updated_at in the display string. Also note stuckWorkers[0].emoji is not guaranteed to exist either; fall back to getRoleEmoji(stuckWorkers[0].role).",
+      "title": "workers.json uses `startedAt` but code expects `updated_at` -- silently kills duration, ETA, stuck-worker UI",
+      "description": "Every time-based feature reads worker.updated_at, but workers.json stores the field as startedAt. Broken features: working-duration badge (never renders), ETA in progress bar (always null), stuck-worker detection in StatsBar (never triggers), idle duration badge in the office (blank), ghost desk last-seen tooltip (blank). Fix: rename the field in workers.json from startedAt to updated_at, or add a mapping in syncFromGitHub. Also, App.jsx line 408 references stuckWorkers[0].started (a third variant of the field name that does not exist) -- that should be updated_at.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "workers.json missing `progress` field -- all progress bars stuck at 0%, rings never appear",
+      "description": "Workers in workers.json have no `progress` field. ProgressBar receives undefined, coercing to 0 -- bars show empty with a 0% label. The progress ring in the office view never appears (guarded by typeof worker.progress === 'number'). Fix: add a progress integer (0-100) to each worker in workers.json. Also consider adding a roster key so the worker-filter dropdown in the activity log is populated rather than empty.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Duplicate characters on office floor -- same worker appears as both active and ghost simultaneously",
+      "description": "Because workers.json workers lack an id field, activeIds in Office.jsx becomes Set([undefined]). The ghost filter !activeIds.has(w.id) passes for every DEFAULT_ROSTER member (since 'maya' and 'sofia' are not undefined), so Maya and Sofia are rendered at their working desks AND as ghost characters at additional desks. This is directly visible in the live screenshot. Root cause is the missing id bug above, but the symptom deserves its own callout as the most user-visible regression.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "prefers-reduced-motion block in Office.css targets deleted class names — char animations still play",
-      "description": "The @media (prefers-reduced-motion: reduce) block in Office.css lines 906–945 applies animation:none to .office-worker, .office-worker--ghost, .office-worker--manager, etc. None of these class names exist in the current DOM — the real classes are .char, .char--working, .char--idle, .char--manager, .char--ghost. The keyframe overrides (bob, wander-1 through wander-4, etc.) ARE effective since they're global, but .char--glitch's animation is notably absent from the empty-keyframe list, meaning glitch effects on error workers still flash at full intensity for users who've opted out of motion. Fix: replace the selector list with .char, .char--working, .char--idle, .char--ghost, .char--manager, .char--deep-work, .office-plant and add char-glitch to the empty keyframe list.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "ux",
-      "title": "10-minute idle timeout silently stops data from refreshing — no user feedback",
-      "description": "App.jsx line 628: if (Date.now() - lastActivity.current > IDLE_TIMEOUT) return — polling silently stops after 10 minutes of no mouse/keyboard interaction. A passive viewer watching dashboards on a second monitor will see stale data with no indication that updates have stopped. The live-dot stays green and the sync time stays unchanged even though no syncs are happening. Fix: either remove the idle timeout (the polling interval is already 30s; it's not expensive), or show a visible staleness indicator — e.g., dim the live-dot to amber and add a 'Paused — move mouse to resume' tooltip when idle.",
-      "effort": "small"
+      "title": "Activity and worker filter bars use role=radio on <button> elements with broken keyboard navigation",
+      "description": "App.jsx lines 1007-1036 use <button role='radio'> for activity and worker filters. Buttons with role=radio should be navigable with arrow keys within the group, not Tab. Currently Tab moves between each button individually (tab-stop flood) with no arrow-key navigation inside the group. The outer role=radiogroup wrapper is correct but the keyboard contract is not fulfilled. Fix options: (a) use real <input type='radio'> styled as buttons, or (b) keep <button> elements, remove role=radio, and use aria-pressed to indicate selection.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Stats bar CSS is hardwired to 5 columns but can render 6–7 items",
-      "description": "App.css line 118: grid-template-columns: repeat(5, 1fr). StatsBar renders 5 static cards (total, active, idle, sync, vibe) plus up to 2 conditional cards (errorCount and stuckWorkers). When both extras are visible, 7 items in a 5-column grid produce a second row of 2 orphaned cards that look like a broken layout. The responsive breakpoints (3-column at 900px, 2-column at 600px) don't solve this since they still use repeat(N, 1fr) with a fixed column count. Fix: change to grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) so the grid adapts naturally to any number of stat cards.",
+      "title": "Vibe streak resets on every page reload -- sessionStorage defeats the streak concept",
+      "description": "The vibeStreak counter reads from sessionStorage, which is cleared when the browser tab is closed or the page is reloaded. A streak disappearing on reload feels punishing and undermines the keep-the-vibe-going mechanic. Switching to localStorage would persist streaks across sessions. Since the streak is purely cosmetic, stale data risk is negligible. Note also that the streak badge only appears at vibeStreak >= 3, so frequent-reloader users never see it.",
       "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Keyboard shortcuts 1, 2, R have zero visual hint — they might as well not exist",
-      "description": "The shortcuts are only surfaced as `title` attributes on the tab buttons and sync button (visible on desktop hover as a browser tooltip). There's no legend, no help icon, no footer note, nothing. Discovered by accident or not at all. The character personalities and vibe system show this project values delight — keyboard shortcuts are part of that delight and deserve to be shown off. Fix: add a small keyboard icon (⌨️) or '?' button in the header-right that reveals a compact popover listing the three shortcuts. This is a 30-minute fix with outsized discoverability payoff.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "visual",
-      "title": "Whiteboard text at 0.42rem is effectively illegible — it's decorative at best",
-      "description": "The .office-whiteboard CSS sets font-size: 0.42rem. At standard screen resolution this renders the vibe message (e.g. '🏆 SHIP IT') at roughly 6.7px — below the browser's minimum readable threshold and smaller than most tooltips. The whiteboard is one of the most charming reactive elements in the whole interface; it deserves to be read. Fix: increase font-size to at least 0.6rem, use word-break or adjust line-height, or switch the emoji + text to a two-line layout inside the whiteboard element.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Clicking an office character to jump to Dashboard is completely undiscoverable",
-      "description": "Characters in the Office view are clickable and navigate to the Dashboard tab with that worker focused. This is a great feature. But the characters have cursor: pointer only when onWorkerClick is defined (a conditional inline style), there's no hover label, no tooltip, and nothing in the UI hints that clicking them does anything. Most users will never discover it. Fix: add a visible tooltip to working/idle characters (e.g. 'Click to view Carlos's dashboard') and ensure the pointer cursor is always applied for clickable chars via a CSS class rather than a conditional inline style.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "responsiveness",
-      "title": "Mobile office floor has ~200px of dead space below it and is too small to read",
-      "description": "On 375×812 (see screenshot-mobile.png), the office floor renders at 4:3 aspect ratio (~335×251px) and then there's a large empty dark area before the footer. The floor itself is cramped: character avatars are 24–30px, names are hidden at 480px (display:none in Office.css line 750), and desk details are unreadable. The idle wandering area in the lower third of the floor is too small for meaningful use. Fix: on mobile, switch the tab default to 'dashboard' (which renders the worker cards in a full-width 1-column grid — much more readable), or apply a taller aspect-ratio (1:1) to the office floor at ≤480px and add a min-height:none override to let it fill the viewport.",
-      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "CSS-only data-tooltip is invisible to screen readers",
-      "description": "Characters in Office.jsx use `data-tooltip={tooltip}` and Office.css renders it via `.char[data-tooltip]::after { content: attr(data-tooltip) }`. This is purely visual — assistive technologies do not read ::after pseudo-element content set via attr(). The tooltip strings ('☕ Heading to the coffee corner', task text, etc.) are meaningful and lost entirely. Fix: for characters with a tooltip, add aria-label={tooltip} or aria-description={tooltip} to the div in addition to the data-tooltip attribute.",
+      "title": "All office characters unconditionally get tabIndex=0 including non-interactive ghost workers",
+      "description": "The Character component in Office.jsx always renders with tabIndex=0. Ghost characters (OOO roster members) show a hover bubble on focus but have no click handler and no keyboard action. Screen-reader and keyboard users must tab through every ghost before reaching other interactive elements. Fix: set tabIndex=0 only when the character has an onClick handler, and tabIndex=-1 (or omit) for ghost characters. Also remove role=button from non-clickable characters.",
       "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "vibeStreak uses sessionStorage — plant and streak reset on every new tab or browser restart",
-      "description": "App.jsx lines 721–728 read/write bloberto-vibe-streak from sessionStorage, which is scoped to a single tab and cleared when the browser closes. The plant growth feature (vibeStreak / 5 → plant stage) requires a streak of 20+ polls to reach 'blooming' — about 10 minutes at 30s intervals — but any tab switch or restart wipes it. Fix: migrate to localStorage with the same keys. Add a stale-check: if the stored timestamp is more than 2 hours old, reset the streak. This preserves intent (streak tracks current session's vibe consistency) while surviving tab reloads.",
+      "category": "ux",
+      "title": "Keyboard shortcuts (1, 2, R, Esc) are completely undiscovered -- no hint visible in the UI",
+      "description": "The app implements useful keyboard shortcuts but they are only hinted in title attributes of tab buttons (desktop hover only). They are invisible on mobile and unknown to screen-reader users. Add a small ? icon button in the header that opens a keyboard shortcuts popover, or add a persistent kbd-styled hint strip below the tab bar. This rewards power users and makes the app feel more intentional.",
       "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "App.jsx is a 1027-line monolith — nine components in one file",
-      "description": "App.jsx defines ActivityLogEntry, ActivityLog, StatusBadge, ProgressBar, WorkerCard, DeltaBadge, StatsBar, EmptyState, LoadingSkeleton, and the main App component — plus utility functions and local constants — in a single 1027-line file. This is a maintenance hazard: finding any component requires scrolling through the entire file, and the file size slows IDE features. Fix: extract each component to src/components/{ComponentName}.jsx, move getRelativeTime/formatFullDateTime/formatDuration/getTaskTags to src/utils/format.js, and import as needed. App.jsx should shrink to ~150 lines.",
+      "category": "ux",
+      "title": "Mobile office view is functional but barely usable -- 24px avatars, hidden names, no touch optimization",
+      "description": "At 375px viewport the office floor collapses to 280px min-height with 24x24px avatars and character names hidden (font-size: 0 at <480px). Tap targets are well below the 44x44px accessibility minimum. The char-hover-card tooltip appears on hover, which does not exist on touch. Suggested fixes: (a) enlarge the office floor with horizontal scroll/pan on mobile, (b) replace hover-card with a tap-to-show overlay, or (c) default to the dashboard tab on narrow screens where the office is impractical.",
       "effort": "medium"
     },
     {
-      "priority": "low",
-      "category": "code",
-      "title": "WORKER_ROLE_COLORS duplicates ROLE_COLORS with divergent hex values — visual inconsistency",
-      "description": "App.jsx line 14 defines WORKER_ROLE_COLORS keyed by worker name: { Maya: '#a855f7', Carlos: '#3b82f6', ... }. constants.js defines ROLE_COLORS keyed by role: { 'Frontend Engineer': '#a78bfa', 'Backend Engineer': '#38bdf8', ... }. They're used for different purposes (confetti vs. card accents) but assign different shades — Maya's confetti is #a855f7 while her card role color is #a78bfa. When the roster changes with new worker names, WORKER_ROLE_COLORS silently falls back to the default purple for the new hire's confetti. Fix: delete WORKER_ROLE_COLORS; derive confetti color from ROLE_COLORS[worker.role] ?? '#a855f7' at the point of use.",
+      "priority": "medium",
+      "category": "ux",
+      "title": "No visual feedback on the Office tab during sync -- Bloberto typing dots are too subtle",
+      "description": "When the sync button is pressed or auto-poll fires, the only feedback on the Office tab is a small typing-dots indicator above Bloberto. A user pressing the sync button (R or click) on the Office tab has no obvious confirmation that data is updating. The Dashboard tab clearly shows sync status via the StatsBar. Add a subtle pulsing border or dim overlay on the office floor during isSyncing, or show a small syncing chip near the tab bar.",
       "effort": "small"
     },
     {
-      "priority": "low",
-      "category": "code",
-      "title": "getRelativeTime duplicated in App.jsx and inlined identically in Office.jsx",
-      "description": "getRelativeTime is defined at App.jsx line 34. Office.jsx lines 395–405 contain a byte-for-byte identical implementation as an anonymous IIFE inside the ghost-bubble render. Two copies means any format change (adding 'weeks ago', changing 'just now' threshold) must be applied in both places — and one will inevitably get missed. Fix: move getRelativeTime and formatFullDateTime to src/utils/format.js (or the existing src/utils/ directory), export them, and import in both files.",
+      "priority": "medium",
+      "category": "ux",
+      "title": "Polling silently stops after 10 minutes of inactivity -- live dot stays green but data is stale",
+      "description": "The IDLE_TIMEOUT of 10 minutes stops polling without any visual feedback. A user who leaves the tab open sees stale data with no indication; the live dot stays green if the last fetch was successful. Add a 'Paused -- move mouse to resume' chip, or change the live dot to yellow/amber when polling is suspended, to prevent misleading status.",
       "effort": "small"
     },
     {
-      "priority": "low",
+      "priority": "medium",
       "category": "performance",
-      "title": "Cache-busting every fetch request prevents HTTP caching of static JSON files",
-      "description": "fetchWorkersFromGitHub and fetchActivityFromGitHub append ?t=Date.now() to their URLs (App.jsx lines 23 and 29). This generates a unique URL on every poll, defeating browser cache and any CDN edge cache. The GitHub raw content CDN does support cache headers — a stale-while-revalidate strategy with a 30-second TTL would let repeat loads within the poll interval be served instantly from cache while background revalidation keeps data fresh. Fix: remove the cache-busting query param; instead, rely on the existing 30-second poll interval to keep data fresh. If stale data is a concern, add appropriate Cache-Control headers server-side.",
+      "title": "Favicon canvas re-created on every poll cycle -- should only update when indicator color actually changes",
+      "description": "The favicon useEffect in App.jsx re-runs whenever activeWorkers or fetchError changes (every 30s poll), each time creating a new Canvas, drawing a circle, converting to a data URL, and replacing the link element. The favicon can only be one of three colors (red/green/grey). Derive a single status string ('error' | 'working' | 'idle') and use that as the effect dependency instead, preventing canvas allocation on every poll.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "No React Error Boundary -- a single component crash silently takes down the entire app",
+      "description": "There is no Error Boundary anywhere in the component tree. If any component throws during render (e.g. malformed worker data, unexpected null from the API), the entire React tree unmounts and users see a blank page with no explanation. Add an ErrorBoundary wrapping at least the Office component and WorkerCard grid, showing a graceful fallback with a retry button. Given the app consumes static JSON with no schema validation, a bad field value will silently break the whole UI.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "completionToast uses 12 inline style declarations that cannot be themed or motion-reduced",
+      "description": "App.jsx lines 822-843 style the completion toast entirely with inline style={{...}}, including position, colors, border, border-radius, padding, font-size, z-index, animation, and box-shadow. The hardcoded rgba box-shadow does not adapt to light theme. The animation cannot be overridden by prefers-reduced-motion. Extract to a .completion-toast CSS class to fix theming, motion, and maintainability in one move.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "No API schema validation -- silent failures when data fields are missing or renamed",
+      "description": "The app fetches two JSON files and consumes them without any validation. Missing fields (as demonstrated by the id/updated_at/progress bugs) fail silently. At minimum, add console.warn in development when expected fields like id, updated_at, or progress are absent. For a more robust solution, a lightweight schema check at the top of syncFromGitHub would surface data contract mismatches immediately during development.",
+      "effort": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "WORKER_ROLE_COLORS in App.jsx duplicates ROLE_COLORS data, keyed by worker name instead of role",
+      "description": "App.jsx defines WORKER_ROLE_COLORS mapping worker names to colors (lines 14-20). The same color values already exist in ROLE_COLORS in constants.js mapped by role. WORKER_ROLE_COLORS is used only for confetti color and would break for any new worker whose name is not listed. Replace with ROLE_COLORS[worker.role] to derive confetti color from the worker role -- no new mapping needed.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "getRelativeTime logic duplicated: named function in App.jsx and identical inline IIFE in Office.jsx",
+      "description": "The relative-time calculation (mins < 1 -> 'just now', mins < 60 -> Xm ago, etc.) is implemented twice: as getRelativeTime in App.jsx (line 34) and as an identical inline IIFE inside the ghost OOO bubble render in Office.jsx (lines 432-441). Move both to utils/time.js and import the shared function. This also makes the formatting logic independently testable.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Footer version string v1.0.0-chaos is hardcoded and will drift from package.json",
+      "description": "The footer renders a hardcoded v1.0.0-chaos string. In a Vite project this is trivially fixed: import { version } from '../package.json' (Vite supports JSON imports by default) and render the value as v${version}-chaos. This keeps the displayed version in sync with the actual package version automatically.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "Activity log is hard-capped at 20 entries with no way to see older events",
-      "description": "ActivityLog (App.jsx line 113): const displayed = [...entries].reverse().slice(0, 20). The raw log is passed in full but only 20 items are ever shown and there is no 'Load more' or pagination control. The section header shows 'Last {min(activityLog.length, 20)} events' which at least signals the cap exists, but there is no way to investigate older events. Fix: add a 'Show more' button below the log that increments the visible count by 20, or implement virtualized rendering if the log grows large.",
+      "title": "No notification when a worker enters error state for background users -- only favicon changes",
+      "description": "When a worker hits error status, the UI reacts visually (red card border, glitch animation, error badge on Dashboard tab), but a user with the app in a background tab only notices the favicon color change. Consider a subtle Notification API call (with user permission) or an aria-live='assertive' announcement when a new error worker appears, making this useful for on-call monitoring scenarios where keeping the tab visible is not practical.",
+      "effort": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Office floor plants are tiny emoji at fixed percentage positions -- invisible on mobile",
+      "description": "The decorative plants are emoji characters at fixed percentage coordinates, rendering at roughly 16-20px on mobile. They add charm on desktop but become invisible blobs at small sizes. Consider replacing with small inline SVGs (consistent with the desk lamp and away-sign approach) so they scale with the floor, or use CSS font-size: clamp(0.6rem, 1.5vw, 1.2rem) so they remain legible at all viewport widths.",
+      "effort": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Activity log entry count label reflects unfiltered total when a worker or type filter is active",
+      "description": "In App.jsx line 997, the label reads 'Last {Math.min(activityLog.length, 20)} events'. This counts the unfiltered log, not the filtered result. If a worker filter is active and that worker has no log entries, the label might say 'Last 15 events' while the visible log is empty. Change the count to reflect the post-filter entry count, and add a 'No entries for this filter' empty state for clarity.",
       "effort": "small"
     }
   ]

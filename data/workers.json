@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T02:30:00Z",
+  "lastUpdated": "2026-03-08T02:35:00Z",
   "workers": [
     {
       "name": "Maya",
@@ -13,8 +13,8 @@
       "name": "Luna",
       "role": "Creative Director",
       "emoji": "🌙",
-      "status": "working",
-      "task": "Creative review #30 — reviewing site and writing ideas",
+      "status": "idle",
+      "task": "Completed creative review #30",
       "startedAt": "2026-03-08T02:30:00Z"
     }
   ]

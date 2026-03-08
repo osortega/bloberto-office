@@ -1,5 +1,11 @@
 [
   {
+    "type": "complete",
+    "worker": "Luna",
+    "message": "Creative review #30 complete \u2014 8 ideas submitted (theme: reward the curious)",
+    "timestamp": "2026-03-08T02:35:00Z"
+  },
+  {
     "type": "hire",
     "worker": "Luna",
     "message": "Clocked in for creative review #27",

@@ -1,70 +1,70 @@
 {
   "creative_director": "Luna",
-  "review_number": 29,
-  "timestamp": "2026-03-08T02:01:23Z",
-  "theme": "Every corner narrates — the office should tell its own story without a single word",
+  "review_number": 30,
+  "timestamp": "2026-03-08T02:31:19Z",
+  "theme": "The office has secrets — reward the curious, animate the mundane, and let no element be silent",
   "ideas": [
     {
       "priority": "must",
-      "category": "office-life",
-      "title": "Wall Clock with Vibe-Reactive Hands",
-      "description": "Place a small SVG analog clock on the upper-left wall (left: 5%, top: 8%), showing actual local time with sweeping second hand. The clock face is vibe-aware: 'crushing' = hands spin 2x faster than real time (optical illusion of urgency); 'slow-day' = second hand drags with a rubber-band ease, hesitates each tick; 'on-fire' = clock face tints red, hands stutter; 'after-hours' = clock dims to 30% opacity with a crescent moon replacing the center dot. Implemented as a pure SVG with `transform: rotate()` driven by `Date.now()` in a `useEffect` interval. WHY: Time is the invisible spine of a workday. A living clock anchors every vibe state in temporal reality — it answers 'how long has this chaos been going on?' at a glance, and it makes the upper-left dead zone earn its real estate.",
+      "category": "feature",
+      "title": "Mobile Tap Bottom-Sheet (Character Dossier)",
+      "description": "On mobile/touch devices, tapping a character in the Office floor currently does nothing visible (desktop click routes to Dashboard, but touch users never get a payoff). Implement a swipe-up bottom-sheet that overlays the bottom 55% of the viewport on tap: large CharacterAvatar (56px), name + role badge, current status + 'Working for Xm' duration, task text, and their last 3 activityLog entries as a minimal timeline. Dismiss on backdrop-tap or swipe-down gesture. Detect touch via `window.matchMedia('(pointer: coarse)')` or `ontouchstart` and branch the `onWorkerClick` handler — desktop keeps its dashboard-jump behavior, touch gets the sheet. The sheet needs z-index above the office floor, a semi-transparent backdrop, and a `border-radius: 24px 24px 0 0` entrance animation from the bottom (transform translateY). WHY: On mobile, the office is where most casual observers land — they see little avatars and naturally tap them. Right now that curiosity hits a wall. The bottom-sheet turns a dead interaction into the primary mobile storytelling moment without disrupting desktop UX.",
       "effort": "medium",
-      "assigned_to": "dave"
+      "assigned_to": "maya"
     },
     {
       "priority": "must",
-      "category": "feature",
-      "title": "Worker Dossier Drawer on Click",
-      "description": "The `onWorkerClick` prop already threads through Office.jsx → Character.jsx → App.jsx, but from the UI nothing visible happens when you click a worker. Implement a slide-up panel (bottom 35% of viewport, z-index above floor): large CharacterAvatar, worker name + role badge, current status with human-readable duration (e.g., 'Working for 47 min'), task description, and their last 3 activity log entries as a mini timeline. Dismiss on click-outside or Escape. Props needed are all on the worker object + activityEntries already passed to Office. WHY: The office floor rewards visual curiosity with zero information. People click workers expecting something — right now they get nothing. The dossier is the payoff that turns clicking into a habit.",
-      "effort": "medium",
-      "assigned_to": "sofia"
+      "category": "delight",
+      "title": "Keyboard Shortcut Discovery Toast",
+      "description": "The app has 4 keyboard shortcuts (1 = Office, 2 = Dashboard, R = Refresh, Esc = Blur) that are completely invisible to users. On first visit (gate with `localStorage.getItem('bloberto-shortcuts-shown')`), show a floating toast in the bottom-right corner after a 1.5s delay: '⌨️ Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear'. Style it like a terminal chip — monospace font, dark surface, subtle border, 80% opacity. Auto-dismiss after 7s with a fade-out. On first keypress of any shortcut key, dismiss immediately with a 'Got it ✓' flash. Set localStorage flag on dismiss. WHY: Power features that no one discovers might as well not exist. This toast converts hidden functionality into actual muscle memory for return visitors. It's 20 lines of code and zero dependencies.",
+      "effort": "small",
+      "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Away Sign Floats Above Idle Desks",
-      "description": "When a worker's status is not 'working' and they haven't updated in 10+ minutes, render a tiny sticky-note SVG (12×14px, yellow, slight rotation) floating above their desk monitor. The note text is pulled from a small array seeded by worker ID + Math.floor(idleMinutes / 10), cycling through: '☕ Coffee run', '🧠 Deep think', '📞 On a call', '🚶 Taking a lap', '🥪 Lunch', '🎧 Headphones in'. The note fades in with a 300ms CSS transition and disappears when status returns to working. WHY: Idle desks currently look abandoned — they lose their narrative presence. Away signs maintain the fiction that everyone is still HERE, just momentarily human. It costs zero new data and closes the 'where did Sofia go?' question instantly.",
+      "category": "office-life",
+      "title": "The Door Animates on Worker Arrivals & Exits",
+      "description": "The `office-door` div (bottom center, '🚪 Entrance') is purely decorative — a static emoji and label. It should react to worker events that already fire in App.jsx: when `newIds` gains a new entry (worker arrived), the door plays a 'swing open' CSS keyframe (rotateY 0→-35deg and back, 1.5s ease). When `fadingMap` gains a new entry (worker leaving), play a 'swing out' variant (rotateY 0→-25deg, slower, 2s). Pass a boolean prop like `isDoorOpen` or event-count to Office.jsx, triggered by changes to `newIds.size` and `Object.keys(fadingMap).length`. The door emoji can also briefly change to '🚪✨' on entry. Add a tiny 'ping' notification dot above the door during transition. WHY: Worker arrivals and exits are significant narrative events — the confetti burst fires in the header (far away) but the office floor has no physical reaction at the point of entry. The door is the single most obvious place to anchor that event. Closing this loop makes the floor feel physically connected to the real world.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "dave"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Today's Vibe Ribbon on Dashboard",
-      "description": "Below the Team Vibe indicator on the Dashboard tab, render a 24-slot horizontal ribbon — one slot per hour of the current day (0h–23h). Each slot is a 12×20px rounded rectangle colored by dominant vibe during that hour: purple (crushing), orange (on-fire), teal (in-flow), grey (slow-day), indigo (after-hours), or dark (no data). Store vibe-change events in a `useRef` history array inside App.jsx — whenever getTeamVibe output changes, push `{ vibe, timestamp }`. Derive slot colors from this in-memory log, no API needed. Hover a slot: show a tooltip '2pm · In Flow'. WHY: The vibe badge answers NOW. The ribbon answers TODAY'S ARC — 'was it chaotic this morning before it calmed down?' That's the narrative question every observer actually has, and right now there's no way to answer it.",
-      "effort": "medium",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "office-life",
-      "title": "Printer as Physical Incident Monitor",
-      "description": "The bottom-left corner (left: 3%, top: 75%) currently has a tiny decorative plant. Relocate the plant one grid cell right and place a SVG printer (40×50px) in that corner. States: (1) READY — small green LED dot, label 'READY'; (2) PRINTING — LED blinks, paper feed animation (a white rectangle slides up from paper tray every 3s when a worker is 'working'); (3) JAMMED — triggers when any worker hits 'error' status: printer shakes (CSS keyframe), LED turns orange, crumpled paper emoji pokes out from tray. (4) CLEARED — when error resolves, printer plays a 'job complete' slip animation (green paper ejects and fades). All state derived from workers prop — no new data. WHY: Errors are invisible until you scroll the log. A physical comedic incident indicator turns system state into environmental storytelling. It's the feature that makes people say 'wait, the printer actually responds to errors?'",
-      "effort": "large",
-      "assigned_to": "tbd"
-    },
-    {
-      "priority": "could",
-      "category": "visual",
-      "title": "Coffee Corner Reacts to Team Energy",
-      "description": "The coffee corner already has `data-vibe={vibe}` on its wrapper — but nothing in the CSS actually changes per-vibe. Add 5 CSS rules to Office.css: 'crushing' = steam animation plays fast (2 stacked ::before/::after pseudo-elements drifting upward) + '3 ORDERS' badge; 'slow-day' = emoji switches to 🥶 cold cup via a data-attribute on the emoji span + no steam; 'on-fire' = steam turns red-orange, label becomes 'DECAF??'; 'after-hours' = emoji becomes 🌙, opacity drops to 40%, label 'CLOSED'. This is almost entirely CSS — the vibe attribute is already there, just untapped. WHY: The coffee corner is literally a vibe-aware element that currently looks the same in every state. Closing this loop takes maybe 20 CSS lines and it's the most effortless environmental upgrade available.",
+      "title": "Luna's Permanent OOO Sticky on the Whiteboard",
+      "description": "Luna (the Creative Director) is in `DEFAULT_ROSTER` but never appears as an active worker — she's perpetually a ghost, always reviewing remotely. Right now she's just absent from the floor with zero acknowledgment. Lean into the lore: render a small sticky note SVG pinned to the bottom-right corner of the whiteboard element (or just below it, left wall area). When Luna is NOT in the active workers array (her perpetual state), show the sticky: '🌙 Luna is reviewing remotely. This is intentional.' plus the relative timestamp of her last activityLog entry ('Last seen: 2h ago'). If Luna IS ever active, hide the sticky and render her on the floor normally. The note should use the same `desk-away-sign` visual language — yellow sticky, slight rotation, handwritten-style font. WHY: Luna's invisibility is currently a plot hole. The sticky note transforms it into a recurring in-universe joke and makes the Creative Director's role legible to anyone watching. It also closes the 'where's Luna?' question that any attentive observer would ask.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
-      "priority": "could",
-      "category": "team",
-      "title": "Progress Ring Replaces Status Dot on Dashboard Cards",
-      "description": "Each Dashboard worker card currently shows a status-colored dot (●) next to the status label. Replace this dot with a 28px SVG progress ring: a circle with stroke-dashoffset calculated from the worker's `progress` field (0–100). Color matches role color (WORKER_ROLE_COLORS already defined in App.jsx). During 'working': ring fills clockwise up to progress %. During 'error': ring pulses red with a 1s animation. During 'idle': ring shows progress frozen with reduced opacity. WHY: 'Working' tells you state; a ring tells you HOW FAR. At a glance you see who's 12% in vs 88% done vs just started, and the Dashboard becomes spatially scannable rather than a text read.",
+      "priority": "should",
+      "category": "visual",
+      "title": "Dashboard Duration Heatmap Bar",
+      "description": "Add a horizontal 'time-in-state' visualization between the StatsBar and the worker grid on the Dashboard tab. One row per active worker: left-pinned label (emoji + name), then a horizontal bar whose width is proportional to time elapsed since `updated_at` (cap at 4 hours = 100% width). Color: working = role color with low opacity glow; idle = grey; error = red pulse. Inside each bar, show a right-aligned text label: 'Working 1h 20m' or 'Idle 45m'. Sort rows: errors first, then working (longest first), then idle. All data is already on the workers array — no new fetch needed. WHY: The StatsBar shows COUNTS. Worker cards show CURRENT STATE. Neither answers 'who's been at it the longest?' or 'is anyone overdue for a break?' The duration bar gives that at a glance. It transforms the Dashboard from a status list into a temporal picture of the workday.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Bloberto's 9AM Standup Note",
+      "description": "Every day between 9:00–9:59 AM local time (checked via `new Date().getHours() === 9`), slide a folded sticky note out from behind the whiteboard into the office floor. The note is assembled from activityLog entries over the past 12 hours using a short template: 'Yesterday: [last complete event + worker]. Today: [N] workers online. Blockers: [last error task, or 'none']. — B 🫠'. The note uses a slightly larger sticky SVG (40×50px), pinned to the bottom edge of the whiteboard. Add a matching indicator in the StatsBar: a tiny '📋 standup up' badge that links/scrolls to the whiteboard when clicked. At 10:00 AM, the note fades back behind the whiteboard. On initial load, check the hour and display immediately if still in window. No new data fetch — synthesize from existing activityLog state. WHY: Standup is the most universal ritual in software teams. Bloberto generating his own daily standup from actual data is pure lore and it gives the site a concrete reason to check back at 9am.",
+      "effort": "medium",
+      "assigned_to": "tbd"
+    },
+    {
+      "priority": "could",
+      "category": "feature",
+      "title": "Footer Version Badge → Micro-Changelog Popover",
+      "description": "The footer currently shows 'v1.0.0-chaos' as static text. Make it a clickable chip: on click, open a small popover above it (tooltip-style, max-width 280px, semi-transparent dark surface) listing the last 5 'complete' or 'hire' type entries from activityLog as a pseudo-changelog: '✅ Maya shipped X · 2h ago', '🟢 Carlos onboarded · 1d ago'. Title it '📦 Recent Shipments'. Dismiss on click-outside. This requires zero new data — it's just a filtered view of the existing activityLog already in state. WHY: The footer is wasted space. Converting the version badge into a live changelog popover is a 2-line-of-data trick that makes the footer the most secretly useful spot on the page. It also normalizes checking the activity log for users who don't navigate to the Dashboard tab.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
       "priority": "wild",
       "category": "delight",
-      "title": "The Intercom — Bloberto Broadcasts Live",
-      "description": "Add a small SVG intercom/speaker unit on the left wall just above the whiteboard (left: 3%, top: 45%). Once per session (and whenever vibe changes), the intercom activates: a 'pulsing ring' animation plays on the unit for 2 seconds, then a speech bubble emerges with a procedurally-generated all-hands message built from live data: e.g., '📢 ALL HANDS: Team is 5 strong. Maya's 87% done. Carlos has been heads-down for 2h. Someone check on Dave. This is not a drill.' Message is assembled from workers array + activityEntries with a small sentence template library (~12 templates, no AI). The intercom glyph stays on-wall as a persistent fixture; click it anytime to replay the last broadcast. WHY: The whiteboard has a static vibe-phrase; the intercom creates a NARRATIVE EVENT — something happened, Bloberto noticed, he addressed the floor. It rewards return visitors ('oh something new') and makes the office feel occupied by an actual manager.",
+      "title": "Achievement Badge Pins on Bloberto's Desk",
+      "description": "As the observer watches the office over time, Bloberto's manager desk nameplate area unlocks micro-achievement badge pins — tiny 10px circle glyphs rendered in SVG next to the nameplate. Achievements earned and persisted in `localStorage` under 'bloberto-achievements': 🏅 MARATHON (any worker active 4+ consecutive hours — detectable from `updated_at` delta), 🏅 GHOST TOWN (all workers idle simultaneously — derived from vibe='slow-day' with 0 working), 🏅 HOTFIX HERO (any worker transitions error→working within 5 min — tracked via prev/current worker status diff in the polling diff logic already in App.jsx), 🏅 PERFECT SYNC (all workers simultaneously 'working'), 🏅 NIGHT OWL (any worker active after 22:00 local). Badges render as tiny pins left of the nameplate. Hover on any pin: Bloberto shows a speech bubble with the badge name + a dry Bloberto-voice description. New badge unlock: play the same confetti burst used for vibe improvements + brief badge-pop animation. WHY: Achievements are self-documenting event memory. They make rare states — things observers usually miss — into collectible milestones. They incentivize leaving the tab open and returning, and they quietly document Bloberto's team lore in a way no log ever could.",
       "effort": "large",
       "assigned_to": "tbd"
     }
