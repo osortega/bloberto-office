@@ -1064,8 +1064,11 @@
 
 /* === Mobile Header Fix (Luna Review #41) === */
 @media (max-width: 480px) {
+  .tab-content {
+    padding: 0.5rem 0.25rem;
+  }
   .header {
-    padding: 0.4rem 0.8rem;
+    padding: 0.4rem 0.75rem;
   }
   .tab-toggle {
     margin: 0.3rem 0;
