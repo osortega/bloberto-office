@@ -2015,3 +2015,26 @@
     font-size: 0.25rem;
   }
 }
+
+/* === Idle Micro-Bubbles (Luna Review #41) === */
+.idle-micro-bubble {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.5rem;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 1px 5px;
+  white-space: nowrap;
+  animation: micro-bubble 2.2s ease-out forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+@keyframes micro-bubble {
+  0% { opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.8); }
+  18% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+}

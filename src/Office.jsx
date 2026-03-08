@@ -372,6 +372,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   const [ghostBubble, setGhostBubble] = useState(false)
   const [hovered, setHovered] = useState(false)
   const [justCompleted, setJustCompleted] = useState(false)
+  const [idleBubble, setIdleBubble] = useState(false)
   const timerRef = useRef(null)      // hover auto-hide timeout
   const ambientRef = useRef(null)    // ambient broadcast interval
   const isHoveringRef = useRef(false) // prevents ambient overlap with hover
@@ -383,6 +384,22 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
     if (timerRef.current)  clearTimeout(timerRef.current)
     if (ambientRef.current) clearInterval(ambientRef.current)
   }, [])
+
+  // Idle micro-bubbles — ambient thought emojis for wandering characters
+  const IDLE_BUBBLE_EMOJIS = { 1: '☕', 2: '💬', 3: '🪟', 4: '🧘' }
+  useEffect(() => {
+    if (variant !== 'idle') return
+    const showDelay = 8000 + wanderIdx * 3000
+    const interval = setInterval(() => {
+      setIdleBubble(true)
+      setTimeout(() => setIdleBubble(false), 2200)
+    }, showDelay + 2200)
+    const initialTimeout = setTimeout(() => {
+      setIdleBubble(true)
+      setTimeout(() => setIdleBubble(false), 2200)
+    }, showDelay)
+    return () => { clearInterval(interval); clearTimeout(initialTimeout) }
+  }, [variant, wanderIdx])
 
   // Progress ring 100% burst
   useEffect(() => {
@@ -538,6 +555,9 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
         )}
       </div>
       <div className="char__name">{firstName}</div>
+      {variant === 'idle' && idleBubble && (
+        <div className="idle-micro-bubble">{IDLE_BUBBLE_EMOJIS[wanderIdx] || '💭'}</div>
+      )}
       {variant === 'working' && (
         <div className="typing-dots">
           <span /><span /><span />
