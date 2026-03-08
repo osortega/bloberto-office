@@ -1,17 +1,5 @@
 {
-  "workers": [
-    {
-      "id": "luna-creative-review-27",
-      "name": "Luna",
-      "role": "Creative Director",
-      "emoji": "🎨",
-      "status": "working",
-      "task": "Creative review #27 — reviewing site and writing fresh ideas",
-      "progress": 10,
-      "started": "2026-03-08T01:00:00Z",
-      "updated_at": "2026-03-08T01:00:00Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     { "name": "Maya", "role": "Frontend Engineer", "emoji": "🧩" },
     { "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },

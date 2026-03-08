@@ -1,109 +1,137 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-08T00:50:00Z",
+  "timestamp": "2026-03-08T00:45:51Z",
   "review_number": 36,
   "scores": {
     "visual": 4,
     "ux": 3,
     "responsiveness": 3,
     "performance": 3,
-    "accessibility": 2.5,
-    "code_quality": 3.5,
+    "accessibility": 2,
+    "code_quality": 3,
     "features": 4,
-    "fun_factor": 4.5
+    "fun_factor": 4
   },
-  "overall_score": 3.4,
-  "notes": "Review #36 — code-only review (Puppeteer still blocked by container PID limits). ALL 12 issues from review #35 remain unfixed. No code changes detected since last review. Scores unchanged. Adding one new finding.",
+  "overall_score": 3.25,
+  "notes": "QA #36 — Site confirmed live (HTTP 200). Screenshots attempted via Puppeteer; system thread limits prevented browser launch, referencing QA #29 screenshots as visual baseline. Thorough code review of App.jsx, Office.jsx, Office.css, App.css, and utils/. 10 of 12 issues from Review #35 remain unresolved (one confirmed fix: ActivityLog filtering now done at call site; one new improvement: activity filter is now functional). Five new issues discovered: `w.started` undefined bug in stuck-worker detection, stats-bar 7-card grid overflow, completionToast missing `role=alert`, Office.css characters missing prefers-reduced-motion, and activity-filter-bar using wrong ARIA radio interaction pattern. Accessibility score held at 2 — multiple keyboard-only blockers remain across tags, Office chars, and the stuck-worker stat card. Performance and code quality marginally improve but the `activeWorkers` non-memoization issue, duplicate `getRelativeTime`, and divergent color maps are all still present.",
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "[UNFIXED x2] Keyboard shortcuts '1' and '2' double-encode the hash",
-      "description": "App.jsx line 604-605: `window.location.hash = '#office'` and `'#dashboard'` — the '#' prefix causes the browser to produce `##office` / `##dashboard` in the URL. The hashchange listener slices only 1 '#', so browser back/forward navigation breaks. Fix: remove the '#' prefix. This was first reported in review #34.",
+      "title": "Keyboard shortcut sets ##office double-hash in URL",
+      "description": "In App.jsx (lines 604–605), the keyboard handler does `window.location.hash = '#office'` and `window.location.hash = '#dashboard'`. Assigning a string that already includes '#' to location.hash results in a double-hash (##office) in the URL. The hashchange listener then reads `window.location.hash.slice(1)` → '#office', which fails the equality check against 'office', so browser back/forward does not restore the active tab. Fix: change both keyboard shortcut assignments to use plain strings without '#' prefix — matching the tab-button click handlers on lines 887 and 900 which correctly use `window.location.hash = 'office'`.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "[UNFIXED x2] ProgressBar milestone Set never resets on task restart",
-      "description": "ProgressBar's `milestonesRef = useRef(new Set())` persists across task changes. When a worker finishes (100%) and starts a new task (0%), milestones 25/50/75/100 are already in the Set so flash animations never fire again. Fix: add `useEffect(() => { milestonesRef.current = new Set() }, [worker.task])` or key the component by task.",
+      "title": "ProgressBar milestone Set never resets — flash fires once forever",
+      "description": "In the ProgressBar component (App.jsx ~line 173), `milestonesRef` is `useRef(new Set())`. Milestones (25, 50, 75, 100) are added to the Set when hit but the Set is never cleared. If a worker gets a new task (progress resets to 0), the milestone flashes will never fire again because the Set still contains all previously-seen milestones. Fix: in the useEffect, check if the new progress is lower than the minimum tracked milestone and clear the Set when a task resets (e.g., when `updatedAt` changes and `progress < 25`). Alternatively, key the Set off `updatedAt` using a ref that resets when `updatedAt` changes.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "[UNFIXED x2] Task-tag filter spans are mouse-only",
-      "description": "WorkerCard task tag `<span>` elements have onClick but no `role='button'`, `tabIndex={0}`, or `onKeyDown`. Keyboard users cannot focus or activate them. Screen readers don't know they're interactive.",
+      "title": "task-tag <span> elements are mouse-only — keyboard users cannot filter",
+      "description": "Task-tag spans in WorkerCard (App.jsx lines 278–290) have `onClick` and a `cursor: pointer` style but no `tabIndex`, no `role=\"button\"`, and no `onKeyDown`/`onKeyPress` handler. Keyboard-only users and screen reader users cannot activate tag filters. Fix: add `tabIndex={0}`, `role=\"button\"`, and an `onKeyDown` handler that calls `onTagClick` on Enter/Space. Also add a `focus-visible` outline style in App.css for `.task-tag`.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "[UNFIXED x3] Character divs in Office lack role='button' and onKeyDown",
-      "description": "Office.jsx Character divs use `<div tabIndex={0}>` with onClick but no `role='button'` and no keyboard activation handler (Enter/Space). First reported review #33. This is a WCAG 2.1 AA failure.",
+      "title": "Clickable Character divs in Office.jsx lack role=button",
+      "description": "The Character component in Office.jsx (line 374) renders a `<div>` with `tabIndex={0}` and an `onClick` handler when `onWorkerClick` is provided. Without `role=\"button\"`, screen readers announce it as a generic group element and do not hint that it is interactive. Additionally, there is no `onKeyDown` handler for Enter/Space activation. Fix: when `handleClick` is defined, add `role=\"button\"` to the div and an `onKeyDown` that calls `handleClick` on Enter/Space.",
       "effort": "small"
     },
     {
-      "priority": "medium",
+      "priority": "high",
       "category": "bug",
-      "title": "[UNFIXED x2] ProgressBar ETA uses updated_at instead of started_at",
-      "description": "App.jsx ProgressBar uses `worker.updated_at` (last data sync, ~30s ago) as task start time for ETA calculation, making it nonsensical. Either use `worker.started` (which exists in the data) or remove ETA entirely.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "[UNFIXED x2] activeWorkers computed without useMemo",
-      "description": "App.jsx line 637-639: `activeWorkers` is computed with `.filter()` directly in render body. useTimeTick(60_000) triggers re-renders that recompute this unnecessarily, defeating the downstream `useMemo(() => getTeamVibe(...))`. Wrap in useMemo.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "[UNFIXED x2] ActivityLog time-grouping runs 4 unfiltered passes per render",
-      "description": "ActivityLog `groups` maps over TIME_GROUP_ORDER calling `.filter()` for each label — O(4n) calls to getTimeGroup() every 60s tick. Wrap in useMemo([entries]).",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "[UNFIXED x2] WORKER_ROLE_COLORS keyed by name, not role",
-      "description": "App.jsx defines WORKER_ROLE_COLORS keyed by worker name (only 5 hardcoded). ROLE_COLORS in constants.js keys by role and handles any worker. Drop WORKER_ROLE_COLORS; use ROLE_COLORS[worker.role] in confetti logic.",
+      "title": "w.started is undefined — stuck-worker detection never triggers",
+      "description": "In StatsBar (App.jsx line 345), `stuckWorkers` filters by `w.started` but worker objects have `updated_at`, not `started`. `new Date(undefined).getTime()` returns NaN, making the `> 7_200_000` comparison always false — so the Stuck stat card never appears. Line 400 then calls `formatDuration(stuckWorkers[0].started)` which returns `null` (empty duration label). Fix: replace `w.started` with `w.updated_at` throughout this logic (or whichever field correctly represents when the task began).",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "[UNFIXED x2] completionToast disappears instantly with no exit animation",
-      "description": "The completion toast has a nice entry animation but vanishes abruptly after 3000ms. Add a fade-out transition before nullifying state.",
+      "title": "ETA calculation uses updated_at instead of task start — produces nonsense",
+      "description": "ProgressBar (App.jsx line 190): `workingMs = Date.now() - new Date(updatedAt)` where `updatedAt` is the last progress update time, not when the task started. If progress is static for hours (e.g., stuck at 60%), `workingMins` grows but `progress` stays fixed, causing the estimated minutes remaining to grow without bound rather than converge. Fix: either remove the ETA display entirely, or require a `startedAt` field from the worker data to compute a meaningful velocity-based estimate.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "activeWorkers not memoized — 5+ useEffect hooks re-run on every render",
+      "description": "In App.jsx (line 637), `activeWorkers` is computed with a plain `.filter()` call, creating a new array reference on every render. Five downstream `useEffect` hooks (lines 644, 707, 728, 746, 770+) and multiple child components receive this as a prop, causing unnecessary re-renders and effect re-executions even when worker data hasn't changed. Fix: wrap in `useMemo`: `const activeWorkers = useMemo(() => allWorkers.filter(w => w.status === 'working' || w.status === 'idle' || w.status === 'error'), [allWorkers])`.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "[UNFIXED x2] Stuck worker stat card is keyboard-inaccessible",
-      "description": "StatsBar stuck worker card has onClick but no tabIndex, role, or onKeyDown. Also uses document.querySelector for scrolling — fragile in React. Add keyboard support and use refs.",
+      "title": "Stuck-worker stat card clickable but not keyboard-accessible",
+      "description": "The Stuck stat card in StatsBar (App.jsx lines 389–404) has an `onClick` handler that scrolls to the stuck worker card, but no `tabIndex`, no `role`, and no `onKeyDown` handler. Keyboard users cannot activate it. Fix: add `tabIndex={0}`, `role=\"button\"`, `aria-label` (e.g., `Scroll to stuck worker: ${stuckWorkers[0].name}`), and an `onKeyDown` handler for Enter/Space.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "completionToast disappears instantly — no exit animation",
+      "description": "The completion toast (App.jsx lines 807–831) has a bounce-in animation (`badge-pop`) but vanishes abruptly when `setTimeout(() => setCompletionToast(null), 3000)` fires. There's no fade-out or slide-out. Fix: use a CSS class-based approach — render the toast with an `is-exiting` class added ~300ms before removal, apply a fade/slide-out keyframe to that class, then remove after the animation completes.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Activity filter bar ARIA radio pattern is broken — no arrow-key navigation",
+      "description": "The filter bar (App.jsx lines 988–1004) uses `role=\"radiogroup\"` on the container and `role=\"radio\"` / `aria-checked` on buttons, but the ARIA radio group pattern requires arrow keys to move focus between options (not Tab). Currently Tab visits each button individually — wrong for a radio group. There's also no `name` attribute on the pseudo-radios. Fix: implement roving tabindex (only active button gets tabIndex=0, others get -1) and add `onKeyDown` arrow navigation within the group — or switch to actual `<input type=\"radio\">` elements styled to match the current pill look.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "completionToast uses aria-live=polite — should be role=alert for immediate announcement",
+      "description": "The completion toast (App.jsx line 809) uses `aria-live=\"polite\"`, which delays screen reader announcements until the current interaction is idle. For a transient notification celebrating task completion, this means the user may miss it entirely. Fix: change to `role=\"alert\"` (which implies `aria-live=\"assertive\"`) so screen readers announce it immediately on insertion.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Stats bar 5-column grid breaks with 7 cards (error + stuck both visible)",
+      "description": "The `.stats-bar` CSS (App.css line 118) defines `grid-template-columns: repeat(5, 1fr)` for the default 5 cards (Total, Active, Idle, Sync, Vibe). When both the error card AND the stuck card appear simultaneously, there are 7 cards total, causing the 7th to be narrower or to overflow unexpectedly on mobile breakpoints. Fix: change to `repeat(auto-fill, minmax(130px, 1fr))` or explicitly handle 6 and 7-card layouts in CSS.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "WORKER_ROLE_COLORS in App.jsx keyed by worker name — diverges from ROLE_COLORS keyed by role",
+      "description": "App.jsx (line 14) defines `WORKER_ROLE_COLORS` as `{ Maya: '#a855f7', Carlos: '#3b82f6', ... }` — keyed by name. `ROLE_COLORS` in constants.js is keyed by role string (e.g., `'Frontend Engineer': '#a78bfa'`). These two maps assign different colors for the same workers and are used in different places (confetti coloring vs card accent). The divergence creates visual inconsistency: confetti for Maya uses `#a855f7` but her card uses `#a78bfa`. Fix: either derive `WORKER_ROLE_COLORS` from `ROLE_COLORS` via the worker's role field, or consolidate to a single source of truth.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[UNFIXED x2] getRelativeTime duplicated between App.jsx and Office.jsx",
-      "description": "Identical time formatting logic exists in both files. Extract to src/utils/time.js.",
+      "title": "getRelativeTime duplicated — defined in App.jsx and inlined in Office.jsx ghost bubble",
+      "description": "App.jsx defines `getRelativeTime` at line 34. Office.jsx (lines 394–403) inlines an identical relative-time calculation inside the ghost bubble IIFE rather than importing the shared function. Fix: move `getRelativeTime` to `utils/time.js` (or similar), export it, and import it in both App.jsx and Office.jsx.",
       "effort": "small"
     },
     {
       "priority": "low",
-      "category": "responsiveness",
-      "title": "[UNFIXED x2] Office floor crushes characters below ~360px viewport",
-      "description": "No media query addresses office view at very narrow widths. Characters, nameplates, and speech bubbles overlap and clip.",
+      "category": "accessibility",
+      "title": "Office.css character animations missing prefers-reduced-motion guard",
+      "description": "App.css (line 886) has a `@media (prefers-reduced-motion: reduce)` block that disables card/shimmer animations, but Office.css has no equivalent. Animations defined in Office.css (enter-office, char-bob, wander-1 through wander-4, char-glitch, fade-in-char, deep-work-pulse) will still run for users who have requested reduced motion. Fix: add a `@media (prefers-reduced-motion: reduce)` block to Office.css that sets `animation: none !important` on `.char`, `.char--working`, `.char--idle`, `.char--glitch`, and related elements.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Office floor has no 360px breakpoint — characters and text become illegible",
+      "description": "The smallest CSS breakpoint in App.css is 420px. At 360px viewports (common on budget Android devices), the office floor (900px max-width, aspect-ratio 4/3) scales down to ~340px wide and ~255px tall. SVG avatars at 36–44px become pinhead-sized, desk nameplates are unreadable, and the whiteboard text overflows. Fix: add a `@media (max-width: 380px)` block in Office.css that increases font sizes for `.office-sign`, `.desk__nameplate`, and `.mgr-desk__nameplate`, and reduces avatar sizes via a CSS custom property.",
       "effort": "medium"
     },
     {
-      "priority": "medium",
-      "category": "bug",
-      "title": "[NEW] ProgressBar uses updatedAt prop but should use worker.started for duration",
-      "description": "ProgressBar receives `updatedAt={worker.updated_at}` but the ETA calc needs task start time. The worker object has a `started` field that contains the actual task start timestamp. The ProgressBar component should receive `startedAt={worker.started}` instead. This is a data plumbing bug — the wrong field is being passed down.",
+      "priority": "low",
+      "category": "ux",
+      "title": "WorkerCard outer div has tabIndex=0 with role=article — creates confusing double tab stop",
+      "description": "WorkerCard (App.jsx line 250) renders a `<div tabIndex={0} role=\"article\">` wrapper. The article itself is not interactive — the ℹ️ flip button inside it handles the main interaction. Having the outer container in the tab order creates a meaningless focus stop that announces as 'article' with no obvious action. Fix: remove `tabIndex={0}` from the outer wrapper (it will still receive focus via keyboard via the inner buttons). If the intent is to allow scrollIntoView on focus, use programmatic `.focus()` on the inner button instead.",
       "effort": "small"
     }
   ]

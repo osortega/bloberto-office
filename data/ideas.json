@@ -1,64 +1,64 @@
 {
   "creative_director": "Luna",
-  "review_number": 26,
-  "timestamp": "2026-03-08T00:30:00Z",
-  "theme": "Ambient Intelligence — The Office That Notices You",
+  "review_number": 27,
+  "timestamp": "2026-03-08T01:00:00Z",
+  "theme": "The Office Has Memory — Moments That Leave a Mark",
   "ideas": [
     {
       "priority": "must",
       "category": "office-life",
-      "title": "Idle Workers Wander the Office",
-      "description": "Right now idle workers sit at their desks doing nothing — they're assigned a desk slot just like working workers. When a worker is idle, instead of parking them at a desk, give them a slow CSS wander animation. Add a new div 'wanderer' that floats around the office floor with a gentle random drift using CSS keyframes (translateX/Y with 20-30s duration, different delays per worker). Show their avatar at 70% opacity with a thought bubble ('💭 thinking...', '☕ brb', '📱 scrolling'). This makes the office feel alive even when nobody's shipping — you can SEE who's between tasks vs who's grinding. WHY: The biggest visual gap right now is that idle workers are invisible (they're just ghost desks). Making them wander creates ambient life and a clear visual distinction between 'working at desk' and 'taking a break'.",
-      "effort": "medium",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "delight",
-      "title": "Confetti Particles Match Worker's Role Color",
-      "description": "The completion confetti (App.jsx) currently uses a fixed color palette. When a worker completes a task, the confetti should use that worker's WORKER_ROLE_COLORS value as the dominant color (60% of particles), with white and gold as accent (20% each). Pass the completing worker's name to the confetti generator and look up their color. This is a 5-line change in the confetti spawn logic. WHY: Right now all completions feel the same. When Maya ships and purple confetti flies, vs Dave shipping with orange confetti, each completion has identity. You can tell WHO just shipped without reading anything.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "storytelling",
-      "title": "Office Ambient Sound Layer (Optional Toggle)",
-      "description": "Add a tiny speaker icon in the corner (🔇/🔊) that toggles ambient office sounds. Use the Web Audio API to generate simple procedural audio: soft white noise filtered to sound like air conditioning, occasional soft 'click' sounds (keyboard), and a gentle chime on task completion. No audio files needed — all procedural via OscillatorNode and filtered noise. Default OFF (muted). Store preference in localStorage. WHY: Sound transforms passive watching into immersive presence. Even at very low volume, ambient office noise makes the dashboard feel like a real place you're visiting. The procedural approach means zero payload increase.",
-      "effort": "medium",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "feature",
-      "title": "Mini Timeline Bar Below Office Floor",
-      "description": "Add a thin horizontal bar (height: 6px) below the office floor that shows the last 24 hours of activity as colored segments. Each completed task is a small colored block (worker's role color) plotted by timestamp on a 24h timeline. Errors are red dots. Gaps are transparent. Build from activityEntries already available as a prop. Render as a single div with positioned child spans. On hover, show a tooltip with the task details. WHY: The activity log is text and requires scrolling. A timeline gives an instant visual answer to 'how busy was the office today?' — a single glance shows if the team shipped 2 things or 20. It's the kind of data visualization that makes people keep the tab open.",
+      "title": "Standup Circle — Meeting Mode",
+      "description": "Add a 'Standup' trigger (manual button or time-based, e.g. 9:55 AM) that temporarily pulls all worker avatars off their desks and arranges them in a small circle in the center of the office floor. Each avatar faces inward. A 'talking stick' (tiny microphone emoji) rotates clockwise around the circle every 8 seconds. After 90 seconds (or manual dismiss), everyone returns to their desks with a slide animation. Build as a separate office layout mode passed as a prop: officeMode: 'standup' | 'work'. WHY: Standups are the ritual heartbeat of any dev team. Visualizing them makes the dashboard feel like it tracks team rhythms, not just task throughput. It also creates an obvious, shareable moment — a screenshot of your team in standup circle is immediately recognizable and fun.",
       "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "visual",
-      "title": "Pulsing Glow on Active Desks",
-      "description": "Working desks have class 'desk--active' but the only visual signal is the lamp and the character. Add a subtle pulsing glow ring around active desks using box-shadow with the worker's --role-color CSS variable (already set on the desk element). Use @keyframes desk-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(var(--role-color-rgb), 0.3) } 50% { box-shadow: 0 0 8px 3px rgba(var(--role-color-rgb), 0.15) } } with a slow 3s infinite animation. This creates a breathing effect that makes active desks stand out without being distracting. WHY: The office floor is hard to scan quickly. A gentle pulse on active desks creates an immediate visual hierarchy — your eye goes to where work is happening.",
+      "title": "Growing Office Plant Tracks Vibe Streak",
+      "description": "Place a small potted plant (pure CSS, using border-radius and gradients — no images) in the bottom corner of the office floor. The plant has 5 growth stages rendered as CSS classes: seedling → sprout → small plant → leafy → blooming. It advances one stage for every 5-unit increase in vibe streak (using the existing vibeStreak state). If the streak resets to 0, the plant wilts (drooping leaves CSS transform) and slowly recovers over 60 seconds rather than snapping back. On hover: 'Fern the office ficus. Growing with your momentum.' WHY: Streaks are abstract numbers. A plant externalizes the streak as something organic and alive — you feel the loss of a reset more when you see the plant droop. It also rewards consistent performance with a visible flourishing office environment.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "should",
+      "category": "delight",
+      "title": "High-Five Spark Between Back-to-Back Completions",
+      "description": "When two different workers both complete a task within 30 seconds of each other, render a brief SVG lightning arc (a curved, animated stroke) between their two desk positions on the office floor. The arc appears over 300ms, glows for 500ms, then fades. The color is a blend of both workers' role colors. Track last-completion timestamp per worker in a ref; on each new completion, check if any other worker completed within the 30s window. WHY: Simultaneous shipping is a team moment, not two individual moments. A visual connection between workers who are 'in sync' creates the feeling of a collaborative flow state that text logs completely miss. It's also a subtle, beautiful reward for coordinated work.",
+      "effort": "medium",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Error Weather: Rain on the Office Window",
+      "description": "The existing day/night window background is static. Wire it to recent error rate: when errors per minute exceed a threshold (e.g. 2+ errors in 5 minutes), CSS-animated rain drops appear on the window (vertical lines falling at varying speeds and opacities, pure CSS). Heavy error rate = heavy rain. Zero errors for 5 minutes = rain fades and sun or stars reappear. Implement as a separate WeatherLayer component that reads a derived errorIntensity prop (0–1 scale). WHY: Error spikes are anxiety-inducing. Externalizing that anxiety as weather is psychologically smart — it acknowledges the storm without alarming anyone, and it provides an ambient signal that something needs attention without a red alert. When the rain clears, the relief is palpable.",
+      "effort": "medium",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Ghost Desk for Long-Idle Workers",
+      "description": "When a worker slot has had no activity (no task start, no completion, no error) for more than 15 minutes, replace their character sprite with a semi-transparent ghostly silhouette at 25% opacity with a slow float animation (translateY ±4px, 4s ease-in-out). A small tooltip on hover: 'Last seen X minutes ago.' When they become active again, the ghost dissolves in a ripple effect and the full-color character reappears. WHY: Right now a long-idle worker looks exactly like a worker mid-task. Ghost desks communicate absence without a disruptive alert — it's a compassionate, ambient signal that lets the team notice without calling anyone out.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Keyboard Shortcut: Press 1-6 to Focus Worker Cards",
-      "description": "Add a keydown listener on the document: pressing 1-6 focuses the corresponding worker card (scrolls to it, applies the existing worker-card--focused class). Press Escape to clear focus. Press 'o' to toggle between Office and Dashboard tabs. This costs almost nothing to implement and gives power users a way to navigate without clicking. Show a tiny '?' icon in the header that reveals the shortcuts on hover. WHY: Anyone who leaves this dashboard open all day is a power user. Keyboard shortcuts are the love language of power users.",
+      "title": "Session XP Badges on Worker Cards",
+      "description": "Track a per-session completion count per worker in a sessionStorage map (reset on page reload). Display a small badge pill on each worker card: '✦ 3', '✦ 10', etc. At milestone counts (5, 10, 25, 50), the badge briefly animates (scale bounce + color flash in the worker's role color) and the milestone number is bold. Badge is hidden at 0. Persist only for the current browser session — this is a 'today's score', not a permanent leaderboard. WHY: Task completions are the atomic unit of team output but they vanish into the log. A live session badge makes each worker's contribution visible at a glance, creates friendly competition, and gives a satisfying sense of accumulation during long sessions.",
       "effort": "small",
-      "assigned_to": "sofia"
+      "assigned_to": "carlos"
     },
     {
       "priority": "wild",
       "category": "office-life",
-      "title": "Office Pet: A Cat That Walks Across Desks",
-      "description": "Add a tiny pixel-art cat (pure CSS, 12x8px) that slowly walks across the office floor on a randomized path. It uses CSS animations with a 60-second loop, moving between desk positions. When it reaches a working character, it 'sits' for 10 seconds (swap to sitting sprite). The cat appears only when the team vibe is 'in-flow' or 'crushing' — when the vibe is 'on-fire', the cat hides under a desk. Give it a name (Pixel) and a hover tooltip: 'Pixel the office cat. Morale officer.' WHY: Every great office has an unofficial mascot. A cat that reacts to team vibe is pure delight — it gives visitors something to watch during quiet moments and creates emergent narratives ('oh the cat is hiding, things must be intense'). It's the feature people would screenshot and share.",
+      "title": "Code Red — Multi-Error Panic Mode",
+      "description": "When 3 or more workers hit errors within a 60-second window, trigger a 10-second 'Code Red' state: the office floor background pulses with a very subtle red tint (max opacity 0.08, 3 slow pulses), all character avatars display a tiny 🚨 badge, and a banner appears at the top: 'The team is in the weeds. Ship something.' The state auto-dismisses after 10 seconds or when any worker completes a task, whichever comes first. Dismissal triggers a brief green flash. Respect the existing reducedMotion flag — in reduced motion mode, just show the banner with no pulses. WHY: Coordinated failure is qualitatively different from individual failure. When the whole team is erroring at once, something systemic is wrong — a bad deploy, a flaky dependency, a blocked queue. Code Red names that moment explicitly and creates urgency without a Slack ping. The 'ship something' prompt is a gentle, gamified nudge toward resolution.",
       "effort": "medium",
-      "assigned_to": "tbd"
+      "assigned_to": "sofia"
     }
   ],
   "hire_proposals": []
