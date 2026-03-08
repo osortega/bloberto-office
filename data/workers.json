@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T08:07:00Z",
+  "lastUpdated": "2026-03-08T08:08:00Z",
   "workers": [
     {
       "name": "Carlos",
@@ -49,12 +49,12 @@
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
-      "status": "idle",
-      "task": "Shipped: Desk Monitor Cursor Blink + Character Click Sonar Ping",
-      "startedAt": "2026-03-08T07:35:00Z",
+      "status": "working",
+      "task": "Chalk-erase transition + Window vibe tint",
+      "startedAt": "2026-03-08T08:08:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T07:40:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T08:08:00Z",
+      "progress": 5
     }
   ],
   "roster": [
