@@ -1,114 +1,106 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-08T03:15:00Z",
-  "review_number": 4,
+  "reviewNumber": 5,
+  "timestamp": "2026-03-08T03:55:00Z",
   "scores": {
     "visual": 4,
-    "ux": 3,
+    "ux": 4,
     "responsiveness": 3,
     "performance": 3,
     "accessibility": 3,
-    "code_quality": 3,
+    "codeQuality": 3,
     "features": 4,
-    "fun_factor": 5
+    "funFactor": 5
   },
-  "overall_score": 3.5,
+  "overall_score": 3.6,
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "vibeStreak prop never passed to Office \u2014 fern permanently stuck as seedling",
-      "description": "App.jsx line 1043 renders <Office> without a vibeStreak prop. Office.jsx defaults vibeStreak to 0, so plantStage is always plantStageNames[0] = 'seedling'. The fern never grows regardless of streak length. Fix: add vibeStreak={vibeStreak} to the Office call.",
+      "category": "performance",
+      "title": "Inline style object in completionToast creates new object every render",
+      "description": "The completionToast notification in App.jsx uses a massive inline style={{...}} object directly in JSX. This creates a new object reference every render cycle, defeating React.memo and causing unnecessary re-renders of the entire App tree. Extract to a CSS class or useMemo the style object.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assignee": "Maya"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "workers.json missing roster key \u2014 worker filter bar shows only 'All Workers'",
-      "description": "syncFromGitHub sets roster = data.roster ?? []. workers.json has no roster key, so roster state is always []. Dashboard worker filter bar renders {roster.map(...)} producing zero buttons. Individual worker filtering is completely broken. Fix: add a roster array to workers.json, or derive it from DEFAULT_ROSTER when data.roster is absent.",
+      "category": "code",
+      "title": "vibeStreak prop not passed to Office component",
+      "description": "App.jsx computes vibeStreak state but the <Office> component receives it as a prop for the Fern plant growth stages. Need to verify the prop is actually being passed — grep shows it IS passed, but the plant stage calculation uses Math.floor(vibeStreak / 5) which means the plant won't grow past seedling until streak=5. Consider lowering the threshold so users see growth sooner.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assignee": "Maya"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "VibeSparkline clips 'Crushing It' dot \u2014 top circle overflows SVG viewBox",
-      "description": "y = 12 - rank * 2.5. For 'crushing' (rank 4), y=2 and r=3, so the circle top edge is at y=-1 \u2014 outside the viewBox '0 0 64 14'. The highest-rank dot is half-clipped. Fix: change scale to y = 11 - rank * 1.8, mapping ranks 0\u219211 through 4\u21923.8, all safely inside the viewBox.",
-      "effort": "small",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "VibeSparkline shows stale history \u2014 only refreshes when vibe key changes",
-      "description": "StatsBar reads localStorage in a useEffect([vibe.key]). If the team stays on the same vibe for 10 poll cycles, App.jsx writes 10 new entries to localStorage but StatsBar never re-reads. The sparkline stays frozen at the first-load snapshot. Fix: lift vibeHistory state up to App.jsx and pass it as a prop to StatsBar, eliminating the stale localStorage read.",
+      "category": "accessibility",
+      "title": "Tab panel switching lacks ARIA live region announcement",
+      "description": "When switching between Office and Dashboard tabs, screen readers get no announcement that content has changed. The tabpanel containers should have aria-live='polite' or use a visually hidden status message to announce the switch. Also, the tab role buttons don't manage focus correctly — after arrow key navigation, focus should move to the newly selected tab.",
       "effort": "medium",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Coffee Corner chatting badge fires on any 2+ idle workers regardless of floor position",
-      "description": "coffee-corner--chatting activates when idleWorkers.length >= 2. But idle workers wander the entire floor \u2014 they may be at desks or by the window. The badge shows 'chatting' on a slow day even when workers are visually scattered. Fix: define a subset of idle workers as 'at coffee' (e.g. those with wander variant 1) and pass that count to the coffee corner block.",
-      "effort": "medium",
-      "assigned_to": "Maya"
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "useTimeTick fires every 60s in hidden tabs \u2014 wasteful re-renders while user is away",
-      "description": "useTimeTick(60_000) runs setTick unconditionally, re-rendering the full app tree to refresh relative timestamps on a tab nobody is watching. The main poll loop already respects document.visibilityState. Fix: skip setTick when document.hidden is true inside the interval callback.",
-      "effort": "small",
-      "assigned_to": "Dave"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Coffee Corner chatting badge shows no names \u2014 anonymous label misses the delight opportunity",
-      "description": "When chatting is active the corner shows '\u2615 chatting' but nothing identifies who is there. Workers are visually scattered on the floor, not clustered at the corner. A tooltip or subtitle listing idle worker first names (e.g. 'Luna & Dave are here') would complete the feature and give it informational value. Fix: pass idleWorkers to the corner block and render their names in a title attribute or subtitle span.",
-      "effort": "small",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Two confetti layers can stack simultaneously \u2014 60 animated spans cover the entire UI",
-      "description": "confettiActive (vibe rank increase) and workerConfetti (task shipped) are independent flags. When both trigger in the same poll cycle, 60 confetti spans render simultaneously, burying the completion toast and creating visual chaos. Fix: queue confetti so only one fires at a time, or merge both into a single confetti state with priority (worker > vibe).",
+      "title": "useTimeTick(60000) causes full App re-render every minute",
+      "description": "The useTimeTick hook in App.jsx increments a counter every 60s to keep relative timestamps fresh. But since it's called at the App level, it forces the ENTIRE component tree to re-render every minute — including Office, all WorkerCards, StatsBar, etc. Move this hook into individual components that display relative times (ActivityLogEntry, WorkerCard duration) or use a context provider with selective subscriptions.",
       "effort": "medium",
-      "assigned_to": "Maya"
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "VibeSparkline SVG missing role='img' \u2014 screen readers announce raw circle elements",
-      "description": "The SVG has aria-label='Vibe history' but no role='img'. Without role='img', JAWS and older NVDA skip the aria-label and read individual circle elements instead. Fix: add role='img' to the SVG and extend the aria-label to include current vibe and data point count, e.g. 'Vibe history: 8 data points, currently Crushing It'.",
+      "category": "bug",
+      "title": "vibe history localStorage race condition",
+      "description": "In App.jsx, vibeHistory is read from localStorage in StatsBar's useEffect AND written in App's useEffect. Both fire on teamVibe.key change. The StatsBar read can get stale data if App's write hasn't flushed yet. Consolidate vibe history management into one place (App) and pass the array down as a prop.",
+      "effort": "medium",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Mobile viewport: character names hidden but no alternative identification",
+      "description": "At ≤480px, .char__name { display: none } hides character names in the office view. But there's no alternative way to identify who's who — the avatars are tiny and hard to distinguish. Consider showing a single-letter badge or keeping names visible at a smaller font size instead of hiding them entirely.",
       "effort": "small",
-      "assigned_to": "Maya"
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "ROLE_EMOJIS in constants.js has 'QA Engineer' but Sofia's role is 'QA & Product Analyst'",
+      "description": "Sofia's role string in workers.json is 'QA & Product Analyst' but ROLE_EMOJIS and ROLE_COLORS only have 'QA Engineer'. This means Sofia gets the fallback emoji (🤖) and default gray color (#6b7280) in the dashboard WorkerCards. Add 'QA & Product Analyst' to both maps, or normalize the role string.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "AwaySign component recalculates message on every render",
+      "description": "AwaySign selects its message using Math.floor(idleMinutes / 10) which changes every 10 minutes — fine. But the component is re-rendered every time the parent desk re-renders (every poll cycle). The string splitting logic (reduce for line1/line2) runs unnecessarily. Wrap in React.memo or useMemo the computed values.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Conference table positioned at left:38% with translate(-50%) — visually off-center",
+      "description": "The CSS for .conference-table uses left:38% + transform:translate(-50%,-50%). This positions the table's center at 38% from the left, which is noticeably left-of-center. Should be left:50% for true centering, or adjust to ~45% if intentionally offset to avoid the door.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "Workers with status 'done' vanish silently \u2014 no shipped-today summary anywhere",
-      "description": "activeWorkers filters to only working/idle/error. A done worker disappears from the office floor, workers grid, and StatsBar counts. There is no 'Shipped Today' tally. The activity log has completion events but no at-a-glance summary. Fix: add a done count to StatsBar and optionally a collapsed 'Shipped Today' section in the workers grid with greyed-out done cards.",
-      "effort": "medium",
-      "assigned_to": "Maya"
+      "title": "No favicon fallback for light theme",
+      "description": "The dynamic favicon generation uses solid colors on a transparent canvas. In light browser themes, the grey idle state (#9ca3af) can be hard to see against the tab bar. Add a subtle dark ring/border to the favicon circle for contrast.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "completionToast still uses 12 inline style declarations \u2014 CSS-class conversion still pending",
-      "description": "The completion toast in App.jsx renders with fully hardcoded inline styles (position, border, padding, fontSize, zIndex, animation, etc). Flagged in review 3, still not fixed. Cannot be themed via CSS variables or overridden in App.css. Fix: move to a .completion-toast class; keep only the dynamic border color as an inline style or --toast-color CSS variable.",
+      "title": "Dead CSS selectors referencing old class names",
+      "description": "Office.css has selectors for .office-worker, .office-worker--ghost, .office-worker--manager, and .worker-standby inside the prefers-reduced-motion block, but these classes don't exist anywhere in the JSX — the actual classes are .char, .char--ghost, .char--manager. These dead selectors should be cleaned up.",
       "effort": "small",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "Poll loop recreates setInterval on every visibilitychange \u2014 minor timer churn",
-      "description": "handleVisibilityChange calls clearInterval + setInterval on every visibility toggle. Rapid alt-tabs create/destroy multiple timers in quick succession. getInterval() is also only evaluated at interval-creation time, not dynamically. Fix: use a single interval; read document.visibilityState inside pollTick itself to decide whether to skip or adjust behavior.",
-      "effort": "small",
-      "assigned_to": "Dave"
+      "assignee": "Maya"
     }
   ]
 }
