@@ -1,106 +1,144 @@
 {
   "analyst": "Sofia",
-  "review_number": 18,
-  "timestamp": "2026-03-08T13:18:00Z",
+  "review_number": 19,
+  "timestamp": "2026-03-08T13:45:48Z",
   "scores": {
     "visual": 4,
-    "ux": 4,
+    "ux": 3,
     "responsiveness": 3,
     "performance": 3,
     "accessibility": 3,
-    "code_quality": 4,
+    "code_quality": 3,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.8,
-  "previous_score": 3.7,
-  "trend": "up",
+  "overall_score": 3.5,
+  "previous_score": 3.9,
+  "trend": "down",
+  "screenshot_desktop": "screenshot-qa19-desktop.png",
+  "screenshot_mobile": "screenshot-qa19-mobile.png",
+  "carries_unresolved": {
+    "shortcut_toast_mobile": "NOT FIXED — ShortcutToast is visible in the mobile screenshot (375x812), bottom of screen, keyboard hints rendered for touch users. This was HIGH priority in review #18. No CSS media query guard has been added.",
+    "completion_toast_aria_live": "NOT FIXED — completionToast still conditionally mounts/unmounts the aria-live div (App.jsx line 945-969). Screen readers will not announce it. Same code, same bug.",
+    "office_jsx_monolith": "MADE WORSE — Office.jsx grew from ~1190 to 1218 lines. The file is moving in the wrong direction. No components were extracted.",
+    "stable_activity_log_noop": "NOT FIXED — stableActivityLog = useMemo(() => activityLog, [activityLog]) still exists at line 759. Same no-op.",
+    "workercard_memo_defeated": "NOT FIXED — activityEntries={stableActivityLog} still passed to every WorkerCard. stableActivityLog changes every 30s poll, defeating React.memo on all cards simultaneously."
+  },
   "suggestions": [
     {
       "priority": "high",
-      "category": "performance",
-      "title": "Office.jsx is a 1200-line monolith — split into sub-components",
-      "description": "Office.jsx contains Character, CharacterAvatar, ConferenceTable, WindowElement, WallClock, AwaySign, VibeShockwave all in one file. This makes it harder to maintain and causes unnecessary re-renders. Split into separate files under src/components/. CharacterAvatar alone is ~200 lines of SVG that never changes.",
-      "effort": "medium"
+      "category": "bug",
+      "title": "ShortcutToast STILL renders on mobile — four reviews in, no excuse",
+      "description": "Confirmed via screenshot: the shortcut toast '⌨️ Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear' is visible on the 375px mobile view, overlapping the footer. This was flagged HIGH in review #18. The fix is a one-liner in App.css: `@media (hover: none) and (pointer: coarse) { .shortcut-toast { display: none; } }`. If someone is blocking this, they need to explain why, because there is no good reason.",
+      "effort": "small",
+      "assigned_to": "Maya"
     },
     {
       "priority": "high",
+      "category": "bug",
+      "title": "completionToast aria-live antipattern still present — silent failure for screen readers",
+      "description": "App.jsx lines 945–969: `{completionToast && <div aria-live='polite'>...}` mounts and unmounts conditionally. Screen readers only observe *changes* to persistent aria-live containers; a newly-mounted element will not be announced in most SRs. This was flagged HIGH in review #18 and is still unaddressed. Fix: keep a permanent `<div aria-live='polite' className='sr-only'>` at the app root, update its text content when completionToast changes, clear it when null. Visual toast can remain conditional. This is a real accessibility regression, not a style preference.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "Office.jsx grew to 1218 lines — wrong direction",
+      "description": "Office.jsx was ~1190 lines in review #18. It is now 1218 lines. The recommendation was to split CharacterAvatar, WallClock, and ConferenceTable into separate files under src/components/. Instead, the file got bigger. CharacterAvatar alone is ~250 lines of static SVG data that will never re-render per-vibe. WallClock is a 60s-interval widget completely independent of everything else. These are easy, low-risk splits. At this size, debugging requires scrolling hundreds of lines to find anything.",
+      "effort": "medium",
+      "assigned_to": "unassigned"
+    },
+    {
+      "priority": "high",
+      "category": "performance",
+      "title": "WorkerCard React.memo still defeated every 30-second poll",
+      "description": "stableActivityLog (App.jsx line 759) is `useMemo(() => activityLog, [activityLog])` — this produces a new reference every time activityLog changes. activityLog changes on every successful poll (every 30s). Every WorkerCard receives `activityEntries={stableActivityLog}` and React.memo bails out on prop equality, re-rendering all cards in sync every 30 seconds. The memo does literally nothing. Fix option A: remove stableActivityLog entirely and pass activityLog directly (same behavior, less confusion). Fix option B: if stability is actually desired, gate it by length — `useMemo(() => activityLog, [activityLog.length])` — so cards only re-render when new entries arrive, not on every reference swap.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Ghost characters are keyboard-focusable but non-interactive — accessibility trap",
+      "description": "Office.jsx line 508: every Character div gets `tabIndex={0}` unconditionally, including ghost variant characters (OOO roster members). Ghost chars have no onClick handler — pressing Enter or Space does nothing. A keyboard user tabbing through the office floor will land on ghost characters, hear no indication of interactivity, and be confused. Fix: only set `tabIndex={0}` when the character is interactive (`tabIndex={handleClick ? 0 : -1}`), or at minimum add a visible keyboard hint for ghost characters.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "activityLogLenRef is dead code — set but never read",
+      "description": "App.jsx lines 758–760: `const activityLogLenRef = useRef(0)` followed by `useEffect(() => { activityLogLenRef.current = activityLog.length }, [activityLog.length])`. This ref is never read anywhere else in the file. It's a leftover from a previous implementation. Delete it. Dead code in a file this large adds cognitive noise.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Duplicate inline toast style objects — extract to CSS class",
+      "description": "App.jsx has two nearly identical inline style objects: the `plantToast` (lines 918–942) and `completionToast` (lines 945–969). Both are fixed-position, centered, same border-radius, same padding, same font-size, same boxShadow pattern, same zIndex 9999, same animation. The only differences are border color and message. Extract a reusable `.toast-popup` CSS class in App.css. Inline styles on dynamic elements bypass CSS caching and make theming harder — light mode overrides can't touch inline styles.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Wander animation classes cap at 4 — 5th+ idle worker gets class collision",
+      "description": "Office.jsx line 1133: `const wIdx = (i % 4) + 1`, so idle workers get class `char--wander-1` through `char--wander-4`. If 5 or more workers are idle simultaneously, workers 5+ share wander classes with workers 1+, producing identical movement paths and IDLE_BUBBLE_EMOJIS. The roster has 5 non-manager members; all-idle is achievable. Fix: define at least one more wander keyframe set (`char--wander-5`) or use a lookup from a larger pool.",
+      "effort": "small",
+      "assigned_to": "Dave"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Worker filter bar silently disappears when data uses flat array format",
+      "description": "App.jsx line 1163: the per-worker filter buttons in the activity log are rendered from `roster.map(...)`. When the API returns a flat array (not `{workers, roster}` format), `roster` is set to `[]` (line 678), and the entire worker filter row shows only 'All Workers' with no individual names. This is a silent feature loss — the filter UI looks broken without any error. Fix: either always populate roster from the worker list as a fallback, or hide the per-worker filter row entirely when roster is empty rather than showing an empty radiogroup.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Office window is a very bright white rectangle at daytime — visually jarring",
+      "description": "Confirmed in desktop screenshot: at 1:45pm the WindowElement renders the daytime gradient (bae6fd → f0f9ff) which is nearly white against the dark office floor. The window stands out as a stark white block more than a gentle sky view. It could use a slight opacity or border treatment, or darken the gradient endpoints slightly to `#93c5fd → #dbeafe` so it reads as 'window' rather than 'broken white rectangle'.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Worker card flip doesn't move focus to Close button",
+      "description": "Flagged as medium in review #18, downgrading to low since the interaction is still functional. But it's still there: clicking ℹ️ flips the card, focus stays on the now-hidden ℹ️ button. Keyboard users must Tab hunt to find the Close button. Add `useEffect(() => { if (isFlipped) cardRef.current?.querySelector('.worker-card__back-close')?.focus() }, [isFlipped])` in WorkerCard. Two lines.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "low",
       "category": "accessibility",
-      "title": "ShortcutToast shows keyboard shortcuts on mobile/touch devices",
-      "description": "The ShortcutToast component shows '⌨️ Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear' on all devices including mobile where keyboard shortcuts are useless. Add a CSS media query to hide it on touch devices: @media (hover: none) and (pointer: coarse) { .shortcut-toast { display: none; } }",
-      "effort": "small"
+      "title": "Activity filter buttons use role=radio but are in a div, not a proper radiogroup container",
+      "description": "App.jsx lines 1136–1153: the filter buttons have `role='radio'` and are inside `<div role='radiogroup'>`. This is technically correct ARIA but the buttons are `<button>` elements, not `<input type='radio'>`. Screen readers may interpret these as both buttons AND radio inputs depending on the implementation. The correct pattern is either: use actual `<input type='radio'>` with labels, or use `role='radio'` on `<div>` elements (not `<button>`), or — simplest — use `role='tab'`/`tablist` since the behavior is more tab-like. Current implementation is confusing to SR users.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
-      "priority": "high",
+      "priority": "low",
       "category": "performance",
-      "title": "7 ambient particles + 8 dust mote box-shadows + coffee steam = animation overload",
-      "description": "The office floor has: 7 ambient-particle spans with infinite animations, 8 box-shadow dust motes via ::before, coffee steam with 3 animated spans, plant sway animations, star twinkle, cloud drift, and more. On lower-end devices this causes jank. Reduce ambient-particle count to 4, and use will-change: transform on animated elements. The reduced-motion media query catches some but not all of these.",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Activity log filter buttons lack visual feedback on mobile tap",
-      "description": "The activity filter bar buttons (All, Hires, Completions, Errors) and worker filter buttons have no :active state for mobile tap feedback. Add a quick opacity or scale transition on :active to confirm the tap registered.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "DESK_SCREEN_SVG is hardcoded per worker ID — won't scale",
-      "description": "The DESK_SCREEN_SVG object in Office.jsx maps individual worker IDs (carlos, maya, dave, sofia, luna) to custom SVG screen content. If a new team member is added, their desk screen is blank. Consider a generic screen SVG based on role instead of individual ID.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "visual",
-      "title": "Ghost desk '···' dust floater overlaps with nameplate on small screens",
-      "description": "The ::after pseudo-element on .desk--ghost shows '···' at top: -10px, which collides with the desk nameplate (bottom: -16px of the desk above) on mobile breakpoints where desks are closer together. Add a mobile media query to hide or reposition it.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "feature",
-      "title": "No loading state for activity log — just blank then populated",
-      "description": "While workers.json gets a LoadingSkeleton, the activity log section has no skeleton/shimmer during initial load. It goes from empty to populated with no transition. Add a simple skeleton or 'Loading activity...' text.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Worker card flip (ℹ️ button) has no way to flip back on keyboard",
-      "description": "The back of the worker card has a close button, but it's not auto-focused when the card flips. Keyboard users who triggered the flip via ℹ️ button have to Tab to find the close button. Add autoFocus to the close button or trap focus within the flipped card.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Footer tagline animation is jarring — pops in with no transition",
-      "description": "When the vibe changes, the footer tagline re-renders with a new key but has no CSS transition. It just pops. Add a subtle fade transition or use the same chalk-write animation from the whiteboard.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "Multiple Date.now() calls in render path — should use shared timestamp",
-      "description": "formatIdleDuration, formatDuration, getRelativeTime, and getTimeGroup all call Date.now() independently within the same render cycle. This can cause subtle inconsistencies (e.g., one says '59m ago' while another says '1h ago'). Create a shared 'now' via context or pass it down.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "Vibe sparkline in StatsBar is tiny and hard to interpret",
-      "description": "The VibeSparkline SVG is 64x14px — too small to convey meaningful trend data. The dots overlap when there are 10+ entries. Either increase the size or add a hover tooltip showing the trend summary (e.g., '3 crushing, 2 in-flow in last hour').",
-      "effort": "medium"
+      "title": "90 keyframe blocks in Office.css still unaudited",
+      "description": "Office.css contains 90 @keyframes declarations. App.css has 28 more. 118 total. Most are small, but several (wander animations, ambient particles) run indefinitely on elements that are always present. No `will-change` or GPU-compositing hints exist except one `backface-visibility: hidden` in App.css. This is especially relevant on mobile where compositing budget is limited. A pass to consolidate duplicate keyframe patterns and add `will-change: transform` to continuously-animating elements would help.",
+      "effort": "medium",
+      "assigned_to": "Dave"
     }
   ],
   "whats_good": [
-    "Coffee corner vibe text bug appears FIXED — the CSS selectors are now using data-vibe attribute correctly",
-    "Focus indicators are working — .char:focus-visible has outline styles",
-    "The ficus plant growth mechanic tied to vibeStreak is genuinely delightful",
-    "Vibe shockwave on vibe transitions is a nice touch — feels alive",
-    "Conference table huddle feature with seated mini-avatars is creative",
-    "The reduced-motion support is comprehensive — covers most animations"
+    "Crushing It vibe rendering is excellent — purple grid lines, CVO nameplate on Bloberto's desk, TRIPLE SHOT coffee corner text, trophy emoji, and Bloberto's wide-grin face all firing correctly. This is a cohesive, charming experience.",
+    "The worker-specific desk screen SVGs (Sofia's bar chart, Carlos's code lines, Dave's blinking cursor, Luna's color blocks) are delightful micro-detail visible in the desktop screenshot.",
+    "Dynamic title cycling (3 frames every 8s) is legitimately useful for background-tab monitoring. Smart feature.",
+    "Polling pause on inactivity (10min idle → pause, resume on any input) is the right call. Saves battery and bandwidth for open-and-forgotten tabs.",
+    "The vibe shockwave on vibe transition is a satisfying bit of theater that doesn't overstay its welcome at 900ms.",
+    "Reduced-motion support coverage is still excellent — 12 separate @media (prefers-reduced-motion) blocks. This is above average for projects of this type.",
+    "The ficus plant with milestone toast and growth stages tied to vibe streak remains one of the best details in the whole project.",
+    "Door arrive/depart animation system with the green notification dot works smoothly and gives the space real personality."
   ],
-  "summary": "Score UP from 3.7 to 3.8. Previous bugs (coffee corner CSS, focus indicators) confirmed FIXED. The dashboard is genuinely fun and polished. Main concerns now are performance (animation count on low-end devices), component architecture (Office.jsx monolith), and a few accessibility gaps (shortcut toast on mobile, keyboard focus trapping on card flip). Fun factor remains a 5 — this thing has personality."
+  "summary": "Score DOWN: 3.9 → 3.5. Five high-priority carries from review #18 are UNRESOLVED. The ShortcutToast on mobile is visible in this review's own screenshot — there is literally a screenshot proving it — and it's still there. The completionToast aria-live antipattern is an accessibility regression. Office.jsx didn't get split; it got longer. This isn't a bad codebase; it's a good codebase with a backlog of known issues that aren't being cleared. The fun factor remains a solid 5 — the craft and personality are real. But technical debt accumulates interest, and five unresolved HPs from a single prior review is the kind of pattern that turns 'fun side project' into 'this is why we have sprints'."
 }
