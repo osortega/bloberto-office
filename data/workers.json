@@ -1,14 +1,24 @@
 {
   "workers": [
     {
-      "name": "Luna",
-      "role": "creative-director",
-      "emoji": "🌙",
+      "id": "sofia-qa-24",
+      "name": "Sofia",
+      "role": "QA",
+      "emoji": "🔍",
       "status": "working",
-      "task": "Creative review #56",
-      "started_at": "2026-03-08T23:00:00Z",
-      "updated_at": "2026-03-08T23:00:00Z"
+      "task": "QA review #24 — visual testing + code analysis of dashboard",
+      "progress": 10,
+      "updated_at": "2026-03-09T06:15:00Z",
+      "startedAt": "2026-03-09T06:15:00Z"
     }
   ],
-  "updated_at": "2026-03-08T23:00:00Z"
+  "roster": [
+    { "name": "Bloberto", "role": "Manager", "emoji": "🫠" },
+    { "name": "Maya", "role": "Frontend", "emoji": "🎨" },
+    { "name": "Carlos", "role": "Backend", "emoji": "⚙️" },
+    { "name": "Dave", "role": "DevOps", "emoji": "🔧" },
+    { "name": "Sofia", "role": "QA", "emoji": "🔍" },
+    { "name": "Luna", "role": "Creative", "emoji": "🌙" }
+  ],
+  "updated_at": "2026-03-09T06:15:00Z"
 }
