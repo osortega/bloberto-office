@@ -1,13 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨",
-      "status": "working",
-      "task": "Error distress bubbles + Bloberto title rotation + Error desk screens",
-      "started_at": "2026-03-08T20:07:00Z"
-    }
-  ],
-  "updated_at": "2026-03-08T20:07:00Z"
+  "workers": [],
+  "updated_at": "2026-03-08T20:10:00Z"
 }
