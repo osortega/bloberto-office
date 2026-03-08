@@ -244,5 +244,17 @@
     "worker": "Sofia",
     "message": "QA review #10 complete \u2014 17 findings (4 high, 8 medium, 5 low). Overall: 3.1/5. Score DOWN from 3.4. Version drift detected. 13 items STILL unfixed from prior reviews.",
     "timestamp": "2026-03-08T06:45:00Z"
+  },
+  {
+    "timestamp": "2026-03-08T07:30:00Z",
+    "type": "hire",
+    "worker": "Luna",
+    "message": "Clocked in for creative review #37"
+  },
+  {
+    "timestamp": "2026-03-08T07:34:00Z",
+    "type": "complete",
+    "worker": "Luna",
+    "message": "Creative review #37 complete \u2014 7 ideas (2 must, 2 should, 2 could, 1 wild). Theme: Every silent element is a story"
   }
 ]
