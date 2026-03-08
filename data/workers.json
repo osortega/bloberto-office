@@ -5,11 +5,11 @@
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
-      "status": "working",
-      "task": "Typing Animation + Hover Cards (Luna #25 ideas #1 & #2)",
+      "status": "idle",
+      "task": "",
       "progress": 0,
-      "started": "2026-03-08T00:07:37Z",
-      "updated_at": "2026-03-08T00:00:39Z"
+      "started": null,
+      "updated_at": "2026-03-08T00:35:00Z"
     },
     {
       "id": "dave",
@@ -17,10 +17,10 @@
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
       "status": "working",
-      "task": "Toast Notifications + Daily Stats (Luna #25 ideas #4 & #5)",
+      "task": "Pulsing Glow on Active Desks (Luna #26 idea #5)",
       "progress": 0,
-      "started": "2026-03-08T00:07:37Z",
-      "updated_at": "2026-03-07T23:12:00Z"
+      "started": "2026-03-08T00:36:00Z",
+      "updated_at": "2026-03-08T00:36:00Z"
     },
     {
       "id": "luna",
@@ -38,11 +38,11 @@
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\ud83d\udd27",
-      "status": "idle",
-      "task": "",
+      "status": "working",
+      "task": "Role-Color Confetti (Luna #26 idea #2)",
       "progress": 0,
-      "started": null,
-      "updated_at": "2026-03-08T00:00:39Z"
+      "started": "2026-03-08T00:36:00Z",
+      "updated_at": "2026-03-08T00:36:00Z"
     },
     {
       "id": "sofia",
