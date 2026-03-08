@@ -1,112 +1,117 @@
 {
   "analyst": "Sofia",
-  "reviewNumber": 7,
-  "timestamp": "2026-03-08T04:46:00Z",
+  "reviewNumber": 8,
+  "timestamp": "2026-03-08T05:15:00Z",
   "scores": {
     "visual": 4,
     "ux": 3,
-    "responsiveness": 2,
+    "responsiveness": 3,
     "performance": 3,
     "accessibility": 3,
     "codeQuality": 3,
     "features": 4,
     "funFactor": 5
   },
-  "overall_score": 3.4,
+  "overall_score": 3.5,
   "fixedSinceLastReview": [
-    "hover card now uses STATUS_LABELS and STATUS_EMOJIS (was raw lowercase)",
-    "vibeStreak prop correctly passed to Office component",
-    "workers.json roster key present — worker filter bar functional",
-    "stuck detection uses worker.startedAt instead of .started"
+    "vibeStreak prop now correctly passed to Office component",
+    "hover card uses STATUS_LABELS/STATUS_EMOJIS properly",
+    "workers.json roster key present — filter bar functional",
+    "stuck detection uses startedAt instead of .started"
+  ],
+  "stillOpenFromReview7": [
+    "ShortcutToast timer leak (HIGH) — still present",
+    "ProgressBar ETA uses updated_at instead of startedAt (HIGH) — still present",
+    "React.memo on WorkerCard defeated by new activityLog array ref (HIGH) — still present"
   ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "ShortcutToast timer leak — timerRef overwritten on 'Got it' dismiss path",
-      "description": "ShortcutToast dismiss() (App.jsx ~line 530): when gotIt=true, timerRef.current is assigned a 500ms timeout (setPhase 'fading-out'), then IMMEDIATELY overwritten with a 900ms timeout (setPhase 'hidden'). The cleanup useEffect only clears timerRef.current — so the 500ms timer is orphaned and fires after unmount, calling setState on a potentially dead component. Fix: use two refs or chain with a single setTimeout.",
+      "title": "Office.css — conference-table CSS block has broken brace structure",
+      "description": "In Office.css, the .conference-table rule opens with '{' but the .office-aisle block is INSIDE it — the brace is never properly closed before .office-aisle starts. This means all CSS after .conference-table { is nested incorrectly. The browser may recover, but rules after this point may not apply as intended. The .office-aisle block and everything after it are technically inside .conference-table's rule body. Fix: close the .conference-table block properly before .office-aisle.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "ProgressBar ETA uses updated_at (last poll time) instead of startedAt",
-      "description": "ProgressBar component (App.jsx ~line 193): `workingMs = Date.now() - new Date(updatedAt).getTime()` — but updatedAt is worker.updated_at which advances every 30s sync. A worker at 10% who started 40 minutes ago but was last synced 30s ago shows ETA of ~4 minutes instead of ~360 minutes. The workers.json already has startedAt which is set once. Fix: pass worker.startedAt to ProgressBar and use it for ETA calculation.",
+      "title": "ShortcutToast timer leak — STILL UNFIXED from review #7",
+      "description": "ShortcutToast dismiss() (App.jsx): when gotIt=true, timerRef.current is assigned a 500ms timeout, then IMMEDIATELY overwritten with a 900ms timeout. The 500ms timer is orphaned. Fix: chain with a single setTimeout or use two refs.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "ProgressBar ETA bug — STILL UNFIXED from review #7",
+      "description": "ProgressBar uses worker.updated_at (which advances every 30s poll) instead of worker.startedAt for ETA calculation. This makes ETAs wildly inaccurate. Fix: pass startedAt to ProgressBar.",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "high",
       "category": "performance",
-      "title": "React.memo on WorkerCard defeated — activityLog is a new array reference every 30s",
-      "description": "syncFromGitHub (App.jsx ~line 691): `setActivityLog(Array.isArray(activity) ? activity : [])` creates a new array ref each poll. This array is passed as activityEntries to every WorkerCard. Since React.memo uses shallow comparison, ALL cards re-render every 30s regardless of whether their data changed. The memo is completely defeated. Fix: useMemo to create per-worker activity slices, or use a stable ref for the full log and only derive worker-specific entries when needed.",
+      "title": "React.memo defeated — STILL UNFIXED from review #7",
+      "description": "syncFromGitHub creates a new activityLog array ref every 30s poll. This array is passed to every WorkerCard, defeating React.memo. ALL cards re-render every poll. Fix: useMemo for per-worker activity slices or useRef for stable log reference.",
       "effort": "medium",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "VibeSparkline reads localStorage BEFORE parent writes — always one entry behind",
-      "description": "React runs child effects before parent effects. StatsBar's useEffect reads vibeHistory from localStorage BEFORE App.jsx's useEffect writes the new vibe entry. The sparkline permanently lags by one vibe change. Fix: lift vibeHistory state into App.jsx, compute it in the same effect that writes to localStorage, and pass the array as a prop to StatsBar.",
+      "title": "VibeSparkline reads localStorage BEFORE parent useEffect writes — always one entry behind",
+      "description": "VibeSparkline's useEffect reads VIBE_HISTORY_KEY from localStorage, but the parent App useEffect that WRITES to localStorage runs in the same render cycle. React doesn't guarantee sibling/child effect order. The sparkline is always one data point behind. Fix: lift vibe history state to App and pass it as a prop.",
       "effort": "medium",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Office floor characters unreadably small at 375px — .char__name is ~7px",
-      "description": "On mobile at 375px width, the office floor renders at about 330x248px. The .char__name labels at 0.44rem are barely 7px — illegible on any phone. The whiteboard text overlaps the leftmost desk column. Idle workers wander into the conference table area due to percentage-based positioning. Fix: switch office floor to aspect-ratio: 3/4 on mobile, increase min-height to 480px, and bump .char__name to 0.6rem.",
-      "effort": "large",
+      "title": "Office floor characters inaccessible via keyboard and touch",
+      "description": "Character hover cards only show on mouseenter. Keyboard users (Tab) and touch/mobile users can never see worker task details or status in the Office view. The tabIndex={0} is set but no focus-visible styles exist. Fix: show hover card on :focus-visible too, add touch-friendly tap interaction.",
+      "effort": "medium",
       "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "getRelativeTime duplicated verbatim in Office.jsx ghost bubble",
-      "description": "App.jsx exports getRelativeTime(timestamp) as a utility. Office.jsx Character component (~line 432) has an identical inline IIFE doing the exact same mins/hours/days math for the ghost bubble 'Last seen' display — it's not imported. Two places to maintain. Fix: import getRelativeTime from App.jsx or extract to utils/time.js.",
+      "title": "completionToast uses 12+ inline styles — unthemeable",
+      "description": "The completion toast (App.jsx) is rendered with a massive inline style object including colors, padding, border-radius, etc. This makes it impossible to theme with CSS variables and inconsistent with the rest of the app. Fix: extract to a CSS class.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "getRelativeTime duplicated in Office.jsx ghost bubble",
+      "description": "The relative time calculation in the ghost OOO bubble (Office.jsx Character component) is a copy-paste of getRelativeTime from App.jsx. Fix: extract to a shared utility in utils/.",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "Office floor character details are hover-only — keyboard and touch users locked out",
-      "description": "Character hover cards (Office.jsx ~line 473) only appear on mouseenter/mouseleave for working/idle variants. Touch users and keyboard users get no worker details when interacting with a character. The tabIndex={0} implies keyboard support but there's no focus handler showing the hover card for non-manager characters. Fix: the onFocus/onBlur handlers are now wired but the hover card only shows for working/idle variants on mouse events — verify the focus path also triggers setHovered(true).",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
       "category": "bug",
-      "title": "completionToast rendered with 12+ inline styles — unthemeable and unmaintainable",
-      "description": "App.jsx ~line 942: the completion toast div has a massive inline style object (position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation). Only border-color is dynamic. Everything else is static and should be a CSS class. It also doesn't follow the light theme properly since colors are hardcoded. Fix: extract to .completion-toast class in App.css.",
+      "title": "StatsBar stuck-worker click uses document.querySelector — breaks on Office tab",
+      "description": "StatsBar's stuck worker card uses document.querySelector to scroll to a worker card by data-worker-name. This only works on the Dashboard tab. If the user is on Office tab, the click does nothing. Fix: use handleWorkerClick pattern (switch tab first).",
       "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "StatsBar scroll-to-stuck-worker uses document.querySelector — breaks on Office tab",
-      "description": "StatsBar (~line 451): `document.querySelector('[data-worker-name=\"${name}\"]')?.scrollIntoView(...)` does imperative DOM access. This only works when Dashboard tab is active (cards are mounted). If user is on Office tab and clicks the stuck worker stat card, nothing happens. Fix: use the existing focusedWorker state + handleWorkerClick pattern to switch to dashboard tab first.",
-      "effort": "medium",
       "assignee": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "Fading worker cards all get index={activeWorkers.length} — stagger animation broken",
-      "description": "App.jsx ~line 1102: all fading cards share the same CSS --i value. When 2+ workers depart simultaneously, they all vanish in sync instead of cascading. Fix: use an incrementing offset or the worker's original index.",
-      "effort": "small",
-      "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "19 ambient particle DOM nodes with permanent CSS animations — jank on mobile",
-      "description": "App.jsx renders 12 ambient particles and Office.jsx renders 7 more. All run permanent CSS animations. On mid-range mobile hardware this causes measurable jank during the 30s sync cycle. prefers-reduced-motion disables them, but only for users who set that preference. Fix: reduce count to 6+4 on mobile via media query, or use a single CSS background animation.",
-      "effort": "medium",
+      "title": "19 ambient particle DOM nodes with permanent CSS animations",
+      "description": "7 particles in Office.jsx + 12 in App.jsx = 19 permanently animating DOM elements. On low-end mobile devices, these cause jank. Consider: reduce count, use will-change sparingly, or pause when tab is hidden.",
+      "effort": "small",
       "assignee": "Dave"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Fading worker cards all get index={activeWorkers.length} — stagger animation broken",
+      "description": "In the workers grid, fading cards all receive the same index value, so their stagger animation delay is identical. Fix: use a counter that increments per fading card.",
+      "effort": "small",
+      "assignee": "Maya"
     }
   ]
 }
