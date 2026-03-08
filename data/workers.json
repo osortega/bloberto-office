@@ -1,12 +1,45 @@
 {
-  "workers": [],
-  "roster": [
-    { "name": "Bloberto", "role": "Manager", "emoji": "🫠" },
-    { "name": "Maya", "role": "Frontend", "emoji": "🎨" },
-    { "name": "Carlos", "role": "Backend", "emoji": "⚙️" },
-    { "name": "Dave", "role": "DevOps", "emoji": "🔧" },
-    { "name": "Sofia", "role": "QA", "emoji": "🔍" },
-    { "name": "Luna", "role": "Creative", "emoji": "🌙" }
+  "workers": [
+    {
+      "name": "Sofia",
+      "role": "QA",
+      "emoji": "\ud83d\udd0d",
+      "status": "active",
+      "task": "QA review #28 \u2014 30-min site analysis",
+      "started_at": "2026-03-09T06:45:00Z"
+    }
   ],
-  "updated_at": "2026-03-09T06:25:00Z"
+  "roster": [
+    {
+      "name": "Bloberto",
+      "role": "Manager",
+      "emoji": "\ud83e\udee0"
+    },
+    {
+      "name": "Maya",
+      "role": "Frontend",
+      "emoji": "\ud83c\udfa8"
+    },
+    {
+      "name": "Carlos",
+      "role": "Backend",
+      "emoji": "\u2699\ufe0f"
+    },
+    {
+      "name": "Dave",
+      "role": "DevOps",
+      "emoji": "\ud83d\udd27"
+    },
+    {
+      "name": "Sofia",
+      "role": "QA",
+      "emoji": "\ud83d\udd0d"
+    },
+    {
+      "name": "Luna",
+      "role": "Creative",
+      "emoji": "\ud83c\udf19"
+    }
+  ],
+  "updated_at": "2026-03-09T06:45:00Z"
 }
