@@ -1,5 +1,22 @@
 {
-  "workers": [],
+  "workers": [
+    {
+      "name": "Maya",
+      "role": "frontend",
+      "emoji": "\ud83c\udfa8",
+      "status": "working",
+      "task": "Footer tagline discoverability + honorific animation",
+      "started_at": "2026-03-08T22:06:00Z"
+    },
+    {
+      "name": "Carlos",
+      "role": "backend",
+      "emoji": "\u2699\ufe0f",
+      "status": "working",
+      "task": "VACANT desk vibe-based job ads",
+      "started_at": "2026-03-08T22:06:00Z"
+    }
+  ],
   "roster": [
     {
       "name": "Sofia",
@@ -27,5 +44,5 @@
       "role": "Creative Director"
     }
   ],
-  "updated_at": "2026-03-08T22:05:00Z"
+  "updated_at": "2026-03-08T22:06:00Z"
 }
