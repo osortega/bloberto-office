@@ -5,12 +5,12 @@
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
-      "status": "working",
-      "task": "Fix high-priority QA #6: roster key missing in workers.json + stuck worker .started bug",
+      "status": "idle",
+      "task": "Fixed roster key + stuck worker formatDuration bug (QA #6)",
       "startedAt": "2026-03-08T04:26:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T04:26:00Z",
-      "progress": 10
+      "updated_at": "2026-03-08T04:30:00Z",
+      "progress": 100
     },
     {
       "name": "Dave",
@@ -49,12 +49,50 @@
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
-      "status": "working",
-      "task": "Fix high-priority QA #6: vibeStreak prop missing on Office + hover card status labels",
+      "status": "idle",
+      "task": "Fixed vibeStreak prop + hover card status labels (QA #6)",
       "startedAt": "2026-03-08T04:26:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T04:26:00Z",
-      "progress": 10
+      "updated_at": "2026-03-08T04:30:00Z",
+      "progress": 100
+    }
+  ],
+  "roster": [
+    {
+      "id": "bloberto",
+      "name": "Bloberto",
+      "role": "Manager",
+      "emoji": "\ud83e\udee0"
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "emoji": "\ud83c\udfa8"
+    },
+    {
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "\u2699\ufe0f"
+    },
+    {
+      "id": "dave",
+      "name": "Dave",
+      "role": "DevOps Engineer",
+      "emoji": "\ud83d\ude80"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA & Product Analyst",
+      "emoji": "\ud83d\udd0d"
+    },
+    {
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "\ud83c\udf19"
     }
   ]
 }

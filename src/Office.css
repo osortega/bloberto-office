@@ -1382,3 +1382,47 @@
   z-index: 1;
   pointer-events: none;
 }
+
+/* ── Ambient Dust Motes ── */
+.ambient-particles { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.ambient-particle {
+  position: absolute;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  animation: dust-drift linear infinite;
+}
+@keyframes dust-drift {
+  0% { transform: translate(0, 0); opacity: 0.08; }
+  25% { transform: translate(15px, -20px); opacity: 0.15; }
+  50% { transform: translate(-10px, -35px); opacity: 0.1; }
+  75% { transform: translate(20px, -15px); opacity: 0.14; }
+  100% { transform: translate(0, 0); opacity: 0.08; }
+}
+
+/* ── Desk Lamp States ── */
+.desk-lamp--working circle { fill: #fbbf24; filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7)); }
+.desk-lamp--working { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4)); }
+.desk-lamp--idle circle { fill: #d97706; animation: lamp-idle-flicker 4s ease-in-out infinite; }
+@keyframes lamp-idle-flicker { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+.desk-lamp--error circle { fill: #ef4444; animation: lamp-error-pulse 1.5s ease-in-out infinite; }
+@keyframes lamp-error-pulse { 0%, 100% { opacity: 0.5; filter: drop-shadow(0 0 3px #ef4444); } 50% { opacity: 1; filter: drop-shadow(0 0 8px #ef4444); } }
+
+/* ── Desk Keystrokes ── */
+.desk-keystrokes { position: absolute; bottom: 100%; left: 50%; pointer-events: none; }
+.desk-keystrokes span {
+  position: absolute;
+  font-size: 7px;
+  color: rgba(255, 255, 255, 0.25);
+  font-family: monospace;
+  animation: keystroke-float 3.6s ease-out infinite;
+  white-space: nowrap;
+}
+.desk-keystrokes span:nth-child(2) { left: 12px; }
+.desk-keystrokes span:nth-child(3) { left: -8px; }
+@keyframes keystroke-float {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.3; }
+  50% { opacity: 0.15; }
+  100% { transform: translateY(-18px); opacity: 0; }
+}

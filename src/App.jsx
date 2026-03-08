@@ -454,7 +454,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
           <span className="stat-label">⚠️ Stuck</span>
           <span className="stat-value">
             {stuckWorkers.length === 1
-              ? `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].started)}`
+              ? `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].startedAt)}`
               : `${stuckWorkers.length} workers`}
           </span>
         </div>
@@ -1040,7 +1040,7 @@ export default function App() {
 
         {tab === 'office' ? (
           <div role="tabpanel" id="tabpanel-office" aria-labelledby="tab-office">
-            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} />
+            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} vibeStreak={vibeStreak} />
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">

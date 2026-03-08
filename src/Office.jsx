@@ -1,7 +1,7 @@
 import { useMemo, useState, useRef, useEffect, memo } from 'react'
 import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
-import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD } from './utils/constants.js'
+import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
 import { VIBE_QUOTES, VIBE_TRANSITION_QUOTES } from './utils/quotes.js'
 
 
@@ -479,7 +479,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
               {worker.task.length > 40 ? worker.task.slice(0, 40) + '…' : worker.task}
             </div>
           )}
-          <div>{worker.status}</div>
+          <div>{STATUS_EMOJIS[worker.status]} {STATUS_LABELS[worker.status]}</div>
         </div>
       )}
     </div>
@@ -704,11 +704,18 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               }}
             >
               {/* Desk lamp — glows when occupied by a working character */}
-              <svg className="desk-lamp" width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
+              <svg className={`desk-lamp${isWorking ? ' desk-lamp--working' : isIdle ? ' desk-lamp--idle' : hasError ? ' desk-lamp--error' : ''}`} width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
                 <ellipse cx="5" cy="4" rx="4.5" ry="2.5" fill="#fbbf24" />
                 <line x1="5" y1="6.5" x2="5" y2="12" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" />
                 <ellipse cx="5" cy="13" rx="3.5" ry="1.5" fill="#9ca3af" />
               </svg>
+              {isWorking && (
+                <div className='desk-keystrokes' aria-hidden='true'>
+                  <span style={{animationDelay: '0s'}}>tap</span>
+                  <span style={{animationDelay: '1.2s'}}>clack</span>
+                  <span style={{animationDelay: '2.4s'}}>click</span>
+                </div>
+              )}
               {!occ ? (
                 <>
                   <div className="desk__monitor desk__monitor--vacant" />
@@ -848,6 +855,17 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             <circle cx="9" cy="6" r="2" fill="#fbbf24" />
             <circle cx="9" cy="6" r="0.8" fill="#f59e0b" />
           </svg>
+        </div>
+
+        <div className="ambient-particles" aria-hidden="true">
+          {[...Array(7)].map((_, i) => (
+            <span key={i} className="ambient-particle" style={{
+              left: `${10 + i * 12}%`,
+              top: `${20 + (i * 17) % 60}%`,
+              animationDuration: `${20 + i * 4}s`,
+              animationDelay: `${i * 3}s`
+            }} />
+          ))}
         </div>
 
       </div>
