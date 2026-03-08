@@ -830,14 +830,17 @@ export default function App() {
     const prevMap = new Map(prev.map(w => [w.id, w]))
     const justShipped = activeWorkers.filter(w => prevMap.get(w.id)?.status === 'working' && w.status === 'idle')
     if (justShipped.length > 0 && prev.length > 0) {
-      const worker = justShipped[0]
-      const color = ROLE_COLORS[worker.role] || ROLE_COLORS['Other']
-      setWorkerConfetti({ name: worker.name, color })
-      setCompletionToast({ name: worker.name, color })
       if (workerConfettiTimerRef.current) clearTimeout(workerConfettiTimerRef.current)
-      workerConfettiTimerRef.current = setTimeout(() => setWorkerConfetti(null), 2500)
       if (completionToastTimerRef.current) clearTimeout(completionToastTimerRef.current)
-      completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3000)
+      justShipped.forEach((worker, i) => {
+        const color = ROLE_COLORS[worker.role] || ROLE_COLORS['Other']
+        setTimeout(() => {
+          setWorkerConfetti({ name: worker.name, color })
+          setCompletionToast({ name: worker.name, color })
+          workerConfettiTimerRef.current = setTimeout(() => setWorkerConfetti(null), 2500)
+          completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3000)
+        }, i * 2600)
+      })
     }
 
     prevActiveWorkersRef.current = activeWorkers

@@ -1,10 +1,9 @@
-import { useMemo, useState, useRef, useEffect, memo } from 'react'
+import { useMemo, useState, useRef, useEffect, memo, useId } from 'react'
 import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
 import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
 import { VIBE_QUOTES, VIBE_TRANSITION_QUOTES } from './utils/quotes.js'
 
-let _gradIdx = 0
 
 const DESK_SCREEN_SVG = {
   carlos: (
@@ -118,6 +117,7 @@ const VIBE_WEATHER_ICONS = {
 const CharacterAvatar = memo(function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
   const ariaLabel = name ? `${name}, ${role}` : role
+  const gradId = useId()
 
   if (workerId === 'bloberto') {
     const v = vibeKey || 'in-flow'
@@ -301,7 +301,6 @@ const CharacterAvatar = memo(function CharacterAvatar({ workerId, role, name, si
   }
 
   if (workerId === 'luna') {
-    const gradId = useRef(`luna-hair-${workerId}-${_gradIdx++}`).current
     return (
       <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         <defs>
@@ -599,7 +598,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       onFocus={handleMouseEnter}
       onBlur={handleMouseLeave}
       onClick={handleClick}
-      onKeyDown={handleClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick() } } : undefined}
+      onKeyDown={handleClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(e) } } : undefined}
       role={handleClick ? 'button' : undefined}
       tabIndex={0}
     >

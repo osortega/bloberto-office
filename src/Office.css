@@ -1193,6 +1193,23 @@
 }
 
 /* ── Vibe Whiteboard ── */
+.office-whiteboard::before {
+  content: 'WHITEBOARD';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(180, 140, 80, 0.55);
+  color: inherit;
+  font-size: 0.45rem;
+  letter-spacing: 0.15em;
+  opacity: 0.5;
+  text-align: center;
+  padding: 1px 0;
+  font-family: sans-serif;
+  pointer-events: none;
+}
+
 .office-whiteboard {
   position: absolute;
   left: 1%;

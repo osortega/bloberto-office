@@ -1066,6 +1066,8 @@
 .shortcut-toast--gotit    { opacity: 1; }
 .shortcut-toast--fading-out { opacity: 0; }
 
+@media (pointer: coarse) { .shortcut-toast { display: none !important; } }
+
 /* === Mobile Header Fix (Luna Review #41) === */
 @media (max-width: 480px) {
   .tab-content {
