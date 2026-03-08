@@ -276,6 +276,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
 
   const [bubble, setBubble] = useState({ quote: null, show: false })
   const [ghostBubble, setGhostBubble] = useState(false)
+  const [hovered, setHovered] = useState(false)
   const timerRef = useRef(null)      // hover auto-hide timeout
   const ambientRef = useRef(null)    // ambient broadcast interval
   const isHoveringRef = useRef(false) // prevents ambient overlap with hover
@@ -319,6 +320,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
 
   const handleMouseEnter = () => {
     if (variant === 'ghost') { setGhostBubble(true); return }
+    if (variant === 'working' || variant === 'idle') { setHovered(true) }
     if (variant !== 'manager') return
     isHoveringRef.current = true
     const quotes = VIBE_QUOTES[managerVibe] || VIBE_QUOTES['in-flow']
@@ -330,6 +332,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
 
   const handleMouseLeave = () => {
     if (variant === 'ghost') { setGhostBubble(false); return }
+    if (variant === 'working' || variant === 'idle') { setHovered(false) }
     if (variant !== 'manager') return
     isHoveringRef.current = false
     if (timerRef.current) clearTimeout(timerRef.current)
@@ -427,6 +430,18 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       {variant === 'working' && (
         <div className="typing-dots">
           <span /><span /><span />
+        </div>
+      )}
+      {hovered && (variant === 'working' || variant === 'idle') && (
+        <div className="char-hover-card">
+          <strong>{worker.name}</strong>
+          <span className="hover-role">{worker.role}</span>
+          {worker.task && (
+            <div className="hover-task">
+              {worker.task.length > 40 ? worker.task.slice(0, 40) + '…' : worker.task}
+            </div>
+          )}
+          <div>{worker.status}</div>
         </div>
       )}
     </div>
