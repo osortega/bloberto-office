@@ -1271,6 +1271,24 @@
   color: inherit;
 }
 
+.wb-history-dots {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  margin-top: 4px;
+}
+.wb-history-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0.3;
+}
+.wb-history-dot[data-vibe='crushing']    { background: #a78bfa; }
+.wb-history-dot[data-vibe='on-fire']     { background: #ef4444; }
+.wb-history-dot[data-vibe='in-flow']     { background: #2dd4bf; }
+.wb-history-dot[data-vibe='slow-day']    { background: #9ca3af; }
+.wb-history-dot[data-vibe='after-hours'] { background: #6366f1; }
+
 .office-whiteboard--done {
   background: #f0ffe8;
 }

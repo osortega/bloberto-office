@@ -863,6 +863,10 @@ function WallClock({ vibeKey }) {
 export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0, doorEvent = null }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
+  const vibeHistoryRef = useRef([vibe])
+  useEffect(() => {
+    vibeHistoryRef.current = [...vibeHistoryRef.current.slice(-2), vibe]
+  }, [vibe])
 
   const bloberto = useMemo(
     () => [...workers, ...effectiveRoster].find(w => w.id === 'bloberto') ?? DEFAULT_BLOBERTO,
@@ -1033,6 +1037,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               <span className="wb-progress-label">avg task progress</span>
             </>
           )}
+          <div className="wb-history-dots" aria-hidden="true">
+            {vibeHistoryRef.current.slice(0, -1).map((v, i) => (
+              <span key={i} className="wb-history-dot" data-vibe={v} />
+            ))}
+          </div>
         </div>
         <div className="mgr-desk" data-vibe={vibe}>
           <div className="mgr-desk__monitor" data-vibe={vibe} />
