@@ -2,56 +2,64 @@
   "creative_director": "Luna",
   "review_number": 47,
   "timestamp": "2026-03-08T15:00:00Z",
-  "theme": "Give the office a memory — the best dashboards reward repeat visitors",
-  "visual_observations": "Review #46 visual notes still current. Whiteboard label fix from #46 already shipped (code confirms wb-progress-label exists). DESK_SCREEN_SVG covers 5 workers. Vibe transitions still only show in speech bubbles, not activity log. Mobile hover cards still unreachable on touch. Previous cycle shipped: hover card time-on-task, slow-day whiteboard, 20 transition quotes, polling-paused pill, plant toast.",
+  "theme": "The walls should feel what the team feels — make architecture carry emotion",
+  "visual_observations": "Desktop (1280×800): Vibe is 🔥 Crushing It. The office-floor container has a static dark-border with fixed purple-tinted box-shadow — completely vibe-neutral despite data-vibe being set on the element in the DOM. Bloberto's nameplate reads 'CVO' — the vibe-reactive title system (CVO / INCIDENT CMD / DIR. OF VIBES / NIGHT WATCH / MANAGER) is confirmed in code and is one of the best hidden features in the app, but nothing calls attention to it when it changes. Conference table renders 6 chairs (correct for Crushing It state) but zero seated workers — Huddle mechanic requires 2+ idle workers simultaneously, so it's almost never seen. WindowElement (right-side rectangle) shows a pale blue daytime sky with drifting clouds — gorgeous and time-of-day reactive, but reads as static decoration to any first-time visitor. Ghost desks (roster members not in workers.json) show completely dark monitors — identical to vacant desks; no way to distinguish OOO from unfilled. vibeCaption fires for 2.8s at bottom of office floor on vibe change then disappears with no record. Mobile (375×812): Below the office floor there is ~100px of dark dead space above the page footer — unused on the device where tab switching is most costly. Deep-work workers (45+ min) get 🎧 + indigo halo per CSS but current data shows no one in that state; the feature is alive but unseen.",
   "ideas": [
     {
-      "priority": "should",
-      "category": "storytelling",
-      "title": "Log Vibe Transitions in the Activity Feed",
-      "description": "Carried from review #46 — still unshipped. The activity log records hire/complete/error/system events but vibe transitions are invisible there. They only appear in Bloberto's speech bubbles which vanish in 4s. When a vibe transition fires (prevKey !== null && prevKey !== teamVibe.key in App.jsx), push a synthetic entry to activityLog: { type: 'system', worker: null, message: '🌡️ Vibe: prevLabel → newLabel', timestamp: now }. WHY: The team's emotional arc across the day IS the story. The activity log is the permanent record — vibe shifts belong there.",
+      "priority": "must",
+      "category": "visual",
+      "title": "Vibe Aura on Office Border",
+      "description": "The office-floor element already has data-vibe set in JSX (line 961 Office.jsx). In Office.css, the floor has a static box-shadow and border: 2px solid var(--border) — no vibe-specific override exists. Fix: Add CSS attribute selectors in Office.css after the base .office-floor rule: [data-vibe='crushing'] { border-color: #a78bfa; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(167,139,250,0.18), inset 0 0 30px rgba(167,139,250,0.05); } [data-vibe='on-fire'] { border-color: #ef4444; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(239,68,68,0.22); } [data-vibe='in-flow'] { border-color: #2dd4bf; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(45,212,191,0.15); } [data-vibe='slow-day'] { border-color: #475569; box-shadow: 0 8px 40px rgba(0,0,0,0.35); } [data-vibe='after-hours'] { border-color: #6366f1; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 80px rgba(99,102,241,0.25); } Zero JSX changes required — pure CSS. WHY: The vibe pill is a 28px chip. The office floor is 900×675px. When the entire room's walls change color for the team's emotional state, vibe becomes architectural. A slow-day office that visibly dims and an on-fire office that pulses red communicate mood before any label is read.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "feature",
-      "title": "Mobile Tap-to-Pin Worker Hover Cards",
-      "description": "Carried from review #46 — still unshipped. On mobile, hover cards with name/role/task/status/on-task-time are unreachable (onMouseEnter never fires on touch). Add pinnedCard state to Character component. On click, if window.matchMedia('(hover: none)').matches, toggle pinnedCard instead of firing handleClick. Show hover card when hovered || pinnedCard. Close on outside tap. WHY: Mobile is the screen most likely to be propped up near a coffee machine. Half the app's meaning vanishes on touch devices.",
-      "effort": "medium",
+      "category": "delight",
+      "title": "Bloberto's Nameplate Gets a Reveal Moment",
+      "description": "Bloberto's mgr-desk__nameplate already changes text on every vibe transition (5 variants: CVO, INCIDENT CMD, MANAGER, DIR. OF VIBES, NIGHT WATCH — Office.jsx line 1002). This is one of the cleverest details in the codebase. But the nameplate text changes silently in tiny text on a small plate — no visitor knows it happens. Fix: In Office.jsx, track prevVibe in a ref inside the manager desk render section. When vibe changes, add a transient CSS class nameplate-pop to the nameplate element (remove after 600ms via setTimeout). In Office.css: .nameplate-pop { animation: nameplate-reveal 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both; } @keyframes nameplate-reveal { from { transform: scale(0.7); opacity: 0; filter: brightness(2); } to { transform: scale(1); opacity: 1; filter: brightness(1); } }. Also: in Bloberto's hover speech bubble system, prepend the current title to the quote as a byline: render '<span class=\"bubble-title\">👔 ' + currentTitle + '</span>' before the quote text. WHY: The nameplate Easter egg is the best undiscovered feature in the product. The pop animation makes it discoverable on the transition; the byline makes it legible on hover.",
+      "effort": "small",
       "assigned_to": "dave"
     },
     {
-      "priority": "could",
-      "category": "delight",
-      "title": "Desk Lamp Color Matches Worker Role",
-      "description": "The desk lamp SVG (Office.jsx) always glows yellow (#fbbf24) regardless of who sits there. When isWorking, tint the lamp ellipse fill to ROLE_COLORS[occ.worker.role] with 60% opacity overlay. WHY: Subtle role-color reinforcement without adding clutter. Walking into an office and seeing different colored desk lamps instantly tells you who's where.",
-      "effort": "small",
-      "assigned_to": "carlos"
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Vibe Caption Leaves a Fading Trail",
+      "description": "The vibeCaption state (Office.jsx line 879) fires on every vibe change and disappears after 2.8s with no record. The office floor bottom area is mostly empty space. Fix: Maintain a vibeCaptionHistory array in Office component state (max 3 entries, each: { text, timestamp }). When setVibeCaption fires, also push to vibeCaptionHistory. Render history entries as a stacked column pinned bottom-right of the office floor (position: absolute, bottom: 4%, right: 3%), each as a <div className='vibe-trail-entry'>. The most recent entry: opacity 0.7, font-size 0.65rem. Second entry: opacity 0.4, font-size 0.6rem. Third: opacity 0.2, font-size 0.55rem. All entries fade to zero opacity over 8 minutes via a CSS animation tied to a data-age attribute. WHY: The office currently shows only NOW — no temporal texture. A fading vibe trail at the bottom-right is the office's mood history in 3 lines, answering the question: 'did we just peak, or have we been crushing it for an hour?' That context transforms the dashboard from a status snapshot into a living story.",
+      "effort": "medium",
+      "assigned_to": "sofia"
     },
     {
       "priority": "could",
-      "category": "visual",
-      "title": "Fallback Desk Screen for Unlisted Workers",
-      "description": "Carried from review #46. DESK_SCREEN_SVG covers 5 IDs. Any new hire renders a blank black monitor. Add a 'default' entry using ROLE_COLORS as line fill. WHY: A dead-black screen next to five rich monitors looks like a bug.",
+      "category": "polish",
+      "title": "Ghost Desk Monitors in Sleep Mode",
+      "description": "OOO workers (ghost variant) have a Character rendered at their desk but the desk-monitor-screen (line 1063 Office.jsx) only renders for isWorking === true. Ghost desk monitors are completely dark — visually identical to vacant desks which also render desk__monitor--vacant with no screen. Fix: For ghost desks, conditionally render the DESK_SCREEN_SVG at reduced opacity: {occ.ghost && DESK_SCREEN_SVG[occ.worker.id] && (<div className='desk-monitor-screen desk-monitor-screen--sleep'>{DESK_SCREEN_SVG[occ.worker.id]}</div>)}. In Office.css: .desk-monitor-screen--sleep { opacity: 0.22; filter: grayscale(0.7) brightness(0.5); animation: screen-sleep-pulse 5s ease-in-out infinite; } @keyframes screen-sleep-pulse { 0%, 100% { opacity: 0.22; } 50% { opacity: 0.35; } }. WHY: A ghost worker's desk being visually identical to a vacant desk loses the narrative distinction between 'someone sits here, they're just OOO' and 'this desk has never had an owner.' The sleeping, gently pulsing screen preserves identity without competing with active workers.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "storytelling",
-      "title": "Daily Stats Ticker on the Whiteboard",
-      "description": "Below the vibe text and progress bar, show a rotating stat every 10s: 'Tasks shipped today: N' → 'Team uptime: Xh' → 'Vibe changes: N'. Pull from activityLog entries filtered to today. WHY: The whiteboard has real estate and is the focal point of the office. A slowly rotating stat ticker gives repeat visitors something new to glance at.",
+      "category": "delight",
+      "title": "Window Sky Tooltip Reveals the Time",
+      "description": "The WindowElement (Office.jsx line 585) already computes a timeLabel: 'midnight' | 'sunrise' | 'daylight' | 'golden hour' | 'dusk' and uses it in the aria-label. It renders a time-reactive sky gradient with animated clouds — daytime shows moving white clouds, golden hour an amber cloud, midnight shows 4 stars. But nothing on the surface tells a visitor this element reacts to real time. Fix: Add a <div className='office-window__time-label'>{timeLabel}</div> rendered inside .office-window. Position it absolutely at bottom-center of the window, font-size 0.5rem, color rgba(255,255,255,0.45) for day and rgba(167,139,250,0.5) for night. On hover of .office-window, increase label opacity to 0.9 via CSS transition. WHY: The window is the most immersive ambient detail in the office and it's completely silent about what it is. A barely-visible 'daylight' label that brightens on hover transforms a colored rectangle into a discoverable real-time window — one of those small details that makes repeat visitors feel like the office is alive.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "wild",
+      "category": "office-life",
+      "title": "After-Hours Desk Memo from Bloberto",
+      "description": "When vibe === 'after-hours', the office is already styled with deep indigo ambient particles and Bloberto's nameplate reads 'NIGHT WATCH'. The CSS already defines .away-note styles (sticky note in Office.css). But Bloberto's desk has no physical artifact for the after-hours state. Fix: In the mgr-desk render block (Office.jsx line 999), add: {vibe === 'after-hours' && <div className='mgr-desk__memo'>{AFTER_HOURS_MEMOS[sessionMemoIdx]}</div>}. Define AFTER_HOURS_MEMOS in Office.jsx: ['everyone else went home. this is fine. 🌙', 'productivity at 11pm: a myth or a personality disorder? discuss.', 'the build server and I have developed an understanding.', 'i told the CI/CD it has beautiful hair. it compiles faster now.', 'if a feature ships after midnight, does it count for today or tomorrow?']. Pick one per session via useMemo(() => Math.floor(Math.random() * AFTER_HOURS_MEMOS.length), []). Style .mgr-desk__memo as a mini sticky note (yellow, rotated 2deg, shadow, 0.6rem font) positioned in the bottom-right corner of the mgr-desk div, borrowing --away-note-bg and --away-note-border CSS vars already defined. WHY: After-hours is the most cinematic vibe and the manager desk is the focal point. A single handwritten-looking note from Bloberto makes 11pm feel like finding a note from your manager after everyone's gone home — absurd, tender, and exactly the brand.",
       "effort": "medium",
-      "assigned_to": "carlos"
+      "assigned_to": "sofia"
     },
     {
       "priority": "wild",
       "category": "feature",
-      "title": "Visitor Counter — You Are Not Alone",
-      "description": "Add a subtle 'N people watching the office right now' indicator using a free analytics ping (e.g., a simple counter service or localStorage-simulated for demo). Even if faked with a plausible random number, it creates social proof and makes the experience feel communal. WHY: Knowing others are watching transforms a dashboard into a shared experience.",
+      "title": "Mobile Activity Ticker Below the Office Floor",
+      "description": "On mobile (375px) the Office tab is valuable but information-dense: avatars are 25px, the whiteboard is illegible, and accessing the Dashboard requires a tab switch. The ~100px below the office-floor container before the page footer is currently empty. Fix: Add a <div className='mobile-activity-ticker'> rendered below <div className='office-floor'> inside office-wrap, only when window.innerWidth <= 600 (or via a CSS media query). Render the last 5 activityLog entries as a single horizontally-scrolling marquee: each entry formatted as '{ACTIVITY_ICONS[entry.type]} {entry.worker ? entry.worker + ': ' : ''}{entry.message}', joined by ' · '. Animate using @keyframes ticker-scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } } at 35s duration, linear, infinite. Pause on touch. Font-size 0.7rem, color var(--text-muted), background var(--surface2), border-top 1px solid var(--border). Pass activityEntries prop down from Office.jsx (it's already received). WHY: Mobile users get the visual office but zero data. The dead zone below the floor is exactly the right real estate for a news ticker that surfaces the activity log without requiring a tab switch. One scrolling line of text converts ~80px of void into a live feed.",
       "effort": "medium",
-      "assigned_to": "tbd"
+      "assigned_to": "dave"
     }
   ],
   "hire_proposals": []
