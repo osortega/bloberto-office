@@ -1,71 +1,63 @@
 {
   "creative_director": "Luna",
-  "review_number": 55,
-  "timestamp": "2026-03-08T22:30:00Z",
-  "theme": "Make idle moments speak — the office should never feel abandoned",
-  "visual_observations": "Desktop (1280x800): Luna is clocked in at top-left desk with color-block monitor. All other desks show ghost state with faint standby pulse. Coffee corner top-right with TRIPLE SHOT steam. Whiteboard left with vibe doodle. Cactus blooming. Window shows amber gradient. Conference table bottom-center with 'everyone is at their desk' label. Vacant desk bottom-right with job-card hover. Mobile (375x812): Renders cleanly but shortcut toast leaks outside office card boundary. Vibe: after-hours, indigo border glow with starfield floor. Review #54 ideas (solo mode, tab title whisper, doodle variants, stats dispatch, idle thought bubbles, coffee topics, sparkline stability, Bloberto vibe badge) are NOT yet implemented.",
+  "review_number": 56,
+  "timestamp": "2026-03-08T23:01:00Z",
+  "theme": "Every silent element is a missed joke — make the office earn its rent",
+  "visual_observations": "Desktop (qa26, 1280x800): Vibe Crushing It — purple border glow, Bloberto center-top with CVO nameplate. Five workers at desks: Luna top-left (4-column colorful monitor), Carlos (wrench icon), Maya (palette icon), Dave (wrench), Sofia (magnifying glass + hover card open + trophy in crushing vibe). Vacant desk bottom-right. Conference table lower-left: circular purple chairs, everyone is at their desk ambient label. Coffee corner top-right: COFFEE TRIPLE SHOT with steam. Window right-wall: tall DUSK purple-amber gradient. Cactus top-right, two plants + Fern lower floor. Aisle: two static ▸ ◂ arrows in floor center — zero animation, zero personality. Shortcut toast inside card. Mobile (375x812): identical vibe, workers compressed, shortcut toast still OUTSIDE the card boundary (the #55 must-fix is not yet shipped). Dashboard tab: 1 active worker (Sofia), stats sparkline shows 2 barely-visible dots on a faint white polyline with no legend, Running solo today. Carrying the whole team on one pair of hands. message.",
   "ideas": [
     {
       "priority": "must",
-      "category": "delight",
-      "title": "Tab Title Whispers When Hidden",
-      "description": "From review #54 — still not implemented. When document.visibilityState becomes 'hidden', change tab title contextually: if there's an error worker show '⚠️ Someone needs help — Bloberto Office'; if a worker completes while hidden show '✅ Task shipped! — Bloberto Office'; if idle show '💤 Office is quiet — Bloberto Office'. Reset to normal cycling on visible. The tab title is the ONLY way to reach users in another tab. This is free engagement.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "must",
-      "category": "storytelling",
-      "title": "Stats Bar Dispatch Lines",
-      "description": "From review #54 — still not implemented. Below each stat number, add a one-line editorial comment keyed to the value. Active: {0: 'ghost town', 1: 'lone wolf', 2: 'dynamic duo', 3: 'skeleton crew'}. Error: {0: 'smooth sailing', 1: 'minor turbulence', 2: 'code red'}. Idle: {0: 'all hands on deck', 1: 'one on break', 2: 'half the team wandering'}. Render as span.stat-dispatch, 0.7rem muted italic with min-height to prevent layout shift. WHY: Numbers alone are data. Numbers with personality are a story. This turns the stats bar from a dashboard into a narrator.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "office-life",
-      "title": "Whiteboard Doodle Rotation",
-      "description": "From review #54 — still not implemented. The whiteboard has one ASCII doodle per vibe that never changes. Add DOODLE_VARIANTS with 3-4 options per vibe state and rotate every 4 minutes via useEffect interval. Vibe change resets to index 0. Example: crushing cycles through (◕‿◕), (ᵔᴥᵔ), \\o/; on-fire cycles through (╯°□°)╯, ಠ_ಠ, (ノಠ益ಠ)ノ. WHY: The whiteboard doodle is a secret joy. When it changes without notification — just a different face watching the progress bar — that's micro-discovery that keeps people watching.",
+      "category": "visual",
+      "title": "Ghost Desk Time Tiers Need Visual Escalation",
+      "description": "The code computes exact elapsed time for ghost desks (working + updated_at > 15min) and stores it as ghostDeskTitle — but that string lives ONLY in a title tooltip. Every ghost desk looks identical at 20 minutes and at 5 hours; desk--ghost has no tier differentiation in CSS. Fix: in Office.jsx, derive a tier from the same elapsed-time computation already in place and add data-ghost-tier to the desk div: fresh (15-60min), stale (1-3h), abandoned (3h+). In Office.css: stale gets amber monitor tint and slower opacity pulse; abandoned gets a red border bleed and faster angrier pulse animation. WHY: A task that has not updated in 5 hours is not the same story as a 20-minute lull. The floor is lying by treating them identically. Time urgency is the one thing this dashboard should never hide.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
+      "priority": "must",
+      "category": "office-life",
+      "title": "Vacant Desk Job Card Is Touch-Inaccessible",
+      "description": "The .vacant-job-card with vibe-specific hiring jokes like Staff Wizard: Must maintain velocity without asking what velocity means is revealed only via CSS :hover. On touch devices there is no hover so the card is permanently invisible on mobile. Pure CSS fix: add .desk--vacant:focus-within .vacant-job-card to the existing hover selector. The vacant desk already has tabIndex=0 so tap-then-focus works on touch with zero JSX changes. Also add a mobile-only CSS pseudo-element on .desk__nameplate--vacant hinting the desk is interactive. WHY: The vibe-specific job postings are the sharpest writing on the floor. On mobile the vacant desk is a grey rectangle with nothing. The joke is locked behind a gesture that does not exist on half of all devices.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
       "priority": "should",
-      "category": "visual",
-      "title": "Vibe Sparkline Stability Badge",
-      "description": "From review #54 — still not implemented. The VibeSparkline shows colored dots but no synthesis. Add: (1) a tiny 'vibe history' label below the SVG. (2) A stability tag: if last 5 vibes are identical → green 'stable' pill; if 3+ different keys in last 5 → amber 'volatile' pill. Render below sparkline in .stat-card.vibe. WHY: The sparkline is decorative data nobody interprets. One word — 'stable' or 'volatile' — turns it into insight.",
+      "category": "storytelling",
+      "title": "Bloberto Goes Silent When You Click a Worker",
+      "description": "When handleCharClick fires in Office.jsx, pingedId gets set and the character flashes. Bloberto does nothing. Fix: when pingedId changes to a non-null worker id, trigger the manager Character speech bubble with a worker-specific one-liner. Add a PING_REACTIONS map keyed by worker id: luna gets creative review in progress, maya gets check the PRs purple and correct as always, carlos gets it is in the logs it is ALWAYS in the logs, dave gets he hears you through the headphones, sofia gets found 3 more bugs already. Reuse the existing bubble system by lifting the ping trigger into Office and forwarding it to the manager Character via a ref or a new onPing prop. WHY: Clicking a worker currently feels like a UI action. Bloberto reacting turns it into an office interaction and the surveillance-dashboard joke writes itself.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "feature",
+      "title": "The Vibe Sparkline Is Beautiful and Completely Unreadable",
+      "description": "In the dashboard Team Vibe stat card, the sparkline is 64x14px colored dots on a faint white polyline. The qa26 screenshot shows 2 barely-visible dots. Each circle already has a title child with timestamp and vibe key but those only surface in narrow browser implementations. The SVG aria-label says only Vibe history with zero content. Fix: update VibeSparkline aria-label to the full sequence — Vibe history: Crushing It → On Fire → Crushing It. Add a title element as first SVG child with the same string. Then add a sibling .sparkline-legend div visible on .stat-card:hover showing the last 3 vibes as inline colored text pills using VIBE_COLORS. Pure render-time data, zero overhead. WHY: The sparkline is the most data-dense element in the dashboard and it is completely silent. People are watching those dots and guessing. Give it a voice.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
-      "priority": "should",
-      "category": "feature",
-      "title": "Office Floor Night Mode Ambient Sound Toggle",
-      "description": "New idea. Add a tiny speaker icon button in the office-sign area (top-left corner). When toggled on, play a subtle ambient loop: keyboard clicks during working state, quiet hum during idle, rain during slow-day. Use Web Audio API with very low gain (0.05-0.1). Store preference in localStorage. Default OFF. WHY: The office is visually alive but sonically dead. Even a faint ambient layer would make people feel like they're watching a real space. The toggle keeps it opt-in so it never annoys.",
-      "effort": "medium",
-      "assigned_to": "carlos"
-    },
-    {
       "priority": "could",
-      "category": "storytelling",
-      "title": "Bloberto Manager Vibe Badge",
-      "description": "From review #54 — still not implemented. Add a tiny floating emoji badge above Bloberto's avatar that reacts to team vibe: crushing → 🚀, on-fire → 😬, in-flow → 😌, slow-day → 🫠, after-hours → ☕. Implemented as span.mgr-vibe-badge positioned absolute top-right of avatar circle, swaps with 0.3s scale bounce keyed to vibeKey. WHY: Bloberto is the mascot. He should have feelings about his team's performance.",
+      "category": "visual",
+      "title": "The Aisle Arrows Are the Only Dead Element in the Office",
+      "description": "office-aisle renders two aria-hidden spans with the arrow characters. Static text. No animation, no vibe reaction, no color. Every other floor element reacts to vibe: the clock tooltip changes, the window gradient shifts, the whiteboard rewrites itself, the door icon switches, the conference table gains and loses chairs. The aisle is the one element that has checked out. Fix: add data-vibe={vibe} to the .office-aisle div (one attribute). Then in Office.css: on-fire makes both arrows red and same-direction pulsing fast; crushing makes them teal and faster; slow-day desaturates and slows animation to 4s; after-hours fades one arrow to opacity 0.1 since nobody is leaving; in-flow gives a gentle teal pulse at 2s. WHY: The aisle is the path workers walk. It should breathe with the office. A dead element in a living world breaks the illusion.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
       "category": "office-life",
-      "title": "Coffee Corner Overheard Topics",
-      "description": "From review #54 — still not implemented. When 2+ idle workers gather at coffee corner (chatting state), pick a random topic from CHAT_TOPICS: ['the deploy timing', 'that one PR', 'sprint velocity again', 'who touched the schema', 'the on-call rotation']. Show as tiny italic text below 'chatting' label. WHY: The chatting state says workers gathered but not about what. 'who touched the schema' as you scroll past is comedy that makes the app feel like an actual office.",
+      "title": "The Full-Idle State Gets No Banner",
+      "description": "isFullSync triggers a glowing Full sync banner on the floor when all workers are in working state — confirmed in the mobile screenshot. But isFullIdle — all active workers idle, zero progress happening — has no equivalent. The floor goes quiet with no acknowledgment. Fix: compute isFullIdle = nonMgr.length > 0 && workingWorkers.length === 0 in Office.jsx. Render a full-idle-banner when true using the same conditional pattern as full-sync-banner: Everyone on break for most vibes, Somewhere... for slow-day, Nobody home for after-hours. Style as the tonal mirror of full-sync-banner — muted colors, slower pulse, italicized. WHY: Full sync gets celebrated with a glowing banner. The full rest deserves equal acknowledgment. It is the breath after the sprint — not an absence of state but a state of its own that the floor should name.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "sofia"
     },
     {
       "priority": "wild",
-      "category": "feature",
-      "title": "Activity Log Gets a Daily Digest Mode",
-      "description": "New idea. Add a 'digest' filter/view to the activity log that collapses the day's entries into a narrative paragraph: 'Today: Luna reviewed the office twice, Carlos shipped 3 features, Sofia found 4 bugs. The team was mostly in-flow with one on-fire moment around 3pm. Vibe trend: stable.' Generated client-side from the activity entries using template strings keyed to event types and counts. Toggle between timeline and digest view. WHY: The activity log grows long. A digest turns raw events into a story someone could read in 10 seconds and understand the whole day.",
+      "category": "storytelling",
+      "title": "The Activity Log Hides the Silence Between Events",
+      "description": "The log groups entries into time buckets — clean and well-implemented. But within a group, entries stack with no indication of time between them. Three entries in Earlier today might span 2 minutes or 4 hours. That gap — the quiet hours when nothing was logged — is invisible. Fix: in the ActivityLog component, after rendering each entry, compute the delta to the next entry in the same group. If delta > 30 minutes, insert an activity-time-gap div between them showing the silence as scaled dot leaders: a short gap renders as 34m in dots, a multi-hour gap renders as 2h 07m with more surrounding dots. Style at 0.55rem muted monospace, centered. Max 1 gap indicator per time group. WHY: The log currently reads like a list. With silence markers it reads like a timeline with chapters. Carlos completed a deploy. Two hours of silence. Sofia hit an error. That blank middle IS the story. The hours when nothing happened are the most honest data in the dashboard.",
       "effort": "medium",
       "assigned_to": "carlos"
     }

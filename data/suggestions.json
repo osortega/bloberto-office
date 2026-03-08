@@ -1,138 +1,131 @@
 {
   "analyst": "Sofia",
-  "review_number": 23,
-  "timestamp": "2026-03-08T22:30:00Z",
+  "review_number": 27,
+  "timestamp": "2026-03-08T23:15:53Z",
   "scores": {
     "visual": 5,
-    "ux": 3,
-    "responsiveness": 3,
-    "performance": 3,
+    "ux": 4,
+    "responsiveness": 4,
+    "performance": 4,
     "accessibility": 4,
-    "code_quality": 3,
-    "features": 4,
+    "code_quality": 4,
+    "features": 5,
     "fun_factor": 5
   },
-  "overall_score": 3.75,
+  "overall_score": 4.4,
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Progress bar renders bare '%' when progress is undefined",
-      "description": "In the Dashboard view, Maya's and Carlos's worker cards show 'PROGRESS  %' with no number — because worker.progress is undefined and React renders undefined as an empty string, leaving just the '%' suffix. The ProgressBar component renders {progress}% unconditionally. Fix: guard the render with `typeof progress === 'number'` before displaying, or default to 0. Also the progress-pct span should be conditionally rendered: `{typeof progress === 'number' && <span className=\"progress-pct\">{progress}%</span>}`.",
+      "title": "Stats Bar Grid Overflows Beyond 5 Columns",
+      "description": "The stats bar uses `grid-template-columns: repeat(5, 1fr)` but dynamically adds error and stuck worker cards beyond those 5 slots. When both an error card AND a stuck card appear simultaneously, you get 7 cells in a 5-col grid \u2014 the overflow wraps to a second row, creating an uneven orphaned row. Switch to `repeat(auto-fill, minmax(160px, 1fr))` or explicitly reserve space for the optional cards.",
       "effort": "small",
       "assigned_to": "Carlos"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Whiteboard text clips and stacks vertically on mobile",
-      "description": "On the 375px mobile viewport, the office whiteboard on the left wall renders as a narrow column with text clipped to read 'WHI / BO / AR / D' stacked vertically — completely unreadable. The whiteboard is positioned absolutely using % coordinates designed for desktop. Fix: either hide the whiteboard entirely on narrow viewports with a CSS `@media (max-width: 500px) { .office-whiteboard { display: none } }`, or reposition it (e.g. move it above the office floor on mobile). The vibe info it displays is already shown in the stats bar anyway.",
-      "effort": "small",
+      "category": "ux",
+      "title": "Office Floor Is Unusable on Mobile",
+      "description": "On 375px mobile, worker names and desk labels in the Office view are rendered at 0.32\u20130.38rem \u2014 effectively sub-pixel and unreadable. Characters overlap or stack awkwardly. The isometric floor layout is a desktop-first experience and needs either: (a) a minimum character/label scale enforced via CSS clamp(), (b) a simplified 2-column grid list view as a mobile fallback, or (c) a pinch-to-zoom container. This is the single biggest UX gap on mobile.",
+      "effort": "large",
       "assigned_to": "Maya"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Activity log 'Last X events' count uses unfiltered total",
-      "description": "In App.jsx line 1162, the label reads `Last {Math.min(activityLog.length, 20)} events`, but `activityLog` here is the UNFILTERED full array. When the user selects 'Errors' or a specific worker filter, the count still shows the total unfiltered number, misleading users. The filtered array is piped into <ActivityLog entries={...} />, so the count should reference the filtered length instead. Fix: extract the filtered array to a const and use its length: `const filteredLog = activityLog.filter(...); <ActivityLog entries={filteredLog} />` then `Last {Math.min(filteredLog.length, 20)} events`.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "Idle workers render twice: wandering AND seated at conference table",
-      "description": "In Office.jsx, `meetingWorkers` is a slice of `idleWorkers` (line 1000). These same workers are then rendered BOTH as wandering `Character` elements (lines 1330-1350) AND as seated avatars in `ConferenceTable` (lines 846-858). A user will see Sofia wandering the floor AND sitting at the table simultaneously. Fix: either exclude meetingWorkers from the wandering render loop (`idleWorkers.filter(w => !meetingWorkers.includes(w))`), or remove the in-table avatar rendering and rely solely on the wandering characters clustering near the table.",
+      "category": "visual",
+      "title": "Inter Font Never Loaded \u2014 Silently Falls Back",
+      "description": "index.css declares `font-family: 'Inter', 'Segoe UI', system-ui` but there is no @import or <link> tag loading Inter from Google Fonts or any self-hosted source. Users without Inter pre-installed (most non-macOS users) silently render in Segoe UI or the system font, breaking typographic consistency. Fix with a preconnect + preload Google Fonts link in index.html, or bundle Inter via npm (fontsource-inter).",
       "effort": "small",
       "assigned_to": "Dave"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "getRelativeTime duplicated between App.jsx and Office.jsx",
-      "description": "App.jsx defines `getRelativeTime()` (line 28) as a module-level utility, but Office.jsx re-implements the exact same logic inline inside the Character component's ghost bubble JSX (lines 626-635). This is a DRY violation — any fix to relative time formatting must be made in two places. Fix: move `getRelativeTime` to `src/utils/time.js` (or `utils/format.js`) and import it in both files. While at it, `formatFullDateTime` and `getTimeGroup` could move there too.",
-      "effort": "small",
+      "title": "App.jsx and Office.jsx Are Too Large to Maintain",
+      "description": "App.jsx is 1,273 lines and Office.jsx is 1,417 lines. App.jsx alone contains StatsBar, ActivityLog, WorkerCard, ProgressBar, DeltaBadge, VibeSparkline, ShortcutToast, LoadingSkeleton, EmptyState, and the main App component. Extract each logical component into its own file under src/components/. This is not cosmetic \u2014 it directly impacts debuggability, test coverage, and future onboarding speed.",
+      "effort": "large",
       "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Dead condition in DESK_SCREEN_SVG lookup always truthy",
-      "description": "In Office.jsx line 1235: `(isWorking || hasError) && (DESK_SCREEN_SVG[occ.worker.id] || true) &&` — the `|| true` makes the parenthesized expression unconditionally true, rendering the entire SVG lookup check dead. This likely was meant to check whether a custom screen SVG exists before rendering the wrapper div, but the fallback generic SVG inside already handles the missing-key case. Fix: remove `|| true`. The condition should simply be `(isWorking || hasError) &&` — or if the intent was to always show something: just remove the DESK_SCREEN_SVG check entirely since the fallback SVG is already there.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "activityLog.filter() called inline per WorkerCard per render",
-      "description": "In App.jsx lines 1112, 1135, 1148, each WorkerCard receives `activityLog.filter(e => e.worker === w.name).slice(-3)` as a prop, computed inline during render. With N workers and M log entries, this is O(N*M) filtering on every parent re-render. The parent re-renders frequently (60s tick, poll intervals, hover state changes). Fix: memoize worker-specific activity slices: `const activityByWorker = useMemo(() => { const map = {}; for (const e of activityLog) { (map[e.worker] ??= []).push(e) }; return map; }, [activityLog])` — then pass `(activityByWorker[w.name] ?? []).slice(-3)`.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Dashboard worker cards use role emoji instead of custom SVG avatars",
-      "description": "The Office view has gorgeous custom pixel-art SVG portraits for each character (Bloberto, Carlos, Maya, Dave, Sofia, Luna). But the Dashboard WorkerCard component (line 253) renders only a generic role emoji: `<div className='worker-avatar'>{getRoleEmoji(worker.role)}</div>`. This is a jarring inconsistency — you click a character in the office, land on their dashboard card, and it's a gray emoji blob. Fix: replace the role emoji div with `<CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={44} emoji={worker.emoji} vibeKey={vibeKey} />`. The component is already defined and exported from Office.jsx — just move it to a shared file (e.g. src/components/CharacterAvatar.jsx).",
-      "effort": "medium",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "stuckWorkers useMemo stale: 2-hour check never re-evaluates",
-      "description": "In App.jsx line 379, `stuckWorkers` is computed with `useMemo(() => workers.filter(w => ... Date.now() - new Date(w.updated_at) > 7_200_000), [workers])`. The dependency is only `workers` — but `workers` doesn't change while someone is stuck. `Date.now()` is captured at memo creation time, so a worker who hits the 2-hour mark mid-session will never appear in the stuck card until the next data poll refreshes `workers`. Fix: add the `tick` from `useTimeTick` as a dependency, or compute it inside the `useTimeTick` interval. At minimum, document why the staleness is acceptable.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Missing 'System' filter option in activity log",
-      "description": "The activity log filter bar has: All, Hires, Completions, Errors — but vibe transition events (type: 'system') injected at App.jsx line 876 have no dedicated filter. Users cannot isolate or hide the system noise ('🌡️ Vibe: Slow Day → Crushing It') from actual team activity. On an active day with frequent vibe changes, system events can flood the log. Fix: add a `{ key: 'system', label: '⚙️ System' }` entry to the filter array in the activity filter bar. Low effort, high signal for power users.",
+      "title": "completionToast Rendered with Inline Styles \u2014 Breaks Light Mode",
+      "description": "The worker completion toast (\ud83c\udf89 X shipped it!) uses hardcoded inline styles (`background: 'var(--surface2)'`, `color: 'var(--text)'`, `boxShadow` with hardcoded rgba values). While CSS variables work in inline styles, the border and glow color are passed as a raw hex prop making the component impossible to theme or override. Move to a `.completion-toast` CSS class with a CSS custom property for the accent color, consistent with every other notification element.",
       "effort": "small",
       "assigned_to": "Maya"
     },
     {
       "priority": "medium",
-      "category": "visual",
-      "title": "Mobile header wraps into awkward two-row layout",
-      "description": "On 375px viewport, the header-right section (greeting badge, vibe pill, streak icon, sync button, theme toggle) wraps onto two rows with no visual alignment — the greeting row and the vibe/controls row feel disconnected. The greeting text ('Good evening, LEGEND 🔥 · Sunday, Mar 8') alone is ~250px wide. Fix: on mobile, consider hiding the date portion (or moving it to a subtitle), abbreviating the greeting to just the honorific, and ensuring the vibe pill + buttons stay on one row. Alternatively use a flex-wrap with proper gap/min-width constraints.",
-      "effort": "medium",
-      "assigned_to": "Maya"
+      "category": "ux",
+      "title": "Escape Key Does Not Clear Active Tag Filter",
+      "description": "Keyboard shortcut: Escape currently only calls `document.activeElement?.blur()`. When a task tag filter is active (selectedTag is set), pressing Escape should also clear it \u2014 this is the expected behavior in any filter UI. A user using keyboard-only navigation has no way to clear the filter without clicking or using mouse. Add `setSelectedTag(null)` to the Escape handler in the global keydown effect.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
-      "priority": "low",
+      "priority": "medium",
       "category": "accessibility",
-      "title": "Non-interactive ghost characters are keyboard-focusable with no action",
-      "description": "In Office.jsx line 612, every `Character` component has `tabIndex={0}` unconditionally. Ghost characters (OOO roster members) have no `onClick` handler but are still in the tab order. Keyboard users tabbing through the office will land on ghosts and get nothing — no action, no announcement beyond the aria attributes. Fix: set `tabIndex={onClick ? 0 : -1}` to remove non-interactive characters from the tab order, or ensure the ghost hover card can be triggered via keyboard (Enter/Space) as well.",
-      "effort": "small",
-      "assigned_to": "Sofia"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Tab switching writes to browser history, breaks back button",
-      "description": "Every `setTab` call also does `window.location.hash = 'office'` or `window.location.hash = 'dashboard'`, which pushes a new history entry. Rapidly switching between tabs (or clicking a character in the office view) can bloat the history stack and make the browser back button useless — it just cycles through office/dashboard states instead of navigating away. Fix: replace `window.location.hash = ...` with `history.replaceState(null, '', '#' + tab)` which updates the URL without pushing a history entry.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "No worker search or name filter in dashboard",
-      "description": "The dashboard already has activity log filtering by worker (via the roster filter bar), but the worker cards grid has no search/filter capability. As the team grows beyond 5-6 workers, finding a specific person requires scanning all cards. The tag filter (Design, QA, Bug, etc.) is a partial solution but name-based search is missing. Fix: add a simple text input above the workers grid that filters cards by name or role. A single `useState(searchQuery)` and `workers.filter(w => w.name.includes(query) || w.role.includes(query))` would suffice.",
+      "title": "No aria-live Announcement When Data Syncs",
+      "description": "When the polling sync completes, worker counts and statuses update silently for screen readers. Add a visually-hidden `aria-live='polite'` region (sr-only) that announces something like 'Dashboard updated, 3 workers active' after each successful sync. The isSyncing state and lastSynced timestamp are already tracked \u2014 just pipe the summary string into the live region. Low effort, high accessibility win.",
       "effort": "small",
       "assigned_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Activity Log Worker Filter Excludes Non-Roster Workers",
+      "description": "The worker filter pill bar below the activity log only renders buttons for workers in the `roster` array from workers.json. Workers who appear in activity.json events but are NOT in the roster (e.g. temporary workers, removed workers, or Bloberto himself for system events) cannot be filtered. Either derive filter options from the union of roster + unique worker names seen in activityLog, or add a fallback showing all workers mentioned in the log.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Footer quote counter math is opaque and off-by-one prone",
-      "description": "App.jsx line 1229: `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 / (BONUS_TAGLINES.length + 1)` — the `+1` to the modulo accounts for the vibe tagline slot, but it's implicit and fragile. When `showBonus` is false, the counter still increments on click (because quoteBonus increments), making the displayed 'X/9' misleading (showing slot 1 as the vibe tagline but quoteBonus keeps counting). Recommend extracting a clear `totalSlots = BONUS_TAGLINES.length + 1` const and adding a comment explaining the +1 means the vibe-tagline slot.",
+      "title": "Dead CSS Block at Bottom of App.css",
+      "description": "A block labeled `/* === Mobile Header Fix (Luna Review #41) === */` at the very end of App.css targets `.tab-content`, `.header-subtitle`, and `.tab-toggle` \u2014 none of which exist as class names in the JSX. These are ghost selectors from an old design iteration that were never cleaned up. Remove the dead block (~14 lines). Also check Office.css for similar orphaned selectors from past refactors.",
+      "effort": "small",
+      "assigned_to": "Dave"
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "title": "getTaskTags() Called Twice Per Worker Per Render",
+      "description": "In the workers grid, `getTaskTags(w.task)` is called both inside WorkerCard (for rendering tags) and at the call site as `!getTaskTags(w.task).some(...)` to compute the `isDimmed` prop. This doubles the regex matching work per worker. Either memoize tags inside WorkerCard with useMemo, compute isDimmed inside WorkerCard using already-computed tags, or pass the tags array as a prop instead of the raw task string.",
       "effort": "small",
       "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Conference Table 'Last Huddle' Text Is Sub-Pixel",
+      "description": "The 'Last huddle' timestamp below the conference table is rendered at `font-size: 0.38rem` \u2014 at 16px base that is approximately 6px, smaller than most screens can render crisply. It is effectively invisible. Either bump it to a minimum of 0.65rem and style it as a proper soft label, or remove the feature entirely. Invisible UI is worse than no UI.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Vibe Sparkline Has No Legend or Context",
+      "description": "The vibe sparkline in the Team Vibe stat card is charming but completely opaque to new users. The y-axis represents vibe rank (after-hours \u2192 crushing), the x-axis is time, and dot colors map to vibe states \u2014 but none of this is documented. Add a tooltip on hover for the SVG element explaining the axes, or add aria-description text. The existing `<title>` tags on individual circles are good but the overall chart needs context.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Add Worker Name Search to Dashboard Grid",
+      "description": "As the roster grows, a text search input above the workers grid would help. A simple uncontrolled input filtering `activeWorkers` by `worker.name.toLowerCase().includes(query)` would cover 90% of the use case with minimal code. Consider placing it in the section header next to 'Active Workers (N)'.",
+      "effort": "medium",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Version String Still Shows v1.0.0-chaos",
+      "description": "The footer version is unchanged through at least 27 reviews. Given the substantial feature additions (vibe history, sparklines, custom SVG characters, stuck worker beacon, activity log filters, hash routing, etc.), consider adopting date-based versioning or at least bumping to v2.0.0-chaos to communicate the scale of changes. It's a cosmetic issue but it signals 'nothing has changed' to returning users.",
+      "effort": "small",
+      "assigned_to": "Dave"
     }
-  ]
+  ],
+  "summary": "Review #27 \u2014 major leap forward from the previous 3.6. The codebase has matured significantly: intelligent polling (visibility-aware + idle-pause), a genuinely delightful vibe streak system with sparkline history, click-to-focus cross-tab worker navigation, task tag filtering with dimming, stuck worker beacon, per-worker completion confetti, and rich custom SVG character avatars that include error-state PANIC screens. The Office view is a legitimate showpiece \u2014 conference table vibe behavior, time-of-day sky gradients, away signs, ghost/OOO workers, and Bloberto's ambient speech bubbles are all cohesive and polished. Accessibility has meaningfully improved (skip link, full ARIA tablist pattern, reduced-motion throughout, coarse-pointer detection). Three issues need fixing before this hits prime time: the stats bar grid silently breaks with 7+ cards, the office view is genuinely unusable on mobile at 375px, and Inter font is declared but never loaded. Code health is the main ongoing debt \u2014 App.jsx at 1273 lines and Office.jsx at 1417 lines are becoming a liability. Fun factor is off the charts. This is the best version yet."
 }

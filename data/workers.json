@@ -1,17 +1,5 @@
 {
-  "workers": [
-    {
-      "id": "sofia-qa-24",
-      "name": "Sofia",
-      "role": "QA",
-      "emoji": "🔍",
-      "status": "working",
-      "task": "QA review #24 — visual testing + code analysis of dashboard",
-      "progress": 10,
-      "updated_at": "2026-03-09T06:15:00Z",
-      "startedAt": "2026-03-09T06:15:00Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     { "name": "Bloberto", "role": "Manager", "emoji": "🫠" },
     { "name": "Maya", "role": "Frontend", "emoji": "🎨" },
@@ -20,5 +8,5 @@
     { "name": "Sofia", "role": "QA", "emoji": "🔍" },
     { "name": "Luna", "role": "Creative", "emoji": "🌙" }
   ],
-  "updated_at": "2026-03-09T06:15:00Z"
+  "updated_at": "2026-03-09T06:25:00Z"
 }
