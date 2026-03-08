@@ -1,75 +1,42 @@
 {
   "workers": [
     {
-      "id": "dave-plant-ghost",
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80",
-      "status": "idle",
-      "task": "",
-      "progress": 100,
-      "started": "2026-03-08T01:06:00Z",
-      "updated_at": "2026-03-08T01:06:00Z"
-    },
-    {
-      "id": "carlos-xp-badges",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f",
-      "status": "idle",
-      "task": "",
-      "progress": 100,
-      "started": "2026-03-08T01:06:00Z",
-      "updated_at": "2026-03-08T01:06:00Z"
-    },
-    {
-      "id": "sofia-worker-filter",
+      "id": "sofia-qa-review",
       "name": "Sofia",
       "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d",
+      "emoji": "🔍",
       "status": "working",
-      "task": "Add per-worker filter chips to Activity Log",
+      "task": "QA & Product Analysis — reviewing live site and codebase",
       "progress": 10,
-      "started": "2026-03-08T01:36:00Z",
-      "updated_at": "2026-03-08T01:36:00Z"
-    },
-    {
-      "id": "maya-conference-table",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83e\udde9",
-      "status": "working",
-      "task": "Build vibe-reactive conference table in lower office floor",
-      "progress": 10,
-      "started": "2026-03-08T01:36:00Z",
-      "updated_at": "2026-03-08T01:36:00Z"
+      "started": "2026-03-08T01:45:00Z",
+      "updated_at": "2026-03-08T01:45:00Z"
     }
   ],
   "roster": [
     {
       "name": "Maya",
       "role": "Frontend Engineer",
-      "emoji": "\ud83e\udde9"
+      "emoji": "🧩"
     },
     {
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f"
+      "emoji": "⚙️"
     },
     {
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "\ud83d\udd27"
+      "emoji": "🔧"
     },
     {
       "name": "Sofia",
       "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d"
+      "emoji": "🔍"
     },
     {
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udfa8"
+      "emoji": "🎨"
     }
   ]
 }
