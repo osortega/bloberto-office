@@ -1,57 +1,65 @@
 {
   "creative_director": "Luna",
-  "review_number": 50,
-  "timestamp": "2026-03-08T18:45:00Z",
-  "theme": "The office breathes — now teach it to remember, adapt, and surprise",
-  "visual_observations": "Desktop (1280x800): After-hours vibe active. All #49 improvements confirmed live — door shows 🔒 Locked, candle flickers on manager desk, window displays 'golden hour' caption, whiteboard has history dots, Bloberto speaks on mount ~3s after load. After-hours quote pool now has 8 entries (doubled). The office is atmospherically rich but interaction-poor on mobile — characters overlap below 480px, conference table clips. prefers-reduced-motion only applies to desk-away-sign. The idle wander paths feel samey after 2 minutes. No keyboard focus indicators on office-floor characters despite tabIndex={0}.",
+  "review_number": 51,
+  "timestamp": "2026-03-08T19:30:00Z",
+  "theme": "Give the office a memory — let it react to what happened, not just what's happening",
+  "visual_observations": "Desktop: after-hours vibe active, starfield floor overlay looks great, door locked, candle on manager desk. All review #50 improvements live (reduced-motion, focus rings, away signs, idle micro-bubbles). Conference table ambient labels working. Ficus at seedling stage. Mobile: characters still crowd below 480px but the scale fix from #50 helps. The office feels rich in the moment but has no sense of history — every refresh is a blank slate.",
   "ideas": [
     {
-      "priority": "must",
-      "category": "delight",
-      "title": "Respect prefers-reduced-motion Globally",
-      "description": "Office.css only has ONE @media (prefers-reduced-motion: reduce) rule (for desk-away-sign). But the office has 20+ animations: manager-wobble, bob, enter-office, ghost-float, idle-wander, lamp-pulse, candle-flicker, coffee-wobble, typing-dots, ambient-particle, heat-shimmer, vibe-shockwave, door-swing, clock-frantic-tick, etc. Users who enable reduced motion preferences get ALL of these. Fix: add a global rule at the top of Office.css: @media (prefers-reduced-motion: reduce) { .char, .char--manager, .char--working, .char--idle, .char--ghost, .desk-lamp, .mgr-desk__candle, .mgr-desk__coffee, .mgr-desk__trophy, .coffee-steam span, .typing-dots span, .ambient-particle, .office-door, .vibe-shockwave, .clock-minute-hand--frantic, .idle-micro-bubble, .confetti-piece { animation: none !important; transition: none !important; } }. WHY: This is an accessibility requirement (WCAG 2.1 SC 2.3.3). The office is a vestibular trigger nightmare with its current animation density. One CSS block fixes it for all current and future animations. Zero JS changes needed.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
       "priority": "should",
-      "category": "delight",
-      "title": "Focus Ring on Office Characters",
-      "description": "Every Character component has tabIndex={0} (Office.jsx Character component) and role='button' when clickable, but there's only one CSS rule for focus: .char:focus-visible .char__avatar { outline: 2px solid var(--accent); outline-offset: 2px; }. However, the .char itself has pointer-events: none as the base state (Office.css .char rule), which means keyboard focus technically works but the visual ring is invisible behind the pointer-events: none layer. Fix: ensure .char:focus-visible has pointer-events: auto and add a subtle glow: .char:focus-visible { pointer-events: auto; } .char:focus-visible .char__avatar { outline: 2px solid var(--accent); outline-offset: 3px; box-shadow: 0 0 12px var(--accent-glow); }. WHY: Keyboard users tabbing through the office can't see where they are. The office view is the hero feature — making it keyboard-navigable completes the accessibility story started by the dashboard's proper aria roles.",
-      "effort": "small",
+      "category": "storytelling",
+      "title": "Activity Feed Toast Notifications",
+      "description": "When a new entry lands in activity.json (worker completes, clocks in/out), show a subtle toast notification at the bottom of the office view that slides up and fades after 4s. Like a Slack notification in the corner. WHY: Right now the activity log only shows in the dashboard tab — if you're watching the office tab you miss everything. A toast bridges both views and makes the office feel alive with real-time events. The App.jsx already polls activity.json — just surface those deltas as toasts.",
+      "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "office-life",
-      "title": "Idle Workers Get Unique Wander Personalities",
-      "description": "Currently idle workers all use the same 4 wander patterns (char--wander-1 through char--wander-4) and the same IDLE_BUBBLE_EMOJIS map ({1:'☕', 2:'💬', 3:'🪟', 4:'🧘'}). The wander CSS paths are fixed sine-wave translations. When 3+ workers are idle, they all drift in the same rhythm. Fix: in Office.css, give each wander variant a different animation-duration and path shape. wander-1: 12s, circular. wander-2: 16s, figure-8. wander-3: 20s, diagonal drift. wander-4: 14s, small circle near desk. Also: tie IDLE_BUBBLE_EMOJIS to the worker's role instead of wander index — Carlos (Backend) gets 🔧, Maya (Frontend) gets 🎨, Dave (DevOps) gets 🔥, Sofia (QA) gets 🔍. WHY: Idle characters are on screen longest (they're not doing tasks). If they all wander identically, the illusion breaks. Unique movement + role-aware thought bubbles make each character feel like a person, not a sprite clone.",
-      "effort": "medium",
-      "assigned_to": "carlos"
+      "title": "Worker Task Progress Tooltip on Desk Monitor",
+      "description": "Hover over a working character's desk monitor to see a mini progress card: task name, progress %, and time on task. Right now you can only see this by hovering the character avatar itself (char-hover-card), but the monitor is a bigger hover target and semantically makes more sense — you'd look at someone's screen to see what they're working on. WHY: Bigger hit target, more intuitive interaction, and the monitor already has role-colored glow — extending it with content makes it feel purposeful rather than decorative.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Coffee Counter — Track Total Coffees Consumed",
+      "description": "Add a tiny counter on the coffee corner: '☕ 47 served'. Increment it each time a worker transitions from working→idle (they earned a coffee). Persist in workers.json or a separate stats field. The number grows over time and becomes a fun office stat. WHY: It's a tiny detail that makes the office feel like it has continuity. People love watching numbers go up. It costs almost nothing to implement — just a counter in state and a small DOM element.",
+      "effort": "small",
+      "assigned_to": "maya"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Conference Table Shows Meeting Timer",
-      "description": "ConferenceTable (Office.jsx) shows a 'Huddle' badge when 2+ idle workers are present, but there's no sense of duration. Fix: track when the meeting started by storing a ref in the Office component: const meetingStartRef = useRef(null). When meetingWorkers goes from 0 to 2+, set meetingStartRef.current = Date.now(). When it drops to <2, clear it. Pass the start time to ConferenceTable. Display a small elapsed timer under the Huddle badge: '2m'. Style it dimly to avoid visual noise. WHY: Meetings in real offices have duration anxiety. A tiny '14m' counter under the huddle badge is funny (oh god they've been 'meeting' for 14 minutes and nobody is even working) and adds life to an otherwise static element.",
-      "effort": "medium",
-      "assigned_to": "carlos"
+      "title": "Keyboard Shortcut Overlay — Press '?' to See Controls",
+      "description": "The office has clickable characters and tab navigation, but no discoverability. Add a '?' keyboard shortcut that shows a small overlay: Tab = cycle characters, Enter = ping, 1/2 = switch tabs, R = force refresh. WHY: Power users (devs watching their own dashboard) want keyboard control. It's a 30-line component and makes the dashboard feel like a real app, not just a pretty page.",
+      "effort": "small",
+      "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "storytelling",
-      "title": "Activity Log Entry Animations",
-      "description": "In the dashboard tab, ActivityLog entries appear instantly when new data arrives. There's no transition. The worker cards have enter/exit animations (worker-card--new, worker-card--fading) but the activity log has none. Fix: add a CSS animation to .activity-entry: @keyframes entry-slide { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } } .activity-entry { animation: entry-slide 0.3s ease both; }. Use animation-delay based on index for stagger: style={{ animationDelay: `${i * 0.05}s` }}. WHY: The activity log is the narrative spine of the dashboard. Static entries feel like a database dump. Staggered slide-in makes each event feel like it's 'arriving' — matching the real-time nature of the data.",
+      "category": "visual",
+      "title": "Vibe Streak Counter Visible in Office",
+      "description": "The vibeStreak prop drives the ficus growth but the number itself is invisible. Show it as a small badge near the ficus: '🔥 12 streak'. When streak breaks, show a brief '💔 streak lost' animation. WHY: The ficus growth stages are too slow to notice (every 5 streaks). A visible counter gives immediate feedback and creates a 'gamification' hook — people want to keep the streak going.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "wild",
-      "category": "delight",
-      "title": "Bloberto's Mood Board — ASCII Art Desk Doodle",
-      "description": "Add a tiny 'doodle' area below the whiteboard (or as a hover reveal on the whiteboard). It shows a 3-line ASCII art that changes with vibe. crushing: '╰(*°▽°*)╯', on-fire: '(╯°□°)╯︵ ┻━┻', in-flow: '(⌐■_■)', slow-day: '(._. )', after-hours: '(∪.∪ )...zzz'. Render it as a <pre> element inside the whiteboard div, below the history dots, with font-size: 0.3rem and opacity: 0.3. On hover, opacity jumps to 0.7. WHY: This is pure personality. It costs 5 lines of JSX and tells the user 'someone with taste made this.' Doodles on a whiteboard are universally human — they bridge the gap between 'data dashboard' and 'someone's actual office.' The hover reveal makes it feel like a discovered secret, not a decoration.",
-      "effort": "small",
+      "category": "office-life",
+      "title": "Inter-Character Chat Bubbles During Idle",
+      "description": "When 2+ characters are idle and their wander paths bring them close (within 15% x/y), show a brief chat bubble exchange between them. Pre-written snippets like 'Did you see the latest deploy?' / 'Carlos broke prod again' / 'Maya's CSS is *chef's kiss*'. WHY: This is the holy grail of office life simulation — characters having relationships. It transforms idle time from 'nothing happening' to 'social dynamics'. Medium effort because it needs proximity detection in the wander animation, but the payoff is massive personality injection.",
+      "effort": "medium",
       "assigned_to": "maya"
+    },
+    {
+      "priority": "wild",
+      "category": "feature",
+      "title": "Sound Design — Optional Ambient Office Audio",
+      "description": "A toggle (muted by default) that plays subtle ambient office sounds: keyboard clicks when workers are typing, a coffee machine gurgle at the coffee corner, a gentle hum. Use Web Audio API with tiny samples (<50KB total). WHY: Sound is the missing sense. Visual-only dashboards are cool but adding optional audio transforms it into an experience. The 'muted by default' respects users, but the option to turn it on makes the office feel real. This is a large effort but would be a massive differentiator.",
+      "effort": "large",
+      "assigned_to": "tbd"
     }
   ],
   "hire_proposals": []
