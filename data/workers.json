@@ -38,12 +38,12 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "Shipped: Ficus Milestone Burst",
-      "startedAt": "2026-03-08T08:33:00Z",
+      "status": "working",
+      "task": "QA review #11 \u2014 analyzing live site + code",
+      "startedAt": "2026-03-08T08:45:00Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T08:36:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T08:45:00Z",
+      "progress": 10
     },
     {
       "name": "Maya",
