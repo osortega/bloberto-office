@@ -334,6 +334,39 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
 })
 
 
+const VIBE_COLORS = {
+  'crushing':    '#a78bfa',
+  'in-flow':     '#2dd4bf',
+  'on-fire':     '#ef4444',
+  'slow-day':    '#9ca3af',
+  'after-hours': '#6366f1',
+}
+const VIBE_RANK = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }
+const VIBE_HISTORY_KEY = 'bloberto-vibe-history'
+const VIBE_HISTORY_MAX = 12
+
+function VibeSparkline({ history }) {
+  if (!history.length) return null
+  const n = history.length
+  const pts = history.map((entry, i) => {
+    const x = n === 1 ? 32 : 3 + i * (58 / (n - 1))
+    const rank = VIBE_RANK[entry.key] ?? 2
+    const y = 12 - rank * 2.5
+    return { x, y, entry }
+  })
+  const polyPoints = pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+  return (
+    <svg width="64" height="14" viewBox="0 0 64 14" className="vibe-sparkline" aria-label="Vibe history">
+      {n > 1 && <polyline points={polyPoints} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeLinejoin="round" />}
+      {pts.map((p, i) => (
+        <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="3" fill={VIBE_COLORS[p.entry.key] ?? '#9ca3af'}>
+          <title>{new Date(p.entry.ts).toLocaleTimeString()}: {p.entry.key}</title>
+        </circle>
+      ))}
+    </svg>
+  )
+}
+
 function DeltaBadge({ delta }) {
   if (delta === 0) return null
   return (
@@ -361,6 +394,21 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
   useEffect(() => {
     prevCountsRef.current = { active, idle, error: errorCount }
   }, [active, idle, errorCount])
+
+  const [vibeHistory, setVibeHistory] = useState([])
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(VIBE_HISTORY_KEY)
+      const stored = raw ? JSON.parse(raw) : []
+      if (stored.length === 0) {
+        setVibeHistory([{ key: vibe.key, ts: Date.now() }])
+      } else {
+        setVibeHistory(stored)
+      }
+    } catch {
+      setVibeHistory([{ key: vibe.key, ts: Date.now() }])
+    }
+  }, [vibe.key])
 
   const syncLabel = lastSynced
     ? lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -392,6 +440,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
       <div className={`stat-card vibe vibe--${vibe.key}`}>
         <span className="stat-label">✨ Team Vibe</span>
         <span className="stat-value vibe-value">{vibe.label}</span>
+        <VibeSparkline history={vibeHistory} />
       </div>
       {errorCount > 0 && <div className='stat-card stat-card--error'><div className='stat-label'>❌ Errors</div><div className='stat-value'>{errorCount}</div></div>}
       {stuckWorkers.length > 0 && (
@@ -463,6 +512,61 @@ const FOOTER_TAGLINES = {
   'after-hours': 'the servers are watching. go home.',
 }
 
+const SHORTCUT_KEYS = new Set(['1', '2', 'r', 'R', 'Escape'])
+
+function ShortcutToast() {
+  const [phase, setPhase] = useState(() =>
+    localStorage.getItem('bloberto-shortcuts-shown') ? 'hidden' : 'pending'
+  )
+  const timerRef = useRef(null)
+
+  const dismiss = useCallback((gotIt = false) => {
+    localStorage.setItem('bloberto-shortcuts-shown', '1')
+    if (gotIt) {
+      setPhase('gotit')
+      timerRef.current = setTimeout(() => setPhase('fading-out'), 500)
+    } else {
+      setPhase('fading-out')
+    }
+    timerRef.current = setTimeout(() => setPhase('hidden'), gotIt ? 900 : 300)
+  }, [])
+
+  useEffect(() => {
+    if (phase !== 'pending') return
+    const showTimer = setTimeout(() => setPhase('visible'), 1500)
+    return () => clearTimeout(showTimer)
+  }, [phase])
+
+  useEffect(() => {
+    if (phase !== 'visible') return
+    const autoTimer = setTimeout(() => dismiss(false), 7000)
+    return () => clearTimeout(autoTimer)
+  }, [phase, dismiss])
+
+  useEffect(() => {
+    if (phase !== 'visible') return
+    const handleKey = (e) => {
+      if (SHORTCUT_KEYS.has(e.key)) dismiss(true)
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [phase, dismiss])
+
+  useEffect(() => () => clearTimeout(timerRef.current), [])
+
+  if (phase === 'hidden') return null
+
+  return (
+    <div
+      className={`shortcut-toast shortcut-toast--${phase}`}
+      aria-live="polite"
+      aria-label="Keyboard shortcuts hint"
+    >
+      {phase === 'gotit' ? 'Got it ✓' : '⌨️ Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear'}
+    </div>
+  )
+}
+
 export default function App() {
   useTimeTick(60_000) // keep relative timestamps fresh
   const [allWorkers, setAllWorkers] = useState([])
@@ -509,6 +613,8 @@ export default function App() {
   const newClearTimersRef    = useRef({})   // { [id]: timeoutId }
   const [fadingMap, setFadingMap] = useState({})
   const [newIds,    setNewIds]    = useState(new Set())
+  const [doorEvent, setDoorEvent] = useState(null)
+  const doorEventTimerRef    = useRef(null)
   const [focusedWorker, setFocusedWorker] = useState(null)
   const focusedWorkerTimerRef = useRef(null)
   const [selectedTag, setSelectedTag] = useState(null)
@@ -663,6 +769,9 @@ export default function App() {
     const firstTime = appeared.filter(w => !seenIdsRef.current.has(w.id))
     if (firstTime.length > 0) {
       setNewIds(ids => new Set([...ids, ...firstTime.map(w => w.id)]))
+      if (doorEventTimerRef.current) clearTimeout(doorEventTimerRef.current)
+      setDoorEvent('arrive')
+      doorEventTimerRef.current = setTimeout(() => { setDoorEvent(null); doorEventTimerRef.current = null }, 1500)
       for (const w of firstTime) {
         if (newClearTimersRef.current[w.id]) clearTimeout(newClearTimersRef.current[w.id])
         newClearTimersRef.current[w.id] = setTimeout(() => {
@@ -684,6 +793,9 @@ export default function App() {
         }
         return next
       })
+      if (doorEventTimerRef.current) clearTimeout(doorEventTimerRef.current)
+      setDoorEvent('depart')
+      doorEventTimerRef.current = setTimeout(() => { setDoorEvent(null); doorEventTimerRef.current = null }, 2000)
       for (const w of disappeared) {
         if (fadingTimersRef.current[w.id]) continue
         fadingTimersRef.current[w.id] = setTimeout(() => {
@@ -735,6 +847,14 @@ export default function App() {
       setTimeout(() => setConfettiActive(false), 2500)
     }
     previousVibeKeyRef.current = teamVibe.key
+
+    try {
+      const raw = localStorage.getItem(VIBE_HISTORY_KEY)
+      const history = raw ? JSON.parse(raw) : []
+      history.push({ key: teamVibe.key, ts: Date.now() })
+      if (history.length > VIBE_HISTORY_MAX) history.splice(0, history.length - VIBE_HISTORY_MAX)
+      localStorage.setItem(VIBE_HISTORY_KEY, JSON.stringify(history))
+    } catch { /* ignore */ }
   }, [teamVibe.key])
 
   // ── Favicon: red=error, green=working, grey=idle ──
@@ -841,6 +961,7 @@ export default function App() {
           🎉 {completionToast.name} shipped it!
         </div>
       )}
+      <ShortcutToast />
       <a href="#main-content" className="skip-link">Skip to content</a>
       <header className="header">
         <div className="header-title">
@@ -919,7 +1040,7 @@ export default function App() {
 
         {tab === 'office' ? (
           <div role="tabpanel" id="tabpanel-office" aria-labelledby="tab-office">
-            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} />
+            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} />
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
