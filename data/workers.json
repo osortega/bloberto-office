@@ -1,21 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨",
-      "status": "working",
-      "task": "Vibe Aura on Office Border (CSS)",
-      "started_at": "2026-03-08T16:36:00Z"
-    },
-    {
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "🚀",
-      "status": "working",
-      "task": "Bloberto Nameplate Reveal Animation",
-      "started_at": "2026-03-08T16:36:00Z"
-    }
-  ],
-  "updated_at": "2026-03-08T16:36:00Z"
+  "workers": [],
+  "updated_at": "2026-03-08T16:40:00Z"
 }
