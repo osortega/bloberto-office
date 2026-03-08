@@ -1,14 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️",
-      "status": "working",
-      "task": "Implementing Luna review #55: tab title whispers + stats dispatch lines",
-      "started_at": "2026-03-08T22:36:00Z",
-      "progress": 10
-    }
-  ],
-  "updated_at": "2026-03-08T22:36:00Z"
+  "workers": [],
+  "updated_at": "2026-03-08T22:40:00Z"
 }

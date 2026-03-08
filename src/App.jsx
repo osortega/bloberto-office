@@ -11,6 +11,18 @@ const ACTIVITY_API_URL =
 const POLL_INTERVAL_ACTIVE = 30_000
 const POLL_INTERVAL_HIDDEN = 60_000
 
+const STAT_DISPATCHES = {
+  active: { 0: 'ghost town', 1: 'lone wolf', 2: 'dynamic duo', 3: 'skeleton crew', 4: 'full squad', 5: 'all hands' },
+  error:  { 0: 'smooth sailing', 1: 'minor turbulence', 2: 'code red', 3: 'everything is fine 🔥' },
+  idle:   { 0: 'all hands on deck', 1: 'one on break', 2: 'half wandering', 3: 'everybody scattered' },
+}
+
+function getDispatch(map, value) {
+  const keys = Object.keys(map).map(Number).sort((a, b) => a - b)
+  const key = keys.reduce((prev, k) => k <= value ? k : prev, keys[0])
+  return map[key]
+}
+
 
 
 async function fetchWorkersFromGitHub() {
@@ -402,11 +414,13 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory }) {
       <div className="stat-card active">
         <span className="stat-label">⚡ Active</span>
         <span className="stat-value">{active}</span>
+        <span className="stat-dispatch">{getDispatch(STAT_DISPATCHES.active, active)}</span>
         <DeltaBadge delta={activeDelta} />
       </div>
       <div className="stat-card idle">
         <span className="stat-label">😴 Idle</span>
         <span className="stat-value">{idle}</span>
+        <span className="stat-dispatch">{getDispatch(STAT_DISPATCHES.idle, idle)}</span>
         <DeltaBadge delta={idleDelta} />
       </div>
       <div className="stat-card sync-status">
@@ -421,7 +435,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory }) {
         <span className="stat-value vibe-value">{vibe.label}</span>
         <VibeSparkline history={vibeHistory} />
       </div>
-      {errorCount > 0 && <div className='stat-card stat-card--error'><div className='stat-label'>❌ Errors</div><div className='stat-value'>{errorCount}</div></div>}
+      {errorCount > 0 && <div className='stat-card stat-card--error'><div className='stat-label'>❌ Errors</div><div className='stat-value'>{errorCount}</div><span className='stat-dispatch'>{getDispatch(STAT_DISPATCHES.error, errorCount)}</span></div>}
       {stuckWorkers.length > 0 && (
         <div
           className="stat-card stat-card--stuck"
@@ -927,11 +941,36 @@ export default function App() {
 
     let idx = 0
     document.title = frames[idx]
-    const timer = setInterval(() => {
+    let timer = setInterval(() => {
       idx = (idx + 1) % frames.length
       document.title = frames[idx]
     }, 8_000)
-    return () => clearInterval(timer)
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        clearInterval(timer)
+        if (errCount > 0) {
+          document.title = '⚠️ Someone needs help — Bloberto Office'
+        } else if (workingCount > 0) {
+          document.title = '🔨 Team is shipping — Bloberto Office'
+        } else {
+          document.title = '💤 Office is quiet — Bloberto Office'
+        }
+      } else {
+        idx = 0
+        document.title = frames[idx]
+        timer = setInterval(() => {
+          idx = (idx + 1) % frames.length
+          document.title = frames[idx]
+        }, 8_000)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [activeWorkers, teamVibe])
 
   const errorCount = activeWorkers.filter(w => w.status === 'error').length

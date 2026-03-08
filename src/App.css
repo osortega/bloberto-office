@@ -155,6 +155,8 @@
   line-height: 1;
 }
 
+.stat-dispatch { display: block; font-size: 0.7rem; color: var(--text-muted); font-style: italic; min-height: 1em; margin-top: 2px; }
+
 .stat-card.total .stat-value  { color: var(--accent2); }
 .stat-card.active .stat-value { color: var(--green); }
 .stat-card.idle .stat-value   { color: var(--yellow); }
