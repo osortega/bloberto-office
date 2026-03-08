@@ -346,5 +346,17 @@
     "type": "complete",
     "worker": "Maya",
     "message": "Idle char name shrunk to 0.32rem with hover reveal (applied by manager)"
+  },
+  {
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #16",
+    "timestamp": "2026-03-08T11:45:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #16 complete \u2014 16 findings (4 high, 8 medium, 4 low). Overall: 3.3/5. Score DOWN from 3.4. Coffee corner vibe text broken, reduced-motion selectors orphaned, dead CSS from unshipped features.",
+    "timestamp": "2026-03-08T11:55:00Z"
   }
 ]

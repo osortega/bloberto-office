@@ -1,7 +1,7 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-08T11:15:46Z",
-  "review_number": 15,
+  "timestamp": "2026-03-08T11:45:00Z",
+  "review_number": 16,
   "scores": {
     "visual": 4,
     "ux": 3,
@@ -9,136 +9,138 @@
     "performance": 3,
     "accessibility": 3,
     "code_quality": 2,
-    "features": 4,
+    "features": 3,
     "fun_factor": 5
   },
-  "overall_score": 3.4,
+  "overall_score": 3.3,
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Dead code: activityLogLenRef is set but never read",
-      "description": "Lines 745–747 of App.jsx: `const activityLogLenRef = useRef(0)` is created and written to in a useEffect but is NEVER READ anywhere in the codebase. It's pure dead code that adds a side-effect run on every activity log change for zero benefit. Delete it.",
-      "effort": "small"
+      "title": "Coffee corner vibe text is completely broken — class name mismatch",
+      "description": "Office.css lines 1344–1349 apply vibe-reactive content to `.coffee-corner-label::after` (e.g. 'TRIPLE SHOT' on crushing, 'STRONG. NOW.' on-fire, '...zzz' on slow-day). But the JSX element at Office.jsx line 1061 uses the BEM name `.coffee-corner__label`. The CSS selector never matches, so all four vibe reactions are permanently invisible. This is a fully-built feature that silently does nothing. Fix: either rename the CSS selectors to `.coffee-corner__label` or align the JSX to the non-BEM name.",
+      "effort": "small",
+      "assigned_to": "Dave"
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "Pointless useMemo: stableActivityLog provides zero memoization",
-      "description": "`const stableActivityLog = useMemo(() => activityLog, [activityLog])` is functionally identical to `activityLog` itself. The dep array invalidates the memo the same moment the value changes — it will always return a fresh reference whenever `activityLog` changes. This misleads maintainers into thinking there's optimization happening when there is none. Just use `activityLog` directly everywhere stableActivityLog is referenced.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "ux",
-      "title": "stat-card--stuck is completely keyboard-inaccessible",
-      "description": "The 'Stuck Workers' stat card has an onClick handler that scrolls to a stuck worker, but has no `tabIndex`, no `role=\"button\"`, and no `onKeyDown` handler. Keyboard-only users cannot activate it at all. Fix: add `tabIndex={0}`, `role=\"button\"`, and `onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { /* scroll logic */ } }}`.",
-      "effort": "small"
+      "title": "Orphaned reduced-motion selectors reference old class names",
+      "description": "Office.css reduced-motion block (lines 1188–1193) lists `.office-worker`, `.office-worker--ghost`, `.office-worker--manager` as targets for `animation: none !important`. These class names do not exist anywhere in the current JSX — the components were renamed to `.char--working`, `.char--ghost`, `.char--manager` at some point. The reduced-motion overrides for these three variants are completely inert, meaning users who prefer-reduced-motion are still getting the bob, ghost-float, and manager-wobble animations. Fix: replace with the current `.char--working`, `.char--ghost`, `.char--manager` class names.",
+      "effort": "small",
+      "assigned_to": "Dave"
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "IIFEs inside JSX are a React anti-pattern (multiple instances in WorkerCard)",
-      "description": "WorkerCard uses `{(() => { const tags = getTaskTags(...); return tags.length > 0 ? ... : null })()}` and `{worker.status === 'working' && worker.updated_at && (() => { ... })()}` inline. IIFEs inside JSX create a new function object on every render, hurt readability, and signal missing component extraction. Extract these to named variables computed before the return, or to dedicated sub-components. There are at least 3 of these in WorkerCard alone.",
-      "effort": "small"
+      "title": "Dead CSS: .char--coffee-break and .coffee-corner--visited are unimplemented features",
+      "description": "Office.css lines 1303–1349 contain a full coffee-break animation system: `.char--coffee-break` walks the character to the coffee corner (keyframe `coffee-break-walk`), `.coffee-corner--visited` shows a steam effect, and `@media prefers-reduced-motion` branches for both. None of these classes are ever applied in Office.jsx or App.jsx. This is ~50 lines of dead CSS from what looks like a half-shipped feature. Either implement the coffee-break trigger (when a worker goes idle, start a coffee-break walk) or delete it. Dead code that looks alive is worse than no code.",
+      "effort": "medium",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "getRelativeTime logic duplicated verbatim in Office.jsx ghost bubble handler",
-      "description": "App.jsx defines `getRelativeTime(timestamp)` at module scope (line 28). Office.jsx's ghost bubble IIFE (lines 524–530) duplicates the exact same logic inline. The function is never exported/imported between files. Either export `getRelativeTime` from App.jsx (or a utils file) and import it in Office.jsx, or move it to `src/utils/time.js`.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "Double ambient-particles layer: 19 animated elements running simultaneously",
-      "description": "App.jsx renders 12 `.ambient-particle` spans in a full-screen fixed div. Office.jsx renders another 7 ambient particles inside the office floor. That's 19 concurrently animated particles in addition to character bobs, clock animations, wander paths, progress rings, etc. The Office.jsx particles are redundant — the floor already has the full-app particles visible through it. Remove the second batch in Office.jsx.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "Activity log filter chain runs on every App render — should be memoized",
-      "description": "The expression `activityLog.filter(e => { ... }).filter(e => { ... })` in the Dashboard JSX runs on every render cycle, including the 60-second timestamp tick from `useTimeTick`. With large activity logs this is wasteful. Wrap with `useMemo(() => activityLog.filter(...).filter(...), [activityLog, activityFilter, workerFilter])`.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "useTimeTick forces full App re-render every 60 seconds",
-      "description": "`useTimeTick(60_000)` is called at the top of App(), which means the ENTIRE component tree re-renders every minute just to refresh relative timestamps. The only consumers are activity log entries. Move the tick to a lower-level component (e.g., ActivityLog) or use a context so only timestamp-displaying nodes re-render.",
-      "effort": "medium"
+      "title": "IDLE_BUBBLE_EMOJIS object is defined inside useEffect — recreated every invocation",
+      "description": "Office.jsx line 389: `const IDLE_BUBBLE_EMOJIS = { 1: '☕', 2: '💬', 3: '🪟', 4: '🧘' }` is declared inside the `useEffect` body of the `Character` component. This creates a new object literal every time the effect fires (on variant or wanderIdx change). It should be hoisted to module scope alongside other constants. Same principle applies to `AWAY_MESSAGES` which is already correctly at module scope — this one just got missed.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "document.querySelector in StatsBar — React anti-pattern",
-      "description": "Line 430: `document.querySelector([data-worker-name=\"${name}\"])?.scrollIntoView(...)` directly manipulates the DOM from a React component. This bypasses React's ref system and is fragile. The WorkerCard already holds a `cardRef` — instead pass a scroll-to callback from App to both WorkerCard and StatsBar, so the card calls it on mount when `isFocused` is true (this pathway already exists and works, just add scroll support there).",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Mobile office view: Luna character overlaps whiteboard area",
-      "description": "On the mobile screenshot (375×812), Luna's character renders over the whiteboard/left wall area. The wander keyframes use fixed percentage values (`left: 15–71%, top: 73–87%`) but at 480px the floor has a `max-height: 320px`. The top percentages (73–87%) may be visually outside usable bounds when aspect-ratio is forced and min-height constrains the floor. Test the wander bounds at small sizes and add floor-height-aware clamping or reduce the top% range.",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "aria-live timestamps are invisible to screen readers (title attribute)",
-      "description": "ActivityLogEntry shows timestamps with `title={formatFullDateTime(...)}` as the accessible label. The `title` attribute is not reliably announced by screen readers. Users navigating by keyboard also can't trigger the tooltip. Consider adding a visually-hidden `<time dateTime={...}>` element alongside the relative timestamp, or use an `aria-label` on the time span.",
-      "effort": "small"
+      "title": "ghost-enter keyframe is an exact duplicate of enter-office",
+      "description": "Office.css lines 706–727: `@keyframes ghost-enter` and `@keyframes enter-office` have identical `from` and `to` declarations (both slide up from `translateY(72px) scale(0.3)` to `translateY(0) scale(1)`). One of them is dead weight. The `.char--ghost` animation could reference `enter-office` directly, or both could be merged into a shared `@keyframes char-enter` used by both variants. 14 lines of duplication for zero difference.",
+      "effort": "small",
+      "assigned_to": "Dave"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "Office.jsx is 1183 lines — needs splitting",
-      "description": "Office.jsx has grown to 1183 lines and contains CharacterAvatar (288 lines of SVG alone), Character, WallClock, WindowElement, ConferenceTable, AwaySign, VibeShockwave, and the main Office component. This violates single-responsibility and makes navigation painful. At minimum extract CharacterAvatar to `src/components/CharacterAvatar.jsx` and WallClock/WindowElement to `src/components/OfficeDecor.jsx`.",
-      "effort": "medium"
+      "title": "Dead CSS: .worker-footer, .tab-content, .header-subtitle defined but never used",
+      "description": "App.css contains three CSS rules targeting classes that don't exist in current JSX: `.worker-footer` (line 545, 8 rules), `.tab-content` (inside @media max-width:480px, line 1067), and `.header-subtitle` (line 1079). These are stale artifacts from prior refactors. They add noise, can confuse maintainers into thinking they're safe to reuse, and inflate the CSS bundle. Search-and-confirm they're unused, then delete.",
+      "effort": "small",
+      "assigned_to": "Dave"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "Office characters have no keyboard affordance despite being interactive",
-      "description": "Working and idle characters have `pointer-events: auto` and click handlers, but no visible focus indicator and their `tabIndex={0}` is set without communicating what pressing Enter/Space will do. The CSS only provides `data-tooltip::after` for hover — there's no equivalent for focus state. Non-mouse users have no way to discover these characters are clickable.",
-      "effort": "medium"
+      "category": "code",
+      "title": "Variable shadowing in ConferenceTable — cx and orbitR redeclared inside map()",
+      "description": "Office.jsx line 656 declares `const cx = 52, cy = 52, tableR = 28, chairR = 6, orbitR = 38` at the function scope. Then at line 711, inside the `meetingWorkers.map()` callback, the code re-declares `const cx = 52, orbitR = 38` with identical values. The inner declarations shadow the outer ones. Linters (no-shadow rule) would flag this. Since the values are the same, the inner declarations are redundant — delete them and use the outer scope variables.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "handleTabKeyDown not wrapped in useCallback — new function reference every render",
+      "description": "App.jsx line 631: `function handleTabKeyDown(e) { ... }` is declared as a plain function inside the App component body, then passed to `onKeyDown` on both tab toggle buttons. It is recreated on every render. While the performance impact here is minimal (it's just two button elements), it's inconsistent with the codebase's pattern of using `useCallback` for all event handlers passed as props (see `handleTagClick`, `handleWorkerClick`, `syncFromGitHub`). Wrap in `useCallback` with `[tab]` as the dependency.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "visual",
-      "title": "completionToast rendered with inline styles — CSS class needed",
-      "description": "The completion toast (line 932–956) uses a massive inline `style` object that's inconsistent with the rest of the codebase where everything uses CSS classes. This makes theming, dark/light mode support, and reduced-motion preferences impossible to apply to the toast. Extract to a `.completion-toast` CSS class in App.css.",
-      "effort": "small"
+      "title": "Whiteboard background (#f0f0e8) is hardcoded — invisible in light mode, jarring in dark",
+      "description": "The `.office-whiteboard` has `background: #f0f0e8` hardcoded (Office.css line 1094). In dark mode, this cream-white box is visually jarring against the `#13152a` floor — fine as a prop but there's no dark-mode variant. In light mode (floor `#e6e6f0`), the whiteboard barely differs from the floor (cream-on-light-grey, ~4% contrast). The `wb-progress-pct` also uses `color: rgba(0,0,0,0.35)` which needs to be visible on the whiteboard in both themes. Add a `[data-theme='light'] .office-whiteboard { border: 1.5px solid rgba(0,0,0,0.2); box-shadow: 0 1px 6px rgba(0,0,0,0.15); }` to make it legible.",
+      "effort": "small",
+      "assigned_to": "Maya"
     },
     {
-      "priority": "low",
-      "category": "code",
-      "title": "window.location.hash mutations are scattered and duplicated",
-      "description": "There are at least 6 places in App.jsx that do `setTab('X'); window.location.hash = 'X'` as a paired operation. Extract a `navigateToTab(tab)` helper that does both atomically, reducing duplication and making it easier to add tab-change side effects later.",
-      "effort": "small"
+      "priority": "medium",
+      "category": "visual",
+      "title": "Stats bar 5-column grid breaks when error and stuck cards both appear",
+      "description": "App.css line 118: `.stats-bar { grid-template-columns: repeat(5, 1fr); }`. The base bar has 5 cards. When `errorCount > 0` AND `stuckWorkers.length > 0`, two additional cards render, for a total of 7. With a fixed 5-column grid the 6th and 7th wrap to a new row and stretch to fill unevenly. The @media override at 900px switches to 3 columns, making it even worse. Replace with `grid-template-columns: repeat(auto-fit, minmax(140px, 1fr))` so the grid is always responsive to card count.",
+      "effort": "small",
+      "assigned_to": "Maya"
     },
     {
-      "priority": "low",
-      "category": "feature",
-      "title": "No error boundary — uncaught throws crash the whole app",
-      "description": "There's no React error boundary wrapping the main content. If CharacterAvatar throws (e.g., a malformed SVG prop), Office, Dashboard, or any component, the user sees a blank white screen with no way to recover. Add a simple ErrorBoundary component wrapping the `<main>` that shows a 'Something went wrong — ↺ Retry' message.",
-      "effort": "medium"
+      "priority": "medium",
+      "category": "responsiveness",
+      "title": "Conference table is 104×104px fixed — takes up ~25% of mobile floor width",
+      "description": "The `ConferenceTable` SVG is rendered at a fixed `width='104' height='104'` with no responsive sizing. On a 375px wide screen, the office floor is ~375px wide and the table occupies 104/375 ≈ 28% of the width. It visually dominates the lower center of the mobile office floor (confirmed in screenshot). Wrap in a container and use CSS `max-width: clamp(60px, 12%, 104px)` or add a `@media (max-width: 480px)` rule to `.conference-table svg` that scales it down to ~60px.",
+      "effort": "small",
+      "assigned_to": "Maya"
     },
     {
-      "priority": "low",
+      "priority": "medium",
+      "category": "ux",
+      "title": "Shortcut toast overlaps footer on mobile due to fixed bottom positioning",
+      "description": "The `.shortcut-toast` uses `position: fixed; bottom: 1.5rem; right: 1.5rem`. On mobile (375px), the toast's text 'Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear' at `font-size: 0.75rem; white-space: nowrap` overflows the viewport width (confirmed in mobile screenshot — it renders outside the right edge). On mobile, keyboard shortcuts aren't relevant anyway. Fix: hide the shortcut toast on mobile entirely (`@media (max-width: 600px) { .shortcut-toast { display: none; } }`) since 1/2/R/Esc are physical keyboard shortcuts.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "medium",
       "category": "accessibility",
-      "title": "Vibe sparkline circle tooltips use SVG <title> — poor SR support",
-      "description": "The VibeSparkline circles use `<title>` child elements for tooltip text. SVG `<title>` has inconsistent screen reader support across browsers. Use `aria-label` on each circle (which already exist as interactive SVG elements) or wrap in a `<g role=\"img\" aria-label=\"...\">` instead.",
-      "effort": "small"
+      "title": "color-mix() used extensively with no fallback for older browsers",
+      "description": "Office.css and App.css use `color-mix(in srgb, ...)` in at least 8 places (e.g. Office.css lines 249, 614, 680; App.css line 289, 978). Browser support is ~93% as of early 2026, but older Safari (<16.2) and Firefox (<113) will silently drop these rules, potentially losing critical visual affordances like role-color borders and focus rings on worker avatars. Add `color-mix`-free fallback values before each use: e.g. `box-shadow: 0 0 9px rgba(167,139,250,0.45); box-shadow: 0 0 9px color-mix(in srgb, var(--role-color) 45%, transparent)`.",
+      "effort": "medium",
+      "assigned_to": "Dave"
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "ETA calculation likely always null — startedAt field name mismatch",
-      "description": "ProgressBar receives `startedAt={worker.startedAt}` and uses it for ETA. Confirmed: workers.json DOES use `startedAt` (camelCase), so the field is correctly named. However, the ETA condition `progress > 5 && progress < 100 && workingMins > 1` means ETA only shows when workers have been going more than 1 minute at >5% progress. Verify the ETA actually appears in practice — it may never show in the UI due to the conditions.",
-      "effort": "small"
+      "title": "WallClock re-renders every minute but only App-level useTimeTick ticks every 60s too",
+      "description": "WallClock (Office.jsx line 760) sets up its own `setInterval` that calls `setTime(new Date())` every 60 seconds. App also has `useTimeTick(60_000)` which forces a full App re-render every 60 seconds. During that re-render, WallClock's parent Office re-renders, which re-renders WallClock — in addition to its own interval tick. The clock effectively re-renders twice per minute. Since WallClock is a pure time display, it should be wrapped in `memo()` so the App tick doesn't cause an unnecessary WallClock re-render on top of its own.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Coffee break walk animation is built but never triggered — wire it up",
+      "description": "Office.css has a complete implementation of `.char--coffee-break` (character walks to coffee corner) and `.coffee-corner--visited` (steam effect after visit). The animation, reduced-motion branch, and positioning are all there. It just needs to be triggered: when a worker transitions from 'working' to 'idle', briefly apply `char--coffee-break` to their Character component for ~2 seconds before switching to the idle wander variant. This would be a delightful micro-interaction that's literally 90% done already.",
+      "effort": "medium",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Vibe caption (TEAM LOCKED IN etc.) has no aria-live on mobile",
+      "description": "The `vibeCaption` div in Office.jsx line 1036 uses `aria-live='polite'` which is correct. However the element is inside the `office-floor` which is `role='region'` — the vibe caption announcing '🔥 All hands' or '🚀 Team locked in' would be a helpful audio cue for screen reader users. Good implementation — just confirming this one is done right. Worth noting as a positive finding.",
+      "effort": "small",
+      "assigned_to": "unassigned"
     }
   ]
 }
