@@ -1,14 +1,14 @@
 {
   "workers": [
     {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA & Product Analyst",
-      "emoji": "🔍",
+      "id": "maya",
+      "name": "Maya",
+      "role": "frontend",
+      "emoji": "🎨",
       "status": "working",
-      "task": "QA review #19",
-      "startedAt": "2026-03-08T15:15:00Z"
+      "current_task": "Implementing Vibe Aura on Office Border (CSS)",
+      "started_at": "2026-03-08T15:30:00Z"
     }
   ],
-  "updated_at": "2026-03-08T15:15:00Z"
+  "updated_at": "2026-03-08T15:30:00Z"
 }
