@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T09:36:00Z",
+  "lastUpdated": "2026-03-08T09:45:00Z",
   "workers": [
     {
       "name": "Carlos",
@@ -38,12 +38,12 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "Shipped: QA review #12 \u2014 14 findings (4 high, 5 med, 5 low). Score: 3.9/5",
-      "startedAt": "2026-03-08T09:15:00Z",
+      "status": "working",
+      "task": "QA review #13 \u2014 analyzing live site + code",
+      "startedAt": "2026-03-08T09:45:00Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T09:25:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T09:45:00Z",
+      "progress": 10
     },
     {
       "name": "Maya",
