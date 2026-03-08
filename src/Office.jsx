@@ -737,7 +737,7 @@ function WindowElement() {
 // Chair positions around the table (angle in degrees, radius from center)
 const CHAIR_ANGLES = [0, 60, 120, 180, 240, 300]
 
-function ConferenceTable({ vibeKey, meetingWorkers = [] }) {
+function ConferenceTable({ vibeKey, meetingWorkers = [], lastHuddle }) {
   const vibe = vibeKey || 'in-flow'
 
   // How many chairs are visible per vibe
@@ -816,6 +816,20 @@ function ConferenceTable({ vibeKey, meetingWorkers = [] }) {
            'locked up'}
         </div>
       )}
+
+      {meetingWorkers.length === 0 && (() => {
+        const h = lastHuddle?.current
+        if (!h || !h.names.length || h.endedAt === null) return null
+        const elapsed = Date.now() - h.endedAt
+        if (elapsed > 30 * 60 * 1000) return null
+        const mins = Math.floor(elapsed / 60000)
+        const timeStr = mins < 1 ? 'just now' : `${mins}m ago`
+        return (
+          <div style={{ opacity: 0.5, fontSize: '0.38rem', textAlign: 'center', marginTop: '2px' }}>
+            Last: {h.names.join(', ')} · {timeStr}
+          </div>
+        )
+      })()}
 
       {meetingWorkers.length >= 2 && (
         <>
@@ -980,6 +994,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const pingTimerRef = useRef(null)
   const prevVibeForNameplate = useRef(vibe)
   const nameplateRef = useRef(null)
+  const lastHuddle = useRef({ names: [], endedAt: null })
 
   const handleCharClick = (worker) => {
     if (pingTimerRef.current) clearTimeout(pingTimerRef.current)
@@ -987,6 +1002,14 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     pingTimerRef.current = setTimeout(() => setPingedId(null), 700)
     if (onWorkerClick) onWorkerClick(worker)
   }
+
+  useEffect(() => {
+    if (meetingWorkers.length >= 2) {
+      lastHuddle.current = { names: meetingWorkers.map(w => w.name), endedAt: null }
+    } else if (meetingWorkers.length === 0 && lastHuddle.current.names.length > 0 && lastHuddle.current.endedAt === null) {
+      lastHuddle.current = { ...lastHuddle.current, endedAt: Date.now() }
+    }
+  }, [meetingWorkers])
   const prevAvgProgress = useRef(avgProgress)
   useEffect(() => {
     if (avgProgress === 100 && prevAvgProgress.current !== 100) {
@@ -1218,7 +1241,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         })}
 
         {/* Conference table — lower center */}
-        <ConferenceTable vibeKey={vibe} meetingWorkers={meetingWorkers} />
+        <ConferenceTable vibeKey={vibe} meetingWorkers={meetingWorkers} lastHuddle={lastHuddle} />
 
         {vibeCaption && <div className="vibe-caption" aria-live="polite">{vibeCaption}</div>}
 
