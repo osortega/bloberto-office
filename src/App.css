@@ -1114,3 +1114,22 @@
     font-size: 0.65rem;
   }
 }
+
+/* === VibeSparkline Hover Legend (Accessibility) === */
+.sparkline-legend {
+  display: none;
+  gap: 3px;
+  margin-top: 2px;
+}
+.stat-card:hover .sparkline-legend {
+  display: flex;
+  flex-wrap: wrap;
+}
+.sparkline-legend__pill {
+  font-size: 0.55rem;
+  padding: 1px 5px;
+  border-radius: 8px;
+  color: #fff;
+  white-space: nowrap;
+  opacity: 0.85;
+}

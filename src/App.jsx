@@ -362,14 +362,26 @@ function VibeSparkline({ history }) {
   })
   const polyPoints = pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
   return (
-    <svg width="64" height="14" viewBox="0 0 64 14" className="vibe-sparkline" aria-label="Vibe history">
-      {n > 1 && <polyline points={polyPoints} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeLinejoin="round" />}
-      {pts.map((p, i) => (
-        <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="3" fill={VIBE_COLORS[p.entry.key] ?? '#9ca3af'}>
-          <title>{new Date(p.entry.ts).toLocaleTimeString()}: {p.entry.key}</title>
-        </circle>
-      ))}
-    </svg>
+    <>
+      <svg width="64" height="14" viewBox="0 0 64 14" className="vibe-sparkline" aria-label={`Vibe history: ${history.map(h => h.key.replace(/-/g, ' ')).join(' then ')}`}>
+        <title>{history.map(h => h.key.replace(/-/g, ' ')).join(' then ')}</title>
+        {n > 1 && <polyline points={polyPoints} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeLinejoin="round" />}
+        {pts.map((p, i) => (
+          <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="3" fill={VIBE_COLORS[p.entry.key] ?? '#9ca3af'}>
+            <title>{new Date(p.entry.ts).toLocaleTimeString()}: {p.entry.key}</title>
+          </circle>
+        ))}
+      </svg>
+      {history.length > 0 && (
+        <div className="sparkline-legend">
+          {history.slice(-3).map((h, i) => (
+            <span key={i} className="sparkline-legend__pill" style={{ background: VIBE_COLORS[h.key] || '#666' }}>
+              {h.key.replace(/-/g, ' ')}
+            </span>
+          ))}
+        </div>
+      )}
+    </>
   )
 }
 

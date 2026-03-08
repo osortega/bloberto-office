@@ -121,6 +121,14 @@ const VACANT_ADS = {
   'after-hours':  { title: 'Night Watch',            req: 'The servers need company.' },
 }
 
+const PING_REACTIONS = {
+  luna: 'Creative review in progress...',
+  carlos: 'Check the logs. It is ALWAYS in the logs.',
+  maya: 'Check the PRs — purple and correct as always.',
+  dave: 'He hears you through the headphones.',
+  sofia: 'Found 3 more bugs already.',
+}
+
 
 const CharacterAvatar = memo(function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
@@ -421,7 +429,7 @@ function AwaySign({ workerId, idleMinutes }) {
   )
 }
 
-const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick, isPinged = false }) {
+const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick, isPinged = false, pingReaction = null }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
   const isManager = worker.id === 'bloberto'
@@ -445,6 +453,15 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
     if (timerRef.current)  clearTimeout(timerRef.current)
     if (ambientRef.current) clearInterval(ambientRef.current)
   }, [])
+
+  // Ping reaction — show Bloberto's worker-specific one-liner
+  useEffect(() => {
+    if (pingReaction) {
+      setBubble({ quote: pingReaction, show: true })
+      if (timerRef.current) clearTimeout(timerRef.current)
+      timerRef.current = setTimeout(() => setBubble(b => ({ ...b, show: false })), 3000)
+    }
+  }, [pingReaction])
 
   // Idle micro-bubbles — ambient thought emojis for wandering characters
   const IDLE_BUBBLE_EMOJIS = { 1: '☕', 2: '💬', 3: '🪟', 4: '🧘' }
@@ -1007,6 +1024,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
   const [showDone, setShowDone] = useState(false)
   const [pingedId, setPingedId] = useState(null)
+  const [pingReaction, setPingReaction] = useState(null)
   const [vibeCaption, setVibeCaption] = useState(null)
   const isFirstVibe = useRef(true)
   const pingTimerRef = useRef(null)
@@ -1018,6 +1036,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     if (pingTimerRef.current) clearTimeout(pingTimerRef.current)
     setPingedId(worker.id)
     pingTimerRef.current = setTimeout(() => setPingedId(null), 700)
+    const reaction = PING_REACTIONS[worker.id]
+    if (reaction) {
+      setPingReaction(reaction)
+      setTimeout(() => setPingReaction(null), 3000)
+    }
     if (onWorkerClick) onWorkerClick(worker)
   }
 
@@ -1311,7 +1334,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
 
         {/* Bloberto — always at manager desk, always visible */}
-        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} />
+        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} pingReaction={pingReaction} />
 
         {/* Active workers at desks (working) or as ghosts (roster-only) — skip idle, they wander */}
         {DESKS.map((desk, i) => {
