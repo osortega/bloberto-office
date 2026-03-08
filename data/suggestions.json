@@ -1,138 +1,87 @@
 {
   "analyst": "Sofia",
-  "review_number": 12,
-  "timestamp": "2026-03-08T09:25:00Z",
+  "timestamp": "2026-03-08T10:15:47Z",
   "scores": {
     "visual": 4,
-    "ux": 4,
+    "ux": 3,
     "responsiveness": 3,
     "performance": 3,
     "accessibility": 4,
     "code_quality": 3,
-    "features": 5,
+    "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.9,
-  "previous_score": 3.9,
-  "what_is_genuinely_good": [
-    "prefers-reduced-motion coverage is comprehensive — nearly every animation has a fallback. Rare.",
-    "The vibe system is genuinely delightful — shockwave, sparkline, streak counter, ficus growth. Cohesive worldbuilding.",
-    "Accessibility is surprisingly solid for a fun project — aria-labels, role attributes, skip-link, keyboard shortcuts, tab roving.",
-    "The office visualization is packed with personality — away signs, ghost OOO bubbles, coffee corner chat, door animations.",
-    "Tab title cycling and dynamic favicon are great polish details most dashboards never bother with."
-  ],
+  "overall_score": 3.6,
   "suggestions": [
     {
       "priority": "high",
-      "category": "code",
-      "title": "useMemo side-effect in activityLogLenRef",
-      "description": "In App.jsx, stableActivityLog uses useMemo with a side-effect (activityLogLenRef.current = activityLog.length). React docs explicitly warn against side-effects in useMemo — it may skip execution in concurrent mode. Move the ref assignment to a useEffect instead.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "performance",
-      "title": "Massive CSS file — Office.css is 1500+ lines",
-      "description": "Office.css is enormous and monolithic. Many animations (@keyframes) are defined but only used conditionally. Consider code-splitting or using CSS modules per component. At minimum, group related blocks and add section comments for maintainability.",
-      "effort": "large",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "high",
       "category": "bug",
-      "title": "Conference table renders outside visible area on mobile",
-      "description": "ConferenceTable has no explicit positioning (no left/top in CSS class .conference-table). On narrow screens it may overlap with desks or be invisible. Needs position: absolute with responsive coordinates.",
-      "effort": "small",
-      "assignee": "Maya"
+      "title": "stableActivityLog memo dep on .length causes stale data",
+      "description": "In App.jsx: `const stableActivityLog = useMemo(() => activityLog, [activityLog.length])`. This only invalidates when the array *length* changes — not when contents change. If the polling response replaces an entry at the same index (same-length array, different data), WorkerCard back-panel histories and the ActivityLog component silently show stale entries. Fix: change the dependency to `[activityLog]`. React's referential equality already handles this correctly because `fetchActivityFromGitHub` creates a new array reference on every fetch. The `.length` optimization saves absolutely nothing and introduces a correctness bug. Two-character deletion.",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "performance",
-      "title": "Multiple setInterval timers per Character instance",
-      "description": "Each Character component (manager variant) creates a 45-second ambient quote interval plus hover timeouts. With 6+ characters rendered, this creates multiple concurrent intervals. Consider lifting the ambient broadcast to a single interval in the parent Office component.",
-      "effort": "medium",
-      "assignee": "Carlos"
+      "category": "ux",
+      "title": "~250px dead zone below office floor on mobile (375px)",
+      "description": "On 375×812 mobile, there is roughly 250px of empty dark space between the bottom of the office floor and the footer. The floor uses `min-height: 280px` at the 480px breakpoint without a corresponding max-height, and `aspect-ratio: auto` is set at 768px. The natural height at 375px width ends up around 280px but the viewport has 500px+ of remaining height, leaving a visually broken gap. Fix: in the 480px media query in Office.css add `.office-floor { max-height: 320px; }` and `.office-wrap { margin-bottom: 1rem; }`. This prevents the floor from collapsing while closing the dead zone. The page currently feels like it crashed on mobile.",
+      "effort": "small"
     },
     {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Mobile whiteboard text clips at 480px",
-      "description": "At 480px breakpoint, .office-whiteboard sets font-size: 0 and relies on ::before pseudo-element (which has no content defined in Office.css). The whiteboard appears blank on small screens. Either add content to the ::before or keep a minimum readable font-size.",
-      "effort": "small",
-      "assignee": "Maya"
+      "priority": "high",
+      "category": "code",
+      "title": "App.jsx is 1192 lines — split into feature components",
+      "description": "App.jsx contains: ActivityLogEntry, ActivityLog, WorkerCard, StuckAlert, ShortcutToast, and the main App component — all 1192 lines in one file. Office.jsx is similarly 1074 lines. Beyond readability, monolithic files make diffs harder to review, prevent effective tree-shaking, and block code-splitting at the feature level. Suggested extraction: (1) `src/components/ActivityLog.jsx` — ActivityLogEntry + ActivityLog, (2) `src/components/WorkerCard.jsx` — WorkerCard + StuckAlert, (3) `src/components/ShortcutToast.jsx` — ShortcutToast. These are already well-isolated components. The refactor is mechanical, not architectural.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Completion toast can overlap error banner",
-      "description": "The '🎉 shipped it!' toast is position:fixed at bottom:2rem with z-index:9999. The fetch-error-banner is at the top. But if multiple toasts fire rapidly (2+ workers ship simultaneously), only the last one shows. Consider a toast queue or stacking.",
-      "effort": "medium",
-      "assignee": "Carlos"
+      "title": "Duplicate color maps — ROLE_COLORS and WORKER_ROLE_COLORS will drift",
+      "description": "Two separate color maps exist: `ROLE_COLORS` in `utils/constants.js` (keyed by role string, e.g. 'Frontend Engineer') and `WORKER_ROLE_COLORS` in `App.jsx` (keyed by worker name, e.g. 'Maya'). The confetti burst and completion toast use the name-keyed map; desks, nameplates, and progress rings use the role-keyed map. These already disagree on shade — Maya is '#a855f7' in constants but App uses '#a855f7' for Maya by name. The moment a new worker is added with a different name mapping, their confetti color will be the fallback '#a855f7' while their desk glows the correct role color. Fix: remove `WORKER_ROLE_COLORS` from App.jsx. When you need a color for a worker by name, look up their role from the roster, then use `ROLE_COLORS[worker.role]`. Single source of truth.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "Vibe history stored in both localStorage AND sessionStorage",
-      "description": "vibeStreak uses sessionStorage while vibeHistory uses localStorage. The streak resets on new tabs but history persists. This is inconsistent — if streak is meaningful, it should persist across tabs too. Pick one storage strategy.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Keyboard shortcut '1' and '2' conflict with number input",
-      "description": "The keyboard handler checks for e.target.tagName INPUT/TEXTAREA but not number keys in contentEditable. Also, pressing 'R' to refresh could be confusing — consider requiring a modifier key (Ctrl+R is already browser refresh).",
-      "effort": "small",
-      "assignee": "Carlos"
+      "title": "No Error Boundary — one component crash takes down the whole app",
+      "description": "The entire component tree renders without an ErrorBoundary wrapper. If Office.jsx throws during render (e.g., malformed JSON from GitHub, an unexpected null in worker data), the full app goes blank with a React error overlay in dev or a white screen in production. Given this app polls external data every 30 seconds, malformed data is a realistic failure mode. Fix: wrap the App return in a simple ErrorBoundary class component that renders a friendly fallback (e.g., 'Bloberto's office is temporarily closed — check back soon 🌙'). This is 20 lines of boilerplate and prevents total app death on data errors.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "fetchWorkersFromGitHub cache-busts every request",
-      "description": "Adding ?t=Date.now() defeats GitHub's CDN cache entirely. raw.githubusercontent.com already has short TTLs (~5 min). Remove the cache-buster or use If-None-Match/ETag headers to reduce bandwidth.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "title": "No code splitting — Dashboard loads even if never visited",
+      "description": "The Dashboard tab content (stats, activity log, sparklines, worker cards grid) is included in the initial bundle even if the user never clicks the Dashboard tab. React.lazy + Suspense would defer this to a separate chunk loaded on demand. Additionally, `Office.jsx` is ~1074 lines of SVG-heavy rendering that could also be lazy-loaded after the initial shell. Current bundle strategy means all 107 CSS @keyframes across App.css and Office.css are parsed upfront regardless of which view is active. Suggested fix: `const Dashboard = React.lazy(() => import('./Dashboard'))` wrapped in `<Suspense fallback={<div>Loading...</div>}>`.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
-      "category": "feature",
-      "title": "No error recovery UI for individual workers",
-      "description": "When a worker has status 'error', there's a red badge and SOS morse but no way for a viewer to see WHAT the error is. Add an error message field to the worker data and show it in the hover card or a detail panel.",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "AwaySign line-splitting logic is fragile",
-      "description": "The reduce-based line splitter in AwaySign puts only the first word on line1 and everything else on line2. For 'Taking a lap' → line1='Taking', line2='a lap'. This works by accident but isn't intentional word-wrapping. Use a simpler split approach.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "category": "accessibility",
+      "title": "Touch targets at 480px breakpoint are 24×24px — fails WCAG 2.5.5",
+      "description": "At the 480px breakpoint, CharacterAvatar is rendered at `size={24}` (px), with the desk wrapper providing minimal additional tap area. WCAG 2.5.5 (AAA) recommends 44×44px; even the more lenient WCAG 2.5.8 (AA, WCAG 2.2) requires 24×24px with adequate spacing. The desk components at mobile have ~48px spacing between them, which technically satisfies 2.5.8 spacing requirements, but the *clickable avatar* itself is 24px and the surrounding desk div may have padding that doesn't extend the tap target. Fix: wrap each desk's avatar in a `<button>` or interactive `<div>` with `min-width: 44px; min-height: 44px` and use `display: flex; align-items: center; justify-content: center` to keep the visual size at 24px while expanding the tap zone. This doubles the clickable area without changing the visual.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Light theme barely tested — several hardcoded dark colors",
-      "description": "Office.css has a few [data-theme='light'] overrides but most colors (floor, monitor, particles) use hardcoded dark values. The light theme works but feels like an afterthought. Need a pass to make light mode feel intentional.",
-      "effort": "large",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "No notification/sound when workers ship",
-      "description": "The completion toast and confetti are visual-only. Consider an optional browser notification or subtle sound effect when a worker finishes. Could be toggled in settings.",
-      "effort": "medium",
-      "assignee": "Carlos"
+      "title": "Mystery orange-pink gradient rectangle on live site (persistent)",
+      "description": "Both screenshots show a large (~70×120px) orange-to-pink gradient rectangle at roughly 87% left / 55–70% top of the office floor. This element does NOT appear in /workspace/src JSX or CSS. It has appeared in multiple consecutive review screenshots and is the first visually jarring element on desktop. Most likely causes: (1) a recently-deployed commit not synced to /workspace/src, (2) an office decoration element with a broken gradient background that survived a refactor. Action: open DevTools on the live site, inspect-element on the orange block, find which component/class is responsible. If it's intentional (a 'corkboard', 'sticky note area', or decoration), it needs a defined purpose. If not, remove it.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "CharacterAvatar has growing if/else chain for worker IDs",
-      "description": "Each worker (bloberto, carlos, maya, dave, sofia, luna) has a dedicated SVG block in CharacterAvatar. This doesn't scale — adding a new team member means adding 30+ lines of JSX. Consider a data-driven approach with SVG templates.",
-      "effort": "large",
-      "assignee": "Maya"
+      "title": "No TypeScript — prop shapes are complex enough to warrant it",
+      "description": "The codebase uses JSDoc `@type` annotations (e.g., `/** @type {Array<{ pattern: RegExp, label: string, ... }>} */`) which shows awareness that types matter. WorkerCard accepts 8 props; CharacterAvatar accepts 6. As of Office.jsx + App.jsx combined, there are ~15 distinct component interfaces. Without TypeScript, prop shape mistakes are runtime errors, not compile-time errors. Migration path: rename `.jsx` to `.tsx`, add `tsconfig.json` with `allowJs: true` and `checkJs: true` to start — this gives type-checking without requiring immediate annotation of everything. The existing JSDoc will be picked up automatically by TypeScript in JS-check mode.",
+      "effort": "large"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "No deep-link to specific workers — URL only supports tab switching",
+      "description": "The app supports `#office` and `#dashboard` URL hash routing (implemented in App.jsx via `window.location.hash`). But there's no way to link directly to a specific worker's card or highlight a worker from a URL. This matters for team use: sharing 'hey look at Luna's status' requires another communication channel. Suggested implementation: support `#office/luna` which would (1) navigate to the office tab, (2) scroll the worker card into view, (3) briefly highlight it (the `worker-card--focused` class already exists for exactly this). The scrollIntoView call (`document.querySelector('[data-worker-name]')`) is already implemented in App.jsx — it just needs to be wired to URL parsing on initial load.",
+      "effort": "medium"
     }
   ]
 }

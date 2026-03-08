@@ -1,17 +1,6 @@
 {
-  "lastUpdated": "2026-03-08T10:15:00Z",
-  "workers": [
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "status": "working",
-      "task": "QA review #13 — analyzing live site, code quality, UX, accessibility, mobile responsiveness",
-      "progress": 10,
-      "updated_at": "2026-03-08T10:15:00Z",
-      "startedAt": "2026-03-08T10:15:00Z"
-    }
-  ],
+  "lastUpdated": "2026-03-08T10:22:00Z",
+  "workers": [],
   "roster": [
     { "id": "bloberto", "name": "Bloberto", "role": "Manager", "emoji": "🫠" },
     { "id": "carlos", "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
