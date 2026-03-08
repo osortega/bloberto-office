@@ -1,73 +1,73 @@
 {
   "creative_director": "Luna",
-  "review_number": 53,
-  "timestamp": "2026-03-08T20:31:27Z",
-  "theme": "The best interactions in this office are invisible — let's fix that",
-  "visual_observations": "Desktop (1280x800): Office floor renders cleanly with grid background and purple border. Bloberto center-top with purple glow desk, CVO label. Luna top-left with her crescent moon avatar and colorful block desk screen. Carlos and Maya working at middle desks with their screen SVGs visible. Dave and Sofia at bottom desks — Sofia shows red ! error badge. VACANT desk bottom-right: completely dead, just the text 'VACANT' against empty grid. Conference table bottom-left renders as a circle with 6 orbit chair-dots, currently empty, ambient label reads 'everyone is at their desk'. Right wall: COFFEE TRIPLE SHOT cup, green cactus, the amber/orange window rectangle (sky gradient), small green plant, ☀️ weather icon. Bottom: Entrance door labeled ENTRANCE. Shortcut toast renders inside the office floor boundary on desktop (correct). Header greeting: 'Good evening, LEGEND 🔥 · Sunday, Mar 8' with 🔥 Crushing It vibe badge. Footer shows vibe-specific tagline with a faint '1/9' counter nobody sees. Mobile (375x812): Same office renders but keyboard shortcut bar floats BELOW the office card in document body — confirmed still broken from review #52. Conference table chairs readable at this scale. VACANT desk even more prominent as dead corner on mobile.",
+  "review_number": 55,
+  "timestamp": "2026-03-08T22:30:00Z",
+  "theme": "Make idle moments speak — the office should never feel abandoned",
+  "visual_observations": "Desktop (1280x800): Luna is clocked in at top-left desk with color-block monitor. All other desks show ghost state with faint standby pulse. Coffee corner top-right with TRIPLE SHOT steam. Whiteboard left with vibe doodle. Cactus blooming. Window shows amber gradient. Conference table bottom-center with 'everyone is at their desk' label. Vacant desk bottom-right with job-card hover. Mobile (375x812): Renders cleanly but shortcut toast leaks outside office card boundary. Vibe: after-hours, indigo border glow with starfield floor. Review #54 ideas (solo mode, tab title whisper, doodle variants, stats dispatch, idle thought bubbles, coffee topics, sparkline stability, Bloberto vibe badge) are NOT yet implemented.",
   "ideas": [
     {
       "priority": "must",
       "category": "delight",
-      "title": "The Footer Tagline Easter Egg Is Invisible",
-      "description": "The footer tagline is already clickable and cycles through 9 bonus quotes — one of the best hidden features in the app. But the only affordance is a browser title tooltip that says 'tap for another thought' and a `1/9` counter at 0.3 opacity that blends into nothing. On mobile there is zero affordance; title tooltips don't fire on touch. Fix: (1) Bump the counter opacity to 0.55 and give it a `font-variant-numeric: tabular-nums` style so it reads clearly as `1/9`. (2) Add a tiny ✦ sparkle icon immediately before the opening quote mark — styled as `cursor: pointer` with a `@keyframes twinkle` that pulses twice on first load (localStorage flag). (3) On tap/click, add a brief CSS text shimmer (`@keyframes quote-swap`: opacity 0→1 + blur 4px→0, 0.25s ease). WHY: This mechanic is already built and delightful. People just don't know it exists. One sparkle and a readable counter turns a secret into a discoverable moment.",
+      "title": "Tab Title Whispers When Hidden",
+      "description": "From review #54 — still not implemented. When document.visibilityState becomes 'hidden', change tab title contextually: if there's an error worker show '⚠️ Someone needs help — Bloberto Office'; if a worker completes while hidden show '✅ Task shipped! — Bloberto Office'; if idle show '💤 Office is quiet — Bloberto Office'. Reset to normal cycling on visible. The tab title is the ONLY way to reach users in another tab. This is free engagement.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "carlos"
     },
     {
       "priority": "must",
       "category": "storytelling",
-      "title": "VACANT Desk Posts a Vibe-Based Job Ad",
-      "description": "The VACANT desk is the only dead corner in the entire office floor — no character, no screen SVG, no interaction, just the word VACANT against empty grid. Add a hover state that pops up a micro job-posting card. No backend needed; build a static VACANT_ADS map keyed by vibeKey: `crushing: { title: 'Staff Wizard', req: 'Must maintain velocity without asking what velocity means' }`, `on-fire: { title: 'URGENT: Firefighter', req: 'Start Monday. Like, this Monday.' }`, `slow-day: { title: 'Chaos Wrangler', req: 'Previous experience with vibe collapse preferred' }`, `in-flow: { title: 'Flow Keeper', req: 'Do not disrupt the rhythm. That is the job.' }`, `after-hours: { title: 'Night Watch', req: 'The servers need company.' }`. Render the ad as a `.vacant-job-card` positioned above the desk on hover — styled like a sticky-note with role title, one funny requirement, and a winking 👀 CTA. WHY: Every other desk tells a story. The VACANT desk tells nothing. A vibe-reactive job ad turns the emptiest spot on the floor into the funniest.",
+      "title": "Stats Bar Dispatch Lines",
+      "description": "From review #54 — still not implemented. Below each stat number, add a one-line editorial comment keyed to the value. Active: {0: 'ghost town', 1: 'lone wolf', 2: 'dynamic duo', 3: 'skeleton crew'}. Error: {0: 'smooth sailing', 1: 'minor turbulence', 2: 'code red'}. Idle: {0: 'all hands on deck', 1: 'one on break', 2: 'half the team wandering'}. Render as span.stat-dispatch, 0.7rem muted italic with min-height to prevent layout shift. WHY: Numbers alone are data. Numbers with personality are a story. This turns the stats bar from a dashboard into a narrator.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "visual",
-      "title": "Desk Screens React to Task Type, Not Just Errors",
-      "description": "Each worker has a custom desk screen SVG that is beautiful and totally static. The `_error` screen variants already exist and auto-apply on `status === error`. But when Carlos is deploying (task matches Ship tag), his screen still shows calm blue bars. When Maya is fixing a bug, her wireframe screen is serene. The `getTaskTags()` function already parses the task string — that data just isn't wired to the desk screen SVG selector. Fix: In Office.jsx, derive a `screenVariant` from the worker's task tags: `error` (existing) → error SVG; `ship/deploy` → add a `_deploy` variant (green/pulse, terminal-like); `bug` (non-error status) → a `_debug` variant (amber, flickery). Pass `screenVariant` to the desk SVG selector alongside `worker.id`. Only 2-3 new SVG variants needed; the wiring logic is 10 lines. WHY: The desk screens are the most visible evidence of what each person is doing right now. When they never change, they become wallpaper.",
-      "effort": "medium",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "should",
-      "category": "delight",
-      "title": "The Honorific Should Type Itself In",
-      "description": "The header greeting includes a vibe-reactive honorific: 'LEGEND 🔥' (crushing), 'captain 🚨' (on-fire), 'boss' (in-flow), 'chief... you still there? 😐' (slow-day), 'night owl 🌙' (after-hours). These are among the most personality-rich words on the page. When vibe changes and the honorific swaps, it does so instantly — a cold text replacement. Fix: Wrap the honorific in a `<span key={teamVibe.key} className='honorific'>`. Add `@keyframes honorific-in { from { opacity: 0; filter: blur(6px); letter-spacing: 0.3em; } to { opacity: 1; filter: blur(0); letter-spacing: normal; } }` with a 0.4s ease-out. The `key` change triggers React to remount the span, firing the animation on every vibe change. No JS logic changes needed. WHY: The honorific is the most personal text in the app. When it changes, it should feel like Bloberto is re-evaluating you. That moment deserves drama.",
+      "category": "office-life",
+      "title": "Whiteboard Doodle Rotation",
+      "description": "From review #54 — still not implemented. The whiteboard has one ASCII doodle per vibe that never changes. Add DOODLE_VARIANTS with 3-4 options per vibe state and rotate every 4 minutes via useEffect interval. Vibe change resets to index 0. Example: crushing cycles through (◕‿◕), (ᵔᴥᵔ), \\o/; on-fire cycles through (╯°□°)╯, ಠ_ಠ, (ノಠ益ಠ)ノ. WHY: The whiteboard doodle is a secret joy. When it changes without notification — just a different face watching the progress bar — that's micro-discovery that keeps people watching.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
-      "priority": "could",
-      "category": "delight",
-      "title": "The Wall Clock Has No Opinion About the Time",
-      "description": "The WallClock component renders a real-time SVG analog clock that updates every 60 seconds. It already changes stroke and fill colors by vibe. It literally knows what time it is and what the vibe is — and says nothing. Add a `data-tooltip` attribute (using the existing CSS tooltip system) with a vibe-keyed comment: `crushing: 'Peak hours. Nobody's watching the clock except the clock.'`, `on-fire: 'Time has no meaning during an incident.'`, `slow-day: 'You've checked this three times in the last hour.'`, `in-flow: 'Don't look. It breaks the flow.'`, `after-hours: 'Still here? So am I. I'm a clock. That's fine for me.'`. Also render the digital time string (h:mm AM/PM) inside the tooltip. WHY: A clock that knows the vibe and has a dry comment about the time is a micro-interaction that rewards the curious user who wonders what that tiny SVG is.",
+      "priority": "should",
+      "category": "visual",
+      "title": "Vibe Sparkline Stability Badge",
+      "description": "From review #54 — still not implemented. The VibeSparkline shows colored dots but no synthesis. Add: (1) a tiny 'vibe history' label below the SVG. (2) A stability tag: if last 5 vibes are identical → green 'stable' pill; if 3+ different keys in last 5 → amber 'volatile' pill. Render below sparkline in .stat-card.vibe. WHY: The sparkline is decorative data nobody interprets. One word — 'stable' or 'volatile' — turns it into insight.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
-      "priority": "could",
+      "priority": "should",
       "category": "feature",
-      "title": "Clicking a Character Has No Affordance",
-      "description": "Clicking any non-manager character in the Office floor triggers a 700ms ping animation AND navigates to the Dashboard tab with that worker's card focused and scrolled into view. This is the most useful interaction in the entire office floor. Almost nobody discovers it. The characters show `cursor: pointer` (good) but there is no hover tooltip, no visual hint, and no label suggesting that clicking does anything. Fix: (1) Add `data-tooltip='click to inspect {firstName}'` to each clickable character `<div>`. (2) On hover (desktop), show a tiny `↗ Dashboard` pill that fades in below the character name using `.char__name::after` — appear after 400ms hover delay so it doesn't flash constantly. (3) On mobile, the `pinnedCard` mechanism already shows a hover-card on tap-first — make the 'ℹ️' icon on that pinned card explicitly say 'View in Dashboard'. WHY: Character-click-to-navigate is the bridge between the visual office and the data dashboard. Right now it's a secret. It shouldn't be.",
-      "effort": "small",
+      "title": "Office Floor Night Mode Ambient Sound Toggle",
+      "description": "New idea. Add a tiny speaker icon button in the office-sign area (top-left corner). When toggled on, play a subtle ambient loop: keyboard clicks during working state, quiet hum during idle, rain during slow-day. Use Web Audio API with very low gain (0.05-0.1). Store preference in localStorage. Default OFF. WHY: The office is visually alive but sonically dead. Even a faint ambient layer would make people feel like they're watching a real space. The toggle keeps it opt-in so it never annoys.",
+      "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
       "category": "storytelling",
-      "title": "Conference Table Label Changes Silently",
-      "description": "The `.conf-ambient-label` already shows 5 vibe-specific messages: 'everyone is at their desk' (crushing), 'no meetings. fix it.' (on-fire), 'reserve the table' (in-flow), 'open office hours' (slow-day), 'locked up' (after-hours). These are excellent micro-copy. But when vibe changes and the label swaps, it does so with a hard cut — no animation, no emphasis. The joke lands but without a rimshot. Fix: Add `key={vibe}` to the `<div className='conf-ambient-label'>` element. Add a CSS entry animation: `@keyframes label-arrive { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }` applied to `.conf-ambient-label` with `animation: label-arrive 0.4s ease`. The key swap triggers remount on vibe change, firing the animation. No JS logic changes. WHY: 'no meetings. fix it.' is three words of comedy gold. Right now it materializes quietly. It deserves a tiny entrance.",
+      "title": "Bloberto Manager Vibe Badge",
+      "description": "From review #54 — still not implemented. Add a tiny floating emoji badge above Bloberto's avatar that reacts to team vibe: crushing → 🚀, on-fire → 😬, in-flow → 😌, slow-day → 🫠, after-hours → ☕. Implemented as span.mgr-vibe-badge positioned absolute top-right of avatar circle, swaps with 0.3s scale bounce keyed to vibeKey. WHY: Bloberto is the mascot. He should have feelings about his team's performance.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "office-life",
+      "title": "Coffee Corner Overheard Topics",
+      "description": "From review #54 — still not implemented. When 2+ idle workers gather at coffee corner (chatting state), pick a random topic from CHAT_TOPICS: ['the deploy timing', 'that one PR', 'sprint velocity again', 'who touched the schema', 'the on-call rotation']. Show as tiny italic text below 'chatting' label. WHY: The chatting state says workers gathered but not about what. 'who touched the schema' as you scroll past is comedy that makes the app feel like an actual office.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "wild",
-      "category": "office-life",
-      "title": "The Entrance Door Gets Ambient Visitor Events",
-      "description": "Between real worker arrivals and departures, the Entrance door sits static and dark — just a labeled door at the bottom of the floor. Real offices have ambient interruptions: deliveries, wrong-floor visitors, mysterious stakeholders. Add a pure front-end ambient event system: a `useEffect` with a randomized interval (8–15 minutes, seeded differently per browser session) fires a `visitorEvent` state containing a randomly chosen visitor from a static VISITORS array: `[{ emoji: '📦', label: 'Delivery' }, { emoji: '🍕', label: 'Lunch order' }, { emoji: '📋', label: 'The Board' }, { emoji: '🦆', label: 'Wrong floor (sorry)' }, { emoji: '🧑‍💻', label: 'External consultant' }, { emoji: '🌮', label: 'Catering arrived' }]`. When triggered: the door plays the existing arrive animation, a `.visitor-badge` label slides up (same as the proposed door name badge from review #52, but for visitors), and auto-dismisses after 3 seconds. The worker roster is never touched. WHY: The door is the office's threshold. Making it react to imaginary visitors — at quiet random intervals — turns a static floor into a breathing space. You never know when The Board is dropping by.",
+      "category": "feature",
+      "title": "Activity Log Gets a Daily Digest Mode",
+      "description": "New idea. Add a 'digest' filter/view to the activity log that collapses the day's entries into a narrative paragraph: 'Today: Luna reviewed the office twice, Carlos shipped 3 features, Sofia found 4 bugs. The team was mostly in-flow with one on-fire moment around 3pm. Vibe trend: stable.' Generated client-side from the activity entries using template strings keyed to event types and counts. Toggle between timeline and digest view. WHY: The activity log grows long. A digest turns raw events into a story someone could read in 10 seconds and understand the whole day.",
       "effort": "medium",
-      "assigned_to": "dave"
+      "assigned_to": "carlos"
     }
   ],
   "hire_proposals": []
