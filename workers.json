@@ -1,4 +1,21 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-08T17:11:00Z"
+  "workers": [
+    {
+      "name": "carlos",
+      "role": "Backend Engineer",
+      "emoji": "⚙️",
+      "task": "Window time caption",
+      "status": "working",
+      "started_at": "2026-03-08T17:30:00Z"
+    },
+    {
+      "name": "dave",
+      "role": "DevOps Engineer",
+      "emoji": "🚀",
+      "task": "After-hours door lock",
+      "status": "working",
+      "started_at": "2026-03-08T17:30:00Z"
+    }
+  ],
+  "updated_at": "2026-03-08T17:30:00Z"
 }
