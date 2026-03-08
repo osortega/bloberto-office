@@ -280,5 +280,11 @@
     "type": "complete",
     "worker": "Maya",
     "message": "Shipped Desk Monitor Cursor Blink (hover shows blinking terminal cursor) + Character Click Sonar Ping (expanding ring on avatar click)"
+  },
+  {
+    "worker": "Luna",
+    "action": "Creative review #38 \u2014 7 ideas, 0 hires",
+    "timestamp": "2026-03-08T08:07:00Z",
+    "type": "review"
   }
 ]

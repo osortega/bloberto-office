@@ -1,165 +1,197 @@
 {
   "analyst": "Sofia",
-  "reviewNumber": 11,
-  "timestamp": "2026-03-08T07:15:45Z",
+  "review_number": 11,
+  "timestamp": "2026-03-08T07:45:00Z",
   "scores": {
-    "visual": 3,
+    "visual": 2,
     "ux": 2,
     "responsiveness": 2,
     "performance": 2,
-    "accessibility": 3,
-    "codeQuality": 2,
+    "accessibility": 2,
+    "code_quality": 2,
     "features": 4,
-    "funFactor": 5
+    "fun_factor": 5
   },
-  "overall_score": 2.9,
-  "fixedSinceLastReview": [
-    "Nothing. Absolutely nothing. We are now on our fourth consecutive review where 15+ open items have been copy-pasted forward untouched. At this rate, the bugs will outlive the product."
+  "overall_score": 2.6,
+  "score_trend": "3.75 -> 3.5 -> 3.4 -> 3.1 -> 2.6. Fifth consecutive drop. Root cause: zero fixes shipped between reviews. Every re-opened item is accruing interest.",
+  "screenshots_taken": [
+    "screenshot-desktop.png (1280x800)",
+    "screenshot-mobile.png (375x812)"
+  ],
+  "visually_confirmed_still_broken": [
+    "Whiteboard 'FL OW' text wrap -- visible in mobile screenshot",
+    "Large dead space below office floor -- visible in mobile screenshot",
+    "ShortcutToast overlapping footer on mobile -- visible in mobile screenshot",
+    "Version v1.0.0-chaos in source, v1.0.5-chaos live -- both screenshots"
   ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "STILL OPEN #10 -- Version drift: source v1.0.0-chaos, live site v1.0.5-chaos",
-      "description": "STILL OPEN FROM REVIEW #10/#9/#8 -- App.jsx line 1190: `<span>v1.0.0-chaos</span>`. Mobile screenshot CONFIRMS: live footer reads 'v1.0.5-chaos'. That is a 5-patch gap between source and deployment, and it has been this way for at least 4 review cycles. Either (a) /workspace/src is perpetually stale and QA has been auditing the wrong code for months, or (b) live patches are hand-applied without committing. Both are catastrophic for process hygiene. Fix: (1) Run `git log --oneline` on the deployed branch, sync /workspace/src to HEAD. (2) Inject version from package.json at build time: replace the hardcoded string with `import.meta.env.VITE_APP_VERSION` and in vite.config.js add `define: { 'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version) }`. One-time setup, prevents this forever.",
+      "title": "STILL OPEN #10 -- Version drift: source v1.0.0-chaos, live v1.0.5-chaos",
+      "description": "STILL OPEN FROM REVIEWS #8/#9/#10. Live footer confirmed 'v1.0.5-chaos' in both screenshots; App.jsx footer hardcodes 'v1.0.0-chaos'. Five-patch gap. Either /workspace/src is perpetually stale (QA has been auditing dead code for months) or live patches are hand-applied without committing (catastrophic). Fix: (1) Sync /workspace/src to HEAD of deployed branch. (2) In vite.config.js: import pkg from './package.json' and add define: { '__APP_VERSION__': JSON.stringify(pkg.version) }. (3) Replace the hardcoded footer string with {__APP_VERSION__}.",
       "effort": "small",
-      "assignee": "Carlos"
+      "assign_to": "carlos"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "STILL OPEN #10 -- updated_at used for WorkerCard duration badge AND StatsBar stuck detection -- always <=30s, never triggers warn/stuck",
-      "description": "STILL OPEN FROM REVIEW #7/#8/#9/#10. (1) WorkerCard duration badge (App.jsx lines 303-306): `durationMs = Date.now() - new Date(worker.updated_at).getTime()` -- if updated_at refreshes on every API poll, durationMs is always <=30,000ms, `tier` is permanently 'normal', the stuck badge never fires. Fix: replace `worker.updated_at` with `worker.startedAt` on lines 303, 304, and 306. (2) StatsBar stuck detection (App.jsx line 386): `Date.now() - new Date(w.updated_at).getTime() > 7_200_000` -- a genuinely stuck worker whose updated_at refreshes silently will never appear in the stuck list. Fix: change `w.updated_at` to `w.startedAt` at line 386. Also line 457: clean up `stuckWorkers[0].updated_at || stuckWorkers[0].startedAt` fallback -- once line 386 is fixed, flip the order to `stuckWorkers[0].startedAt || stuckWorkers[0].updated_at`.",
+      "title": "STILL OPEN #10 -- updated_at family #1: WorkerCard duration badge and StatsBar stuck detection never trigger",
+      "description": "STILL OPEN FROM REVIEWS #7/#8/#9/#10. Both features measure time since last API poll (updated_at resets every 30s) instead of task start. (1) WorkerCard lines 303-306: durationMs uses worker.updated_at, always <=30s, tier always 'normal', stuck badge never shows. Fix: replace worker.updated_at with worker.startedAt on lines 303, 304, and 306. (2) StatsBar useMemo ~line 386: filters stuck workers using w.updated_at > 7_200_000 -- genuinely stuck workers never surface. Fix: change w.updated_at to w.startedAt. Clean up stuckWorkers[0].updated_at fallback at ~line 457 by flipping the order once line 386 is fixed.",
       "effort": "small",
-      "assignee": "Carlos"
+      "assign_to": "carlos"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "NEW -- char--deep-work detection AND ghost desk detection also use updated_at -- both permanently broken",
-      "description": "NEW IN REVIEW #11. Two more instances of the updated_at family of bugs missed in previous reviews. (1) Office.jsx line 400: `if (variant === 'working' && worker.updated_at && Date.now() - new Date(worker.updated_at).getTime() > 45 * 60 * 1000)` -- sets the `char--deep-work` CSS class for workers in 45+ minutes of focused work. If updated_at resets on poll, this threshold never fires: no character ever enters the deep-work animation state. Fix: replace `worker.updated_at` with `worker.startedAt`. (2) Office.jsx lines 812-813: `isGhostDesk = isWorking && occ.worker.updated_at && (Date.now() - new Date(occ.worker.updated_at).getTime()) > 900000` -- ghost desk visual (desk goes translucent after 15min) also uses updated_at. Same failure mode: never fires. Fix: replace `occ.worker.updated_at` with `occ.worker.startedAt` at line 812. The total updated_at/startedAt confusion count is now FOUR distinct broken features across two files.",
+      "title": "STILL OPEN #10 -- updated_at family #2: char--deep-work aura and ghost desk visual never fire",
+      "description": "STILL OPEN FROM REVIEW #10. (1) Office.jsx ~line 400: char--deep-work class (yellow glow + headphones badge) checks worker.updated_at > 45 min -- since updated_at resets on every poll this threshold never fires, zero deep-work auras ever shown. Fix: replace worker.updated_at with worker.startedAt. (2) Office.jsx lines 812-813: isGhostDesk checks occ.worker.updated_at > 900000 (15 min) -- same failure mode, translucent ghost desk never triggers. Fix: replace occ.worker.updated_at with occ.worker.startedAt. Total updated_at/startedAt confusion: 4 distinct broken features across two files.",
       "effort": "small",
-      "assignee": "Carlos"
+      "assign_to": "carlos"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "STILL OPEN #10 -- Office.css media query ordering confirmed: 768px block overrides 600px at 375px viewport",
+      "description": "STILL OPEN FROM REVIEWS #8/#9/#10. VISUALLY CONFIRMED in mobile screenshot: large blank area below the office floor. Source order lines 794, 831, 853 is: max-width:600px, then max-width:768px, then max-width:480px. At 375px ALL THREE match; later-in-source wins. The 768px block applies min-height:400px and aspect-ratio:auto to .office-floor AFTER the 600px block's 320px. The 480px block overrides min-height to 280px but never overrides aspect-ratio:auto -- creating the dead space. Fix: reorder to largest-first: 768px -> 600px -> 480px. Add aspect-ratio:unset inside the 480px block as a guard.",
+      "effort": "small",
+      "assign_to": "maya"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "STILL OPEN #10 -- Whiteboard renders 'FL OW' on mobile, confirmed in screenshot",
+      "description": "STILL OPEN FROM REVIEWS #7/#8/#9/#10. VISUALLY CONFIRMED in mobile screenshot: whiteboard shows 'FL' on one line and 'OW' on the next -- 'FLOW' broken mid-word by word-break:break-word at a ~17.7px container width. Fix (two-part): (1) Reorder media queries first (separate item above). (2) Add white-space:nowrap; overflow:hidden to .wb-vibe-text in Office.css so the text never wraps regardless of container width. Optionally shorten VIBE_WHITEBOARD['in-flow'] from 'FLOW' to 'GO' for extra safety margin.",
+      "effort": "small",
+      "assign_to": "maya"
     },
     {
       "priority": "high",
       "category": "performance",
       "title": "STILL OPEN #10 -- React.memo on WorkerCard defeated by stableActivityLog + side effect inside useMemo",
-      "description": "STILL OPEN FROM REVIEW #7/#8/#9/#10. App.jsx lines 763-767: `stableActivityLog = useMemo(() => { activityLogLenRef.current = activityLog.length; return activityLog }, [activityLog.length])`. Two problems: (1) Any new activity (length changes) invalidates stableActivityLog, returning a new array reference -- ALL WorkerCards re-render because activityEntries={stableActivityLog} propagates to every card (lines 1078, 1101, 1114). React.memo buys zero benefit. Fix: `const workerActivitySlices = useMemo(() => Object.fromEntries(activeWorkers.map(w => [w.id, activityLog.filter(e => e.worker === w.name).slice(-3).reverse()])), [activityLog, activeWorkers])` and pass `activityEntries={workerActivitySlices[w.id] ?? []}` per card. (2) Line 765: `activityLogLenRef.current = activityLog.length` inside useMemo is a textbook React violation -- side effects in useMemo are explicitly forbidden. The ref is never read in the render path. Delete it.",
+      "description": "STILL OPEN FROM REVIEWS #7/#8/#9/#10. App.jsx lines 763-767: stableActivityLog = useMemo(() => { activityLogLenRef.current = activityLog.length; return activityLog }, [activityLog.length]). Two violations: (1) Any activity arrival invalidates stableActivityLog returning a new array reference -- ALL WorkerCards re-render on every new event, defeating React.memo entirely. Fix: const workerActivitySlices = useMemo(() => Object.fromEntries(activeWorkers.map(w => [w.id, activityLog.filter(e => e.worker === w.name).slice(-3)])), [activityLog, activeWorkers]) then pass activityEntries={workerActivitySlices[w.id] ?? []} per card. (2) Assigning activityLogLenRef.current inside useMemo is a React violation. The ref is never read in render. Delete that line.",
       "effort": "medium",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "STILL OPEN #10 -- Header greeting badge overflows off-screen when vibe is slow-day",
-      "description": "STILL OPEN FROM REVIEW #9/#10. Currently masked because vibe is 'in-flow' (honorific = 'boss', 4 chars) -- badge fits fine on mobile as confirmed in this screenshot. But App.jsx line 922: `HONORIFICS['slow-day'] = 'chief... you still there?'`. The full badge text at slow-day becomes 'Good morning, chief... you still there? -- Sunday, Mar 8' -- ~380px at 0.72rem on a 375px viewport. App.css line 61: `white-space: nowrap` on `.header-badge` with no `max-width` or `overflow: hidden`. It will clip the left edge the next time slow-day triggers. Fix: in App.css at the <=420px breakpoint add `.header-badge { max-width: min(280px, 100%); overflow: hidden; text-overflow: ellipsis; }`. Optionally shorten the honorific in App.jsx line 922 to `'slow-day': 'chief'`.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "STILL OPEN #10 -- VibeSparkline reads localStorage BEFORE parent writes -- sparkline permanently one vibe behind",
-      "description": "STILL OPEN FROM REVIEW #7/#8/#9/#10. StatsBar's useEffect (App.jsx lines 398-411) reads vibeHistory from localStorage on every vibe.key change. App.jsx's vibe effect (lines 841-868) writes a new entry. React child useEffects run before parent useEffects in the same commit -- StatsBar reads the OLD value before App.jsx writes the new entry. The sparkline permanently lags by one vibe state. Fix: lift vibeHistory state to App.jsx. In the vibe effect at ~line 862, after localStorage.setItem, also call `setVibeHistory(history)`. Pass `vibeHistory` as prop to StatsBar. Remove the localStorage-reading useEffect from StatsBar entirely (lines 398-411).",
-      "effort": "medium",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "STILL OPEN #10 -- Office.css media query ordering bug -- 768px block overrides 600px block at mobile -- confirmed in screenshot",
-      "description": "STILL OPEN FROM REVIEW #8/#9/#10. VISUALLY CONFIRMED in mobile screenshot: large blank area (~180px) below the office floor. Root cause: @media (max-width: 600px) at line 794 sets `.office-floor { min-height: 320px }`, then @media (max-width: 768px) at line 831 sets `.office-floor { min-height: 400px; aspect-ratio: auto }`, then @media (max-width: 480px) at line 853 sets `min-height: 280px`. At 375px ALL THREE match. Later source order wins -- the 768px block overrides the 600px one. `aspect-ratio: auto` from the 768px block is never overridden, creating the dead space. Fix: reorder rules largest-to-smallest breakpoint in source: 768px first, then 600px, then 480px.",
-      "effort": "small",
-      "assignee": "Maya"
+      "assign_to": "carlos"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "STILL OPEN #10 -- ShortcutToast untouchable on mobile AND clips beyond viewport -- confirmed in screenshot",
-      "description": "STILL OPEN FROM REVIEW #8/#9/#10. VISUALLY CONFIRMED in mobile screenshot: toast text is truncated on the left and overlaps the footer content. App.css line 1057: `pointer-events: none` -- still there, still untappable, still non-dismissable for 7 full seconds on touch devices. Fix: (1) Remove `pointer-events: none` from App.css. (2) Add `onClick={() => dismiss(true)}` to the toast div at App.jsx line 564. (3) Add to App.css: `@media (max-width: 480px) { .shortcut-toast { right: 0.5rem; left: 0.5rem; white-space: normal; text-align: center; font-size: 0.68rem; } }` so it wraps instead of clipping.",
+      "title": "STILL OPEN #10 -- ShortcutToast untappable on mobile and clips beyond viewport, confirmed in screenshot",
+      "description": "STILL OPEN FROM REVIEWS #8/#9/#10. VISUALLY CONFIRMED in mobile screenshot: toast text clips at right edge and overlaps the footer. App.css still has pointer-events:none -- users cannot tap to dismiss for 7 full seconds on touch devices. Fixes: (1) Remove pointer-events:none from .shortcut-toast in App.css. (2) Add onClick={() => dismiss(true)} to the toast div. (3) Add to App.css: @media (max-width:480px) { .shortcut-toast { right:0.5rem; left:0.5rem; white-space:normal; text-align:center; font-size:0.68rem; bottom:3.5rem; } } to wrap text and lift above footer.",
       "effort": "small",
-      "assignee": "Maya"
+      "assign_to": "maya"
     },
     {
       "priority": "medium",
       "category": "bug",
+      "title": "STILL OPEN #10 -- VibeSparkline reads localStorage before parent writes -- always one state behind",
+      "description": "STILL OPEN FROM REVIEWS #7/#8/#9/#10. StatsBar useEffect reads vibeHistory from localStorage on vibe.key change. App.jsx vibe effect writes the new entry. React child useEffects run before parent useEffects in the same commit -- StatsBar reads the OLD value. Sparkline permanently lags by one vibe state. Fix: lift vibeHistory state to App.jsx. In the vibe effect after localStorage.setItem, call setVibeHistory(history). Pass vibeHistory as a prop to StatsBar. Remove the localStorage-reading useEffect from StatsBar entirely.",
+      "effort": "medium",
+      "assign_to": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
       "title": "STILL OPEN #10 -- StatsBar stuck worker scroll uses document.querySelector -- silently fails from Office tab",
-      "description": "STILL OPEN FROM REVIEW #7/#8/#9/#10. App.jsx line 451: `document.querySelector('[data-worker-name=\"${name}\"]')?.scrollIntoView(...)`. WorkerCard elements only exist in the DOM when the Dashboard tab is active. Clicking the stuck worker card from the Office tab does nothing. Fix: pass `onWorkerClick` as a prop to StatsBar from App.jsx line 1057. In the onClick at line 449, call `onWorkerClick(stuckWorkers[0])` instead of the querySelector hack. `handleWorkerClick` at App.jsx line 660 already handles tab switching and WorkerCard's useEffect at lines 243-247 already handles scrollIntoView on focus.",
+      "description": "STILL OPEN FROM REVIEWS #7/#8/#9/#10. App.jsx ~line 451: document.querySelector('[data-worker-name]')?.scrollIntoView(). WorkerCard nodes only exist when Dashboard tab is active. Clicking the stuck card from the Office tab does nothing with zero feedback. Fix: pass onWorkerClick as a prop to StatsBar from App.jsx. In the stuck card onClick call onWorkerClick(stuckWorkers[0]) instead of the querySelector hack. handleWorkerClick already handles tab switching and setsFocusedWorker; WorkerCard already handles scrollIntoView on focus. The infrastructure is all there -- just wire the prop.",
       "effort": "medium",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "STILL OPEN #10 -- Whiteboard renders 'FL OW' on mobile -- confirmed in screenshot",
-      "description": "STILL OPEN FROM REVIEW #7/#8/#9/#10. VISUALLY CONFIRMED in mobile screenshot: whiteboard clearly shows 'FL OW' on two lines -- the vibe text is being broken mid-word. Caused by the media query ordering bug (768px `aspect-ratio: auto` never overridden), which compresses the office floor and wraps the whiteboard text. Fix priorities: (1) Fix the media query order bug first (separate item). (2) Add `white-space: nowrap; overflow: hidden;` to the `.office-whiteboard` or `.wb-vibe-text` element in Office.css. (3) Consider shortening the vibe labels for the whiteboard (Office.jsx imports `VIBE_WHITEBOARD` from constants -- the label for 'in-flow' is 'FLOW' which is exactly where the wrap occurs).",
-      "effort": "medium",
-      "assignee": "Maya"
+      "assign_to": "carlos"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "STILL OPEN #10 -- document.title cycles every 8s -- disruptive for screen readers",
-      "description": "STILL OPEN FROM REVIEW #8/#9/#10. App.jsx lines 888-910: title rotates among 3 frames every 8s using setInterval. Some screen readers announce tab title changes on every cycle. No prefers-reduced-motion guard, no document.hasFocus() check. Fix A (recommended): `document.title = frames[0]` once per data change, remove the setInterval entirely -- the status info already lives in the StatsBar. Fix B: wrap the setInterval in `if (document.hasFocus() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches)` and clear on visibilitychange.",
+      "title": "STILL OPEN #10 -- document.title cycles every 8s is disruptive for screen readers",
+      "description": "STILL OPEN FROM REVIEWS #8/#9/#10. App.jsx: title rotates through 3 frames every 8s via setInterval. Screen readers announce tab title changes -- audio interrupt every 8 seconds regardless of user activity. No prefers-reduced-motion guard, no document.hasFocus() check. Fix A (recommended): set document.title once on syncFromGitHub completion, remove interval entirely -- status info already lives in StatsBar. Fix B: guard with if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && document.hasFocus()) and clear on visibilitychange.",
       "effort": "small",
-      "assignee": "Carlos"
+      "assign_to": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "NEW -- ARIA radio group keyboard pattern violated in both activity filter bars",
+      "description": "NEW IN REVIEW #11. App.jsx ~lines 1145-1175: two filter bars use role='radiogroup' with role='radio' buttons and aria-checked -- correct ARIA semantics. But keyboard implementation is wrong. ARIA radio groups require roving tabindex: only the checked item has tabIndex=0, all others get tabIndex=-1, arrow keys move between options. Currently ALL buttons receive default tabIndex=0, forcing keyboard users to tab through every filter button (6+ tab stops). Compare with the tab toggle which correctly implements roving tabindex. Fix: add tabIndex={activityFilter === key ? 0 : -1} in the type filter map and tabIndex={workerFilter === member.name ? 0 : -1} in the worker filter map. Add onKeyDown handlers for ArrowLeft/ArrowRight mirroring handleTabKeyDown.",
+      "effort": "small",
+      "assign_to": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "STILL OPEN #10 -- Header greeting badge overflow on slow-day vibe (latent, not triggered this run)",
+      "description": "STILL OPEN FROM REVIEWS #9/#10. Currently masked -- vibe is 'in-flow' (honorific = 'boss', 4 chars). But HONORIFICS['slow-day'] = 'chief... you still there?'. Badge text at slow-day: 'Good morning, chief... you still there? -- Sunday, Mar 8' -- ~380px at small font on a 375px viewport. App.css has white-space:nowrap on .header-badge with no max-width or overflow protection. Next slow-day trigger will clip the left edge. Fix: in App.css at the <=420px breakpoint add .header-badge { max-width: min(260px, 100%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.",
+      "effort": "small",
+      "assign_to": "maya"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "STILL OPEN #10 -- completionToast rendered with 15 inline styles -- unthemeable, hardcodes shadow",
-      "description": "STILL OPEN FROM REVIEW #8/#9/#10. App.jsx lines 950-973: the completion toast carries 15 inline style properties. `boxShadow` hardcodes `rgba(0,0,0,0.4)` which looks wrong in light theme. Only `border` is genuinely dynamic. Fix: extract all static properties to `.completion-toast` class in App.css. Use one CSS custom property for the dynamic value: `style={{ '--toast-border': completionToast.color }}` and in CSS: `border: 2px solid var(--toast-border)`. Separately, the element uses `aria-live='polite'` which is good, but add `role='status'` explicitly for wider screen reader compat.",
+      "title": "STILL OPEN #10 -- completionToast uses 15 inline styles including hardcoded box-shadow",
+      "description": "STILL OPEN FROM REVIEWS #8/#9/#10. App.jsx lines ~950-973: completion toast has 15 inline style properties. boxShadow hardcodes rgba(0,0,0,0.4) which looks wrong in light theme. Only border is genuinely dynamic. Fix: extract all static properties to .completion-toast class in App.css. Use a CSS custom property for the dynamic border: style={{ '--toast-border-color': completionToast.color }} and in CSS: border: 2px solid var(--toast-border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 12px color-mix(in srgb, var(--toast-border-color) 33%, transparent). Also add role='status' alongside aria-live='polite'.",
       "effort": "small",
-      "assignee": "Maya"
+      "assign_to": "maya"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "STILL OPEN #10 -- getRelativeTime duplicated verbatim between App.jsx and Office.jsx",
-      "description": "STILL OPEN FROM REVIEW #7/#8/#9/#10. Office.jsx lines 432-441 contain an inline IIFE with identical mins/hours/days arithmetic to `getRelativeTime()` at App.jsx lines 34-43. Byte-for-byte duplicates. Fix: create `src/utils/time.js`, export `getRelativeTime` from it, import it in both App.jsx and Office.jsx. Remove the IIFE from Office.jsx line 432 and the inline function from App.jsx lines 34-43. This eliminates the maintenance trap where future time format changes must be applied in two places.",
+      "title": "STILL OPEN #10 -- getRelativeTime duplicated verbatim as inline IIFE in Office.jsx ghost bubble",
+      "description": "STILL OPEN FROM REVIEWS #7/#8/#9/#10. Office.jsx ~line 432: ghost bubble uses an inline IIFE with identical mins/hours/days arithmetic to getRelativeTime() in App.jsx lines 34-43. Any future format change must be applied in two places. Fix: create src/utils/time.js, export getRelativeTime (and move formatDuration, formatFullDateTime there too). Import in both App.jsx and Office.jsx, replacing the duplicate IIFE with a single getRelativeTime(lastEvent.timestamp) call.",
       "effort": "small",
-      "assignee": "Carlos"
+      "assign_to": "carlos"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "STILL OPEN #10 -- Idle wander and cloud-drift animations use left/top -- layout-triggering at 60fps",
-      "description": "STILL OPEN FROM REVIEW #9/#10 (wander) and #8/#9/#10 (cloud-drift). (1) Office.css lines 706-731: all four `@keyframes wander-N` animate `left` and `top` percentage values, forcing browser layout (reflow) on every animation frame. With up to 4 wandering characters simultaneously, this is 4x layout-triggering at 60fps on mobile. Fix: set base `left`/`top` on each `.char--wander-N` class and animate `transform: translate(Xpx, Ypx)` using delta offsets from the base position. (2) Office.css lines 783-786: `@keyframes cloud-drift { from { left: -20%; } to { left: 115%; } }` -- same problem. Fix: set `.window-cloud { left: -20%; }` as base and animate `transform: translateX(0)` to `transform: translateX(675%)`. Both are GPU-composited and eliminate layout pressure.",
+      "title": "STILL OPEN #10 -- Idle wander and cloud-drift animations use left/top: layout-triggering at 60fps",
+      "description": "STILL OPEN FROM REVIEWS #8/#9/#10. (1) Office.css ~lines 706-731: all four @keyframes wander-N animate left and top percentage values, forcing browser full layout on every frame. With 4+ idle workers simultaneously this is 4x layout per frame. Fix: set each .char--wander-N with a base left/top position, then animate transform:translate(Xpx, Ypx) relative deltas -- GPU-composited, zero layout cost. (2) @keyframes cloud-drift animates from left:-20% to left:115% -- same issue. Fix: set .window-cloud { left:-20% } as base, animate transform:translateX(0) to transform:translateX(135%).",
       "effort": "medium",
-      "assignee": "Dave"
+      "assign_to": "dave"
     },
     {
       "priority": "low",
       "category": "bug",
-      "title": "STILL OPEN #10 -- Fading worker cards all get index={activeWorkers.length} -- stagger animation lost for simultaneous departures",
-      "description": "STILL OPEN FROM REVIEW #7/#8/#9/#10. App.jsx line 1112: `index={activeWorkers.length}` passed to EVERY fading WorkerCard in the fadingMap loop. When 2+ workers depart simultaneously, all share the same `--i` CSS variable, all fade at identical timing, stagger is lost. Fix: change `Object.values(fadingMap).map((w) => ...)` to `Object.values(fadingMap).map((w, fadingIdx) => ...)` and pass `index={activeWorkers.length + fadingIdx}`.",
+      "title": "STILL OPEN #10 -- Fading cards all receive index={activeWorkers.length}: stagger lost on simultaneous departures",
+      "description": "STILL OPEN FROM REVIEWS #7/#8/#9/#10. App.jsx ~line 1112: every fading WorkerCard gets index={activeWorkers.length} -- same --i value for all fading workers. When 2+ workers depart simultaneously all fade at identical timing, stagger effect lost entirely. Fix: change .map((w) => to .map((w, fadingIdx) => and pass index={activeWorkers.length + fadingIdx}.",
       "effort": "small",
-      "assignee": "Maya"
+      "assign_to": "maya"
     },
     {
       "priority": "low",
       "category": "bug",
-      "title": "STILL OPEN #10 -- ActivityLogEntry key uses string concatenation without delimiters -- silent collision risk",
-      "description": "STILL OPEN FROM REVIEW #8/#9/#10. App.jsx line 130: `key={entry.timestamp + entry.worker + i}`. Numeric string concatenation is collision-prone: timestamp='123', worker='45', i=0 gives '1234500'; timestamp='12345', worker='0', i=0 gives the same '1234500'. Silent React key collision causes reconciliation issues. Fix: use template literal with dash separators: `key={entry.timestamp + '-' + (entry.worker ?? 'system') + '-' + i}`.",
+      "title": "STILL OPEN #10 -- ActivityLogEntry key uses string concatenation without delimiters: silent collision risk",
+      "description": "STILL OPEN FROM REVIEWS #8/#9/#10. App.jsx ~line 130: key={entry.timestamp + entry.worker + i}. Without separators timestamp='123'+worker='45'+i=0 gives '1234500'; timestamp='12345'+worker='0'+i=0 gives identical '1234500'. Silent React key collision. Fix: key={`${entry.timestamp}-${entry.worker ?? 'system'}-${i}`}.",
       "effort": "small",
-      "assignee": "Carlos"
+      "assign_to": "carlos"
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "STILL OPEN #10 -- 19 ambient particle DOM nodes with permanent CSS animations compound mobile jank",
-      "description": "STILL OPEN FROM REVIEW #7/#8/#9/#10. App.jsx lines 926-930: 12 ambient particles. Office.jsx lines 994-1003: 7 more. All run permanent CSS animations. Combined with 4x layout-triggering wander animations and cloud-drift on mobile, compositor layer pressure is significant on mid-range devices during the 30s sync cycle. Fix: add `@media (pointer: coarse) { .ambient-particle:nth-child(even) { display: none; } }` in both App.css and Office.css to halve particle count on touch devices. Or consolidate both layers into one shared component capped at 8 particles.",
+      "title": "STILL OPEN #10 -- 19 ambient particle animations running permanently compound mobile jank",
+      "description": "STILL OPEN FROM REVIEWS #7/#8/#9/#10. App.jsx: 12 ambient particles. Office.jsx: 7 more. All run permanent CSS animations. Combined with 4x layout-triggering wander animations and cloud-drift, compositor pressure is material on mid-range mobile during the 30s sync cycle. Fix: add @media (pointer:coarse) { .ambient-particle:nth-child(even) { display:none; } } in both App.css and Office.css to halve particle count on touch devices with zero visual impact on desktop.",
       "effort": "medium",
-      "assignee": "Dave"
+      "assign_to": "dave"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "STILL OPEN #10 -- completionToast.color hex alpha suffix '55' fragile for non-6-digit colors",
+      "description": "STILL OPEN FROM REVIEW #10. App.jsx ~line 964: boxShadow string appends literal '55' to completionToast.color assuming 6-digit #rrggbb format. WORKER_ROLE_COLORS are all 6-digit today so it works. But a future worker with a 3-digit hex, named color, or rgb() value silently produces invalid CSS. Fix: use color-mix(in srgb, ${completionToast.color} 33%, transparent). Becomes moot if completionToast inline-styles item is fixed first.",
+      "effort": "small",
+      "assign_to": "maya"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "NEW -- Dead updatedAt prop in ProgressBar: vestigial parameter misleads future readers",
+      "description": "NEW IN REVIEW #11. WorkerCard JSX passes updatedAt={worker.updated_at} to ProgressBar. Inside ProgressBar, updatedAt is declared in props but NEVER READ -- ETA calculation correctly uses startedAt only: const workingMs = startedAt ? Date.now() - new Date(startedAt).getTime() : null. This is vestigial dead code from an earlier implementation. Fix: remove updatedAt from ProgressBar prop destructuring and from all JSX call sites. Zero behaviour change.",
+      "effort": "small",
+      "assign_to": "carlos"
     },
     {
       "priority": "low",
       "category": "bug",
-      "title": "NEW -- completionToast.color hex alpha suffix '55' is fragile -- silently breaks for non-6-digit colors",
-      "description": "NEW IN REVIEW #11. App.jsx line 964: `boxShadow: '... 0 0 12px ' + completionToast.color + '55'` -- appending the string '55' to a hex color assumes the color is always a 6-digit #rrggbb hex. WORKER_ROLE_COLORS (App.jsx lines 14-20) are currently all 6-digit hex so this works today. But if anyone adds a worker with a 3-digit hex (#rgb), a named color, or an rgb() value, the shadow value becomes invalid CSS and is silently dropped. Fix: use `color-mix(in srgb, ${completionToast.color} 33%, transparent)` instead of the manual alpha suffix. Or adopt the CSS custom property pattern recommended in the completionToast inline-styles item.",
+      "title": "NEW -- Worker filter buttons silently disappear when workers.json arrives as a flat array",
+      "description": "NEW IN REVIEW #11. App.jsx syncFromGitHub: when workers.json is a flat array (not the {workers:[], roster:[]} shape), setRoster([]) is called. The worker filter bar maps over roster -- if empty, all per-worker filter buttons silently vanish with no indication filtering is unavailable. Fix: when Array.isArray(data), derive roster from the flat worker data: setRoster(data.map(w => ({ id: w.id, name: w.name, role: w.role, emoji: w.emoji }))). Filter buttons then always render regardless of API response shape.",
       "effort": "small",
-      "assignee": "Maya"
+      "assign_to": "carlos"
     }
   ]
 }
