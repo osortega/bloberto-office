@@ -1,4 +1,15 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-08T12:50:00Z"
+  "workers": [
+    {
+      "id": "luna",
+      "name": "Luna Vargas",
+      "role": "Creative Director",
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review — analyzing site and writing ideas",
+      "progress": 10,
+      "updated_at": "2026-03-08T13:00:00Z"
+    }
+  ],
+  "updated_at": "2026-03-08T13:00:00Z"
 }

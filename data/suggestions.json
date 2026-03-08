@@ -1,95 +1,116 @@
 {
   "analyst": "Sofia",
   "review_number": 18,
-  "timestamp": "2026-03-08T12:50:00Z",
+  "timestamp": "2026-03-08T12:45:00Z",
   "scores": {
-    "visual": 4,
-    "ux": 3.5,
-    "responsiveness": 3.5,
-    "performance": 3,
-    "accessibility": 3.5,
-    "code_quality": 3,
-    "features": 4,
-    "fun_factor": 5
+    "visual": 7,
+    "ux": 6,
+    "responsiveness": 7,
+    "performance": 5,
+    "accessibility": 5,
+    "code_quality": 5,
+    "features": 8,
+    "fun_factor": 9
   },
-  "overall_score": 3.7,
+  "overall_score": 6.5,
   "suggestions": [
     {
       "priority": "high",
-      "category": "performance",
-      "title": "118 @keyframes definitions across CSS files — animation budget is out of control",
-      "description": "Office.css has 90 @keyframes and App.css has 28 — totaling 118 animation definitions. Many are duplicates or near-duplicates (dust-drift defined twice, ghost-float used in multiple places). The browser has to parse and keep all of these in memory. Consolidate duplicates and remove unused keyframes. This directly impacts paint performance on low-end devices.",
-      "effort": "medium"
+      "category": "Visual Bug",
+      "title": "Whiteboard text is invisible in dark mode — duplicate `color` property",
+      "description": "Office.css lines 1113 and 1122: `.office-whiteboard` sets `color: #c4b5fd` (light lavender) and then immediately overrides it with `color: #333` (dark grey) in the SAME rule. The computed text color in dark mode is therefore #333 on a #14122a background — essentially invisible. The emoji in strings like '🏆 SHIP IT' may still render, but the text part won't. Worst case: 'TODO: ???' (slow-day vibe, no emoji) is completely invisible. Fix: remove the `color: #333` at line 1122 from the base rule; it belongs only in the `[data-theme='light']` override already present at line 1133.",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "code",
-      "title": "Office.css is 2071 lines — needs splitting or CSS modules",
-      "description": "A single 2071-line CSS file is unmaintainable. Combined with App.css at 1082 lines, that's 3153 lines of global CSS with potential selector collisions. Consider CSS modules, or at minimum split Office.css into desk.css, character.css, animations.css, etc.",
+      "category": "Accessibility",
+      "title": "`stat-card--stuck` click target is keyboard-inaccessible",
+      "description": "App.jsx lines 426–439: the 'Stuck workers' stat card uses a plain `<div onClick={...}>` with no `tabIndex`, `role`, `aria-label`, or `onKeyDown` handler. Keyboard-only users cannot trigger the scroll-to-stuck-worker action. Fix: add `tabIndex={0}`, `role='button'`, `aria-label='Scroll to stuck worker: {name}'`, and `onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ...scroll } }}`.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "Bug",
+      "title": "Arrow-key tab navigation does not update `window.location.hash`",
+      "description": "App.jsx lines 631–640: `handleTabKeyDown` calls `setTab(...)` on ArrowLeft/ArrowRight but never updates `window.location.hash`. The two `onClick` handlers (lines 1013, 1026) correctly call `window.location.hash = 'office'/'dashboard'`. So clicking a tab updates the URL; pressing arrow keys does not. Hash-based deep links and browser back/forward break when the keyboard is used to switch tabs. Fix: add `window.location.hash = TABS[(newIdx)]` inside both arrow key branches of `handleTabKeyDown`.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Bug",
+      "title": "`stuckWorkers[0].emoji` renders literal 'undefined' string",
+      "description": "App.jsx line 436: `\\`${stuckWorkers[0].emoji} ${stuckWorkers[0].name}\\`` — if the stuck worker has no `emoji` field (it's optional and not present in DEFAULT_ROSTER entries except Luna), the template literal renders the string 'undefined' before the name. Example output: 'undefined Carlos · Working for 3h'. Fix: use `${stuckWorkers[0].emoji ?? ''} ${stuckWorkers[0].name}`.trim() or use a separate expression.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Dead Code",
+      "title": "`activityLogLenRef` is set but never read — dead ref",
+      "description": "App.jsx line 745: `const activityLogLenRef = useRef(0)` and line 747: `useEffect(() => { activityLogLenRef.current = activityLog.length }, [...])`. This ref is assigned on every activity update but is never read anywhere in the component. Likely a leftover from a dropped browser-notification feature (which would explain why Review #17 flagged 'No background tab notification on worker events' as still missing). Remove the ref and its effect unless the notification feature is being actively built.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality",
+      "title": "`stableActivityLog` is a misleading no-op memoization",
+      "description": "App.jsx line 746: `const stableActivityLog = useMemo(() => activityLog, [activityLog])`. This returns the exact same array reference as `activityLog` — the useMemo wrapper adds zero stabilization since it re-runs every time `activityLog` changes anyway. The name implies a stable reference but provides none. Either remove it and use `activityLog` directly, or if the intent was to prevent unnecessary re-renders in WorkerCard, a real selector/comparison function or a separate memoized slice would be needed.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality",
+      "title": "`ProgressBar` receives `updatedAt` prop that is never used",
+      "description": "App.jsx line 166: `function ProgressBar({ progress, updatedAt, startedAt })` — `updatedAt` is destructured but is not referenced anywhere in the component body. Only `startedAt` is used for ETA calculation. The prop is passed at line 303 (`updatedAt={worker.updated_at}`), creating a false impression that it affects output. Remove the prop from the signature and the call site.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Dead Code",
+      "title": "Dead CSS classes in mobile media query — stale from old refactor",
+      "description": "App.css lines 1065–1082 (`@media (max-width: 480px)` block from 'Luna Review #41'): references three class names that do not exist anywhere in the JSX. `.tab-content` (doesn't exist; content is in `role=tabpanel` divs), `.header-subtitle` (doesn't exist; the subtitle is a `<p>` inside `.header-title`), and `.header h1` (the h1 lives inside `.header-title`, not directly in `.header`). These rules never fire. Clean them up to reduce confusion.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Performance",
+      "title": "Excessive concurrent CSS animations — still unaddressed from review #17",
+      "description": "Counting active infinite animations in a typical 'crushing' state with 3 working + 2 idle workers: manager-wobble, enter-office×3, bob×3, deep-glow+deep-focus-halo (if >45min), 2×wander pairs, dust-drift, 4×star-twinkle (midnight), 2×cloud-drift, 12×ambient-drift (app-level) + 7×ambient-drift (office-level) = 19 ambient particles, desk-pulse×3, lamp-pulse×3, typing-bounce×9 (3 dots × 3 chars), coffee-steam×3, plant-sway×3, heat-shimmer (on-fire), full-sync-pulse, vibe-crush (monitor). On a low-end phone this is 50+ simultaneous `animation` properties with `infinite` duration. No `will-change` is set, no animation budget management, and the reduced-motion block only helps users with that preference. Consider throttling or removing animations when the tab is hidden, or limiting concurrent wander chars.",
       "effort": "large"
     },
     {
-      "priority": "high",
-      "category": "bug",
-      "title": "Coffee corner vibe-text selectors rely on data-vibe attribute on ancestor — verify propagation",
-      "description": "Lines 1367-1371 of Office.css use [data-vibe='crushing'] .coffee-corner__label selectors. If the data-vibe attribute isn't set on a parent element that contains the coffee corner, these styles silently fail. Verified this was flagged in QA #17 and may still be broken depending on DOM structure. Need to verify the data-vibe attribute is on the office-floor wrapper.",
+      "priority": "medium",
+      "category": "Accessibility",
+      "title": "Focus ring applied to inner `.char__avatar`, not the focusable `.char` element",
+      "description": "Office.css line 683: `.char:focus-visible .char__avatar { outline: 2px solid var(--accent); outline-offset: 2px; }`. The focusable element with `tabIndex={0}` is `.char`, not its child `.char__avatar`. Applying the visual ring to the inner element means it clips under the avatar border, may be partially hidden, and is offset from the actual focused element boundary. A keyboard user tabbing through workers will see an outline that doesn't correctly frame the interactive region. Fix: move the focus-visible style to `.char:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }` directly.",
       "effort": "small"
     },
     {
-      "priority": "medium",
-      "category": "performance",
-      "title": "WorkerCard memo defeated by activityEntries array prop",
-      "description": "WorkerCard (App.jsx:226) uses React.memo but receives activityEntries as a filtered array. Every render creates a new array reference, defeating memoization. Use useMemo to stabilize the filtered array or pass a stable selector.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Characters have tabIndex=0 but no keyboard interaction handler",
-      "description": "Office.jsx:508 sets tabIndex={0} on characters, making them focusable, but keyboard events (Enter/Space) should trigger the same action as click. Verify onKeyDown handler exists for the character div.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "stableActivityLog useMemo is a no-op",
-      "description": "App.jsx:746 — `useMemo(() => activityLog, [activityLog])` does literally nothing. useMemo with the same reference as dependency returns the same reference. This is dead code that suggests a misunderstanding of memoization.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Reduced-motion selectors are thorough but some target removed animations",
-      "description": "There are 16 prefers-reduced-motion blocks across both CSS files. Some target animations that may have been removed or renamed in recent refactors (e.g., Office.css:1231 nullifies dust-drift and ghost-float in a reduced-motion block but the animations are defined elsewhere and used). Audit each block against actual animation usage.",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "No loading skeleton or placeholder when workers.json fetch is in-flight",
-      "description": "When the page first loads or when polling fails, there's no visual indication. A skeleton loader for the office view would prevent the flash of empty content.",
+      "priority": "low",
+      "category": "Bug",
+      "title": "SVG gradient ID `luna-hair-luna` is document-scoped — clashes when rendered twice",
+      "description": "Office.jsx line 252: `const gradId = \\`luna-hair-${workerId}\\`` always resolves to `luna-hair-luna` for Luna. SVG `<linearGradient id>` values are document-scoped in SVG 1.1. When Luna appears in both the office floor (as a ghost or working character) and in the dashboard's WorkerCard avatar at the same time, two `<linearGradient id='luna-hair-luna'>` elements exist in the DOM. The second one silently wins, and the reference in the first SVG may point to wrong colors. Fix: include a render-time unique suffix (e.g., using a `useId()` hook or a counter) or scope the gradient to a `<defs>` inside the exact SVG element using a `#fragment` reference only within that SVG.",
       "effort": "medium"
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "DESK_SCREEN_SVG object in Office.jsx is 60+ lines of inline SVG",
-      "description": "Lines 8-63 of Office.jsx define static SVG screens as JSX. These could be extracted to separate SVG files or a dedicated component file to reduce Office.jsx complexity.",
+      "category": "Dead Code",
+      "title": "`.live-badge` in `prefers-reduced-motion` block targets nonexistent class — still from review #17",
+      "description": "App.css line 897: the reduced-motion block lists `.live-badge` in its animation reset selector. This class does not exist anywhere — the live indicator uses `.live-dot.live`. The class was presumably renamed at some point. It's harmless but contributes to selector noise and misleads anyone debugging animation suppression.",
       "effort": "small"
     },
     {
       "priority": "low",
-      "category": "ux",
-      "title": "Activity log has no local persistence — refreshing loses context",
-      "description": "Activity entries are fetched from GitHub raw but not cached in localStorage. A page refresh during a deploy means the user loses the activity timeline until the next fetch succeeds.",
+      "category": "UX",
+      "title": "Double confetti layers can fire simultaneously — 60 animated spans at once",
+      "description": "App.jsx lines 914–930: `confettiActive` (vibe rank increase) and `workerConfetti` (worker task completion) are independent states, both rendering 30 `<span>` elements inside `.confetti-layer`. They can both be truthy at the same time (e.g., a worker completes a task AND vibe rank increases in the same poll cycle). This spawns 60 simultaneously animated confetti elements. Not a crash, but a performance spike on an already animation-heavy page. Fix: merge into a single confetti state with priority (worker confetti > vibe confetti), or render only one layer at a time.",
       "effort": "small"
     },
     {
       "priority": "low",
-      "category": "accessibility",
-      "title": "Skip-link exists but verify it targets the right anchor",
-      "description": "App.css:17 styles a skip-link. Verify the href points to a valid #main-content id that exists in the DOM.",
-      "effort": "small"
+      "category": "UX",
+      "title": "Activity log still has no local persistence — third time reporting this",
+      "description": "Activity log is fetched fresh each poll cycle and capped to the last 20 items from the API response. If the user closes and reopens the tab, all activity history is gone. The `VIBE_HISTORY_KEY` mechanism already uses localStorage for vibe history (App.jsx line 843) — the same pattern could apply to activity log. Consider caching the last N activity entries in localStorage under a `bloberto-activity-log` key and merging on load to give continuity across sessions.",
+      "effort": "medium"
     }
   ]
 }
