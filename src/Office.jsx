@@ -4,6 +4,64 @@ import { getTeamVibeKey } from './utils/vibe.js'
 import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
 import { VIBE_QUOTES, VIBE_TRANSITION_QUOTES } from './utils/quotes.js'
 
+const DESK_SCREEN_SVG = {
+  carlos: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#05050f" />
+      <rect x="2" y="3" width="28" height="2" rx="1" fill="#3b82f6" opacity="0.9" />
+      <rect x="2" y="8" width="20" height="2" rx="1" fill="#3b82f6" opacity="0.7" />
+      <rect x="2" y="13" width="24" height="2" rx="1" fill="#3b82f6" opacity="0.8" />
+    </svg>
+  ),
+  maya: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#05050f" />
+      <rect x="1" y="1" width="36" height="16" rx="1" fill="none" stroke="#a855f7" strokeWidth="0.8" />
+      <rect x="3" y="3" width="32" height="5" rx="0.5" fill="none" stroke="#c084fc" strokeWidth="0.7" />
+      <rect x="3" y="10" width="14" height="5" rx="0.5" fill="none" stroke="#a855f7" strokeWidth="0.7" />
+      <rect x="19" y="10" width="16" height="5" rx="0.5" fill="none" stroke="#a855f7" strokeWidth="0.7" />
+    </svg>
+  ),
+  dave: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#05050f" />
+      <rect x="2" y="2" width="34" height="14" rx="1" fill="#0d1117" />
+      <rect x="3" y="4" width="22" height="2" rx="0.5" fill="#f97316" opacity="0.85" />
+      <rect x="3" y="8" width="17" height="2" rx="0.5" fill="#f97316" opacity="0.65" />
+      <rect x="3" y="12" width="4" height="2.5" rx="0.3" fill="#f97316">
+        <animate attributeName="opacity" values="1;0;1" dur="0.9s" repeatCount="indefinite" calcMode="discrete" />
+      </rect>
+    </svg>
+  ),
+  sofia: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#05050f" />
+      <rect x="4"  y="10" width="5" height="6" rx="0.5" fill="#22c55e" opacity="0.9" />
+      <rect x="11" y="6"  width="5" height="10" rx="0.5" fill="#22c55e" opacity="0.85" />
+      <rect x="18" y="8"  width="5" height="8"  rx="0.5" fill="#22c55e" opacity="0.8" />
+      <rect x="25" y="3"  width="5" height="13" rx="0.5" fill="#22c55e" opacity="0.9" />
+    </svg>
+  ),
+  luna: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#05050f" />
+      <rect x="1"  y="3" width="7" height="12" rx="1" fill="#8b5cf6" />
+      <rect x="9"  y="3" width="7" height="12" rx="1" fill="#c084fc" />
+      <rect x="17" y="3" width="7" height="12" rx="1" fill="#a78bfa" />
+      <rect x="25" y="3" width="7" height="12" rx="1" fill="#7c3aed" />
+      <path d="M35,3.5 L35.7,5.3 L37.4,5.4 L36.2,6.5 L36.5,8.3 L35,7.4 L33.5,8.3 L33.8,6.5 L32.6,5.4 L34.3,5.3 Z" fill="#fbbf24" />
+    </svg>
+  ),
+}
+
+const VIBE_WEATHER_ICONS = {
+  'on-fire':    '⛈️',
+  'crushing':   '☀️',
+  'in-flow':    '⛅',
+  'slow-day':   '🌧️',
+  'after-hours':'🌙',
+}
+
 
 const CharacterAvatar = memo(function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
@@ -313,16 +371,29 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   const [bubble, setBubble] = useState({ quote: null, show: false })
   const [ghostBubble, setGhostBubble] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const [justCompleted, setJustCompleted] = useState(false)
   const timerRef = useRef(null)      // hover auto-hide timeout
   const ambientRef = useRef(null)    // ambient broadcast interval
   const isHoveringRef = useRef(false) // prevents ambient overlap with hover
   const prevVibeRef = useRef(null)
+  const prevProgressRef = useRef(worker.progress)
 
   // Cleanup both timer and interval on unmount
   useEffect(() => () => {
     if (timerRef.current)  clearTimeout(timerRef.current)
     if (ambientRef.current) clearInterval(ambientRef.current)
   }, [])
+
+  // Progress ring 100% burst
+  useEffect(() => {
+    const prev = prevProgressRef.current
+    prevProgressRef.current = worker.progress
+    if (worker.progress === 100 && prev < 100) {
+      setJustCompleted(true)
+      const t = setTimeout(() => setJustCompleted(false), 1400)
+      return () => clearTimeout(t)
+    }
+  }, [worker.progress])
 
   // Ambient broadcast loop — fires every 45s, resets on vibe change
   useEffect(() => {
@@ -409,6 +480,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
 
   return (
     <div className={classes.join(' ')} style={{ ...style, ...(handleClick ? { cursor: 'pointer' } : {}) }} {...extraProps}
+      data-complete={justCompleted || undefined}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onFocus={handleMouseEnter}
@@ -852,11 +924,17 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             <span className="wb-progress-pct">{avgProgress}%</span>
           )}
         </div>
-        <div className="mgr-desk">
+        <div className="mgr-desk" data-vibe={vibe}>
           <div className="mgr-desk__monitor" data-vibe={vibe} />
           <div key={vibe} className="mgr-desk__nameplate mgr-desk__nameplate--vibe">
             {vibe === 'crushing' ? 'CVO' : vibe === 'on-fire' ? 'INCIDENT CMD' : vibe === 'in-flow' ? 'MANAGER' : vibe === 'slow-day' ? 'DIR. OF VIBES' : vibe === 'after-hours' ? 'NIGHT WATCH' : 'MANAGER'}
           </div>
+          {vibe === 'on-fire' && (
+            <div className="mgr-desk__coffee" aria-hidden="true">☕</div>
+          )}
+          {vibe === 'crushing' && (
+            <div className="mgr-desk__trophy" aria-hidden="true">🏆</div>
+          )}
           <span className="sr-only">Manager desk</span>
         </div>
 
@@ -910,6 +988,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               ) : (
                 <div className="desk-character">
                   <div className="desk__monitor" />
+                  {isWorking && DESK_SCREEN_SVG[occ.worker.id] && (
+                    <div className="desk-monitor-screen">
+                      {DESK_SCREEN_SVG[occ.worker.id]}
+                    </div>
+                  )}
                   {!occ.ghost && (
                     <div
                       className={`desk__nameplate${isWorking ? ' desk__nameplate--active' : ''}${hasError ? ' desk__nameplate--error' : ''}`}
@@ -1045,6 +1128,12 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             <line x1="7" y1="11" x2="7" y2="18" stroke="#166534" strokeWidth="1" />
             <line x1="13" y1="11" x2="13" y2="18" stroke="#166534" strokeWidth="1" />
           </svg>
+        </div>
+        <div
+          className={`vibe-weather vibe-weather--${vibe}`}
+          aria-hidden="true"
+        >
+          {VIBE_WEATHER_ICONS[vibe]}
         </div>
         <div className="office-plant office-plant--cactus" style={{ left: '92%', top: '30%' }}>
           <svg width="18" height="28" viewBox="0 0 18 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

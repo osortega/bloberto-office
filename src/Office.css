@@ -168,6 +168,35 @@
   font-weight: 700;
 }
 
+/* ── Bloberto Stress Tells ── */
+.mgr-desk[data-vibe=on-fire] .mgr-desk__nameplate {
+  animation: nameplate-shake 0.35s ease-in-out infinite;
+  color: #ef4444;
+}
+@keyframes nameplate-shake {
+  30% { transform: translateX(-2px) rotate(-0.5deg); }
+  70% { transform: translateX(2px) rotate(0.5deg); }
+}
+.mgr-desk__coffee {
+  position: absolute;
+  bottom: 3%;
+  right: 4%;
+  font-size: 0.42rem;
+  opacity: 0.65;
+  animation: coffee-wobble 2.5s ease-in-out infinite;
+}
+@keyframes coffee-wobble {
+  50% { transform: rotate(5deg) translateY(-2px); }
+}
+.mgr-desk__trophy {
+  position: absolute;
+  bottom: 3%;
+  right: 4%;
+  font-size: 0.42rem;
+  opacity: 0.65;
+  animation: coffee-wobble 2.5s ease-in-out infinite;
+}
+
 /* ── Desk lamp — glows warm yellow when occupied by a working worker ── */
 .desk-lamp {
   position: absolute;
@@ -220,6 +249,22 @@
   box-shadow: 0 0 8px color-mix(in srgb, var(--role-color, var(--accent)) 55%, transparent);
   background: #0d0d1a;
   animation: monitor-blink 1.8s step-start infinite;
+}
+
+/* ── Desk Monitor Screen Content ── */
+.desk-monitor-screen {
+  position: absolute;
+  left: calc(50% - 19%);
+  top: 8%;
+  width: 38%;
+  height: 44%;
+  border-radius: 2px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.office-floor[data-vibe=crushing] .desk-monitor-screen {
+  filter: brightness(1.25);
 }
 
 @keyframes monitor-blink {
@@ -1323,6 +1368,28 @@
   .progress-ring--complete .progress-ring__fill { animation: none; }
 }
 
+/* ── Progress Ring 100% Burst ── */
+.char[data-complete]::after {
+  content: '✅';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  font-size: 10px;
+  animation: complete-burst 1.4s ease-out forwards;
+  z-index: 12;
+}
+@keyframes complete-burst {
+  0%   { opacity: 1; transform: translateX(-50%) scale(0.5) translateY(0); }
+  60%  { opacity: 1; transform: translateX(-50%) scale(1.3) translateY(-18px); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1) translateY(-28px); }
+}
+.char[data-complete] .char__avatar {
+  animation: complete-glow 0.5s ease-out 2 both;
+}
+@keyframes complete-glow {
+  50% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.5); }
+}
+
 /* ── Active desk pulsing glow (Luna #26) ── */
 @keyframes desk-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.25); }
@@ -1553,6 +1620,36 @@
   transform: translate(-50%, -50%);
   z-index: 1;
   pointer-events: none;
+}
+
+/* ── Vibe Weather Widget ── */
+.vibe-weather {
+  position: absolute;
+  right: 3%;
+  bottom: 26%;
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.55;
+  transition: opacity 0.6s ease;
+}
+.vibe-weather--on-fire {
+  animation: wx-urgent 1.4s ease-in-out infinite;
+}
+@keyframes wx-urgent {
+  50% { transform: scale(1.18) rotate(6deg); }
+}
+.vibe-weather--crushing {
+  animation: wx-sunny 3s ease-in-out infinite;
+}
+@keyframes wx-sunny {
+  50% { transform: scale(1.1) rotate(15deg); }
+}
+.vibe-weather--slow-day {
+  animation: wx-rain 2.5s ease-in-out infinite;
+}
+@keyframes wx-rain {
+  50% { transform: translateY(2px); opacity: 0.35; }
 }
 
 /* ── Ambient Dust Motes ── */
