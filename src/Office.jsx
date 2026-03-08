@@ -626,6 +626,7 @@ function WindowElement() {
 
   return (
     <div className="office-window" role="img" aria-label={`Office window showing ${timeLabel} sky`}>
+      <span className="office-window__time-caption">{timeLabel}</span>
       <div className="office-window__sky" style={{ background: getGradient(hour) }}>
         {isMidnight && (
           <>
