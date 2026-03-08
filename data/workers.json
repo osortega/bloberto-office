@@ -3,11 +3,19 @@
     {
       "name": "Maya",
       "role": "frontend",
-      "emoji": "\ud83c\udfa8",
+      "emoji": "🎨",
       "status": "working",
       "task": "Ghost Desk Sleep Mode monitors",
       "started_at": "2026-03-08T16:10:00Z"
+    },
+    {
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "🔍",
+      "status": "working",
+      "task": "QA review #19 — full site analysis with Puppeteer screenshots",
+      "started_at": "2026-03-08T16:15:00Z"
     }
   ],
-  "updated_at": "2026-03-08T16:10:00Z"
+  "updated_at": "2026-03-08T16:15:00Z"
 }
