@@ -1,106 +1,115 @@
 {
   "analyst": "Sofia",
-  "review_number": 20,
-  "timestamp": "2026-03-08T18:25:00Z",
-  "screenshot_note": "Chrome cannot launch in this environment (pthread_create resource limit). Screenshots copied from last successful capture (luna review #50 session, same live deploy). Visual assessment also based on full source code review of App.jsx, Office.jsx, Office.css, App.css, utils/*.js and live data from workers.json + activity.json.",
+  "review_number": 22,
+  "timestamp": "2026-03-08T19:15:00Z",
+  "screenshot_note": "Code-only review this cycle. Prior visual captures from 18:22 session still valid — no layout changes deployed since.",
   "scores": {
-    "visual": 4,
-    "ux": 3,
+    "visual": 5,
+    "ux": 4,
     "responsiveness": 4,
     "performance": 3,
-    "accessibility": 3,
-    "code_quality": 3,
+    "accessibility": 4,
+    "code_quality": 4,
     "features": 4,
-    "fun_factor": 4
+    "fun_factor": 5
   },
-  "overall_score": 3.5,
-  "fixes_verified": {
-    "confetti_timer_leak": "PARTIAL -- workerConfettiTimerRef and completionToastTimerRef are properly guarded with clearTimeout before setting (confirmed). The vibe-burst confetti setTimeout is also guarded via confettiTimerRef. BUT none of the four App-level timer refs have unmount cleanup effects. ShortcutToast has proper cleanup; App itself does not.",
-    "luna_svg_gradient_collision": "PARTIAL -- useRef+_gradIdx counter gives a unique ID per CharacterAvatar mount, preventing the original same-ID collision. However, useRef is called inside 'if (workerId === 'luna')' -- a conditional branch, violating Rules of Hooks. eslint-plugin-react-hooks will error on this. _gradIdx is also module-level mutable state that increments in StrictMode double-invoke.",
-    "activityLogLenRef_removed": "CONFIRMED FIXED -- activityLogLenRef is absent from the codebase.",
-    "stableActivityLog_useMemo": "NOT FIXED -- The fix was never landed. Lines 1104, 1127, and 1140 still pass activityLog.filter(e => e.worker === w.name).slice(-3) inline in JSX. Fresh array every render defeats React.memo on WorkerCard. Every 30s poll still forces all WorkerCard re-renders.",
-    "hover_card_time_bug": "CONFIRMED FIXED -- Office.jsx line 604 now correctly uses worker.startedAt for working-variant hover cards."
-  },
+  "overall_score": 4.1,
+  "delta_from_last": "+0.2",
+  "fixed_since_last": [
+    "prefers-reduced-motion — now has 18+ guards across both CSS files ✅",
+    "keyboard focus-visible rings on chars, cards, tabs ✅",
+    "skip-link and sr-only utility class added ✅",
+    "mobile stats-bar responsive grid (3→2 col) ✅",
+    "tooltip :focus-visible/:focus-within support ✅"
+  ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "useRef called inside conditional in CharacterAvatar -- Rules of Hooks violation",
-      "description": "Office.jsx line 253-254: the Luna branch does `if (workerId === 'luna') { const gradId = useRef(...).current }`. Hooks must be called unconditionally at the top level. While it does not visibly crash in practice (each CharacterAvatar always renders the same workerId), React warns in dev mode and eslint-plugin-react-hooks throws an error, which breaks CI linting. Fix: move `const gradIdRef = useRef(null)` to the TOP of CharacterAvatar unconditionally, and initialize lazily inside the luna branch: `if (gradIdRef.current === null) gradIdRef.current = 'luna-hair-' + (_gradIdx++)`. The conditional simply reads it. This also keeps _gradIdx mutation out of the unconditional render path.",
+      "title": "localStorage JSON.parse crash in private/incognito browsing",
+      "description": "App.jsx line ~879: `const history = raw ? JSON.parse(raw) : []` — no try-catch. If localStorage is corrupted or throws (Safari private mode, quota exceeded), the entire app crashes with a white screen. Wrap in try-catch with fallback. Same for theme preference read. This is a user-facing crash bug.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assignee": "Maya"
     },
     {
       "priority": "high",
+      "category": "bug",
+      "title": "Confetti only fires for first shipped worker in simultaneous completions",
+      "description": "App.jsx line ~833: `const worker = justShipped[0]` — ignores all other workers that shipped at the same time. If Carlos and Maya both finish in the same poll cycle, only Carlos gets celebrated. Fix: iterate justShipped and stagger confetti triggers by 200ms each.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "Module-level mutable _gradIdx counter breaks React StrictMode",
+      "description": "Office.jsx line 3: `let _gradIdx = 0` — increments on every render, never resets. Breaks StrictMode double-invoke, hot reload, and SSR. Replace with useId() hook (React 18+) for stable unique SVG gradient IDs.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
       "category": "performance",
-      "title": "WorkerCard React.memo STILL defeated -- inline filter creates new array every render",
-      "description": "App.jsx lines 1104, 1127, and 1140 pass `activityLog.filter(e => e.worker === w.name).slice(-3)` directly as the activityEntries prop. React.memo does shallow reference comparison. A new array is a new reference every render, so every WorkerCard re-renders on every 30s poll AND every 60s useTimeTick tick, regardless of whether that worker's data changed. Reported in reviews #17, #18, #19. The stableActivityLog fix was described as shipped but is absent from the code. Fix: build a `useMemo(() => { const m = new Map(); activityLog.forEach(e => { if (!m.has(e.worker)) m.set(e.worker, []); m.get(e.worker).push(e); }); return m; }, [activityLog])` map, then each WorkerCard receives `(activityByWorker.get(w.name) ?? []).slice(-3)` -- a stable reference until that specific worker gets new activity.",
-      "effort": "medium",
-      "assigned_to": "Maya"
+      "title": "Memoize reversed activity log slice",
+      "description": "The `[...entries].reverse().slice(0, 20)` allocation happens on every render (60s poll + state changes). Wrap in useMemo keyed on the activity array reference to eliminate unnecessary GC pressure.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
-      "priority": "high",
-      "category": "bug",
-      "title": "Duplicate filter in WorkerCard -- parent pre-filters, child filters again redundantly",
-      "description": "App.jsx passes activityEntries already filtered to a single worker's entries (slice of max 3). WorkerCard.workerHistory (line 243-246) then runs `.filter(e => e.worker === worker.name)` again on that already-filtered input. The second filter is fully redundant. More importantly it reveals a design confusion: the parent is doing filtering work that belongs to the child, and the child is defensively re-doing it. Pick one: either the parent passes the raw log and the child filters, OR the parent pre-filters and the child just slices/reverses. The current half-and-half approach wastes cycles and misleads future developers.",
+      "priority": "medium",
+      "category": "performance",
+      "title": "Add CSS containment to ambient particle containers",
+      "description": "19 absolutely-positioned animated spans run continuously. Add `contain: strict` to .ambient-particles container so browser can skip layout/paint for offscreen particles. Consider reducing count to 8-10 — visual effect is equivalent.",
       "effort": "small",
-      "assigned_to": "Maya"
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "Duplicate CSS vibe floor rules -- single-quoted block immediately shadowed by double-quoted block",
-      "description": "Office.css lines 65-69 define .office-floor vibe border/shadow styles with single-quote attribute selectors. Lines 71-88 immediately redefine the same selectors with double quotes, this time also setting --grid-line. The double-quote block wins (later in cascade). The single-quote block is entirely dead CSS. This is confusing for anyone editing vibe styles -- changes to lines 65-69 are silently ignored. Fix: delete lines 65-69. The double-quote block is complete and authoritative.",
+      "title": "Wall clock drifts up to 59 seconds on mount",
+      "description": "Office.jsx starts `setInterval(() => setTime(new Date()), 60_000)` immediately. If mounted at :45 seconds, first update fires at next-minute:45, showing stale time. Sync to next minute boundary with initial setTimeout before starting the interval.",
       "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Footer tagline counter denominator is 9 for 8 taglines -- counter and content desync",
-      "description": "App.jsx line 1221: the counter formula is `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` which produces 1-9. But BONUS_TAGLINES has 8 entries (indices 0-7). When quoteBonus reaches 8, the counter displays 9/9 but the tagline rendered is `BONUS_TAGLINES[8 % 8]` = index 0, which is the first tagline again. Counter shows '9' but content has already cycled back to the beginning. Fix: change to `(quoteBonus % BONUS_TAGLINES.length) + 1 / BONUS_TAGLINES.length` to keep counter in sync with content. Or just remove the counter -- it is low-opacity noise.",
-      "effort": "small",
-      "assigned_to": "Dave"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "ActivityLogEntry ignores entry.emoji field -- only does roster lookup",
-      "description": "App.jsx lines 66-68: ActivityLogEntry derives workerEmoji via `roster.find(r => r.name === entry.worker)?.emoji`. The live activity.json already includes an emoji field on each entry directly (e.g. Sofia's review entry has emoji '🔍'). If the worker name in an entry does not exactly match the roster, the emoji is lost even though it was already in the payload. Fix: use the entry's own emoji first, roster as fallback: `const workerEmoji = entry.emoji ?? roster?.find(r => r.name === entry.worker)?.emoji ?? (entry.worker ? '🤖' : null)`. One-line change, more resilient.",
-      "effort": "small",
-      "assigned_to": "Maya"
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "feature",
-      "title": "Activity log has no icons for 'review' or 'deploy' entry types -- both show wrench fallback",
-      "description": "ACTIVITY_ICONS only maps: hire, complete, error, system. The live activity.json has entries with type='review' (Sofia's QA reviews) and type='deploy' (Carlos/Dave ship events). Both fall to the '🔧' wrench fallback. A code review represented by a wrench is... technically accurate but feels wrong, and deploy events deserve something more energetic. Fix: add `review: '🔍', deploy: '🚀'` to ACTIVITY_ICONS. Two lines.",
-      "effort": "small",
-      "assigned_to": "Maya"
+      "title": "Browser Notification API for error status alerts",
+      "description": "On-fire vibe is only visible in active tab. Add opt-in browser notifications when a worker enters 'error' status — useful for background monitoring. Gate behind a 🔔 toggle in header, persist preference in localStorage.",
+      "effort": "medium",
+      "assignee": "Carlos"
     },
     {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "Activity filter buttons use role='radio' on button elements -- inconsistent keyboard behavior",
-      "description": "App.jsx lines 1159-1196: both filter bars put role='radiogroup' + role='radio' + aria-checked on <button> elements. Screen readers announce these as radio buttons, but arrow-key navigation between options (expected radio group behavior) does not work -- the elements respond to Tab/Space like regular buttons. This creates a mismatch between announced semantics and actual behavior. Fix option A (correct): use actual <input type='radio'> elements styled as pill buttons. Fix option B (pragmatic): remove role='radiogroup'/'radio', replace aria-checked with aria-pressed. Makes them honest toggle buttons which is what they actually are.",
+      "priority": "medium",
+      "category": "feature",
+      "title": "Activity log export button (JSON/CSV)",
+      "description": "Add a small 'Export ↓' button that downloads the current activity array as JSON or CSV. Useful for retrospectives. Small Blob, big convenience.",
       "effort": "small",
-      "assigned_to": "Dave"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "completionToast and plantToast hardcode 15-property inline style objects",
-      "description": "App.jsx lines 969-992 and Office.jsx lines 977-1001 each embed a 15-property inline style object (position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation). These objects recreate on every parent render and are unreadable in JSX. The only dynamic part is the color. Fix: move all static properties to .completion-toast and .plant-toast CSS classes. Inject only the dynamic value as a CSS custom property: `style={{ '--toast-color': completionToast.color }}` and reference `var(--toast-color)` in border and box-shadow rules.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "IDLE_BUBBLE_EMOJIS declared inside Character component body -- allocates new object every render",
-      "description": "Office.jsx line 392: `const IDLE_BUBBLE_EMOJIS = { 1: '☕', 2: '💬', 3: '🪟', 4: '🧘' }` is declared inside the Character memo function body. This allocates a new object on every render of every Character instance. Every other lookup constant in the file (AWAY_MESSAGES, DESK_SCREEN_SVG, VIBE_WEATHER_ICONS) is correctly at module scope. Move IDLE_BUBBLE_EMOJIS to module scope alongside its siblings.",
+      "title": "Establish z-index scale with CSS custom properties",
+      "description": "z-index values scattered ad-hoc (1, 2, 10, 50, 100, 200, 9999). Define --z-floor, --z-character, --z-overlay, --z-header, --z-modal, --z-toast in :root and replace all hard-coded values.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Offline stale-while-revalidate caching",
+      "description": "If GitHub CDN is down, app shows error banner with nothing useful. Cache successful responses to localStorage with timestamp, fall back to cache if < 15 min old with 'Last updated X ago' indicator.",
+      "effort": "medium",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Load Inter font explicitly via CDN",
+      "description": "Inter is declared in font-family but never loaded. On Linux/older Windows, silently falls back to system-ui causing inconsistent rendering. Add bunny.net font link (GDPR-safe) to index.html.",
+      "effort": "small",
+      "assignee": "Dave"
     }
   ]
 }
