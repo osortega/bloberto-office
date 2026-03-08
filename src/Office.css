@@ -1043,11 +1043,15 @@
   word-break: break-word;
   padding: 2px;
   transition: background 0.4s ease, border-color 0.4s ease;
+  overflow: hidden;
 }
 
 .wb-vibe-text {
   display: block;
   animation: chalk-write 0.6s ease forwards;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes chalk-write {
@@ -1687,21 +1691,21 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 9px;
-  animation: leaf-burst 1.6s ease-out forwards;
+  animation: leaf-burst 1.8s ease-out forwards;
   pointer-events: none;
   z-index: 5;
 }
 @keyframes leaf-burst {
   0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(0.4); }
-  55% { opacity: 1; transform: translateX(-50%) translateY(-18px) scale(1.1); }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-28px) scale(0.9); }
+  55% { opacity: 1; transform: translateX(-50%) translateY(-20px) scale(1.2); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-32px) scale(0.9); }
 }
 .office-plant--ficus[data-milestone] .ficus-foliage {
-  animation: foliage-flash 0.4s ease-out 2 both;
+  animation: foliage-flash 0.4s ease-out 3 both;
 }
 @keyframes foliage-flash {
   0%, 100% { filter: none; }
-  50% { filter: brightness(1.5) drop-shadow(0 0 4px #4ade80); }
+  50% { filter: brightness(1.6) drop-shadow(0 0 5px #4ade80); }
 }
 
 /* === Full-Sync Aura === */
@@ -1735,4 +1739,11 @@
 @keyframes banner-drop {
   from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .wb-vibe-text {
+    font-size: 0.48rem;
+    letter-spacing: 0.06em;
+  }
 }

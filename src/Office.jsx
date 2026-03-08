@@ -723,7 +723,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   useEffect(() => {
     if (prevPlantStageRef.current !== plantStage && plantStage !== 'seedling') {
       setPlantMilestone(true)
-      const t = setTimeout(() => setPlantMilestone(false), 1600)
+      const t = setTimeout(() => setPlantMilestone(false), 1800)
       return () => clearTimeout(t)
     }
     prevPlantStageRef.current = plantStage
