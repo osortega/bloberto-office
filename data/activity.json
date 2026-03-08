@@ -16,5 +16,11 @@
     "worker": "Sofia",
     "message": "QA review complete \u2014 14 suggestions, 5 high-priority bugs found (overall: 3.6/5)",
     "timestamp": "2026-03-08T01:45:00Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Maya",
+    "message": "Clocked in to fix 5 high-priority bugs from Sofia QA review",
+    "timestamp": "2026-03-08T01:46:00Z"
   }
 ]
