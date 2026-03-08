@@ -316,5 +316,17 @@
     "type": "hire",
     "worker": "Maya",
     "message": "Assigned: Conference table mobile fix + whiteboard 480px fix (Sofia #12)"
+  },
+  {
+    "timestamp": "2026-03-08T09:28:00Z",
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "Shipped useMemo side-effect fix (moved to useEffect) + sessionStorage→localStorage for vibe streak consistency"
+  },
+  {
+    "timestamp": "2026-03-08T09:28:00Z",
+    "type": "complete",
+    "worker": "Maya",
+    "message": "Shipped conference table absolute positioning (left:50%, top:62%) + whiteboard 480px readability fix (font-size:0.32rem, hide progress)"
   }
 ]

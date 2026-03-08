@@ -899,10 +899,15 @@
   }
   .office-whiteboard {
     width: 7.5%;
-    font-size: 0;
+    font-size: 0.32rem;
   }
-  .office-whiteboard::before {
-    font-size: 0.7rem;
+  .wb-progress-track,
+  .wb-progress-pct {
+    display: none;
+  }
+  .wb-vibe-text {
+    font-size: 0.48rem;
+    letter-spacing: 0.06em;
   }
 }
 
@@ -1500,6 +1505,12 @@
 
 /* ── Conference table ── */
 .conference-table {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* ── Office Aisle Marker ── */

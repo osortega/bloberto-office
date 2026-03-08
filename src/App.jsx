@@ -761,10 +761,8 @@ export default function App() {
   )
 
   const activityLogLenRef = useRef(0)
-  const stableActivityLog = useMemo(() => {
-    activityLogLenRef.current = activityLog.length
-    return activityLog
-  }, [activityLog.length])
+  const stableActivityLog = useMemo(() => activityLog, [activityLog.length])
+  useEffect(() => { activityLogLenRef.current = activityLog.length }, [activityLog.length])
 
   const teamVibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers])
 
@@ -840,13 +838,13 @@ export default function App() {
 
   // ── Vibe Streak Counter + Confetti Burst ──
   useEffect(() => {
-    const storedKey = sessionStorage.getItem('bloberto-vibe-key')
-    const storedStreak = parseInt(sessionStorage.getItem('bloberto-vibe-streak') || '0', 10)
+    const storedKey = localStorage.getItem('bloberto-vibe-key')
+    const storedStreak = parseInt(localStorage.getItem('bloberto-vibe-streak') || '0', 10)
     // Only increment if the vibe key is the same AND this isn't the initial mount
     const isInitialMount = previousVibeKeyRef.current === null
     const newStreak = storedKey === teamVibe.key ? storedStreak + (isInitialMount ? 0 : 1) : 1
-    sessionStorage.setItem('bloberto-vibe-key', teamVibe.key)
-    sessionStorage.setItem('bloberto-vibe-streak', String(newStreak))
+    localStorage.setItem('bloberto-vibe-key', teamVibe.key)
+    localStorage.setItem('bloberto-vibe-streak', String(newStreak))
     setVibeStreak(newStreak)
 
     // Confetti burst when vibe rank increases
