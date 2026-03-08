@@ -2,6 +2,12 @@
   {
     "type": "complete",
     "worker": "Sofia",
+    "message": "\ud83d\udd0d QA review #25 complete \u2014 overall score 3.75/5 (-0.05) \u2014 4 high-priority bugs found, 16 total suggestions",
+    "timestamp": "2026-03-08T21:53:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
     "message": "\ud83d\udd0d QA review #24 complete \u2014 reviewed #23 findings, 4 high-priority bugs confirmed, assigning Maya for fixes",
     "timestamp": "2026-03-08T21:20:00Z"
   },
