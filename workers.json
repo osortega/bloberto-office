@@ -1,14 +1,4 @@
 {
-  "workers": [
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨",
-      "status": "working",
-      "task": "Implementing Luna's creative review items: desk monitor screens, progress ring burst, Bloberto stress tells, vibe weather widget",
-      "started_at": "2026-03-08T10:31:00Z"
-    }
-  ],
-  "updated_at": "2026-03-08T10:31:00Z"
+  "workers": [],
+  "updated_at": "2026-03-08T10:36:00Z"
 }
