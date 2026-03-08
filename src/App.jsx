@@ -169,7 +169,7 @@ function StatusBadge({ status }) {
   )
 }
 
-function ProgressBar({ progress, updatedAt }) {
+function ProgressBar({ progress, updatedAt, startedAt }) {
   const milestonesRef = useRef(new Set())
   const prevProgressRef = useRef(progress)
   const [flashClass, setFlashClass] = useState('')
@@ -190,7 +190,7 @@ function ProgressBar({ progress, updatedAt }) {
     }
   }, [progress])
 
-  const workingMs = updatedAt ? Date.now() - new Date(updatedAt).getTime() : null
+  const workingMs = startedAt ? Date.now() - new Date(startedAt).getTime() : null
   const workingMins = workingMs ? workingMs / 60000 : 0
   const eta = (progress > 5 && workingMins > 1) ? Math.round((workingMins / progress) * (100 - progress)) : null
 
@@ -306,7 +306,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             return <div className="worker-duration" data-tier={tier}>{tier === 'stuck' ? '⚠️ ' : ''}⏱️ {formatDuration(worker.updated_at)}</div>
           })()}
 
-          <ProgressBar progress={worker.progress} updatedAt={worker.updated_at} />
+          <ProgressBar progress={worker.progress} updatedAt={worker.updated_at} startedAt={worker.startedAt} />
         </div>
 
         <div className="worker-card__back" aria-hidden={!isFlipped || undefined} tabIndex={!isFlipped ? -1 : undefined}>
@@ -524,11 +524,14 @@ function ShortcutToast() {
     localStorage.setItem('bloberto-shortcuts-shown', '1')
     if (gotIt) {
       setPhase('gotit')
-      timerRef.current = setTimeout(() => setPhase('fading-out'), 500)
+      timerRef.current = setTimeout(() => {
+        setPhase('fading-out')
+        timerRef.current = setTimeout(() => setPhase('hidden'), 400)
+      }, 500)
     } else {
       setPhase('fading-out')
+      timerRef.current = setTimeout(() => setPhase('hidden'), 300)
     }
-    timerRef.current = setTimeout(() => setPhase('hidden'), gotIt ? 900 : 300)
   }, [])
 
   useEffect(() => {
@@ -755,6 +758,8 @@ export default function App() {
     ),
     [allWorkers]
   )
+
+  const stableActivityLog = useMemo(() => activityLog, [JSON.stringify(activityLog)])
 
   const teamVibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers])
 
@@ -1040,7 +1045,7 @@ export default function App() {
 
         {tab === 'office' ? (
           <div role="tabpanel" id="tabpanel-office" aria-labelledby="tab-office">
-            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} vibeStreak={vibeStreak} />
+            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={stableActivityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} vibeStreak={vibeStreak} />
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
@@ -1065,7 +1070,7 @@ export default function App() {
                     worker={activeWorkers[0]}
                     index={0}
                     isNew={newIds.has(activeWorkers[0].id)}
-                    activityEntries={activityLog}
+                    activityEntries={stableActivityLog}
                     isFocused={focusedWorker === activeWorkers[0].id}
                     selectedTag={selectedTag}
                     onTagClick={handleTagClick}
@@ -1088,7 +1093,7 @@ export default function App() {
                         worker={w}
                         index={i}
                         isNew={newIds.has(w.id)}
-                        activityEntries={activityLog}
+                        activityEntries={stableActivityLog}
                         isFocused={focusedWorker === w.id}
                         selectedTag={selectedTag}
                         onTagClick={handleTagClick}
@@ -1101,7 +1106,7 @@ export default function App() {
                         worker={w}
                         index={activeWorkers.length}
                         isFading
-                        activityEntries={activityLog}
+                        activityEntries={stableActivityLog}
                         selectedTag={selectedTag}
                         onTagClick={handleTagClick}
                         isDimmed={selectedTag !== null && !getTaskTags(w.task).some(t => t.label === selectedTag)}

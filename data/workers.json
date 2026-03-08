@@ -1,10 +1,10 @@
 {
-  "lastUpdated": "2026-03-08T05:22:04Z",
+  "lastUpdated": "2026-03-08T05:30:59Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "⚙️",
+      "emoji": "\u2699\ufe0f",
       "status": "working",
       "task": "Fix 2 HIGH bugs: ProgressBar ETA bug + React.memo defeat (QA #8)",
       "startedAt": "2026-03-08T05:22:04Z",
@@ -15,7 +15,7 @@
     {
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "🚀",
+      "emoji": "\ud83d\ude80",
       "status": "idle",
       "task": "Ambient dust motes task stalled (no container found)",
       "startedAt": "2026-03-08T03:36:00Z",
@@ -26,20 +26,20 @@
     {
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙",
-      "status": "working",
-      "task": "Creative review #34",
+      "emoji": "\ud83c\udf19",
+      "status": "idle",
+      "task": "Creative review #34 complete \u2014 7 ideas (2 must, 2 should, 2 could, 1 wild)",
       "startedAt": "2026-03-08T05:00:48Z",
       "id": "luna",
-      "updated_at": "2026-03-08T05:00:48Z",
-      "progress": 0
+      "updated_at": "2026-03-08T05:30:59Z",
+      "progress": 100
     },
     {
       "name": "Sofia",
       "role": "QA & Product Analyst",
-      "emoji": "🔍",
+      "emoji": "\ud83d\udd0d",
       "status": "idle",
-      "task": "QA review #8 complete — 11 findings (3 high from #7 STILL UNFIXED + 1 new high, 5 medium, 2 low). Overall: 3.5/5",
+      "task": "QA review #8 complete \u2014 11 findings (3 high from #7 STILL UNFIXED + 1 new high, 5 medium, 2 low). Overall: 3.5/5",
       "startedAt": "2026-03-08T05:15:27Z",
       "id": "sofia",
       "updated_at": "2026-03-08T05:21:53Z",
@@ -48,7 +48,7 @@
     {
       "name": "Maya",
       "role": "Frontend Engineer",
-      "emoji": "🎨",
+      "emoji": "\ud83c\udfa8",
       "status": "working",
       "task": "Fix 2 HIGH bugs: ShortcutToast timer leak + Office.css broken brace (QA #8)",
       "startedAt": "2026-03-08T05:22:04Z",
@@ -62,37 +62,37 @@
       "id": "bloberto",
       "name": "Bloberto",
       "role": "Manager",
-      "emoji": "🫠"
+      "emoji": "\ud83e\udee0"
     },
     {
       "id": "maya",
       "name": "Maya",
       "role": "Frontend Engineer",
-      "emoji": "🎨"
+      "emoji": "\ud83c\udfa8"
     },
     {
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "⚙️"
+      "emoji": "\u2699\ufe0f"
     },
     {
       "id": "dave",
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "🚀"
+      "emoji": "\ud83d\ude80"
     },
     {
       "id": "sofia",
       "name": "Sofia",
       "role": "QA & Product Analyst",
-      "emoji": "🔍"
+      "emoji": "\ud83d\udd0d"
     },
     {
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙"
+      "emoji": "\ud83c\udf19"
     }
   ]
 }
