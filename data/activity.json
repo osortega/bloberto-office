@@ -1,5 +1,23 @@
 [
   {
+    "type": "system",
+    "worker": null,
+    "message": "\ud83c\udf19 Luna completed creative review #47",
+    "timestamp": "2026-03-08T15:05:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "dave",
+    "message": "\ud83d\udd27 Dave shipped: mobile tap-to-pin hover cards",
+    "timestamp": "2026-03-08T15:10:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "carlos",
+    "message": "\ud83d\udd35 Bloberto shipped: role-colored desk lamps + fallback desk screens",
+    "timestamp": "2026-03-08T15:11:00Z"
+  },
+  {
     "type": "complete",
     "worker": "Bloberto",
     "emoji": "\ud83e\udee0",
@@ -287,195 +305,5 @@
     "worker": "Maya",
     "message": "Fixed ShortcutToast timer leak + Office.css broken brace (QA #8 HIGH)",
     "timestamp": "2026-03-08T05:33:52Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Carlos",
-    "message": "Fixed ProgressBar ETA bug + React.memo defeat + stuck worker null display (QA #8 HIGH)",
-    "timestamp": "2026-03-08T05:33:52Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #9 complete \u2014 16 findings (3 high, 10 medium, 3 low). Overall: 3.4/5. 2 items from #8 STILL unfixed (updated_at bug, React.memo). New: mobile header overflow.",
-    "timestamp": "2026-03-08T05:52:42Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #10 complete \u2014 17 findings (4 high, 8 medium, 5 low). Overall: 3.1/5. Score DOWN from 3.4. Version drift detected. 13 items STILL unfixed from prior reviews.",
-    "timestamp": "2026-03-08T06:45:00Z"
-  },
-  {
-    "timestamp": "2026-03-08T07:30:00Z",
-    "type": "hire",
-    "worker": "Luna",
-    "message": "Clocked in for creative review #37"
-  },
-  {
-    "timestamp": "2026-03-08T07:34:00Z",
-    "type": "complete",
-    "worker": "Luna",
-    "message": "Creative review #37 complete \u2014 7 ideas (2 must, 2 should, 2 could, 1 wild). Theme: Every silent element is a story"
-  },
-  {
-    "timestamp": "2026-03-08T07:35:00Z",
-    "type": "hire",
-    "worker": "Maya",
-    "message": "Assigned: Desk Monitor Cursor Blink + Character Click Sonar Ping (Luna #37)"
-  },
-  {
-    "timestamp": "2026-03-08T07:35:00Z",
-    "type": "hire",
-    "worker": "Carlos",
-    "message": "Assigned: Deep Work Focus Halo + Error Room Tint (Luna #37)"
-  },
-  {
-    "timestamp": "2026-03-08T07:40:00Z",
-    "type": "complete",
-    "worker": "Carlos",
-    "message": "Shipped Deep Work Focus Halo (indigo halo + \ud83c\udfa7 for 45min+ workers) + Error Room Tint (red radial gradient on floor when errors exist)"
-  },
-  {
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for QA review #11 (actually #15 in her count)",
-    "timestamp": "2026-03-08T11:15:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #15 complete \u2014 18 findings (5 high, 9 medium, 4 low). Overall: 3.4/5. Score UP from 3.1. Dead code + useless useMemo + keyboard a11y remain top issues.",
-    "timestamp": "2026-03-08T11:25:00Z"
-  },
-  {
-    "timestamp": "2026-03-08T11:30:00Z",
-    "type": "hire",
-    "worker": "Luna",
-    "message": "Clocked in for creative review #42 (timed out \u2014 using #41 ideas)"
-  },
-  {
-    "timestamp": "2026-03-08T11:36:00Z",
-    "type": "hire",
-    "worker": "Carlos",
-    "message": "Assigned: Luna dedup bug + vibe weather widget visibility"
-  },
-  {
-    "timestamp": "2026-03-08T11:36:00Z",
-    "type": "hire",
-    "worker": "Dave",
-    "message": "Assigned: mobile dead space fix"
-  },
-  {
-    "timestamp": "2026-03-08T11:38:00Z",
-    "type": "complete",
-    "worker": "Carlos",
-    "message": "Fixed worker dedup (working > idle priority) + vibe weather opacity/size"
-  },
-  {
-    "timestamp": "2026-03-08T11:39:00Z",
-    "type": "complete",
-    "worker": "Dave",
-    "message": "Fixed mobile dead space: calc(100vw * 0.75) + tighter padding"
-  },
-  {
-    "timestamp": "2026-03-08T11:39:00Z",
-    "type": "complete",
-    "worker": "Maya",
-    "message": "Idle char name shrunk to 0.32rem with hover reveal (applied by manager)"
-  },
-  {
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for QA review #16",
-    "timestamp": "2026-03-08T11:45:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #16 complete \u2014 16 findings (4 high, 8 medium, 4 low). Overall: 3.3/5. Score DOWN from 3.4. Coffee corner vibe text broken, reduced-motion selectors orphaned, dead CSS from unshipped features.",
-    "timestamp": "2026-03-08T11:55:00Z"
-  },
-  {
-    "type": "hire",
-    "worker": "Luna",
-    "message": "Clocked in for creative review #43",
-    "timestamp": "2026-03-08T12:00:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Luna",
-    "message": "Creative review #43 complete \u2014 2 MUSTs carried forward (nameplate idle guard, whiteboard dark mode), both implemented by manager. 2 SHOULDs, 2 COULDs. No hire proposals.",
-    "timestamp": "2026-03-08T12:08:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Bloberto",
-    "message": "Implemented nameplate idle guard fix (Office.jsx) + away glyph + whiteboard dark mode fix (Office.css)",
-    "timestamp": "2026-03-08T12:10:00Z"
-  },
-  {
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for QA review #17",
-    "timestamp": "2026-03-08T12:15:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #17 complete \u2014 11 findings (3 high, 5 medium, 3 low). Overall: 3.7/5. Score UP from 3.3. Coffee corner CSS bug still broken (carried from #16), focus indicators missing, animation performance concerns.",
-    "timestamp": "2026-03-08T12:20:00Z"
-  },
-  {
-    "type": "hire",
-    "worker": "Maya",
-    "message": "Assigned 3 high-priority QA fixes: coffee corner CSS bug, focus indicators, animation performance",
-    "timestamp": "2026-03-08T12:21:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Maya",
-    "message": "Fixed 5 items from QA #17: coffee corner CSS selectors, focus indicators, duplicate dust-drift/ghost-float keyframes, reduced-motion selectors. +13 -17 lines.",
-    "timestamp": "2026-03-08T12:24:00Z"
-  },
-  {
-    "type": "hire",
-    "worker": "Sofia",
-    "message": "Clocked in for QA review #18",
-    "timestamp": "2026-03-08T13:15:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "QA review #18 complete \u2014 11 findings (3 high, 5 medium, 3 low). Overall: 3.8/5. Score UP from 3.7. Previous bugs confirmed FIXED. Main concerns: Office.jsx monolith, animation performance, shortcut toast on mobile.",
-    "timestamp": "2026-03-08T13:20:00Z"
-  },
-  {
-    "worker": "Maya",
-    "task": "Plant level-up toast + polling-paused indicator",
-    "status": "done",
-    "timestamp": "2026-03-08T13:32:00Z",
-    "duration_minutes": 2
-  },
-  {
-    "worker": "Luna",
-    "task": "Creative review #45",
-    "status": "done",
-    "timestamp": "2026-03-08T13:30:00Z",
-    "duration_minutes": 30
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "QA review #19 complete \u2014 13 findings (4 high, 5 medium, 4 low). Overall: 3.5/5. Score DOWN from 3.9. 5 carries from #18 UNRESOLVED. ShortcutToast mobile, aria-live bug, Office.jsx monolith, memo defeat persist.",
-    "timestamp": "2026-03-08T13:55:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "QA review #20 complete \u2014 13 findings (4 high, 5 medium, 4 low). Overall: 3.4/5. Score DOWN from 3.5. 5 carries from R19 STILL UNRESOLVED. ShortcutToast mobile (5th review!), aria-live bugs grew to 3, Office.jsx still 1218 lines, WorkerCard memo still defeated.",
-    "timestamp": "2026-03-08T14:45:00Z"
   }
 ]
