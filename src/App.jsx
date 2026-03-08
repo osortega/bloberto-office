@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo, memo } from '
 import './App.css'
 import Office from './Office.jsx'
 import { getTeamVibe } from './utils/vibe.js'
-import { ROLE_EMOJIS, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
+import { ROLE_EMOJIS, STATUS_LABELS, STATUS_EMOJIS, ROLE_COLORS } from './utils/constants.js'
 
 const GITHUB_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json'
@@ -11,13 +11,7 @@ const ACTIVITY_API_URL =
 const POLL_INTERVAL_ACTIVE = 30_000
 const POLL_INTERVAL_HIDDEN = 60_000
 
-const WORKER_ROLE_COLORS = {
-  Maya:   '#a855f7',
-  Carlos: '#3b82f6',
-  Dave:   '#f97316',
-  Sofia:  '#22c55e',
-  Luna:   '#8b5cf6',
-}
+
 
 async function fetchWorkersFromGitHub() {
   const res = await fetch(GITHUB_API_URL + '?t=' + Date.now())
@@ -761,7 +755,7 @@ export default function App() {
   )
 
   const activityLogLenRef = useRef(0)
-  const stableActivityLog = useMemo(() => activityLog, [activityLog.length])
+  const stableActivityLog = useMemo(() => activityLog, [activityLog])
   useEffect(() => { activityLogLenRef.current = activityLog.length }, [activityLog.length])
 
   const teamVibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers])
@@ -826,7 +820,7 @@ export default function App() {
     const justShipped = activeWorkers.filter(w => prevMap.get(w.id)?.status === 'working' && w.status === 'idle')
     if (justShipped.length > 0 && prev.length > 0) {
       const worker = justShipped[0]
-      const color = WORKER_ROLE_COLORS[worker.name] || '#a855f7'
+      const color = ROLE_COLORS[worker.role] || ROLE_COLORS['Other']
       setWorkerConfetti({ name: worker.name, color })
       setCompletionToast({ name: worker.name, color })
       setTimeout(() => setWorkerConfetti(null), 2500)

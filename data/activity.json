@@ -358,5 +358,17 @@
     "type": "hire",
     "worker": "Maya",
     "message": "Assigned: Fix mobile dead zone + touch targets (Sofia #13)"
+  },
+  {
+    "timestamp": "2026-03-08T10:25:00Z",
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "Shipped stableActivityLog fix (useMemo dep) + removed duplicate WORKER_ROLE_COLORS map"
+  },
+  {
+    "timestamp": "2026-03-08T10:25:00Z",
+    "type": "complete",
+    "worker": "Maya",
+    "message": "Shipped mobile dead zone fix (max-height:320px + margin-bottom) for 480px breakpoint"
   }
 ]

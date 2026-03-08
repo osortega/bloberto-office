@@ -883,6 +883,10 @@
 @media (max-width: 480px) {
   .office-floor {
     min-height: 280px;
+    max-height: 320px;
+  }
+  .office-wrap {
+    margin-bottom: 1rem;
   }
   .char__avatar {
     width: 24px;
