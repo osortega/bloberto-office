@@ -1,4 +1,14 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-08T20:10:00Z"
+  "workers": [
+    {
+      "name": "Luna",
+      "emoji": "🌙",
+      "role": "Creative Director",
+      "status": "idle",
+      "task": "Creative review #53 — completed",
+      "started_at": "2026-03-08T20:30:00Z",
+      "finished_at": "2026-03-08T21:00:00Z"
+    }
+  ],
+  "updated_at": "2026-03-08T21:00:00Z"
 }
