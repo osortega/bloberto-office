@@ -4,11 +4,23 @@
       "id": "maya",
       "name": "Maya",
       "role": "frontend",
-      "emoji": "🎨",
+      "emoji": "\ud83c\udfa8",
       "status": "working",
       "current_task": "Implementing Vibe Aura on Office Border (CSS)",
       "started_at": "2026-03-08T15:30:00Z"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "\ud83d\udd0d",
+      "status": "working",
+      "task": "QA review #19 \u2014 full site analysis + code review",
+      "progress": 10,
+      "current_task": "QA review #19 \u2014 full site analysis + code review",
+      "started_at": "2026-03-08T15:45:00Z",
+      "updated_at": "2026-03-08T15:45:00Z"
     }
   ],
-  "updated_at": "2026-03-08T15:30:00Z"
+  "updated_at": "2026-03-08T15:45:00Z"
 }
