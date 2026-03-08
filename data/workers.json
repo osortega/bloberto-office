@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T05:33:52Z",
+  "lastUpdated": "2026-03-08T05:45:26Z",
   "workers": [
     {
       "name": "Carlos",
@@ -38,12 +38,12 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "QA review #8 complete \u2014 11 findings (3 high from #7 STILL UNFIXED + 1 new high, 5 medium, 2 low). Overall: 3.5/5",
-      "startedAt": "2026-03-08T05:15:27Z",
+      "status": "working",
+      "task": "QA review #9 \u2014 full site analysis with Puppeteer screenshots",
+      "startedAt": "2026-03-08T05:45:26Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T05:21:53Z",
-      "progress": 100
+      "updated_at": "2026-03-08T05:45:26Z",
+      "progress": 0
     },
     {
       "name": "Maya",
