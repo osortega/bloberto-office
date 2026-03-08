@@ -1014,12 +1014,15 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                       {DESK_SCREEN_SVG[occ.worker.id]}
                     </div>
                   )}
-                  {!occ.ghost && (
+                  {!occ.ghost && !occ.idle && (
                     <div
                       className={`desk__nameplate${isWorking ? ' desk__nameplate--active' : ''}${hasError ? ' desk__nameplate--error' : ''}`}
                     >
                       {occ.worker.name.split(' ')[0]}
                     </div>
+                  )}
+                  {occ.idle && (
+                    <div className="desk__nameplate desk__nameplate--away">↪ away</div>
                   )}
                   {showAwaySign && (
                     <AwaySign workerId={occ.worker.id} idleMinutes={idleMinutes} />

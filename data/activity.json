@@ -358,5 +358,23 @@
     "worker": "Sofia",
     "message": "QA review #16 complete \u2014 16 findings (4 high, 8 medium, 4 low). Overall: 3.3/5. Score DOWN from 3.4. Coffee corner vibe text broken, reduced-motion selectors orphaned, dead CSS from unshipped features.",
     "timestamp": "2026-03-08T11:55:00Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Luna",
+    "message": "Clocked in for creative review #43",
+    "timestamp": "2026-03-08T12:00:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Luna",
+    "message": "Creative review #43 complete \u2014 2 MUSTs carried forward (nameplate idle guard, whiteboard dark mode), both implemented by manager. 2 SHOULDs, 2 COULDs. No hire proposals.",
+    "timestamp": "2026-03-08T12:08:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Bloberto",
+    "message": "Implemented nameplate idle guard fix (Office.jsx) + away glyph + whiteboard dark mode fix (Office.css)",
+    "timestamp": "2026-03-08T12:10:00Z"
   }
 ]

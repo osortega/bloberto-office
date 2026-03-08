@@ -1,81 +1,57 @@
 {
   "creative_director": "Luna",
-  "review_number": 42,
-  "timestamp": "2026-03-08T11:31:30Z",
-  "theme": "Fix the ghosts in the machine — every pixel should tell one honest story",
-  "visual_observations": "Screenshots captured 11:31 UTC, desktop 1280x800 (After Hours / Night Watch) and mobile 375x812 (Crushing It / Full Sync). DESKTOP: Only Bloberto is on the floor — zzz face, 'Night Watch' title, sleeping well. The starfield floor IS rendering (confirmed: subtle radial dot texture visible against the dark grid, twinkle animation implemented). The ghost desk dust aura is live too. Biggest visual offense: the office-whiteboard on the left wall is a BLAZING cream-white rectangle (#f0f0e8 in Office.css line 1083) against the dark floor — burns the eyes like someone left the lights on in a movie theater. It's 5.5% wide, 16% tall, positioned at left:1% top:38% — impossible to miss. Lower-left of floor: a large, dark wandering-character circle with purple role-color glow, no visible name label (possibly after-hours with one idle worker). Right side: office window with time-accurate sky (blue-white gradient confirming daytime at viewer's local time even though the vibe is After Hours — temporal mismatch). MOBILE: Luna is working at her desk — progress bar active (blue segments), LUNA nameplate visible at her desk position in the upper-left. Simultaneously, LUNA appears as a nameplate label at the desk even though her character body is wandering (the dual representation: desk nameplate renders for occ.idle workers at Office.jsx line 1017 because the condition is `!occ.ghost` without `&& !occ.idle`). The SHIP_IT-style task card floater is visible on the left edge of the mobile floor — but it does NOT exist in /workspace/src/Office.jsx (code drift, same as review #41). FULL SYNC banner showing, TEAM LOCKED IN vibe caption at bottom. Mobile office floor fills roughly 70% of viewport — better than before but the max-height: 320px in the first 480px media query block (Office.css line 931) still caps height, fighting the min-height: 65vh added in the second 480px block (line 1991). Net: dead space persists. Three MUSTs from review #41 are confirmed unfixed in the current source.",
+  "review_number": 43,
+  "timestamp": "2026-03-08T12:05:00Z",
+  "theme": "Clean up the carry-forwards — the whiteboard is still blinding and the nameplate ghost persists",
+  "visual_observations": "Code review confirms: (1) Nameplate dual-render bug STILL unfixed — Office.jsx line 1017 condition is !occ.ghost without !occ.idle, so idle workers show nameplate at desk AND wandering character. (2) max-height: 320px mobile issue is FIXED — grep returns no results, the offending line was removed. (3) Whiteboard #f0f0e8 background STILL unfixed at Office.css line 1094 — blazing white on dark mode. (4) Wandering char name size FIXED — now 0.32rem at line 669 with hover reveal. Two of four review #42 MUSTs resolved, two remaining.",
   "ideas": [
     {
       "priority": "must",
       "category": "office-life",
-      "title": "Luna Dual-Render Bug — Nameplate Condition Missing Idle Guard",
-      "description": "Carry-forward from reviews #40 and #41. Root cause NOW IDENTIFIED in code: Office.jsx line 1017 renders the desk nameplate with condition `!occ.ghost` but NOT `!occ.idle`. So when Luna is idle (wandering), her first name still renders at her desk as a nameplate AND her Character body wanders the lower floor. Two Lunas, one office. One-line fix: change line 1017 from `{!occ.ghost && (` to `{!occ.ghost && !occ.idle && (`. This hides the nameplate for any idle/wandering worker. To signal the vacated desk clearly, the desk-character div should also show a vacated indicator when `occ.idle` — see the companion 'should' idea about the vacant desk glyph. WHY: The bug has been confirmed across three consecutive reviews. It was identified as a data race in #40, then a status filter issue in #41. It's now a confirmed one-line code fix. Ship it.",
+      "title": "Luna Dual-Render Bug — Nameplate Condition Missing Idle Guard (carry-forward #3)",
+      "description": "Third consecutive carry-forward. Office.jsx line 1017: condition is `!occ.ghost` but needs `!occ.ghost && !occ.idle`. When a worker is idle/wandering, their name renders at the desk nameplate AND as a wandering character label. One-line fix. WHY: This has been identified for three reviews. The fix is literally adding '&& !occ.idle' to one condition.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "must",
       "category": "visual",
-      "title": "Mobile Dead Space — max-height: 320px Is Still Winning",
-      "description": "Carry-forward from reviews #39, #40, #41. Confirmed unfixed in source. The first @media (max-width: 480px) block in Office.css (lines 928-932) sets max-height: 320px. The second 480px block (lines 1984-2018, added in review #41) sets min-height: 65vh — which at 812px viewport = 527px. But max-height: 320px from the EARLIER block is not overridden by the second block and caps the height at 320px. The min and max fight each other, max wins. Fix: In the FIRST 480px block (line 929-932), remove the max-height: 320px line entirely. Keep min-height: 280px as a floor. The second block's min-height: 65vh then takes over and fills the viewport correctly. Single-line deletion. Also add to the second 480px block: `.office-floor { max-height: none; }` to explicitly clear any inherited cap. WHY: Three sprints. One deleted CSS property. Mobile is likely the primary access pattern for async team status checks. The office-as-hero metaphor collapses to a postage stamp when 30% of the screen is wasted dark space.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "must",
-      "category": "visual",
-      "title": "Whiteboard Dark Mode Skin — #f0f0e8 Is Burning the Floor",
-      "description": "NEW observation from review #42 desktop screenshot. The .office-whiteboard element (Office.css line 1083) uses `background: #f0f0e8` — a near-white cream that blazes against the dark office floor like a phone screen at 3am. This is a light-mode color that was never given a dark-mode variant. Three-part fix: (1) Change the base background to a dark surface: `.office-whiteboard { background: #14122a; border-color: rgba(139,92,246,0.25); color: #c4b5fd; }`. (2) Restore light-mode via existing `[data-theme='light']`: `[data-theme='light'] .office-whiteboard { background: #f0f0e8; border-color: rgba(0,0,0,0.18); color: #333; }`. (3) Update vibe-specific whiteboard accents to match: `[data-vibe='on-fire'] .office-whiteboard { border-color: rgba(249,115,22,0.35); }`, `[data-vibe='crushing'] .office-whiteboard { border-color: rgba(139,92,246,0.45); }`, `[data-vibe='after-hours'] .office-whiteboard { background: #0e0c20; border-color: rgba(99,102,241,0.3); }`. The wb-vibe-text color already uses #333 which needs updating to the dark surface color — already done via the parent color:inherit chain. WHY: The whiteboard is the most prominent wall element and it's currently a flashbang. Every dark-mode user (almost everyone using this product) sees a blown-out white panel as the dominant mid-floor landmark. Fix is four CSS rules.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "visual",
-      "title": "Wandering Char Name — Desktop Still Shows Full 0.58rem",
-      "description": "Carry-forward from review #41. On desktop (>768px), the .char__name rule (Office.css line 538) sets font-size: 0.58rem with no reduction for idle/wandering characters. The wandering Character floats freely across the floor with its name label at full size, uncontained by any desk frame. The 768px and 480px media queries reduce the name on smaller viewports but desktop is untouched. Fix in Office.css: add `.char--idle .char__name { font-size: 0.38rem; opacity: 0.65; letter-spacing: 0.06em; }` and `.char--idle:hover .char__name { opacity: 1; font-size: 0.42rem; }`. This makes the wandering name ambient — legible on hover, unobtrusive at rest. Note: the companion MUST fix (nameplate condition) will hide the desk nameplate for idle workers — once that ships, this floating name is the ONLY place Luna's name appears while wandering, so it must be readable enough to hover-identify but not dominant enough to read as 'Luna is here at this exact coordinate'. WHY: The office floor is a spatial metaphor. A character wandering the floor is ambient presence, not a labeled landmark. Name size should match the energy: whisper when roaming, speak when addressed.",
+      "title": "Whiteboard Dark Mode — #f0f0e8 Still Burning Eyes (carry-forward #1)",
+      "description": "Office.css line 1094 still has background: #f0f0e8 with no dark-mode variant. Fix: change base to #14122a, add [data-theme='light'] .office-whiteboard { background: #f0f0e8; }. Add vibe-specific border accents. WHY: The whiteboard is the most prominent wall element and it's a flashbang on dark mode.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "office-life",
-      "title": "Idle Desk Vacated Glyph — The Desk Knows Its Person Is Away",
-      "description": "NEW companion to the dual-render MUST fix. Once `!occ.idle` hides the nameplate at a desk, the desk will show a monitor and an empty nameplate slot with no label. This looks broken — just a blank space. Instead, when `occ.idle` is true, render a lightweight 'away' indicator at the nameplate position: `{occ.idle && <div className='desk__nameplate desk__nameplate--away'>↪ away</div>}`. CSS: `.desk__nameplate--away { opacity: 0.3; font-style: italic; font-size: 0.28rem; letter-spacing: 0.08em; color: var(--text-muted); pointer-events: none; }`. On hover of the desk: `.desk:hover .desk__nameplate--away { opacity: 0.65; }`. The monitor screen SVG should also dim when the worker is idle: `.desk--idle-occ .desk-monitor-screen { opacity: 0.25; filter: saturate(0.3); }` — add `desk--idle-occ` class to the desk div when `occ.idle` is true. WHY: A blank desk tells no story. 'Away' tells the right story: this is Luna's desk, she's just not sitting here right now. The monitor going dim reinforces that the machine is idle too. One prop, two CSS rules, complete narrative.",
+      "title": "Idle Desk Vacated Glyph (carry-forward #1)",
+      "description": "Companion to the nameplate fix. When occ.idle hides the nameplate, show a subtle 'away' indicator: {occ.idle && <div className='desk__nameplate desk__nameplate--away'>↪ away</div>}. CSS: opacity 0.3, italic, 0.28rem. WHY: Empty desk with no label looks broken — 'away' tells the right story.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "feature",
-      "title": "Task Card Formalization — Stop the Code Drift",
-      "description": "Carry-forward from review #41 (SHOULD, still unfixed). The live deployed site at https://osortega.github.io/bloberto-office/ shows a floating task card labeled SHIP_IT/400 on the mobile floor. This element is NOT present in /workspace/src/Office.jsx — confirmed by grep returning zero results for 'task-card', 'TaskCard', 'SHIP', 'SprintCard'. The deployed build is ahead of the workspace source. Formalize it: In Office.jsx add a `<SprintCard>` component that renders when `workingWorkers.length > 0 && workingWorkers[0].task`. Position: `style={{ position: 'absolute', left: '1.5%', bottom: '36%', zIndex: 2 }}`. CSS: `.sprint-card { background: rgba(10,8,25,0.88); border: 1px solid rgba(139,92,246,0.22); border-radius: 5px; padding: 4px 7px; font-size: 0.36rem; color: var(--text-muted); backdrop-filter: blur(4px); min-width: 44px; max-width: 64px; }`. Show task name truncated to 12 chars, a 2px mini progress bar reusing wb-progress-fill classes, and the percentage. Vibe-reactive border: `[data-vibe='on-fire'] .sprint-card { border-color: rgba(249,115,22,0.4); }`. WHY: The feature exists in production. Not having it in source means it'll be lost on the next clean build. Formalizing it makes it testable, accessible, and consistently styled.",
+      "title": "Task Card / Sprint Card Formalization (carry-forward #1)",
+      "description": "The deployed site shows a floating task card that doesn't exist in /workspace/src. Add a SprintCard component to Office.jsx that renders when workers are active. Shows task name (truncated), mini progress bar, percentage. WHY: Feature exists in production but not in source — next clean build loses it.",
       "effort": "medium",
       "assigned_to": "sofia"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "On-Fire Floor Heat Shimmer — The Vibe Should Make the Air Vibrate",
-      "description": "NEW idea. When `data-vibe='on-fire'`, the office floor feels identical to every other vibe except the grid color. Add a heat-distortion shimmer via a ::before pseudo-element on `.office-floor[data-vibe='on-fire']`: `content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(249,115,22,0.015) 3px, rgba(249,115,22,0.015) 4px); animation: heat-rise 2.8s linear infinite; opacity: 0.7;`. Add `@keyframes heat-rise { 0% { background-position: 0 0; } 100% { background-position: 0 -40px; } }`. This creates a very subtle upward drift of faint orange horizontal lines — a heat mirage. On `prefers-reduced-motion: reduce`, skip it. WHY: 'On fire' is the most urgent vibe but visually the floor is the same grid as always. The shimmer costs zero JSX and two CSS rules. It turns 'elevated urgency' into something the floor itself communicates without words. The effect should be barely perceptible — felt more than seen.",
+      "title": "On-Fire Floor Heat Shimmer (carry-forward #1)",
+      "description": "When data-vibe='on-fire', add a subtle upward-drifting orange shimmer via ::before pseudo-element on office-floor. Pure CSS, zero JSX. WHY: on-fire vibe should feel different from the floor up, not just the color scheme.",
       "effort": "small",
-      "assigned_to": "tbd"
+      "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "visual",
-      "title": "Office Tab Worker Count Badge — Active Status Without Switching Tabs",
-      "description": "NEW idea. The tab toggle (Office / Dashboard) shows icons and labels but no dynamic data. Add a live worker count badge to the Office tab: when `workingWorkers.length > 0`, render a small pill badge next to the Office label: `<span className='tab-worker-badge'>{workingWorkers.length}/{nonMgr.length}</span>`. CSS: `.tab-worker-badge { font-size: 0.55rem; background: var(--accent); color: white; border-radius: 8px; padding: 0px 5px; margin-left: 4px; font-weight: 600; vertical-align: middle; }`. When all workers are idle (slowday/after-hours): `.tab-worker-badge { background: var(--text-muted); opacity: 0.6; }`. When any error: `.tab-worker-badge { background: var(--error); }`. Pass the worker data (already available in App.jsx via the workers state) as a prop to the tab component. WHY: People open this product on a second monitor to glance at team state. Right now you must be on the Office tab to see anything. A `3/5` badge on the tab lets a Dashboard viewer see 'oh 3 people are working' at a glance. Tiny feature, eliminates a tab-switch.",
+      "category": "feature",
+      "title": "Office Tab Worker Count Badge (carry-forward #1)",
+      "description": "Add a live worker count badge (e.g., 3/5) to the Office tab button so Dashboard viewers can see team activity at a glance without switching tabs. WHY: Eliminates unnecessary tab switches for status checks.",
       "effort": "small",
       "assigned_to": "carlos"
-    },
-    {
-      "priority": "wild",
-      "category": "storytelling",
-      "title": "After-Hours Solo Worker Spotlight — The Lone Coder Gets a Moment",
-      "description": "NEW idea. When the vibe is 'after-hours' and exactly ONE non-manager worker is working (everyone else is absent/ghost), that worker gets a cinematic solo treatment: (1) In Office.jsx detect `isAfterHours && workingWorkers.length === 1` and set `data-solo-worker` on the office-floor. (2) In Office.css: `.office-floor[data-solo-worker] .desk[data-worker-id='${soloWorker.id}']` — wait, this isn't feasible in pure CSS; instead pass a `data-solo` prop to the Character. (3) `.char[data-solo] .char__avatar { box-shadow: 0 0 0 3px rgba(99,102,241,0.3), 0 0 22px rgba(99,102,241,0.25), 0 4px 16px rgba(0,0,0,0.5); animation: solo-pulse 3s ease-in-out infinite; }` and `@keyframes solo-pulse { 0%, 100% { box-shadow: 0 0 0 3px rgba(99,102,241,0.3), 0 0 22px rgba(99,102,241,0.25); } 50% { box-shadow: 0 0 0 4px rgba(99,102,241,0.5), 0 0 35px rgba(99,102,241,0.4); } }`. (4) The Bloberto manager character during this state gets a data-watching prop: his bubble quote changes to a night-watch quote — add to VIBE_QUOTES: `'after-hours-solo': ['Still at it? Legend.', 'The night shift has entered the chat.', 'Respect.']`. (5) The vibe-weather widget glows: `[data-solo-worker] .vibe-weather { font-size: 1.1rem; filter: drop-shadow(0 0 8px rgba(99,102,241,0.6)); animation: solo-moon 4s ease-in-out infinite; }`. WHY: Working alone after hours is the loneliest and most heroic thing in a team product. The office should notice. A gentle indigo spotlight, a quiet nod from the boss, and a moon that glows a little brighter — that's the product earning its keep at 11pm.",
-      "effort": "medium",
-      "assigned_to": "sofia"
     }
   ],
   "hire_proposals": []
