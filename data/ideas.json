@@ -1,80 +1,65 @@
 {
   "creative_director": "Luna",
-  "review_number": 25,
-  "timestamp": "2026-03-08T00:00:00Z",
-  "theme": "The Office Has Opinions — Personality, Presence, and the Small Things That Make a Place Feel Real",
+  "review_number": 26,
+  "timestamp": "2026-03-08T00:30:00Z",
+  "theme": "Ambient Intelligence — The Office That Notices You",
   "ideas": [
     {
       "priority": "must",
-      "category": "visual",
-      "title": "Per-Desk Completion Burst on the Office Floor",
-      "description": "When a worker hits 100% progress, the dashboard fires confetti — but the office floor does nothing. The character just sits there. Add a CSS-only particle burst that explodes *spatially* from the completing worker's desk tile. In Office.jsx, detect progress crossing 100% via a `useEffect` comparing prev/current worker props, then add class `desk--celebrating` to that specific desk for 1.5s. Inside the desk div, render 8 `<span className='burst-dot'>` elements with `position:absolute; pointer-events:none` and CSS custom properties `--dx` / `--dy` (ranging -40px to +40px at varied angles). Animate: `@keyframes burst-fly { from { transform: translate(0,0) scale(1.2); opacity: 1 } to { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0 } }`. Set each dot's background to the worker's role color via inline `style={{ '--role-color': WORKER_ROLE_COLORS[worker.name] }}` on the desk. WHY: Completions deserve a *place* in the office. Right now the floor is spatially blind to achievement — you'd never know someone shipped from the office view. A burst that explodes from the right desk makes the floor feel alive and makes each worker's moment feel earned.",
-      "effort": "small",
+      "category": "office-life",
+      "title": "Idle Workers Wander the Office",
+      "description": "Right now idle workers sit at their desks doing nothing — they're assigned a desk slot just like working workers. When a worker is idle, instead of parking them at a desk, give them a slow CSS wander animation. Add a new div 'wanderer' that floats around the office floor with a gentle random drift using CSS keyframes (translateX/Y with 20-30s duration, different delays per worker). Show their avatar at 70% opacity with a thought bubble ('💭 thinking...', '☕ brb', '📱 scrolling'). This makes the office feel alive even when nobody's shipping — you can SEE who's between tasks vs who's grinding. WHY: The biggest visual gap right now is that idle workers are invisible (they're just ghost desks). Making them wander creates ambient life and a clear visual distinction between 'working at desk' and 'taking a break'.",
+      "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "must",
-      "category": "office-life",
-      "title": "Bloberto's Rolling CEO Monologue",
-      "description": "Bloberto is the CVO. They sit at the top desk, their title changes by vibe (CVO → INCIDENT CMD → NIGHT WATCH), their typing animation plays — but they have zero tasks. They are the only person in the office with nothing to do. Add a `BLOBERTO_TASKS` constant array in `src/utils/constants.js` with 10 rotating CEO-tier activities: `['Syncing with stakeholders', 'Reviewing the Q3 roadmap', 'Scheduling the retro about the retro', 'Drafting the all-hands email', 'Justifying infrastructure costs to finance', 'Deciding between two shades of blue', 'Contemplating OKRs', 'Writing mission statement v47', 'Actioning the action items', 'Circling back on the circle-back']`. In Office.jsx's `DEFAULT_BLOBERTO` or inside the manager Character render, use `useState` + `useEffect` with a 5-minute interval to cycle through them. Render the current task in a small muted `<div className='bloberto-task'>` below the vibe-title in the manager desk. WHY: Bloberto is the emotional heart of the product — every vibe, every confetti, every burn state flows through them. But they don't *work*. This closes that gap with just the right amount of absurdist corporate humor. Also: devs will see 'Deciding between two shades of blue' and laugh every time.",
+      "category": "delight",
+      "title": "Confetti Particles Match Worker's Role Color",
+      "description": "The completion confetti (App.jsx) currently uses a fixed color palette. When a worker completes a task, the confetti should use that worker's WORKER_ROLE_COLORS value as the dominant color (60% of particles), with white and gold as accent (20% each). Pass the completing worker's name to the confetti generator and look up their color. This is a 5-line change in the confetti spawn logic. WHY: Right now all completions feel the same. When Maya ships and purple confetti flies, vs Dave shipping with orange confetti, each completion has identity. You can tell WHO just shipped without reading anything.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Coffee Corner Keeps Score",
-      "description": "The coffee corner (top-right of office) is a charming static decoration. Make it *earned*: each time the app syncs, count how many workers have `status === 'working'` and `updated_at` more than 30 minutes ago — that's how many coffees the team has 'consumed'. Show a small badge inside `.coffee-corner__body`: `<span className='coffee-count'>×{n}</span>` in muted type. When vibe is `crushing` or `on-fire`, add a CSS steam loop above the cup emoji: 3 tiny `<span className='steam-wisp'>` divs with `@keyframes steam { 0%,100%{opacity:0;transform:translateY(0) scaleX(1)} 50%{opacity:0.55;transform:translateY(-8px) scaleX(0.7)} }` at staggered delays of 0s, 0.4s, 0.8s. Steam stops on `slow-day` or `after-hours`. WHY: Quantifying imaginary coffee consumption is exactly the kind of harmless absurdity that makes a dashboard feel inhabited. It also creates a subtle vibe-pressure: when you see ☕×6 and steam pouring, you *feel* the team is grinding. It's ambient storytelling at 0 data cost.",
-      "effort": "small",
-      "assigned_to": "dave"
+      "title": "Office Ambient Sound Layer (Optional Toggle)",
+      "description": "Add a tiny speaker icon in the corner (🔇/🔊) that toggles ambient office sounds. Use the Web Audio API to generate simple procedural audio: soft white noise filtered to sound like air conditioning, occasional soft 'click' sounds (keyboard), and a gentle chime on task completion. No audio files needed — all procedural via OscillatorNode and filtered noise. Default OFF (muted). Store preference in localStorage. WHY: Sound transforms passive watching into immersive presence. Even at very low volume, ambient office noise makes the dashboard feel like a real place you're visiting. The procedural approach means zero payload increase.",
+      "effort": "medium",
+      "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Entrance Door Welcome Ritual",
-      "description": "The `office-door` div at the bottom shows 🚪 'Entrance' statically. It never reacts to anything. On every page load, play a micro door-open animation: add class `office-door--opening` for 900ms which applies `@keyframes door-swing { 0% { transform: perspective(160px) rotateY(0deg) } 60% { transform: perspective(160px) rotateY(-28deg) } 100% { transform: perspective(160px) rotateY(0deg) } }` to the door icon element. Simultaneously render a transient `<div className='door-welcome'>` that appears for 3 seconds then fades. Message logic: check `localStorage.getItem('bloberto-visit-date')` — if it matches today's date string, show `'Back again? ☕'`; otherwise set the key and show `'Welcome in! 👋'`. WHY: You arrive at this office every time you open the tab, but nothing acknowledges it. A door that swings open for you is a 10-line change that transforms passive loading into a tiny narrative moment. It respects the metaphor the product is built on: *this is a real office and you just walked in*.",
-      "effort": "small",
-      "assigned_to": "sofia"
+      "category": "feature",
+      "title": "Mini Timeline Bar Below Office Floor",
+      "description": "Add a thin horizontal bar (height: 6px) below the office floor that shows the last 24 hours of activity as colored segments. Each completed task is a small colored block (worker's role color) plotted by timestamp on a 24h timeline. Errors are red dots. Gaps are transparent. Build from activityEntries already available as a prop. Render as a single div with positioned child spans. On hover, show a tooltip with the task details. WHY: The activity log is text and requires scrolling. A timeline gives an instant visual answer to 'how busy was the office today?' — a single glance shows if the team shipped 2 things or 20. It's the kind of data visualization that makes people keep the tab open.",
+      "effort": "medium",
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "visual",
-      "title": "Desk Nameplate Mood Indicator",
-      "description": "Desk nameplates (`desk__nameplate`) currently show only the worker's name in their role color. Add a micro-icon slot at the end of each nameplate — one character, no tooltip, pure at-a-glance signal: `working` → 🔥 with `@keyframes flicker { 0%,100%{opacity:1} 45%{opacity:0.75} 50%{opacity:1} 55%{opacity:0.8} }` at 2.5s infinite; `idle` (wandering) → 💤 with a slow `0.9s ease-in-out infinite alternate` scale pulse `(0.85→1.05)`; `error` → ⚠️ with 1s blink; ghost (OOO) → 👻 static. Render as `<span className='nameplate-mood' aria-hidden='true'>{moodIcon}</span>` appended inside the existing `desk__nameplate` div. Apply the appropriate CSS class based on occupant status. WHY: The office floor is status-blind unless you hover everything. These single-character mood glyphs create an instant read — you can scan all 6 desks in one second and know exactly who's grinding, who's drifting, and who's on fire. Pure information density with zero clutter.",
+      "title": "Pulsing Glow on Active Desks",
+      "description": "Working desks have class 'desk--active' but the only visual signal is the lamp and the character. Add a subtle pulsing glow ring around active desks using box-shadow with the worker's --role-color CSS variable (already set on the desk element). Use @keyframes desk-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(var(--role-color-rgb), 0.3) } 50% { box-shadow: 0 0 8px 3px rgba(var(--role-color-rgb), 0.15) } } with a slow 3s infinite animation. This creates a breathing effect that makes active desks stand out without being distracting. WHY: The office floor is hard to scan quickly. A gentle pulse on active desks creates an immediate visual hierarchy — your eye goes to where work is happening.",
       "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "could",
-      "category": "team",
-      "title": "Worker Card 'Shipping Streak' Badge",
-      "description": "The Dashboard worker cards show current task, progress, and duration — but nothing about *history*. The activity log already tracks completions per worker. Add a 'streak' badge on each WorkerCard front face: scan `activityEntries` (already passed as prop) for consecutive `type === 'complete'` entries from the same worker without an `error` entry interrupting. If streak ≥ 2, render `<span className='streak-badge'>🔥 {n} in a row</span>` in the top-right area of the card, styled with `background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.4); font-size: 10px; padding: 2px 6px; border-radius: 12px`. At streak ≥ 5, swap 🔥 for ⚡ and shift the border to yellow. WHY: The activity log is a gold mine of narrative data that's barely surfaced. A streak badge gives workers a tiny performance identity beyond their current task — Maya isn't just 'working on a component', she's 'on a 4-ship streak'. It gamifies shipping in a way that's visible to anyone watching the dashboard.",
-      "effort": "small",
-      "assigned_to": "carlos"
+      "assigned_to": "dave"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Whiteboard Doubles as Live Sprint Counter",
-      "description": "The office whiteboard (`.office-whiteboard`) currently shows a vibe-keyed phrase (`🏆 SHIP IT`, `🚨 HELP`, etc.) — reactive to team vibe but static in content. Extend it: below the vibe phrase, add a second line that dynamically counts from live worker data. In Office.jsx, compute `inProgress = workers.filter(w => w.status==='working').length` and `shipped = activityLog.filter(e => e.type==='complete').length` (pass `activityEntries` prop, already available). Render: `<div className='whiteboard-counter'>{inProgress} in flight · {shipped} shipped</div>` in a smaller, chalk-texture font (use letter-spacing + opacity 0.7 + font-size 0.65rem). On vibe `on-fire`, swap to `{inProgress} 🔥 ACTIVE · {shipped} out the door`. WHY: The whiteboard is the most prominent decoration in the office but it's a one-liner. Real sprint boards show *numbers*. Turning it into a live sprint counter takes it from 'cute detail' to 'actual information radiator' — the kind of thing that justifies leaving the office tab open all day.",
+      "title": "Keyboard Shortcut: Press 1-6 to Focus Worker Cards",
+      "description": "Add a keydown listener on the document: pressing 1-6 focuses the corresponding worker card (scrolls to it, applies the existing worker-card--focused class). Press Escape to clear focus. Press 'o' to toggle between Office and Dashboard tabs. This costs almost nothing to implement and gives power users a way to navigate without clicking. Show a tiny '?' icon in the header that reveals the shortcuts on hover. WHY: Anyone who leaves this dashboard open all day is a power user. Keyboard shortcuts are the love language of power users.",
       "effort": "small",
-      "assigned_to": "dave"
+      "assigned_to": "sofia"
     },
     {
       "priority": "wild",
-      "category": "visual",
-      "title": "Team Progress Reflected in the Window Glass",
-      "description": "The office window already shows a dynamic sky matching the visitor's local time of day (day/dusk/night/stars). Add one more layer: a subtle *reflection* inside the glass itself that represents the team's collective momentum. In Office.jsx, compute `avgProgress = working workers' average progress %`. Render a `<div className='window-reflection-bar'>` inside `.office-window__sky`, absolutely positioned at the bottom: `height: 3px; left: 8%; right: 8%; bottom: 6%; background: rgba(255,255,255,0.18); border-radius: 2px; transition: width 3s ease`. Inside it, a fill div at `width: ${avgProgress}%` with `background: rgba(255,255,255,0.45)`. Add a `<span className='window-progress-label'>` in the bottom-right of the window: `font-size: 8px; opacity: 0.55; color: white; letter-spacing: 0.5px` showing `team ${avgProgress}%`. WHY: The window is already doing double duty as a time-of-day indicator. Adding team progress as a barely-visible glass reflection is the kind of layered, discoverable detail that rewards attentive users. The sky tells you what time it is. The glass tells you how the day is going. Nature and productivity, framed together.",
+      "category": "office-life",
+      "title": "Office Pet: A Cat That Walks Across Desks",
+      "description": "Add a tiny pixel-art cat (pure CSS, 12x8px) that slowly walks across the office floor on a randomized path. It uses CSS animations with a 60-second loop, moving between desk positions. When it reaches a working character, it 'sits' for 10 seconds (swap to sitting sprite). The cat appears only when the team vibe is 'in-flow' or 'crushing' — when the vibe is 'on-fire', the cat hides under a desk. Give it a name (Pixel) and a hover tooltip: 'Pixel the office cat. Morale officer.' WHY: Every great office has an unofficial mascot. A cat that reacts to team vibe is pure delight — it gives visitors something to watch during quiet moments and creates emergent narratives ('oh the cat is hiding, things must be intense'). It's the feature people would screenshot and share.",
       "effort": "medium",
       "assigned_to": "tbd"
     }
   ],
-  "hire_proposals": [
-    {
-      "name": "Remi",
-      "role": "Site Reliability Engineer",
-      "emoji": "🛰️",
-      "rationale": "Bloberto's Office has zero infrastructure visibility — no error rates, no latency, no deploy frequency. The team fixes bugs and ships features but the *system itself* has no presence in the office. Remi would own a new `reliability.json` data source fed by Bloberto's pipeline, exposing p99 latency, weekly deploy count, and last incident age. On the office floor, Remi's desk nameplate glows green/yellow/red based on system health. On Dashboard, Remi's worker card shows 'system health' instead of a task. When health degrades, Bloberto's vibe key shifts to `on-fire` automatically. WHY: The team monitors *people* but not the *product those people build*. Remi closes the loop — and gives the office its first non-human, non-Bloberto character, which opens up a whole new storytelling dimension."
-    }
-  ]
+  "hire_proposals": []
 }

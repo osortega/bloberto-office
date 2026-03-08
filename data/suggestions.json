@@ -1,114 +1,103 @@
 {
   "analyst": "Sofia",
+  "timestamp": "2026-03-08T00:15:46Z",
   "review_number": 35,
-  "timestamp": "2026-03-08T00:25:00Z",
-  "screenshot_note": "Code-level review — worker timed out on Puppeteer; Bloberto completed analysis from source",
   "scores": {
     "visual": 4,
-    "ux": 3.5,
+    "ux": 3,
     "responsiveness": 3,
     "performance": 3,
-    "accessibility": 3,
+    "accessibility": 2.5,
     "code_quality": 3.5,
     "features": 4,
     "fun_factor": 4.5
   },
-  "overall_score": 3.6,
-  "previous_review_check": "Review #34 had 10 suggestions (3 high, 4 medium, 3 low). Checking which are still unfixed.",
+  "overall_score": 3.4,
+  "notes": "Puppeteer blocked by network sandbox — live screenshots unavailable. Visual assessment based on code review + screenshots from review #29. Bugs from review #34 are largely unaddressed.",
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "ProgressBar milestone Set never resets — STILL UNFIXED from #34",
-      "description": "milestonesRef = useRef(new Set()) persists across task changes. When a worker completes (progress=100) then starts new task (progress=0), the Set still has {25,50,75,100}, so milestones never flash again. Fix: useEffect that clears the Set when progress drops below 25.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "status": "recurring"
+      "title": "Keyboard shortcuts '1' and '2' URL-encode the hash '#' character",
+      "description": "In App.jsx handleKeyDown (line 604-605): `window.location.hash = '#office'` and `window.location.hash = '#dashboard'` — when the value includes a leading '#', browsers encode it as '%23', resulting in the URL becoming `##office` and `##dashboard`. The hashchange listener does `window.location.hash.slice(1)` expecting 'office'/'dashboard', but gets '%23office'/'%23dashboard' instead — so back/forward browser navigation breaks. All other tab-switch sites (onClick, handleWorkerClick) correctly set it WITHOUT the '#' prefix. Fix: remove the '#' prefix in handleKeyDown: `window.location.hash = 'office'` and `window.location.hash = 'dashboard'`.",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "code",
-      "title": "WORKER_ROLE_COLORS duplicates ROLE_COLORS — STILL UNFIXED from #34",
-      "description": "App.jsx has WORKER_ROLE_COLORS keyed by NAME with diverged hex values from ROLE_COLORS in constants.js. Delete WORKER_ROLE_COLORS, use ROLE_COLORS[worker.role] everywhere.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "status": "recurring"
+      "category": "bug",
+      "title": "ProgressBar milestone Set never resets on task restart (unfixed from #34)",
+      "description": "ProgressBar declares `milestonesRef = useRef(new Set())` which lives for the entire lifetime of the WorkerCard component instance. When a worker finishes a task (progress hits 100%) and starts a new task (progress resets to 0%), the milestones 25/50/75/100 are already in the Set, so the milestone flash animations never fire again. Fix: either use the worker's current task string (or a task-start timestamp) as part of a key that resets the milestone Set, or move milestone tracking into state with a reset trigger: `useEffect(() => { milestonesRef.current = new Set() }, [worker.task])`.",
+      "effort": "small"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "Clickable characters missing role='button' and keyboard handler — STILL UNFIXED from #34",
-      "description": "Character divs with onClick have tabIndex={0} but no role='button' and no onKeyDown. Screen readers can't interact. Add role='button' and Enter/Space key handler.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "status": "recurring"
+      "title": "Task-tag filter spans are mouse-only — no keyboard or screen reader support",
+      "description": "In App.jsx WorkerCard (line 280-290), task tag `<span>` elements have onClick but no `role`, no `tabIndex`, no `onKeyDown`. A keyboard user cannot focus or activate them at all. A screen reader has no indication they are interactive. Fix: add `role='button'`, `tabIndex={0}`, and `onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTagClick(label) } }}` to each tag span. This was partially noted in review #34 for Character divs but this specific pattern in WorkerCard was missed.",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Maya and Dave show progress: 0 despite being active — workers.json stale progress",
-      "description": "Maya and Dave were clocked in at 00:07 but their progress is still 0. Either the Docker workers aren't updating progress, or there's no mechanism to update it. The dashboard shows 0% with spinning typing dots, which looks broken to users. This is a process/tooling issue — workers need to write progress updates to workers.json periodically, or Bloberto needs to estimate progress based on elapsed time.",
-      "effort": "medium",
-      "assign_to": "Carlos"
+      "category": "accessibility",
+      "title": "Character divs in Office view still lack role='button' (unfixed from #34)",
+      "description": "In Office.jsx, each Character is rendered as a `<div tabIndex={0}>` with onClick. The CSS now correctly sets `pointer-events: auto` for `.char--working` and `.char--idle` variants (so mouse clicks work), but the div still has no `role='button'` and no `onKeyDown` handler for Enter/Space activation. Screen readers announce these as generic containers, and keyboard users who focus them with Tab cannot activate the click via Enter. Fix: add `role='button'` and an `onKeyDown` handler to the char div when `onClick` is provided.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "Tab hash sync doesn't handle initial load with no hash",
-      "description": "App initializes tab from window.location.hash but doesn't SET the hash on initial load. If user loads the bare URL, hash is empty, tab is 'office', but clicking browser back does nothing because there's no history entry. Set window.location.hash = 'office' on mount.",
-      "effort": "small",
-      "assign_to": "Maya"
+      "category": "bug",
+      "title": "ProgressBar ETA is nonsensical — uses updated_at (data sync time) as task start",
+      "description": "In App.jsx ProgressBar (line 188-190): `workingMs = Date.now() - new Date(updatedAt).getTime()` where `updatedAt` is `worker.updated_at` — the last time the JSON data was updated, not when the worker started the current task. Since data refreshes every 30s, `workingMins` is almost always less than 1, and the `eta !== null && eta < 120` condition suppresses most valid ETAs anyway. When it does show, it's based on 30 seconds of data — completely useless. Fix: either remove ETA entirely, or require a `worker.started_at` field in the data contract and use that instead. Showing a misleading metric is worse than showing none.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "ActivityLog time-groups not memoized — STILL UNFIXED from #34",
-      "description": "TIME_GROUP_ORDER.map + filter runs 80 iterations per render cycle (every 60s). Wrap in useMemo keyed on entries array.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "status": "recurring"
+      "title": "activeWorkers filter runs unwrapped on every render tick",
+      "description": "In App.jsx (line 637-639), `activeWorkers` is computed with `allWorkers.filter(...)` directly in the render body with no `useMemo`. The `useTimeTick(60_000)` hook triggers a re-render every 60 seconds, which recomputes `activeWorkers` even when `allWorkers` hasn't changed. `activeWorkers` then cascades into `useMemo(() => getTeamVibe(...))`, defeating the purpose of that memo. Fix: `const activeWorkers = useMemo(() => allWorkers.filter(w => ...), [allWorkers])`.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "completionToast has no exit animation — STILL UNFIXED from #34",
-      "description": "Toast vanishes abruptly after 3s. Add fade-out CSS transition before unmount.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "status": "recurring"
+      "category": "performance",
+      "title": "ActivityLog time-grouping runs 4 unfiltered passes every 60s tick (unfixed from #34)",
+      "description": "In App.jsx ActivityLog (lines 115-118), the `groups` computation maps over TIME_GROUP_ORDER and calls `.filter(e => getTimeGroup(e.timestamp) === label)` for each of 4 labels, calling `getTimeGroup()` up to 80 times per render. `useTimeTick` triggers this every 60s for no data change. Fix: wrap `groups` (and `displayed`) in `useMemo([entries])` so it only recomputes when the activity log data actually changes.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "visual",
-      "title": "Worker card flip animation has no backface-visibility",
-      "description": "WorkerCard has front/back faces but neither .worker-card__front nor .worker-card__back set backface-visibility:hidden. On some browsers, both faces render simultaneously during the flip. Add backface-visibility: hidden to both faces and transform-style: preserve-3d to .worker-card__inner.",
-      "effort": "small",
-      "assign_to": "Maya"
+      "category": "code",
+      "title": "WORKER_ROLE_COLORS name-map still diverges from ROLE_COLORS role-map (unfixed from #34)",
+      "description": "App.jsx line 14-20 defines `WORKER_ROLE_COLORS` keyed by worker **name** (Maya, Carlos, Dave, Sofia, Luna) only for the original 5 hardcoded characters. The confetti color for any worker not in this list falls back to `'#a855f7'` (purple). Meanwhile, `ROLE_COLORS` in constants.js keys by **role** and would correctly handle any worker. Fix: drop `WORKER_ROLE_COLORS` entirely. In the shipping confetti logic, derive the color from `ROLE_COLORS[worker.role] ?? '#a855f7'` — this is already imported and handles all roles including future ones.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Solo spotlight message hardcoded for 1 worker — doesn't account for Bloberto",
-      "description": "The solo spotlight check (activeWorkers.length === 1) triggers when only Bloberto's manager entry is filtered out and 1 non-manager is active. But it says 'Carrying the whole team on one pair of hands' which is cute — however, it also shows when that single worker is IDLE, which is weird. Should only show when the solo worker is actually working.",
-      "effort": "small",
-      "assign_to": "Maya"
+      "title": "completionToast removal is instant with no exit animation (unfixed from #34)",
+      "description": "The completion toast (App.jsx line 807-831) appears with a nice `badge-pop` animation but disappears abruptly after 3000ms when `setCompletionToast(null)` fires. The CSS has no fade-out transition. Fix: instead of removing the element immediately, trigger a CSS class that fades it out (e.g., `opacity: 0; transition: opacity 0.3s`) via a state flag, and only nullify the state after the transition completes — or use a CSS animation-fill-mode with a 2.7s delay on the fade-out so the full 3s window looks intentional.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Stuck worker stat card is clickable but completely keyboard-inaccessible",
+      "description": "In App.jsx StatsBar (line 390-404), the stuck worker card `div.stat-card--stuck` has an `onClick` handler that scrolls to the stuck worker's card. However, it has no `tabIndex`, no `role`, and no `onKeyDown`. Keyboard users cannot trigger this shortcut. Additionally, the scroll implementation uses `document.querySelector('[data-worker-name]')` which is a direct DOM query inside React — fragile and could silently fail if the card hasn't rendered yet. Fix: add `role='button'`, `tabIndex={0}`, and `onKeyDown` for Enter/Space. Replace the querySelector with a React ref or a proper callback prop.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "stuckWorkers uses worker.started which can be null — STILL UNFIXED from #34",
-      "description": "Use `w.started || w.updated_at` as fallback. NaN comparison silently skips stuck workers.",
-      "effort": "small",
-      "assign_to": "Maya",
-      "status": "recurring"
+      "title": "getRelativeTime logic duplicated between App.jsx and Office.jsx Character",
+      "description": "App.jsx defines a standalone `getRelativeTime(timestamp)` function (lines 34-43). Office.jsx's Character component (lines 394-403) contains an identical inline IIFE doing the exact same mins/hours/days calculation for the ghost OOO bubble last-seen timestamp. This means any fix (e.g., adding 'weeks' or changing wording) must be applied in two places. Fix: move `getRelativeTime` to `src/utils/time.js`, export it, and import it in both App.jsx and Office.jsx.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "feature",
-      "title": "Activity log doesn't show worker emoji for Bloberto/system events",
-      "description": "ActivityLogEntry looks up workerData from roster but Bloberto isn't in the roster array. System events also have no emoji. Add Bloberto to roster or handle the fallback case.",
-      "effort": "small",
-      "assign_to": "Maya"
+      "category": "responsiveness",
+      "title": "Office floor aspect-ratio 4/3 crushes characters into each other below ~360px width",
+      "description": "The `.office-floor` uses `aspect-ratio: 4/3` with absolutely-positioned characters at fixed percentages. At 320px viewport width (iPhone SE), the floor is only ~280px tall, desk nameplates clip off-canvas, character name labels overlap desk elements, and speech bubbles escape the floor boundary. No `@media (max-width: 480px)` rule addresses the office view — the only responsive CSS targets `.stats-bar` and `.workers-grid`. Fix: add a media query that either switches `.office-floor` to `aspect-ratio: 1/1` on narrow screens or constrains the minimum height to 300px. Alternatively, hide the office view on small screens and direct users to dashboard.",
+      "effort": "medium"
     }
   ]
 }
