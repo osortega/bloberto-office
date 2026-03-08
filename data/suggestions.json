@@ -1,7 +1,7 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-08T00:15:46Z",
-  "review_number": 35,
+  "timestamp": "2026-03-08T00:50:00Z",
+  "review_number": 36,
   "scores": {
     "visual": 4,
     "ux": 3,
@@ -13,91 +13,98 @@
     "fun_factor": 4.5
   },
   "overall_score": 3.4,
-  "notes": "Puppeteer blocked by network sandbox — live screenshots unavailable. Visual assessment based on code review + screenshots from review #29. Bugs from review #34 are largely unaddressed.",
+  "notes": "Review #36 — code-only review (Puppeteer still blocked by container PID limits). ALL 12 issues from review #35 remain unfixed. No code changes detected since last review. Scores unchanged. Adding one new finding.",
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Keyboard shortcuts '1' and '2' URL-encode the hash '#' character",
-      "description": "In App.jsx handleKeyDown (line 604-605): `window.location.hash = '#office'` and `window.location.hash = '#dashboard'` — when the value includes a leading '#', browsers encode it as '%23', resulting in the URL becoming `##office` and `##dashboard`. The hashchange listener does `window.location.hash.slice(1)` expecting 'office'/'dashboard', but gets '%23office'/'%23dashboard' instead — so back/forward browser navigation breaks. All other tab-switch sites (onClick, handleWorkerClick) correctly set it WITHOUT the '#' prefix. Fix: remove the '#' prefix in handleKeyDown: `window.location.hash = 'office'` and `window.location.hash = 'dashboard'`.",
+      "title": "[UNFIXED x2] Keyboard shortcuts '1' and '2' double-encode the hash",
+      "description": "App.jsx line 604-605: `window.location.hash = '#office'` and `'#dashboard'` — the '#' prefix causes the browser to produce `##office` / `##dashboard` in the URL. The hashchange listener slices only 1 '#', so browser back/forward navigation breaks. Fix: remove the '#' prefix. This was first reported in review #34.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "ProgressBar milestone Set never resets on task restart (unfixed from #34)",
-      "description": "ProgressBar declares `milestonesRef = useRef(new Set())` which lives for the entire lifetime of the WorkerCard component instance. When a worker finishes a task (progress hits 100%) and starts a new task (progress resets to 0%), the milestones 25/50/75/100 are already in the Set, so the milestone flash animations never fire again. Fix: either use the worker's current task string (or a task-start timestamp) as part of a key that resets the milestone Set, or move milestone tracking into state with a reset trigger: `useEffect(() => { milestonesRef.current = new Set() }, [worker.task])`.",
+      "title": "[UNFIXED x2] ProgressBar milestone Set never resets on task restart",
+      "description": "ProgressBar's `milestonesRef = useRef(new Set())` persists across task changes. When a worker finishes (100%) and starts a new task (0%), milestones 25/50/75/100 are already in the Set so flash animations never fire again. Fix: add `useEffect(() => { milestonesRef.current = new Set() }, [worker.task])` or key the component by task.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "Task-tag filter spans are mouse-only — no keyboard or screen reader support",
-      "description": "In App.jsx WorkerCard (line 280-290), task tag `<span>` elements have onClick but no `role`, no `tabIndex`, no `onKeyDown`. A keyboard user cannot focus or activate them at all. A screen reader has no indication they are interactive. Fix: add `role='button'`, `tabIndex={0}`, and `onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTagClick(label) } }}` to each tag span. This was partially noted in review #34 for Character divs but this specific pattern in WorkerCard was missed.",
+      "title": "[UNFIXED x2] Task-tag filter spans are mouse-only",
+      "description": "WorkerCard task tag `<span>` elements have onClick but no `role='button'`, `tabIndex={0}`, or `onKeyDown`. Keyboard users cannot focus or activate them. Screen readers don't know they're interactive.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "Character divs in Office view still lack role='button' (unfixed from #34)",
-      "description": "In Office.jsx, each Character is rendered as a `<div tabIndex={0}>` with onClick. The CSS now correctly sets `pointer-events: auto` for `.char--working` and `.char--idle` variants (so mouse clicks work), but the div still has no `role='button'` and no `onKeyDown` handler for Enter/Space activation. Screen readers announce these as generic containers, and keyboard users who focus them with Tab cannot activate the click via Enter. Fix: add `role='button'` and an `onKeyDown` handler to the char div when `onClick` is provided.",
+      "title": "[UNFIXED x3] Character divs in Office lack role='button' and onKeyDown",
+      "description": "Office.jsx Character divs use `<div tabIndex={0}>` with onClick but no `role='button'` and no keyboard activation handler (Enter/Space). First reported review #33. This is a WCAG 2.1 AA failure.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "ProgressBar ETA is nonsensical — uses updated_at (data sync time) as task start",
-      "description": "In App.jsx ProgressBar (line 188-190): `workingMs = Date.now() - new Date(updatedAt).getTime()` where `updatedAt` is `worker.updated_at` — the last time the JSON data was updated, not when the worker started the current task. Since data refreshes every 30s, `workingMins` is almost always less than 1, and the `eta !== null && eta < 120` condition suppresses most valid ETAs anyway. When it does show, it's based on 30 seconds of data — completely useless. Fix: either remove ETA entirely, or require a `worker.started_at` field in the data contract and use that instead. Showing a misleading metric is worse than showing none.",
+      "title": "[UNFIXED x2] ProgressBar ETA uses updated_at instead of started_at",
+      "description": "App.jsx ProgressBar uses `worker.updated_at` (last data sync, ~30s ago) as task start time for ETA calculation, making it nonsensical. Either use `worker.started` (which exists in the data) or remove ETA entirely.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "activeWorkers filter runs unwrapped on every render tick",
-      "description": "In App.jsx (line 637-639), `activeWorkers` is computed with `allWorkers.filter(...)` directly in the render body with no `useMemo`. The `useTimeTick(60_000)` hook triggers a re-render every 60 seconds, which recomputes `activeWorkers` even when `allWorkers` hasn't changed. `activeWorkers` then cascades into `useMemo(() => getTeamVibe(...))`, defeating the purpose of that memo. Fix: `const activeWorkers = useMemo(() => allWorkers.filter(w => ...), [allWorkers])`.",
+      "title": "[UNFIXED x2] activeWorkers computed without useMemo",
+      "description": "App.jsx line 637-639: `activeWorkers` is computed with `.filter()` directly in render body. useTimeTick(60_000) triggers re-renders that recompute this unnecessarily, defeating the downstream `useMemo(() => getTeamVibe(...))`. Wrap in useMemo.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "ActivityLog time-grouping runs 4 unfiltered passes every 60s tick (unfixed from #34)",
-      "description": "In App.jsx ActivityLog (lines 115-118), the `groups` computation maps over TIME_GROUP_ORDER and calls `.filter(e => getTimeGroup(e.timestamp) === label)` for each of 4 labels, calling `getTimeGroup()` up to 80 times per render. `useTimeTick` triggers this every 60s for no data change. Fix: wrap `groups` (and `displayed`) in `useMemo([entries])` so it only recomputes when the activity log data actually changes.",
+      "title": "[UNFIXED x2] ActivityLog time-grouping runs 4 unfiltered passes per render",
+      "description": "ActivityLog `groups` maps over TIME_GROUP_ORDER calling `.filter()` for each label — O(4n) calls to getTimeGroup() every 60s tick. Wrap in useMemo([entries]).",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "WORKER_ROLE_COLORS name-map still diverges from ROLE_COLORS role-map (unfixed from #34)",
-      "description": "App.jsx line 14-20 defines `WORKER_ROLE_COLORS` keyed by worker **name** (Maya, Carlos, Dave, Sofia, Luna) only for the original 5 hardcoded characters. The confetti color for any worker not in this list falls back to `'#a855f7'` (purple). Meanwhile, `ROLE_COLORS` in constants.js keys by **role** and would correctly handle any worker. Fix: drop `WORKER_ROLE_COLORS` entirely. In the shipping confetti logic, derive the color from `ROLE_COLORS[worker.role] ?? '#a855f7'` — this is already imported and handles all roles including future ones.",
+      "title": "[UNFIXED x2] WORKER_ROLE_COLORS keyed by name, not role",
+      "description": "App.jsx defines WORKER_ROLE_COLORS keyed by worker name (only 5 hardcoded). ROLE_COLORS in constants.js keys by role and handles any worker. Drop WORKER_ROLE_COLORS; use ROLE_COLORS[worker.role] in confetti logic.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "completionToast removal is instant with no exit animation (unfixed from #34)",
-      "description": "The completion toast (App.jsx line 807-831) appears with a nice `badge-pop` animation but disappears abruptly after 3000ms when `setCompletionToast(null)` fires. The CSS has no fade-out transition. Fix: instead of removing the element immediately, trigger a CSS class that fades it out (e.g., `opacity: 0; transition: opacity 0.3s`) via a state flag, and only nullify the state after the transition completes — or use a CSS animation-fill-mode with a 2.7s delay on the fade-out so the full 3s window looks intentional.",
+      "title": "[UNFIXED x2] completionToast disappears instantly with no exit animation",
+      "description": "The completion toast has a nice entry animation but vanishes abruptly after 3000ms. Add a fade-out transition before nullifying state.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Stuck worker stat card is clickable but completely keyboard-inaccessible",
-      "description": "In App.jsx StatsBar (line 390-404), the stuck worker card `div.stat-card--stuck` has an `onClick` handler that scrolls to the stuck worker's card. However, it has no `tabIndex`, no `role`, and no `onKeyDown`. Keyboard users cannot trigger this shortcut. Additionally, the scroll implementation uses `document.querySelector('[data-worker-name]')` which is a direct DOM query inside React — fragile and could silently fail if the card hasn't rendered yet. Fix: add `role='button'`, `tabIndex={0}`, and `onKeyDown` for Enter/Space. Replace the querySelector with a React ref or a proper callback prop.",
+      "title": "[UNFIXED x2] Stuck worker stat card is keyboard-inaccessible",
+      "description": "StatsBar stuck worker card has onClick but no tabIndex, role, or onKeyDown. Also uses document.querySelector for scrolling — fragile in React. Add keyboard support and use refs.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "getRelativeTime logic duplicated between App.jsx and Office.jsx Character",
-      "description": "App.jsx defines a standalone `getRelativeTime(timestamp)` function (lines 34-43). Office.jsx's Character component (lines 394-403) contains an identical inline IIFE doing the exact same mins/hours/days calculation for the ghost OOO bubble last-seen timestamp. This means any fix (e.g., adding 'weeks' or changing wording) must be applied in two places. Fix: move `getRelativeTime` to `src/utils/time.js`, export it, and import it in both App.jsx and Office.jsx.",
+      "title": "[UNFIXED x2] getRelativeTime duplicated between App.jsx and Office.jsx",
+      "description": "Identical time formatting logic exists in both files. Extract to src/utils/time.js.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "responsiveness",
-      "title": "Office floor aspect-ratio 4/3 crushes characters into each other below ~360px width",
-      "description": "The `.office-floor` uses `aspect-ratio: 4/3` with absolutely-positioned characters at fixed percentages. At 320px viewport width (iPhone SE), the floor is only ~280px tall, desk nameplates clip off-canvas, character name labels overlap desk elements, and speech bubbles escape the floor boundary. No `@media (max-width: 480px)` rule addresses the office view — the only responsive CSS targets `.stats-bar` and `.workers-grid`. Fix: add a media query that either switches `.office-floor` to `aspect-ratio: 1/1` on narrow screens or constrains the minimum height to 300px. Alternatively, hide the office view on small screens and direct users to dashboard.",
+      "title": "[UNFIXED x2] Office floor crushes characters below ~360px viewport",
+      "description": "No media query addresses office view at very narrow widths. Characters, nameplates, and speech bubbles overlap and clip.",
       "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "[NEW] ProgressBar uses updatedAt prop but should use worker.started for duration",
+      "description": "ProgressBar receives `updatedAt={worker.updated_at}` but the ETA calc needs task start time. The worker object has a `started` field that contains the actual task start timestamp. The ProgressBar component should receive `startedAt={worker.started}` instead. This is a data plumbing bug — the wrong field is being passed down.",
+      "effort": "small"
     }
   ]
 }

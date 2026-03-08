@@ -687,5 +687,11 @@
     "worker": "Carlos",
     "message": "Role-color confetti (Luna #26 idea #2) \u2014 already implemented in prior code. Skipped.",
     "timestamp": "2026-03-08T00:40:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA Review #36 complete \u2014 13 findings logged (0 issues fixed since #35)",
+    "timestamp": "2026-03-08T00:50:00Z"
   }
 ]
