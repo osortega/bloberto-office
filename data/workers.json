@@ -1,98 +1,14 @@
 {
-  "lastUpdated": "2026-03-08T09:45:00Z",
+  "lastUpdated": "2026-03-08T10:00:00Z",
   "workers": [
     {
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f",
-      "status": "idle",
-      "task": "Shipped: Conference Table Meeting Scene",
-      "startedAt": "2026-03-08T09:31:00Z",
-      "id": "carlos",
-      "updated_at": "2026-03-08T09:36:00Z",
-      "progress": 100
-    },
-    {
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80",
-      "status": "idle",
-      "task": "Shipped: Full-Sync Aura",
-      "startedAt": "2026-03-08T08:11:00Z",
-      "id": "dave",
-      "updated_at": "2026-03-08T08:36:00Z",
-      "progress": 100
-    },
-    {
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19",
-      "status": "idle",
-      "task": "Review #39 timed out \u2014 using #38 ideas",
-      "startedAt": "2026-03-08T08:30:00Z",
-      "id": "luna",
-      "updated_at": "2026-03-08T08:33:00Z",
-      "progress": 100
-    },
-    {
-      "name": "Sofia",
-      "role": "QA & Product Analyst",
-      "emoji": "\ud83d\udd0d",
+      "emoji": "🌙",
       "status": "working",
-      "task": "QA review #13 \u2014 analyzing live site + code",
-      "startedAt": "2026-03-08T09:45:00Z",
-      "id": "sofia",
-      "updated_at": "2026-03-08T09:45:00Z",
+      "task": "Creative review #40 — visual audit and ideation",
+      "startedAt": "2026-03-08T10:00:00Z",
       "progress": 10
-    },
-    {
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8",
-      "status": "idle",
-      "task": "Shipped: Vibe Transition Caption Bar",
-      "startedAt": "2026-03-08T09:31:00Z",
-      "id": "maya",
-      "updated_at": "2026-03-08T09:35:00Z",
-      "progress": 100
-    }
-  ],
-  "roster": [
-    {
-      "id": "bloberto",
-      "name": "Bloberto",
-      "role": "Manager",
-      "emoji": "\ud83e\udee0"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8"
-    },
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f"
-    },
-    {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA & Product Analyst",
-      "emoji": "\ud83d\udd0d"
-    },
-    {
-      "id": "luna",
-      "name": "Luna",
-      "role": "Creative Director",
-      "emoji": "\ud83c\udf19"
     }
   ]
 }
