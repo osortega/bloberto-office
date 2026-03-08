@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T07:00:00Z",
+  "lastUpdated": "2026-03-08T07:06:00Z",
   "workers": [
     {
       "name": "Carlos",
@@ -27,12 +27,12 @@
       "name": "Luna",
       "role": "Creative Director",
       "emoji": "\ud83c\udf19",
-      "status": "working",
-      "task": "Creative review #36",
+      "status": "idle",
+      "task": "Creative review #36 complete",
       "startedAt": "2026-03-08T07:00:00Z",
       "id": "luna",
-      "updated_at": "2026-03-08T07:00:00Z",
-      "progress": 0
+      "updated_at": "2026-03-08T07:06:00Z",
+      "progress": 100
     },
     {
       "name": "Sofia",
