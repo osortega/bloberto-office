@@ -58,5 +58,17 @@
     "worker": "Sofia",
     "message": "QA review #2 complete \u2014 16 findings (4 high, 8 medium, 4 low). Overall score: 3.75/5. Fun factor: 5/5 \ud83c\udf89",
     "timestamp": "2026-03-08T02:45:00Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #3",
+    "timestamp": "2026-03-08T02:45:53Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #3 complete \u2014 21 findings (4 high, 10 medium, 7 low). Schema bugs fixed inline. Overall: 3.75/5",
+    "timestamp": "2026-03-08T02:45:53Z"
   }
 ]
