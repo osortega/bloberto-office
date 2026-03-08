@@ -1,16 +1,5 @@
 {
-  "workers": [
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "status": "working",
-      "task": "QA review #11 — analyzing live site + code quality audit",
-      "progress": 10,
-      "updated_at": "2026-03-08T11:15:00Z",
-      "startedAt": "2026-03-08T11:15:00Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     { "id": "bloberto", "name": "Bloberto", "role": "Manager", "emoji": "🫠" },
     { "id": "carlos", "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
@@ -19,5 +8,5 @@
     { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
     { "id": "luna", "name": "Luna", "role": "Creative Director", "emoji": "🌙" }
   ],
-  "updated_at": "2026-03-08T11:15:00Z"
+  "updated_at": "2026-03-08T11:25:00Z"
 }

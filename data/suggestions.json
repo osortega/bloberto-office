@@ -1,128 +1,144 @@
 {
-  "review_number": 14,
-  "timestamp": "2026-03-08T10:45:00Z",
-  "overall_score": 3,
-  "summary": "The codebase is creative and well-intentioned, but carries several compounding correctness bugs: error-state workers are mis-classified as idle (seated at the conference table with an AwaySign), uncleared setTimeout calls leak state updates post-unmount, localStorage reads crash the entire app in Safari private mode, and Luna's SVG gradient ID duplicates when she renders twice in the same document. The vibe sparkline always lags one tick behind due to a React child-before-parent effect ordering issue. Accessibility gaps include a focusable article element with no keyboard activation, ghost characters with no accessible label, and sparkline data inaccessible to screen readers. Performance is impacted by 19 concurrent CSS animation spans when the Office tab is active. All findings are fixable with surgical changes — no architectural overhaul required.",
-  "findings": [
+  "analyst": "Sofia",
+  "timestamp": "2026-03-08T11:15:46Z",
+  "review_number": 15,
+  "scores": {
+    "visual": 4,
+    "ux": 3,
+    "responsiveness": 3,
+    "performance": 3,
+    "accessibility": 3,
+    "code_quality": 2,
+    "features": 4,
+    "fun_factor": 5
+  },
+  "overall_score": 3.4,
+  "suggestions": [
     {
-      "id": 1,
       "priority": "high",
       "category": "bug",
-      "title": "Error-state workers mis-classified as idle in Office.jsx",
-      "description": "In Office.jsx line 824: idleWorkers = nonMgr.filter(w => w.status !== 'working'). This includes workers with status === 'error' in the idle bucket. Consequences: (1) error workers get seated at a desk with the desk--idle CSS class instead of desk--error, so the red error glow and nameplate shake are never applied to their desk; (2) the AwaySign ('Coffee run', 'Deep think') appears on an erroring worker's desk after 10 minutes, actively misleading the viewer; (3) meetingWorkers is derived from idleWorkers.slice(0, 3), so an erroring worker can be seated at the conference table with a 'Huddle' badge.",
-      "file": "src/Office.jsx",
-      "suggestion": "Change line 824 to: const idleWorkers = nonMgr.filter(w => w.status === 'idle'). Add a separate const errorWorkers = nonMgr.filter(w => w.status === 'error'). Update desk assignment to seat error workers with ghost: false, idle: false so they get the working/error variant animations. Exclude error workers from meetingWorkers.",
-      "assignee": "Carlos"
+      "title": "Dead code: activityLogLenRef is set but never read",
+      "description": "Lines 745–747 of App.jsx: `const activityLogLenRef = useRef(0)` is created and written to in a useEffect but is NEVER READ anywhere in the codebase. It's pure dead code that adds a side-effect run on every activity log change for zero benefit. Delete it.",
+      "effort": "small"
     },
     {
-      "id": 2,
       "priority": "high",
-      "category": "bug",
-      "title": "Three uncleared setTimeout calls cause post-unmount state updates",
-      "description": "In App.jsx the activeWorkers effect (lines 826-827) calls setTimeout(() => setWorkerConfetti(null), 2500) and setTimeout(() => setCompletionToast(null), 3000) without storing the timer IDs or returning a cleanup function. Similarly, the vibe-streak effect (line 849) calls setTimeout(() => setConfettiActive(false), 2500) without cleanup. If a worker ships a task and the component unmounts within 2.5s (e.g., fast page navigation), React will log a 'state update on unmounted component' warning. In React 18 strict mode, double-invocation makes this fire reliably in dev. These bare timeouts also accumulate in production: if vibe changes twice in quick succession, the first confetti timer is orphaned with no way to cancel it.",
-      "file": "src/App.jsx",
-      "suggestion": "Add confettiTimerRef and toastTimerRef refs. Store timer IDs into those refs and call clearTimeout(ref.current) before each new setTimeout. Return a cleanup function from each useEffect that calls clearTimeout(ref.current). Alternatively consolidate the two completion-related timers into a single useEffect that watches [workerConfetti, completionToast] and cleans up on dependency change.",
-      "assignee": "Carlos"
+      "category": "code",
+      "title": "Pointless useMemo: stableActivityLog provides zero memoization",
+      "description": "`const stableActivityLog = useMemo(() => activityLog, [activityLog])` is functionally identical to `activityLog` itself. The dep array invalidates the memo the same moment the value changes — it will always return a fresh reference whenever `activityLog` changes. This misleads maintainers into thinking there's optimization happening when there is none. Just use `activityLog` directly everywhere stableActivityLog is referenced.",
+      "effort": "small"
     },
     {
-      "id": 3,
       "priority": "high",
-      "category": "bug",
-      "title": "localStorage reads unguarded — crashes entire app in Safari private mode",
-      "description": "Lines 582, 835, and 836 in App.jsx call localStorage.getItem() and localStorage.setItem() without try/catch. In Safari private browsing mode and some embedded WebViews, localStorage access throws SecurityError: DOM Exception 18. Line 582 runs inside a useState initializer — a synchronous throw here propagates out of the component render and crashes the entire app with a blank white screen. The vibe-history block (lines 854-858) correctly wraps in try/catch, but the streak reads and theme initialization do not. This is a real bug for any user in private mode.",
-      "file": "src/App.jsx",
-      "suggestion": "Create a utils/storage.js with: function safeGet(key, fallback) { try { return localStorage.getItem(key) ?? fallback } catch { return fallback } } and function safeSet(key, value) { try { localStorage.setItem(key, value) } catch {} }. Replace all 8 bare localStorage calls in App.jsx with these helpers. The useState initializer on line 582 is highest priority as it is the only synchronous throw path.",
-      "assignee": "Maya"
+      "category": "ux",
+      "title": "stat-card--stuck is completely keyboard-inaccessible",
+      "description": "The 'Stuck Workers' stat card has an onClick handler that scrolls to a stuck worker, but has no `tabIndex`, no `role=\"button\"`, and no `onKeyDown` handler. Keyboard-only users cannot activate it at all. Fix: add `tabIndex={0}`, `role=\"button\"`, and `onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { /* scroll logic */ } }}`.",
+      "effort": "small"
     },
     {
-      "id": 4,
+      "priority": "high",
+      "category": "code",
+      "title": "IIFEs inside JSX are a React anti-pattern (multiple instances in WorkerCard)",
+      "description": "WorkerCard uses `{(() => { const tags = getTaskTags(...); return tags.length > 0 ? ... : null })()}` and `{worker.status === 'working' && worker.updated_at && (() => { ... })()}` inline. IIFEs inside JSX create a new function object on every render, hurt readability, and signal missing component extraction. Extract these to named variables computed before the return, or to dedicated sub-components. There are at least 3 of these in WorkerCard alone.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "getRelativeTime logic duplicated verbatim in Office.jsx ghost bubble handler",
+      "description": "App.jsx defines `getRelativeTime(timestamp)` at module scope (line 28). Office.jsx's ghost bubble IIFE (lines 524–530) duplicates the exact same logic inline. The function is never exported/imported between files. Either export `getRelativeTime` from App.jsx (or a utils file) and import it in Office.jsx, or move it to `src/utils/time.js`.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "Double ambient-particles layer: 19 animated elements running simultaneously",
+      "description": "App.jsx renders 12 `.ambient-particle` spans in a full-screen fixed div. Office.jsx renders another 7 ambient particles inside the office floor. That's 19 concurrently animated particles in addition to character bobs, clock animations, wander paths, progress rings, etc. The Office.jsx particles are redundant — the floor already has the full-app particles visible through it. Remove the second batch in Office.jsx.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "Activity log filter chain runs on every App render — should be memoized",
+      "description": "The expression `activityLog.filter(e => { ... }).filter(e => { ... })` in the Dashboard JSX runs on every render cycle, including the 60-second timestamp tick from `useTimeTick`. With large activity logs this is wasteful. Wrap with `useMemo(() => activityLog.filter(...).filter(...), [activityLog, activityFilter, workerFilter])`.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "useTimeTick forces full App re-render every 60 seconds",
+      "description": "`useTimeTick(60_000)` is called at the top of App(), which means the ENTIRE component tree re-renders every minute just to refresh relative timestamps. The only consumers are activity log entries. Move the tick to a lower-level component (e.g., ActivityLog) or use a context so only timestamp-displaying nodes re-render.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "document.querySelector in StatsBar — React anti-pattern",
+      "description": "Line 430: `document.querySelector([data-worker-name=\"${name}\"])?.scrollIntoView(...)` directly manipulates the DOM from a React component. This bypasses React's ref system and is fragile. The WorkerCard already holds a `cardRef` — instead pass a scroll-to callback from App to both WorkerCard and StatsBar, so the card calls it on mount when `isFocused` is true (this pathway already exists and works, just add scroll support there).",
+      "effort": "medium"
+    },
+    {
       "priority": "medium",
       "category": "bug",
-      "title": "Luna's SVG linearGradient ID is always 'luna-hair-luna' — breaks when rendered twice",
-      "description": "In Office.jsx line 252: const gradId = 'luna-hair-' + workerId. Since workerId is always the string 'luna', this always produces the ID 'luna-hair-luna'. CharacterAvatar renders Luna both via Character at the desk and via CharacterAvatar inside ConferenceTable's seated avatars when meetingWorkers includes Luna. SVG id attributes must be unique per document. When duplicated, browsers use whichever linearGradient appears last in the DOM, making Luna's hair in the first instance resolve to black or transparent.",
-      "file": "src/Office.jsx",
-      "suggestion": "Use React 18's useId() hook inside CharacterAvatar to generate a stable unique ID per instance: const uid = useId(); const gradId = 'luna-hair-' + uid. This ensures each rendered instance gets its own gradient definition regardless of how many times CharacterAvatar mounts.",
-      "assignee": "Maya"
+      "title": "Mobile office view: Luna character overlaps whiteboard area",
+      "description": "On the mobile screenshot (375×812), Luna's character renders over the whiteboard/left wall area. The wander keyframes use fixed percentage values (`left: 15–71%, top: 73–87%`) but at 480px the floor has a `max-height: 320px`. The top percentages (73–87%) may be visually outside usable bounds when aspect-ratio is forced and min-height constrains the floor. Test the wander bounds at small sizes and add floor-height-aware clamping or reduce the top% range.",
+      "effort": "medium"
     },
     {
-      "id": 5,
       "priority": "medium",
-      "category": "bug",
-      "title": "StatsBar reads vibe history from localStorage before App writes it — sparkline always one tick stale",
-      "description": "StatsBar's useEffect (App.jsx lines 393-405) reads VIBE_HISTORY_KEY from localStorage and sets vibeHistory state. It depends on [vibe.key]. In the same render cycle, App's vibe-streak effect (lines 833-860) writes a new entry to VIBE_HISTORY_KEY — also triggered by [teamVibe.key]. React runs child effects before parent effects, so StatsBar's read fires before App's write. Result: the sparkline always shows the history from the previous vibe change. On a stable vibe (e.g., 'crushing' for 30 minutes), the sparkline never updates even though new entries are being written.",
-      "file": "src/App.jsx",
-      "suggestion": "Extract a useVibeHistory(vibeKey) custom hook that owns both the write (on vibe change) and the read (for display). Call it once in App, pass the resulting history array down as a prop to StatsBar. This eliminates the parent-child effect ordering race by keeping read and write in the same hook scope.",
-      "assignee": "Carlos"
+      "category": "accessibility",
+      "title": "aria-live timestamps are invisible to screen readers (title attribute)",
+      "description": "ActivityLogEntry shows timestamps with `title={formatFullDateTime(...)}` as the accessible label. The `title` attribute is not reliably announced by screen readers. Users navigating by keyboard also can't trigger the tooltip. Consider adding a visually-hidden `<time dateTime={...}>` element alongside the relative timestamp, or use an `aria-label` on the time span.",
+      "effort": "small"
     },
     {
-      "id": 6,
       "priority": "medium",
-      "category": "a11y",
-      "title": "WorkerCard uses role='article' with tabIndex=0 — articles must not be focusable interactive elements",
-      "description": "The WorkerCard outer div (App.jsx line 249) has role='article' and tabIndex={0}. The ARIA 'article' role is structural, not interactive — it should never appear in the tab order. Screen readers announce it as 'article' when focused, but Tab + Enter/Space does nothing (no onKeyDown handler on the outer div). Meanwhile, the info button and task tag spans inside the card are also separately focusable, creating a confusing two-stop focus sequence per card. This violates WCAG 2.1 SC 4.1.2: the element advertises an interactive affordance it does not provide.",
-      "file": "src/App.jsx",
-      "suggestion": "Remove tabIndex={0} and role='article' from the outer div. Replace with role='group' and aria-labelledby pointing to the worker name element. This keeps the card as a labelled group without putting it in the tab order. The internal button elements already provide all necessary keyboard interaction.",
-      "assignee": "Maya"
+      "category": "code",
+      "title": "Office.jsx is 1183 lines — needs splitting",
+      "description": "Office.jsx has grown to 1183 lines and contains CharacterAvatar (288 lines of SVG alone), Character, WallClock, WindowElement, ConferenceTable, AwaySign, VibeShockwave, and the main Office component. This violates single-responsibility and makes navigation painful. At minimum extract CharacterAvatar to `src/components/CharacterAvatar.jsx` and WallClock/WindowElement to `src/components/OfficeDecor.jsx`.",
+      "effort": "medium"
     },
     {
-      "id": 7,
-      "priority": "medium",
-      "category": "a11y",
-      "title": "Ghost character divs have tabIndex=0 but no accessible role or label",
-      "description": "In Office.jsx the Character component (line 490) always renders with tabIndex={0}. For ghost variants, the conditional role={handleClick ? 'button' : undefined} evaluates to undefined since ghost characters have no onClick. The ghost OOO bubble is only revealed via onFocus which calls handleMouseEnter, but the containing div has no role or aria-label — a keyboard user focusing it hears nothing useful. The data-tooltip attribute is also explicitly suppressed for ghosts. Screen reader users cannot identify who is OOO or why.",
-      "file": "src/Office.jsx",
-      "suggestion": "For ghost characters, add role='img' and aria-label={'worker.name + ' is out of office, ' + worker.role} to the outer div. Move the OOO bubble text into a visually-hidden sibling span so screen readers can read it without hover interaction. If ghosts should not be keyboard-focusable at all, set tabIndex={variant === 'ghost' ? -1 : 0}.",
-      "assignee": "Maya"
-    },
-    {
-      "id": 8,
       "priority": "medium",
       "category": "ux",
-      "title": "CompletionToast and ShortcutToast overlap — toast overflows on mobile with long names",
-      "description": "The completionToast element (App.jsx lines 941-965) uses inline styles with whiteSpace: 'nowrap' and no maxWidth constraint. On a 375px mobile viewport, names longer than ~22 characters overflow beyond the screen edge. Both ShortcutToast and completionToast render at position fixed, bottom: 2rem — when a worker ships a task within 7 seconds of the page loading, both toasts render at exactly the same position and overlap completely. The inline style object is also recreated on every render, bypassing shallow comparison optimizations.",
-      "file": "src/App.jsx",
-      "suggestion": "Move the completion toast styles to App.css as .completion-toast with max-width: calc(100vw - 2rem) and white-space: normal. Give ShortcutToast a bottom: 1rem and completionToast a bottom: 5rem so they stack vertically instead of overlapping. Use a CSS class instead of inline styles to avoid per-render object allocation.",
-      "assignee": "Maya"
+      "title": "Office characters have no keyboard affordance despite being interactive",
+      "description": "Working and idle characters have `pointer-events: auto` and click handlers, but no visible focus indicator and their `tabIndex={0}` is set without communicating what pressing Enter/Space will do. The CSS only provides `data-tooltip::after` for hover — there's no equivalent for focus state. Non-mouse users have no way to discover these characters are clickable.",
+      "effort": "medium"
     },
     {
-      "id": 9,
       "priority": "medium",
-      "category": "code-quality",
-      "title": "getRelativeTime is duplicated verbatim in Office.jsx ghost bubble — will drift",
-      "description": "App.jsx defines getRelativeTime(timestamp) at line 28 with identical logic. Office.jsx contains a character-for-character copy as an inline IIFE inside the ghost bubble render (lines 505-513): same variable names (diff, mins, hours, days), same return strings ('just now', mins + 'm ago', etc.). This is a classic DRY violation — if formatting logic changes (e.g., adding a 'seconds' granularity or localization), one copy will be missed. This function should live in utils/time.js alongside the other utilities.",
-      "file": "src/Office.jsx",
-      "suggestion": "Create src/utils/time.js exporting getRelativeTime(timestamp) and formatFullDateTime(timestamp). Remove both inline definitions from App.jsx and Office.jsx and replace with imports. While in this file, also extract formatIdleDuration (Office.jsx line 318) and formatDuration (App.jsx line 215) which share identical rounding logic.",
-      "assignee": "Dave"
+      "category": "visual",
+      "title": "completionToast rendered with inline styles — CSS class needed",
+      "description": "The completion toast (line 932–956) uses a massive inline `style` object that's inconsistent with the rest of the codebase where everything uses CSS classes. This makes theming, dark/light mode support, and reduced-motion preferences impossible to apply to the toast. Extract to a `.completion-toast` CSS class in App.css.",
+      "effort": "small"
     },
     {
-      "id": 10,
-      "priority": "medium",
-      "category": "perf",
-      "title": "19 concurrent CSS animations when Office tab is active (dual ambient-particle sets)",
-      "description": "App.jsx (line 918) renders 12 ambient-particle spans with CSS keyframe animations, always in the DOM. Office.jsx (line 1149) renders an additional 7 ambient-particle spans with explicit animationDuration and animationDelay inline styles. When the Office tab is active, all 19 spans animate simultaneously alongside desk entry animations, character bob/wander animations, the vibe shockwave, typing dots (3 per working character), and the walking dustmotes. The Office.jsx particles use the same CSS class name 'ambient-particle' as App.jsx, but the Office floor is position: relative with overflow hidden — these particles may be clipped unexpectedly without providing value.",
-      "file": "src/Office.jsx",
-      "suggestion": "Remove the 7 duplicate ambient-particle spans from Office.jsx (lines 1149-1158). App.jsx's 12 particles already provide atmospheric ambience at the app level with data-vibe driving their color theme. If a distinct floor-level atmosphere is needed, create a separate .office-floor-particle class with position: absolute and clip to the floor container. Ensure the prefers-reduced-motion block in App.css targets this class explicitly.",
-      "assignee": "Dave"
-    },
-    {
-      "id": 11,
       "priority": "low",
-      "category": "a11y",
-      "title": "VibeSparkline data not accessible — SVG circle titles are not reliably read by screen readers",
-      "description": "The VibeSparkline SVG (App.jsx line 353) has aria-label='Vibe history' on the root element, but the data encoded in the sparkline (up to 12 vibe transitions with timestamps) is only accessible via SVG title elements inside each circle. SVG title elements have poor, inconsistent cross-browser screen reader support — Firefox + NVDA ignores them unless the shape has role='img' or aria-labelledby. A user navigating by keyboard or screen reader cannot discover the team's vibe trajectory, which is core dashboard information.",
-      "file": "src/App.jsx",
-      "suggestion": "Add a visually-hidden text summary adjacent to the SVG: a span with className='sr-only' containing 'Vibe history: ' + history.map(e => e.key + ' at ' + new Date(e.ts).toLocaleTimeString()).join(', '). Replace the SVG's aria-label with aria-describedby pointing to that span. This approach works universally across assistive technology without relying on SVG title support.",
-      "assignee": "Maya"
+      "category": "code",
+      "title": "window.location.hash mutations are scattered and duplicated",
+      "description": "There are at least 6 places in App.jsx that do `setTab('X'); window.location.hash = 'X'` as a paired operation. Extract a `navigateToTab(tab)` helper that does both atomically, reducing duplication and making it easier to add tab-change side effects later.",
+      "effort": "small"
     },
     {
-      "id": 12,
       "priority": "low",
-      "category": "ux",
-      "title": "No immediate re-sync after returning from idle — data can be up to 60 minutes stale",
-      "description": "The idle detection pauses polling after 10 minutes of no mouse/keyboard activity. When the user returns, the next poll fires at the end of the current interval (up to 30 seconds later). Since they could have been idle for up to 30 minutes, data displayed can be 30 + 30 = 60 minutes old before refreshing. The lastActivity.current update in the mousemove handler (line 625) only updates the timestamp that pollTick checks — it does not trigger an immediate sync. There is no 'activity resumed' event equivalent to visibilitychange.",
-      "file": "src/App.jsx",
-      "suggestion": "Track a wasIdleRef = useRef(false). In pollTick, when Date.now() - lastActivity.current > IDLE_TIMEOUT, set wasIdleRef.current = true. In the mousemove/keydown/touchstart handler, check if wasIdleRef.current is true and isSyncing is false, then call syncFromGitHub() immediately and set wasIdleRef.current = false. This ensures the user sees fresh data within one interaction of returning from an idle period.",
-      "assignee": "Dave"
+      "category": "feature",
+      "title": "No error boundary — uncaught throws crash the whole app",
+      "description": "There's no React error boundary wrapping the main content. If CharacterAvatar throws (e.g., a malformed SVG prop), Office, Dashboard, or any component, the user sees a blank white screen with no way to recover. Add a simple ErrorBoundary component wrapping the `<main>` that shows a 'Something went wrong — ↺ Retry' message.",
+      "effort": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "Vibe sparkline circle tooltips use SVG <title> — poor SR support",
+      "description": "The VibeSparkline circles use `<title>` child elements for tooltip text. SVG `<title>` has inconsistent screen reader support across browsers. Use `aria-label` on each circle (which already exist as interactive SVG elements) or wrap in a `<g role=\"img\" aria-label=\"...\">` instead.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "title": "ETA calculation likely always null — startedAt field name mismatch",
+      "description": "ProgressBar receives `startedAt={worker.startedAt}` and uses it for ETA. Confirmed: workers.json DOES use `startedAt` (camelCase), so the field is correctly named. However, the ETA condition `progress > 5 && progress < 100 && workingMins > 1` means ETA only shows when workers have been going more than 1 minute at >5% progress. Verify the ETA actually appears in practice — it may never show in the UI due to the conditions.",
+      "effort": "small"
     }
   ]
 }
