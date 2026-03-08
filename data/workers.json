@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T04:42:00Z",
+  "lastUpdated": "2026-03-08T04:45:53Z",
   "workers": [
     {
       "name": "Carlos",
@@ -38,12 +38,12 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "Implemented coffee machine steam animation with vibe-reactive speed (Luna #33)",
-      "startedAt": "2026-03-08T04:36:00Z",
+      "status": "working",
+      "task": "QA review #7 \u2014 analyzing codebase and live site",
+      "startedAt": "2026-03-08T04:45:53Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T04:40:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T04:45:53Z",
+      "progress": 15
     },
     {
       "name": "Maya",

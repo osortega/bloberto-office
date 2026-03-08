@@ -172,5 +172,11 @@
     "worker": "Carlos",
     "message": "Implemented office aisle marker \u2014 dashed line between desk rows, vibe-reactive opacity",
     "timestamp": "2026-03-08T04:42:00Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #7",
+    "timestamp": "2026-03-08T04:45:53Z"
   }
 ]
