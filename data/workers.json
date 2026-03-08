@@ -1,14 +1,5 @@
 {
-  "workers": [
-    {
-      "name": "Luna",
-      "role": "creative-director",
-      "emoji": "\ud83c\udf19",
-      "status": "working",
-      "task": "Creative review #54",
-      "started_at": "2026-03-08T22:00:00Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     {
       "name": "Sofia",
@@ -36,5 +27,5 @@
       "role": "Creative Director"
     }
   ],
-  "updated_at": "2026-03-08T22:00:00Z"
+  "updated_at": "2026-03-08T22:05:00Z"
 }
