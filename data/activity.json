@@ -394,5 +394,11 @@
     "worker": "Maya",
     "message": "Assigned 3 high-priority QA fixes: coffee corner CSS bug, focus indicators, animation performance",
     "timestamp": "2026-03-08T12:21:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Maya",
+    "message": "Fixed 5 items from QA #17: coffee corner CSS selectors, focus indicators, duplicate dust-drift/ghost-float keyframes, reduced-motion selectors. +13 -17 lines.",
+    "timestamp": "2026-03-08T12:24:00Z"
   }
 ]

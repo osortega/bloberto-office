@@ -1,17 +1,5 @@
 {
-  "workers": [
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8",
-      "status": "working",
-      "task": "Fix 3 high-priority QA findings: coffee corner CSS selector, focus indicators, animation perf",
-      "progress": 5,
-      "updated_at": "2026-03-08T12:21:00Z",
-      "startedAt": "2026-03-08T12:21:00Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     {
       "id": "bloberto",
@@ -50,5 +38,5 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "updated_at": "2026-03-08T12:21:00Z"
+  "updated_at": "2026-03-08T12:24:00Z"
 }
