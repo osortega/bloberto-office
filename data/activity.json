@@ -304,5 +304,17 @@
     "type": "complete",
     "worker": "Sofia",
     "message": "QA review #12 complete — 14 findings (4 high, 5 medium, 5 low). Overall: 3.9/5. Key: useMemo side-effect, conference table mobile position, CSS monolith, timer leak in Character."
+  },
+  {
+    "timestamp": "2026-03-08T09:26:00Z",
+    "type": "hire",
+    "worker": "Carlos",
+    "message": "Assigned: Fix useMemo side-effect + lift ambient interval (Sofia #12)"
+  },
+  {
+    "timestamp": "2026-03-08T09:26:00Z",
+    "type": "hire",
+    "worker": "Maya",
+    "message": "Assigned: Conference table mobile fix + whiteboard 480px fix (Sofia #12)"
   }
 ]
