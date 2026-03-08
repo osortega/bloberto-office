@@ -1,13 +1,13 @@
 {
   "workers": [
     {
-      "name": "Luna",
-      "emoji": "🌙",
-      "role": "Creative Director",
+      "name": "Maya",
+      "emoji": "🎨",
+      "role": "Frontend Engineer",
       "status": "working",
-      "task": "Creative review #53",
-      "started_at": "2026-03-08T20:30:00Z"
+      "task": "Kill keyboard shortcut toast on mobile + whiteboard label",
+      "started_at": "2026-03-08T20:35:00Z"
     }
   ],
-  "updated_at": "2026-03-08T20:30:00Z"
+  "updated_at": "2026-03-08T20:35:00Z"
 }
