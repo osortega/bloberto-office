@@ -1,15 +1,25 @@
 {
   "workers": [
     {
-      "id": "luna",
-      "name": "Luna",
-      "role": "Creative Director",
-      "emoji": "🌙",
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "⚡",
       "status": "working",
-      "task": "Creative Review #42",
+      "task": "Fix Luna dual-render bug + vibe weather widget",
       "progress": 10,
-      "startedAt": "2026-03-08T11:30:00Z"
+      "startedAt": "2026-03-08T11:36:00Z"
+    },
+    {
+      "id": "dave",
+      "name": "Dave",
+      "role": "DevOps Engineer",
+      "emoji": "🔧",
+      "status": "working",
+      "task": "Fix mobile dead space",
+      "progress": 10,
+      "startedAt": "2026-03-08T11:36:00Z"
     }
   ],
-  "updated_at": "2026-03-08T11:30:00Z"
+  "updated_at": "2026-03-08T11:36:00Z"
 }
