@@ -1,4 +1,21 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-08T21:06:00Z"
+  "workers": [
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Ghost desk time tiers - visual escalation",
+      "started_at": "2026-03-08T23:30:00Z"
+    },
+    {
+      "id": "dave",
+      "name": "Dave",
+      "role": "DevOps Engineer",
+      "status": "working",
+      "task": "Vacant desk job card touch accessibility fix",
+      "started_at": "2026-03-08T23:30:00Z"
+    }
+  ],
+  "updated_at": "2026-03-08T23:30:00Z"
 }
