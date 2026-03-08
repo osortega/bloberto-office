@@ -1,16 +1,16 @@
 {
-  "lastUpdated": "2026-03-08T06:05:00Z",
+  "lastUpdated": "2026-03-08T06:06:00Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
-      "status": "idle",
-      "task": "Fixed ProgressBar ETA bug + React.memo defeat + stuck worker null (QA #8 HIGH)",
-      "startedAt": "2026-03-08T05:22:04Z",
+      "status": "working",
+      "task": "Whiteboard Team Progress Thermometer (Luna idea #34.2)",
+      "startedAt": "2026-03-08T06:06:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T05:33:52Z",
-      "progress": 100
+      "updated_at": "2026-03-08T06:06:00Z",
+      "progress": 0
     },
     {
       "name": "Dave",
@@ -49,12 +49,12 @@
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
-      "status": "idle",
-      "task": "Fixed ShortcutToast timer leak + Office.css broken brace (QA #8 HIGH)",
-      "startedAt": "2026-03-08T05:22:04Z",
+      "status": "working",
+      "task": "Office Wall Clock \u2014 SVG analog clock component (Luna idea #34.1)",
+      "startedAt": "2026-03-08T06:06:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T05:33:52Z",
-      "progress": 100
+      "updated_at": "2026-03-08T06:06:00Z",
+      "progress": 0
     }
   ],
   "roster": [
