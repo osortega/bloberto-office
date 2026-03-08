@@ -1,109 +1,95 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-08T12:18:00Z",
-  "review_number": 17,
+  "review_number": 18,
+  "timestamp": "2026-03-08T12:50:00Z",
   "scores": {
-    "visual": 4.2,
-    "ux": 3.8,
+    "visual": 4,
+    "ux": 3.5,
     "responsiveness": 3.5,
-    "performance": 3.2,
-    "accessibility": 3.0,
-    "code_quality": 3.5,
-    "features": 4.0,
-    "fun_factor": 4.5
+    "performance": 3,
+    "accessibility": 3.5,
+    "code_quality": 3,
+    "features": 4,
+    "fun_factor": 5
   },
   "overall_score": 3.7,
-  "previous_score": 3.3,
-  "delta": "+0.4",
-  "summary": "Score UP from 3.3 to 3.7. Nameplate idle guard and whiteboard dark mode fixes from review #16 landed well. Fun factor remains strongest. Main concerns: performance (concurrent animation overload), accessibility gaps, CSS dead code carried from previous reviews.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Coffee corner vibe text uses wrong CSS class selector",
-      "description": "Office.css targets .coffee-corner-label but JSX renders className='coffee-corner__label'. The ::after pseudo-elements for TRIPLE SHOT, STRONG NOW etc never render. Flagged in review #16, still broken. Fix: change CSS selectors to .coffee-corner__label.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "No visible focus indicators on interactive characters",
-      "description": "Characters have tabIndex={0} and role='button' when clickable, but zero visible focus styles. Add :focus-visible outline to .char elements.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "high",
       "category": "performance",
-      "title": "Too many concurrent CSS animations",
-      "description": "Office view runs 7+ ambient particles, dust drift, plant sway, coffee steam, star twinkle, manager wobble, wander paths ALL at once. Add will-change, pause off-screen animations.",
-      "effort": "medium",
-      "assignee": "maya"
+      "title": "118 @keyframes definitions across CSS files — animation budget is out of control",
+      "description": "Office.css has 90 @keyframes and App.css has 28 — totaling 118 animation definitions. Many are duplicates or near-duplicates (dust-drift defined twice, ghost-float used in multiple places). The browser has to parse and keep all of these in memory. Consolidate duplicates and remove unused keyframes. This directly impacts paint performance on low-end devices.",
+      "effort": "medium"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "Office.css is 2071 lines — needs splitting or CSS modules",
+      "description": "A single 2071-line CSS file is unmaintainable. Combined with App.css at 1082 lines, that's 3153 lines of global CSS with potential selector collisions. Consider CSS modules, or at minimum split Office.css into desk.css, character.css, animations.css, etc.",
+      "effort": "large"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Coffee corner vibe-text selectors rely on data-vibe attribute on ancestor — verify propagation",
+      "description": "Lines 1367-1371 of Office.css use [data-vibe='crushing'] .coffee-corner__label selectors. If the data-vibe attribute isn't set on a parent element that contains the coffee corner, these styles silently fail. Verified this was flagged in QA #17 and may still be broken depending on DOM structure. Need to verify the data-vibe attribute is on the office-floor wrapper.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "Duplicated dust-drift keyframe causes style conflict",
-      "description": "@keyframes dust-drift defined twice with different animations. Browser uses last definition, breaking ::before dust effect. Rename one to dust-mote-drift.",
-      "effort": "small",
-      "assignee": "maya"
+      "category": "performance",
+      "title": "WorkerCard memo defeated by activityEntries array prop",
+      "description": "WorkerCard (App.jsx:226) uses React.memo but receives activityEntries as a filtered array. Every render creates a new array reference, defeating memoization. Use useMemo to stabilize the filtered array or pass a stable selector.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Characters have tabIndex=0 but no keyboard interaction handler",
+      "description": "Office.jsx:508 sets tabIndex={0} on characters, making them focusable, but keyboard events (Enter/Space) should trigger the same action as click. Verify onKeyDown handler exists for the character div.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "stableActivityLog useMemo is a no-op",
+      "description": "App.jsx:746 — `useMemo(() => activityLog, [activityLog])` does literally nothing. useMemo with the same reference as dependency returns the same reference. This is dead code that suggests a misunderstanding of memoization.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "ghost-float keyframe defined twice",
-      "description": "@keyframes ghost-float appears twice in Office.css. Remove the duplicate.",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "Reduced-motion selectors are thorough but some target removed animations",
+      "description": "There are 16 prefers-reduced-motion blocks across both CSS files. Some target animations that may have been removed or renamed in recent refactors (e.g., Office.css:1231 nullifies dust-drift and ghost-float in a reduced-motion block but the animations are defined elsewhere and used). Audit each block against actual animation usage.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
-      "category": "performance",
-      "title": "WorkerCard memoization defeated by array reference",
-      "description": "WorkerCard is React.memo'd but receives full activityEntries array each poll, defeating memoization. Memoize per-worker activity slices.",
-      "effort": "medium",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Color-only progress bar differentiation",
-      "description": "Progress bar fill color is the only status indicator. Add text or pattern for colorblind users.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "feature",
-      "title": "No background tab notification on worker events",
-      "description": "Toast/confetti invisible when tab backgrounded. Use Notification API or persist event in title until tab focused.",
-      "effort": "medium",
-      "assignee": "carlos"
+      "category": "ux",
+      "title": "No loading skeleton or placeholder when workers.json fetch is in-flight",
+      "description": "When the page first loads or when polling fails, there's no visual indication. A skeleton loader for the office view would prevent the flash of empty content.",
+      "effort": "medium"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Reduced-motion selectors target nonexistent classes",
-      "description": "prefers-reduced-motion targets .office-worker, .worker-standby which don't exist. Should target .char--working, .char--ghost, .char--manager.",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "DESK_SCREEN_SVG object in Office.jsx is 60+ lines of inline SVG",
+      "description": "Lines 8-63 of Office.jsx define static SVG screens as JSX. These could be extracted to separate SVG files or a dedicated component file to reduce Office.jsx complexity.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "Mobile conference table overlaps idle wander paths",
-      "description": "On <480px, conference table at 62% overlaps wander paths (73-87%). Characters walk through table.",
-      "effort": "small",
-      "assignee": "maya"
+      "title": "Activity log has no local persistence — refreshing loses context",
+      "description": "Activity entries are fetched from GitHub raw but not cached in localStorage. A page refresh during a deploy means the user loses the activity timeline until the next fetch succeeds.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "feature",
-      "title": "Activity log no local persistence",
-      "description": "Activity fetched fresh each load with no localStorage cache. History lost if activity.json cleared.",
-      "effort": "medium",
-      "assignee": "carlos"
+      "category": "accessibility",
+      "title": "Skip-link exists but verify it targets the right anchor",
+      "description": "App.css:17 styles a skip-link. Verify the href points to a valid #main-content id that exists in the DOM.",
+      "effort": "small"
     }
   ]
 }
