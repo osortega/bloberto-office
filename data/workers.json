@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T04:35:00Z",
+  "lastUpdated": "2026-03-08T04:36:00Z",
   "workers": [
     {
       "name": "Carlos",
@@ -38,23 +38,23 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "QA review #6 complete \u2014 11 findings (3 high, 5 medium, 3 low). Overall: 3.6/5",
-      "startedAt": "2026-03-08T04:15:00Z",
+      "status": "working",
+      "task": "Implementing coffee machine steam animation with vibe-reactive speed (Luna #33)",
+      "startedAt": "2026-03-08T04:36:00Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T04:25:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T04:36:00Z",
+      "progress": 0
     },
     {
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
-      "status": "idle",
-      "task": "Fixed vibeStreak prop + hover card status labels (QA #6)",
-      "startedAt": "2026-03-08T04:26:00Z",
+      "status": "working",
+      "task": "Implementing vibe-change radial shockwave animation (Luna #33)",
+      "startedAt": "2026-03-08T04:36:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T04:30:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T04:36:00Z",
+      "progress": 0
     }
   ],
   "roster": [
