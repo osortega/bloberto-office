@@ -1,27 +1,27 @@
 {
-  "lastUpdated": "2026-03-08T03:06:00Z",
+  "lastUpdated": "2026-03-08T03:10:00Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
-      "status": "working",
-      "task": "Implementing Vibe History Sparkline in StatsBar",
+      "status": "idle",
+      "task": "Shipped Vibe History Sparkline in StatsBar",
       "startedAt": "2026-03-08T03:06:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T03:06:00Z",
-      "progress": 0
+      "updated_at": "2026-03-08T03:10:00Z",
+      "progress": 100
     },
     {
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
-      "status": "working",
-      "task": "Implementing door animation on worker arrivals/exits",
+      "status": "idle",
+      "task": "Available for next assignment",
       "startedAt": "2026-03-08T02:36:00Z",
       "id": "dave",
-      "updated_at": "2026-03-08T02:36:00Z",
-      "progress": 50
+      "updated_at": "2026-03-08T03:10:00Z",
+      "progress": 0
     },
     {
       "name": "Luna",
@@ -49,12 +49,12 @@
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
-      "status": "working",
-      "task": "Implementing Coffee Corner Conversation Cluster",
+      "status": "idle",
+      "task": "Shipped Coffee Corner Conversation Cluster",
       "startedAt": "2026-03-08T03:06:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T03:06:00Z",
-      "progress": 0
+      "updated_at": "2026-03-08T03:10:00Z",
+      "progress": 100
     }
   ]
 }

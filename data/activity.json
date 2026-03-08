@@ -76,5 +76,17 @@
     "worker": "Luna",
     "message": "Creative review #31 complete \u2014 7 fresh ideas (theme: Every static element is a sleeping story)",
     "timestamp": "2026-03-08T03:05:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Maya",
+    "message": "Shipped Coffee Corner Conversation Cluster \u2014 idle workers now trigger a chatting badge with glow",
+    "timestamp": "2026-03-08T03:10:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "Shipped Vibe History Sparkline \u2014 StatsBar now shows last 12 vibe changes as a color-coded sparkline",
+    "timestamp": "2026-03-08T03:10:00Z"
   }
 ]
