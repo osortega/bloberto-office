@@ -1,48 +1,16 @@
 {
   "workers": [
     {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "🔍",
-      "status": "working",
-      "task": "QA review #20 — 30-min site analysis",
-      "progress": 10,
-      "updated_at": "2026-03-08T18:15:32.170029Z",
-      "startedAt": "2026-03-08T18:15:32.170062Z"
-    }
-  ],
-  "roster": [
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨"
-    },
-    {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "🚀"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "🔍"
-    },
-    {
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙"
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review #50 — evaluating office dashboard for new ideas",
+      "progress": 10,
+      "updated_at": "2026-03-08T18:30:00Z",
+      "startedAt": "2026-03-08T18:30:00Z"
     }
   ],
-  "updated_at": "2026-03-08T18:15:32.170079Z"
+  "updated_at": "2026-03-08T18:30:00Z"
 }
