@@ -1095,3 +1095,18 @@
 @media (prefers-reduced-motion: reduce) {
   .progress-ring--complete .progress-ring__fill { animation: none; }
 }
+
+/* ── Active desk pulsing glow (Luna #26) ── */
+@keyframes desk-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.25); }
+  50% { box-shadow: 0 0 12px 4px rgba(168, 85, 247, 0.12); }
+}
+
+.desk--active {
+  animation: desk-pulse 3s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk--active { animation: none; }
+}
