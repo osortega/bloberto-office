@@ -1,65 +1,65 @@
 {
   "creative_director": "Luna",
-  "review_number": 51,
-  "timestamp": "2026-03-08T19:30:00Z",
-  "theme": "Give the office a memory — let it react to what happened, not just what's happening",
-  "visual_observations": "Desktop: after-hours vibe active, starfield floor overlay looks great, door locked, candle on manager desk. All review #50 improvements live (reduced-motion, focus rings, away signs, idle micro-bubbles). Conference table ambient labels working. Ficus at seedling stage. Mobile: characters still crowd below 480px but the scale fix from #50 helps. The office feels rich in the moment but has no sense of history — every refresh is a blank slate.",
+  "review_number": 52,
+  "timestamp": "2026-03-08T20:01:03Z",
+  "theme": "Your office has amnesia — every missed micro-detail is a missed micro-laugh",
+  "visual_observations": "Desktop (1280x800): Crushing It / LEGEND tier. Luna at top-left desk with witch-hat character. Bloberto center-top with purple glowing border, CVO label. Carlos and Maya at desks in working state. Dave bottom-left, Sofia center-bottom with red ! error badge. VACANT desk bottom-right — still bare VACANT text. Conference table bottom-left empty; ambient text reads everyone is at their desk. Right wall: COFFEE TRIPLE SHOT cup, cactus, tall amber-orange rectangle (the whiteboard — unidentifiable from distance, no visible label), small green plant, gold sun weather icon. Entrance door at bottom center labeled Entrance. Shortcut toast bottom-right visible. Mobile (375x812): Keyboard shortcut bar renders BELOW the office-floor card boundary — outside the container, floating in document body. Office elements survive breakpoint but shortcut text is exposed and irrelevant on touchscreen.",
   "ideas": [
     {
-      "priority": "should",
-      "category": "storytelling",
-      "title": "Activity Feed Toast Notifications",
-      "description": "When a new entry lands in activity.json (worker completes, clocks in/out), show a subtle toast notification at the bottom of the office view that slides up and fades after 4s. Like a Slack notification in the corner. WHY: Right now the activity log only shows in the dashboard tab — if you're watching the office tab you miss everything. A toast bridges both views and makes the office feel alive with real-time events. The App.jsx already polls activity.json — just surface those deltas as toasts.",
-      "effort": "medium",
+      "priority": "must",
+      "category": "visual",
+      "title": "Kill the Keyboard Shortcut Toast on Mobile",
+      "description": "On mobile (375x812), the shortcut toast renders OUTSIDE the office floor boundary — floating below the card in document body. On a touchscreen there is no keyboard, making this broken AND meaningless. Fix: add @media (pointer: coarse) { .shortcut-toast { display: none !important; } } to App.css. Also audit the absolute positioning to be contained within the app root on desktop. WHY: A floating keyboard shortcut hint on a device with no keyboard is textbook broken UI. It is the first debris a mobile user sees below the office floor — and it should simply not exist.",
+      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "office-life",
-      "title": "Worker Task Progress Tooltip on Desk Monitor",
-      "description": "Hover over a working character's desk monitor to see a mini progress card: task name, progress %, and time on task. Right now you can only see this by hovering the character avatar itself (char-hover-card), but the monitor is a bigger hover target and semantically makes more sense — you'd look at someone's screen to see what they're working on. WHY: Bigger hit target, more intuitive interaction, and the monitor already has role-colored glow — extending it with content makes it feel purposeful rather than decorative.",
+      "category": "visual",
+      "title": "The Whiteboard Needs a Label So It Looks Like One",
+      "description": "The whiteboard renders as a tall amber-orange gradient rectangle on the right wall. From desktop viewing distance it looks like a decorative color swatch — there is NO visual affordance that it IS a whiteboard. The VIBE_WHITEBOARD content is only readable on close inspection. Fix: add a masking-tape strip label across the top edge of .office-whiteboard via a CSS ::before pseudo-element: a 3px-high strip in a slightly different hue with the text WHITEBOARD in font-size: 0.45rem; letter-spacing: 0.15em; opacity: 0.5. No JS changes. WHY: An element that looks like a color swatch teaches nobody. One CSS pseudo-element makes it legible as the information-dense vibe panel it actually is.",
       "effort": "small",
       "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Conference Table Remembers Its Last Huddle",
+      "description": "When a meeting ends (meetingWorkers drops from 2+ to 0), the Huddle badge disappears and the table returns to ambient text — as if the meeting never happened. Add a lastHuddleRef in Office. When meetingWorkers.length >= 2, store { names, endedAt: null }. When it drops to 0, set endedAt: Date.now(). Pass lastHuddle to ConferenceTable and render a muted caption: Last: Dave, Sofia · 4m ago — hidden when null or older than 30 minutes. WHY: The office has no memory. A conference table that shows who last sat there turns a decorative circle into a temporal record without any new API calls.",
+      "effort": "small",
+      "assigned_to": "dave"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "Coffee Counter — Track Total Coffees Consumed",
-      "description": "Add a tiny counter on the coffee corner: '☕ 47 served'. Increment it each time a worker transitions from working→idle (they earned a coffee). Persist in workers.json or a separate stats field. The number grows over time and becomes a fun office stat. WHY: It's a tiny detail that makes the office feel like it has continuity. People love watching numbers go up. It costs almost nothing to implement — just a counter in state and a small DOM element.",
+      "title": "The Entrance Door Announces by Name",
+      "description": "The door shows 🚪✨ on doorEvent===arrive — a visual event with zero information about WHO arrived. App.jsx already fires doorEvent on roster diffs. Extend it: when a worker joins activeWorkers, set doorEvent to { type: arrive, name: worker.name }. In the door JSX, replace static icon with a two-line arrival notice: icon line 1, {name} is here line 2 — in a tiny badge that slides up from the door for 2.5s then fades. Similarly for departures: {name} left. Use data-arrival-name attribute and drive content via existing CSS classes. WHY: 🚪✨ is visual noise. ✨ Carlos is back is a micro-story.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "carlos"
     },
     {
       "priority": "could",
-      "category": "feature",
-      "title": "Keyboard Shortcut Overlay — Press '?' to See Controls",
-      "description": "The office has clickable characters and tab navigation, but no discoverability. Add a '?' keyboard shortcut that shows a small overlay: Tab = cycle characters, Enter = ping, 1/2 = switch tabs, R = force refresh. WHY: Power users (devs watching their own dashboard) want keyboard control. It's a 30-line component and makes the dashboard feel like a real app, not just a pretty page.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "could",
-      "category": "visual",
-      "title": "Vibe Streak Counter Visible in Office",
-      "description": "The vibeStreak prop drives the ficus growth but the number itself is invisible. Show it as a small badge near the ficus: '🔥 12 streak'. When streak breaks, show a brief '💔 streak lost' animation. WHY: The ficus growth stages are too slow to notice (every 5 streaks). A visible counter gives immediate feedback and creates a 'gamification' hook — people want to keep the streak going.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "wild",
       "category": "office-life",
-      "title": "Inter-Character Chat Bubbles During Idle",
-      "description": "When 2+ characters are idle and their wander paths bring them close (within 15% x/y), show a brief chat bubble exchange between them. Pre-written snippets like 'Did you see the latest deploy?' / 'Carlos broke prod again' / 'Maya's CSS is *chef's kiss*'. WHY: This is the holy grail of office life simulation — characters having relationships. It transforms idle time from 'nothing happening' to 'social dynamics'. Medium effort because it needs proximity detection in the wander animation, but the payoff is massive personality injection.",
-      "effort": "medium",
+      "title": "Fern Gets a Visible Nameplate",
+      "description": "The office ficus has title=Fern the office ficus — a beautiful detail that 95% of users never discover because browser title tooltips are invisible unless hovered, and the plant is small. Add a .ficus-nameplate div below .ficus-pot: a tiny plant-tag SVG with Fern as text. Style as a 2x0.7rem cream-colored label on a thin green stick at font-size 0.38rem opacity 0.7. When plantStage === blooming, append a flower emoji. No JS changes needed — the class already exists. WHY: Fern has a name, a growth arc, and personality tied to team morale. Hiding her name in a title attribute is a storytelling failure. A visible label turns a background prop into a character.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Vibe Weather Station Forecast Tooltip",
+      "description": "The .vibe-weather div renders a single emoji icon in the office floor corner. No label, no text — just an emoji floating in the grid. Add a VIBE_FORECAST constant: crushing = Clear skies 100% shipped, on-fire = Storm warning avoid eye contact, in-flow = Light focus flow state detected, slow-day = Dense fog questionable velocity, after-hours = Night watch 18C eerily quiet. Render as a data-tooltip on the vibe-weather div using the existing CSS tooltip system. On mobile render as a tiny 2-word sub-label below the emoji. WHY: The weather metaphor already exists. Making it speak a forecast doubles the comedy for zero new infrastructure.",
+      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "wild",
-      "category": "feature",
-      "title": "Sound Design — Optional Ambient Office Audio",
-      "description": "A toggle (muted by default) that plays subtle ambient office sounds: keyboard clicks when workers are typing, a coffee machine gurgle at the coffee corner, a gentle hum. Use Web Audio API with tiny samples (<50KB total). WHY: Sound is the missing sense. Visual-only dashboards are cool but adding optional audio transforms it into an experience. The 'muted by default' respects users, but the option to turn it on makes the office feel real. This is a large effort but would be a massive differentiator.",
-      "effort": "large",
-      "assigned_to": "tbd"
+      "category": "storytelling",
+      "title": "Bloberto's Desk Has a Mood Ring Strip",
+      "description": "Bloberto manager desk shows: avatar, name, CVO title, glowing border — but no history. Add a row of 5 mini colored dots (.mgr-mood-ring) below the CVO label — each 5x5px, colored by vibe palette, fed by the last 5 entries of vibeHistory[] passed to the manager desk JSX. Dots ordered oldest-to-newest left-to-right with staggered CSS fade-in via --i index. Hover any dot shows a micro-tooltip: Crushing It 4m ago. WHY: Bloberto is the vibe barometer. His desk showing last 5 mood states turns him from a static manager into a living history chart. A volatile strip tells a very different story than 5 calm purple dots. The team mood — rendered on the boss nameplate.",
+      "effort": "medium",
+      "assigned_to": "dave"
     }
   ],
   "hire_proposals": []

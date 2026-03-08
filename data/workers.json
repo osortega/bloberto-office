@@ -1,17 +1,5 @@
 {
-  "workers": [
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "🔍",
-      "status": "working",
-      "task": "QA review #23 — visual testing + code analysis of Bloberto's Office dashboard",
-      "progress": 10,
-      "updated_at": "2026-03-08T20:15:00Z",
-      "startedAt": "2026-03-08T20:15:00Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     { "id": "carlos", "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
     { "id": "maya", "name": "Maya", "role": "Frontend Engineer", "emoji": "🎨" },
@@ -19,5 +7,5 @@
     { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
     { "id": "luna", "name": "Luna", "role": "Creative Director", "emoji": "🌙" }
   ],
-  "updated_at": "2026-03-08T20:15:00Z"
+  "updated_at": "2026-03-08T20:25:00Z"
 }

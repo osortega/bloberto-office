@@ -1,57 +1,105 @@
 {
   "analyst": "Sofia",
-  "review_number": 22,
-  "timestamp": "2026-03-08T19:15:00Z",
-  "screenshot_note": "Code-only review this cycle. Prior visual captures from 18:22 session still valid — no layout changes deployed since.",
+  "review_number": 23,
+  "timestamp": "2026-03-08T20:15:48Z",
   "scores": {
-    "visual": 5,
+    "visual": 4,
     "ux": 4,
-    "responsiveness": 4,
+    "responsiveness": 3,
     "performance": 3,
     "accessibility": 4,
-    "code_quality": 4,
+    "code_quality": 3,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 4.1,
-  "delta_from_last": "+0.2",
+  "overall_score": 3.8,
+  "delta_from_last": "-0.3",
+  "screenshot_note": "Chromium headless unavailable in this environment (pthread quota exceeded). Visual review based on code + deployed CSS bundle + prior captures from 20:06 session. No new layout changes detected since prior screenshots.",
   "fixed_since_last": [
-    "prefers-reduced-motion — now has 18+ guards across both CSS files ✅",
-    "keyboard focus-visible rings on chars, cards, tabs ✅",
-    "skip-link and sr-only utility class added ✅",
-    "mobile stats-bar responsive grid (3→2 col) ✅",
-    "tooltip :focus-visible/:focus-within support ✅"
+    "localStorage JSON.parse for vibe history now wrapped in try-catch ✅ (was crashing in Safari private mode)"
+  ],
+  "still_open_from_last": [
+    "module-level _gradIdx mutable counter (Office.jsx line 3)",
+    "confetti only fires for first shipped worker in simultaneous completions",
+    "wall clock setInterval not synced to next minute boundary — drifts up to 59s",
+    "activityLog .reverse().slice(20) allocation not memoized",
+    "ambient particles missing CSS containment",
+    "browser notification API for error states (feature)",
+    "activity log export button (feature)",
+    "scattered z-index values — no custom property scale",
+    "offline stale-while-revalidate caching",
+    "Inter font not explicitly loaded"
   ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "localStorage JSON.parse crash in private/incognito browsing",
-      "description": "App.jsx line ~879: `const history = raw ? JSON.parse(raw) : []` — no try-catch. If localStorage is corrupted or throws (Safari private mode, quota exceeded), the entire app crashes with a white screen. Wrap in try-catch with fallback. Same for theme preference read. This is a user-facing crash bug.",
+      "title": "useRef called inside conditional block — Rules of Hooks violation",
+      "description": "Office.jsx line 304: `const gradId = useRef(...)` is called inside `if (workerId === 'luna')`. This violates the Rules of Hooks (hooks must not be called conditionally). React may reorder or skip hooks between renders, especially in StrictMode, hot-reload, or if the component tree structure changes. Fix: hoist the useRef call to the top of CharacterAvatar (before any conditionals), but only use the value when workerId is 'luna'. Alternatively, split Luna into its own memoized sub-component. Bonus: this also removes the dependency on the mutable module-level _gradIdx counter.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Confetti only fires for first shipped worker in simultaneous completions",
-      "description": "App.jsx line ~833: `const worker = justShipped[0]` — ignores all other workers that shipped at the same time. If Carlos and Maya both finish in the same poll cycle, only Carlos gets celebrated. Fix: iterate justShipped and stagger confetti triggers by 200ms each.",
+      "title": "keyboard activation of office characters crashes on touch+keyboard devices",
+      "description": "Office.jsx line 602: `onKeyDown={handleClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick() } } : undefined}` calls `handleClick()` with no arguments. Inside handleClick (line 585), if `window.matchMedia('(hover: none)').matches` is true (Surface tablets, touch-first devices with keyboards), the code reaches `e.stopPropagation()` where `e` is `undefined` — TypeError crash. Fix: pass the keyboard event to handleClick, or guard with optional chaining: `e?.stopPropagation()`.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "high",
-      "category": "code",
-      "title": "Module-level mutable _gradIdx counter breaks React StrictMode",
-      "description": "Office.jsx line 3: `let _gradIdx = 0` — increments on every render, never resets. Breaks StrictMode double-invoke, hot reload, and SSR. Replace with useId() hook (React 18+) for stable unique SVG gradient IDs.",
+      "category": "bug",
+      "title": "Module-level _gradIdx counter still breaks StrictMode and hot-reload",
+      "description": "Office.jsx line 3: `let _gradIdx = 0` — increments every time CharacterAvatar renders, never resets. React StrictMode double-invokes renders, causing IDs like `luna-hair-luna-2` vs `luna-hair-luna-3` between invocations, making the SVG gradient reference point to a non-existent ID and rendering Luna's hair as a solid color fallback. Replace with `useId()` (React 18+): `const gradId = useId()` hoisted unconditionally at the top of CharacterAvatar, and just use `gradId` inside the Luna branch.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Confetti still only fires for first worker in simultaneous completions",
+      "description": "App.jsx line ~833: `const worker = justShipped[0]` — when two workers complete in the same poll cycle (common if polling catches up after a tab switch), only the first one in the array gets the confetti and toast. Carlos ships 3 features, Maya notices only Carlos got celebrated. Fix: iterate `justShipped` array and stagger each confetti+toast trigger by 300ms: `justShipped.forEach((w, i) => setTimeout(() => triggerCelebration(w), i * 300))`. Requires refactoring completion toast to support a queue.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Broken mobile CSS selectors from 'Luna Review #41' fix",
+      "description": "App.css lines 1071-1086: the mobile header fix under `@media (max-width: 480px)` references three non-existent selectors. `.tab-content` is never used in JSX (the tab panels use inline `role=tabpanel` divs with no class). `.header-subtitle` is never used in JSX (the subtitle is just `<p>` inside `.header-title`). `.header h1` has specificity 0-1-1 and is overridden by the existing `.header-title h1` rule at specificity 0-2-1 from the 600px breakpoint — so the h1 never shrinks to 1rem on 480px screens as intended. Fix all three selectors: `.tab-panel` (or just remove if unused), `.header-title p`, `.header-title h1` respectively.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Activity log 'Last X events' count ignores active filters",
+      "description": "App.jsx line 1154: `Last {Math.min(activityLog.length, 20)} events` always shows the pre-filter total. If the user filters by 'Errors' and only 3 error entries exist, the label still shows 'Last 20 events' — a lie. Calculate the count AFTER applying both the type filter and the worker filter: `const filteredCount = activityLog.filter(...typeFilter).filter(...workerFilter).length` and use `Math.min(filteredCount, 20)` in the label.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "Memoize reversed activity log slice",
-      "description": "The `[...entries].reverse().slice(0, 20)` allocation happens on every render (60s poll + state changes). Wrap in useMemo keyed on the activity array reference to eliminate unnecessary GC pressure.",
+      "title": "O(n×m) activity filter inside render loop not memoized",
+      "description": "App.jsx lines 1104, 1127, 1140: `activityLog.filter(e => e.worker === w.name).slice(-3)` is called for every worker card on every render. With 10 workers and 50 activity log entries, this is 500 comparisons per render cycle, triggered by the 60s poll AND the 60s time-tick AND any state change. Add `useMemo` to pre-compute a map of activity entries keyed by worker name: `const activityByWorker = useMemo(() => activityLog.reduce((acc, e) => { (acc[e.worker] ??= []).push(e); return acc }, {}), [activityLog])` and pass slices from that map.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "Stats bar grid overflows silently when error + stuck cards both present",
+      "description": "App.css: `.stats-bar` uses `grid-template-columns: repeat(5, 1fr)` (7 columns at 900px+ breakpoints). When `errorCount > 0` AND `stuckWorkers.length > 0`, the StatsBar renders 7 cards against a 5-column grid, causing the 6th and 7th to flow to a second row without any alignment treatment. This looks broken: the last row has 2 cards at full width instead of 5. Fix: use `grid-template-columns: repeat(auto-fill, minmax(160px, 1fr))` or conditionally add a CSS modifier class when extra cards are present.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Wall clock still drifts up to 59 seconds on initial mount",
+      "description": "Office.jsx line 880: `setInterval(() => setTime(new Date()), 60000)` starts immediately on mount, not aligned to the next clock minute. If mounted at :45, the clock shows the correct time but won't update until :45 of the next minute — it could be 59 seconds stale. Fix: calculate initial delay to next minute boundary and use a setTimeout → setInterval chain: `const msUntilNextMinute = 60000 - (Date.now() % 60000); setTimeout(() => { setTime(new Date()); const id = setInterval(...); }, msUntilNextMinute)`.",
       "effort": "small",
       "assignee": "Maya"
     },
@@ -59,55 +107,47 @@
       "priority": "medium",
       "category": "performance",
       "title": "Add CSS containment to ambient particle containers",
-      "description": "19 absolutely-positioned animated spans run continuously. Add `contain: strict` to .ambient-particles container so browser can skip layout/paint for offscreen particles. Consider reducing count to 8-10 — visual effect is equivalent.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Wall clock drifts up to 59 seconds on mount",
-      "description": "Office.jsx starts `setInterval(() => setTime(new Date()), 60_000)` immediately. If mounted at :45 seconds, first update fires at next-minute:45, showing stale time. Sync to next minute boundary with initial setTimeout before starting the interval.",
+      "description": "App.css: The `.ambient-particles` container (12 particles in App, 7 in Office = 19 total) runs continuous CSS animation on all particles even when offscreen. Add `contain: strict` or `contain: layout paint` to `.ambient-particles` so the browser can skip layout recalculation outside this boundary during each animation frame. Also consider reducing particle count to 8 — at opacity 0.15, the visual difference between 12 and 8 is imperceptible, but the paint savings aren't.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "feature",
-      "title": "Browser Notification API for error status alerts",
-      "description": "On-fire vibe is only visible in active tab. Add opt-in browser notifications when a worker enters 'error' status — useful for background monitoring. Gate behind a 🔔 toggle in header, persist preference in localStorage.",
+      "title": "Browser Notification API for critical status alerts",
+      "description": "Still not implemented since review #22. When a worker enters 'error' status or vibe shifts to 'on-fire', active-tab monitoring is useless if the user is in another tab. Add an opt-in 🔔 toggle in the header that calls `Notification.requestPermission()` and sends browser notifications on error state transitions. Gate the feature behind permission check and persist opt-in preference to localStorage under 'bloberto-notify'. Estimated user value: high for any real monitoring use case.",
       "effort": "medium",
       "assignee": "Carlos"
     },
     {
-      "priority": "medium",
+      "priority": "low",
+      "category": "code",
+      "title": "Dead CSS classes polluting mobile breakpoints",
+      "description": "App.css contains references to classes that do not exist in any JSX: `.tab-content` (referenced in 480px breakpoint), `.header-subtitle` (referenced in 480px breakpoint). Also `.progress-wrapper {}` at line ~340 is an empty rule block. Clean up: grep all CSS selectors against JSX usage and remove orphans. Prevents confusion for future maintainers who will spend 20 minutes looking for `.header-subtitle` in JSX and finding nothing.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
       "category": "feature",
       "title": "Activity log export button (JSON/CSV)",
-      "description": "Add a small 'Export ↓' button that downloads the current activity array as JSON or CSV. Useful for retrospectives. Small Blob, big convenience.",
+      "description": "Still not implemented since review #22. A small 'Export ↓' button next to 'Last N events' that downloads the current filtered activity array as JSON or CSV. Useful for sprint retrospectives. Implemented as a Blob download: `URL.createObjectURL(new Blob([JSON.stringify(entries)]))`. Total: ~5 lines. Assignee still Maya.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Establish z-index scale with CSS custom properties",
-      "description": "z-index values scattered ad-hoc (1, 2, 10, 50, 100, 200, 9999). Define --z-floor, --z-character, --z-overlay, --z-header, --z-modal, --z-toast in :root and replace all hard-coded values.",
+      "title": "Footer hardcodes version string instead of reading package.json",
+      "description": "App.jsx footer renders `v1.0.0-chaos` as a literal string. The actual package.json has `\"version\": \"0.0.0\"`. These will inevitably diverge. In a Vite project, import the version via `import.meta.env` + define plugin, or import from package.json directly: `import { version } from '../package.json'` and render `v${version}`. Or just pick one source of truth and use it.",
       "effort": "small",
-      "assignee": "Maya"
+      "assignee": "Dave"
     },
     {
       "priority": "low",
-      "category": "feature",
-      "title": "Offline stale-while-revalidate caching",
-      "description": "If GitHub CDN is down, app shows error banner with nothing useful. Cache successful responses to localStorage with timestamp, fall back to cache if < 15 min old with 'Last updated X ago' indicator.",
-      "effort": "medium",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "Load Inter font explicitly via CDN",
-      "description": "Inter is declared in font-family but never loaded. On Linux/older Windows, silently falls back to system-ui causing inconsistent rendering. Add bunny.net font link (GDPR-safe) to index.html.",
+      "category": "performance",
+      "title": "Inter font still not loaded — silent system-font fallback",
+      "description": "Still not implemented since review #22. `font-family: 'Inter'` is declared in index.css but no @font-face or CDN link loads it. On Linux and older Windows, the app silently renders in system-ui (often Segoe UI on Windows, DejaVu Sans on Linux), causing cross-platform inconsistency. Add `<link rel=\"preconnect\" href=\"https://fonts.bunny.net\">` + `<link href=\"https://fonts.bunny.net/css?family=inter:400,600,700,800\" rel=\"stylesheet\">` to index.html. Bunny.net is GDPR-compliant (unlike Google Fonts).",
       "effort": "small",
       "assignee": "Dave"
     }
