@@ -1289,6 +1289,20 @@
 .wb-history-dot[data-vibe='slow-day']    { background: #9ca3af; }
 .wb-history-dot[data-vibe='after-hours'] { background: #6366f1; }
 
+.wb-doodle {
+  margin: 4px 0 0;
+  font-size: 0.3rem;
+  text-align: center;
+  opacity: 0.25;
+  transition: opacity 0.3s;
+  pointer-events: auto;
+  cursor: default;
+  font-family: monospace;
+  line-height: 1.2;
+  white-space: pre;
+}
+.office-whiteboard:hover .wb-doodle { opacity: 0.7; }
+
 .office-whiteboard--done {
   background: #f0ffe8;
 }
@@ -1330,6 +1344,15 @@
 
   @keyframes monitor-blink { from {} to {} }
   @keyframes deep-glow { from {} to {} }
+  @keyframes candle-flicker { from {} to {} }
+  @keyframes lamp-pulse { from {} to {} }
+  @keyframes heat-shimmer { from {} to {} }
+  @keyframes lamp-idle-flicker { from {} to {} }
+  @keyframes lamp-error-pulse { from {} to {} }
+  @keyframes shockwave-expand { from {} to {} }
+  @keyframes keystroke-float { from {} to {} }
+  @keyframes sonar-ping { from {} to {} }
+  @keyframes ambient-drift { from {} to {} }
   .char--deep-work { animation: none !important; filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.5)); }
   .desk--active .desk__monitor { animation: none; }
 

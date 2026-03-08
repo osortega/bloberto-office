@@ -1042,6 +1042,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               <span key={i} className="wb-history-dot" data-vibe={v} />
             ))}
           </div>
+          <pre className="wb-doodle" aria-hidden="true">
+            {vibe === 'crushing' ? '╰(*°▽°*)╯' : vibe === 'on-fire' ? '(╯°□°)╯︵ ┻━┻' : vibe === 'in-flow' ? '(⌐■_■)' : vibe === 'slow-day' ? '(._. )' : '(∪.∪ )...zzz'}
+          </pre>
         </div>
         <div className="mgr-desk" data-vibe={vibe}>
           <div className="mgr-desk__monitor" data-vibe={vibe} />
