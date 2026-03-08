@@ -612,6 +612,40 @@ function ConferenceTable({ vibeKey }) {
   )
 }
 
+const VIBE_SHOCKWAVE_COLORS = {
+  crushing: '#a78bfa',
+  'on-fire': '#ef4444',
+  'in-flow': '#2dd4bf',
+  'slow-day': '#9ca3af',
+  'after-hours': '#6366f1',
+}
+
+function VibeShockwave({ vibeKey }) {
+  const prevVibeRef = useRef(vibeKey)
+  const [shockwave, setShockwave] = useState(null)
+
+  useEffect(() => {
+    if (prevVibeRef.current !== vibeKey) {
+      const color = VIBE_SHOCKWAVE_COLORS[vibeKey] || '#a78bfa'
+      setShockwave({ color, key: Date.now() })
+      const timer = setTimeout(() => setShockwave(null), 900)
+      prevVibeRef.current = vibeKey
+      return () => clearTimeout(timer)
+    }
+  }, [vibeKey])
+
+  if (!shockwave) return null
+
+  return (
+    <div
+      key={shockwave.key}
+      className="vibe-shockwave"
+      style={{ borderColor: shockwave.color }}
+      aria-hidden="true"
+    />
+  )
+}
+
 export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0, doorEvent = null }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
@@ -656,6 +690,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         aria-label="Virtual office visualization showing team members at desks"
       >
 
+        <VibeShockwave vibeKey={vibe} />
         <div className="office-sign">🏢 Bloberto&apos;s HQ</div>
 
         {/* Whiteboard — left wall, vibe-reactive */}
@@ -755,6 +790,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             <span className="coffee-corner__chat-label">☕ chatting</span>
           </div>
           <div className="coffee-corner__body">
+            <div className="coffee-steam" aria-hidden="true">
+              <span /><span /><span />
+            </div>
             <span className="coffee-corner__emoji">☕</span>
           </div>
           <span className="coffee-corner__label">Coffee</span>
