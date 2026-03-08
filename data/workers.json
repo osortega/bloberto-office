@@ -1,13 +1,21 @@
 {
   "workers": [
     {
+      "name": "Maya",
+      "emoji": "🎨",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Implementing footer tagline easter egg visibility + honorific typing animation",
+      "started_at": "2026-03-08T21:30:00Z"
+    },
+    {
       "name": "Carlos",
-      "emoji": "\u26a1",
+      "emoji": "⚙️",
       "role": "Backend Engineer",
       "status": "working",
-      "task": "Conference table remembers last huddle",
-      "started_at": "2026-03-08T20:37:00Z"
+      "task": "Implementing VACANT desk vibe-reactive job ad cards",
+      "started_at": "2026-03-08T21:30:00Z"
     }
   ],
-  "updated_at": "2026-03-08T21:20:00Z"
+  "updated_at": "2026-03-08T21:30:00Z"
 }
