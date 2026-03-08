@@ -5,9 +5,9 @@
       "name": "Dave",
       "role": "DevOps Engineer",
       "emoji": "\ud83d\ude80",
-      "status": "working",
-      "task": "Implement Growing Office Plant + Ghost Desk CSS features",
-      "progress": 10,
+      "status": "idle",
+      "task": "",
+      "progress": 100,
       "started": "2026-03-08T01:06:00Z",
       "updated_at": "2026-03-08T01:06:00Z"
     },
@@ -16,11 +16,22 @@
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
-      "status": "working",
-      "task": "Implement Session XP Badges on worker cards",
-      "progress": 10,
+      "status": "idle",
+      "task": "",
+      "progress": 100,
       "started": "2026-03-08T01:06:00Z",
       "updated_at": "2026-03-08T01:06:00Z"
+    },
+    {
+      "id": "luna-creative-28",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "\ud83c\udfa8",
+      "status": "working",
+      "task": "Creative review #28 \u2014 visual + ideation review",
+      "progress": 10,
+      "started": "2026-03-08T01:30:00Z",
+      "updated_at": "2026-03-08T01:30:00Z"
     }
   ],
   "roster": [
