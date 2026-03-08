@@ -1,10 +1,10 @@
 {
-  "lastUpdated": "2026-03-08T03:55:00Z",
+  "lastUpdated": "2026-03-08T04:00:00Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "⚙️",
+      "emoji": "\u2699\ufe0f",
       "status": "idle",
       "task": "Shipped Vibe History Sparkline in StatsBar",
       "startedAt": "2026-03-08T03:06:00Z",
@@ -15,7 +15,7 @@
     {
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "🚀",
+      "emoji": "\ud83d\ude80",
       "status": "working",
       "task": "Implementing ambient dust motes on office floor",
       "startedAt": "2026-03-08T03:36:00Z",
@@ -26,20 +26,20 @@
     {
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙",
-      "status": "idle",
-      "task": "Completed creative review #32",
-      "startedAt": "2026-03-08T03:30:00Z",
+      "emoji": "\ud83c\udf19",
+      "status": "working",
+      "task": "Creative review #33",
+      "startedAt": "2026-03-08T04:00:00Z",
       "id": "luna",
-      "updated_at": "2026-03-08T03:35:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T04:00:00Z",
+      "progress": 10
     },
     {
       "name": "Sofia",
       "role": "QA & Product Analyst",
-      "emoji": "🔍",
+      "emoji": "\ud83d\udd0d",
       "status": "idle",
-      "task": "QA review #5 complete — 11 findings (3 high, 5 medium, 3 low). Overall: 3.6/5",
+      "task": "QA review #5 complete \u2014 11 findings (3 high, 5 medium, 3 low). Overall: 3.6/5",
       "startedAt": "2026-03-08T03:45:00Z",
       "id": "sofia",
       "updated_at": "2026-03-08T03:55:00Z",
@@ -48,7 +48,7 @@
     {
       "name": "Maya",
       "role": "Frontend Engineer",
-      "emoji": "🎨",
+      "emoji": "\ud83c\udfa8",
       "status": "working",
       "task": "Implementing desk lamp glow states + keyboard typing viz",
       "startedAt": "2026-03-08T03:36:00Z",
