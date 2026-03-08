@@ -618,6 +618,7 @@ export default function App() {
   const [selectedTag, setSelectedTag] = useState(null)
   const [quoteBonus, setQuoteBonus] = useState(0)
   const [showBonus, setShowBonus] = useState(false)
+  const [sparkleUnseen] = useState(() => !localStorage.getItem('footer-sparkle-seen'))
 
   const handleTagClick = useCallback((tag) => {
     setSelectedTag(prev => prev === tag ? null : tag)
@@ -652,6 +653,10 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('bloberto-theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    if (sparkleUnseen) localStorage.setItem('footer-sparkle-seen', '1')
+  }, [sparkleUnseen])
 
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
@@ -1000,7 +1005,7 @@ export default function App() {
         </div>
         <div className="header-right">
           <div className="header-badge">
-            {greeting}, <span key={teamVibe.key} className="honorific-in">{HONORIFICS[teamVibe.key] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
+            {greeting}, <span key={teamVibe.key} className="honorific">{HONORIFICS[teamVibe.key] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
             {new Date().toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'short',
@@ -1221,7 +1226,7 @@ export default function App() {
           style={{ cursor: 'pointer' }}
           title="tap for another thought"
           onClick={() => { setShowBonus(prev => !prev); setQuoteBonus(prev => prev + 1) }}
-        ><span className="footer-sparkle">✦</span>&ldquo;{showBonus ? BONUS_TAGLINES[quoteBonus % BONUS_TAGLINES.length] : (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.')}&rdquo;</span><span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
+        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{showBonus ? BONUS_TAGLINES[quoteBonus % BONUS_TAGLINES.length] : (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.')}&rdquo;</span><span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
         <span>v1.0.0-chaos</span>
       </footer>
     </div>
