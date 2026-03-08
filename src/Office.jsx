@@ -1073,6 +1073,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               ) : (
                 <div className="desk-character">
                   <div className="desk__monitor" />
+                  {occ.ghost && (
+                    <div className="desk-monitor-screen">
+                      <div className="desk-monitor-screen--sleep" />
+                    </div>
+                  )}
                   {isWorking && (DESK_SCREEN_SVG[occ.worker.id] || true) && (
                     <div className="desk-monitor-screen">
                       {DESK_SCREEN_SVG[occ.worker.id] || (

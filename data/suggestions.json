@@ -1,177 +1,165 @@
 {
   "analyst": "Sofia",
   "review_number": 19,
-  "timestamp": "2026-03-08T15:45:49Z",
+  "timestamp": "2026-03-08T16:15:59Z",
   "screenshot_desktop": "screenshot-qa19-desktop.png",
   "screenshot_mobile": "screenshot-qa19-mobile.png",
-  "screenshot_notes": "Fresh screenshots captured at 15:45 UTC at 1280x800 and 375x812. Site is live and fully rendered. Vibe: Crushing It, LEGEND \ud83d\udd25. All 5 workers at desks, Sofia showing red error ring. Window element top-right is a jarring blown-out white/light-blue rectangle against dark floor \u2014 confirmed again. Large wander-orbit circle visible lower-left quadrant (looks like a stray CSS artifact or mispositioned conference table). ShortcutToast visible bottom-right on desktop. On mobile, ShortcutToast renders as plain unstyled text BELOW the office card, outside its fixed-bottom container \u2014 confirmed for the seventh consecutive review. Carlos barely visible at top-right desk on mobile. Footer wraps onto 2 lines at 375px.",
+  "screenshot_dashboard": "dashboard screenshot unavailable — Chromium thread exhaustion in sandbox (pthread_create EAGAIN); desktop+mobile captured at 15:51 UTC",
   "scores": {
     "visual": 3,
-    "ux": 3,
-    "responsiveness": 3,
+    "ux": 2,
+    "responsiveness": 4,
     "performance": 3,
-    "accessibility": 2,
-    "code_quality": 3,
-    "features": 4,
+    "accessibility": 3,
+    "code_quality": 2,
+    "features": 3,
     "fun_factor": 5
   },
-  "overall_score": 3.3,
-  "carries_still_broken": {
-    "shortcut_toast_mobile": "CONFIRMED AGAIN \u2014 7th consecutive review. Mobile screenshot at 375x812 shows toast text rendered as plain text BELOW the office card, outside the fixed-bottom container. Zero lines of CSS or JS have changed to address this.",
-    "conditional_aria_live_mounts": "Four instances still conditionally mount with content already set: (1) completionToast App.jsx ~955, (2) plantToast Office.jsx ~935, (3) ShortcutToast div App.jsx ~543, (4) polling-paused-pill App.jsx ~1007. All four fail NVDA/JAWS/VoiceOver announcement. Unchanged.",
-    "stable_activity_log_noop": "App.jsx line 759: useMemo(() => activityLog, [activityLog]) still a no-op. WorkerCard memo defeated on every 30s poll across all 4 call sites. Unchanged.",
-    "office_jsx_monolith": "Office.jsx is now 1245 lines \u2014 grown 27 lines since last flagged at 1218. Going the wrong direction.",
-    "activityLogLenRef_dead_code": "App.jsx lines 758\u2013760: useRef set, never read. Still there.",
-    "ghost_chars_tabindex": "Office.jsx line 525: tabIndex={0} unconditional on all Character divs including ghost variant. Ghost has no onClick, no role=button, no onKeyDown. Keyboard dead-end. Unchanged.",
-    "wander_cap_at_4": "Office.jsx line 1159: (i % 4) + 1. 5th idle worker duplicates wander-1 path and tooltip. Unchanged.",
-    "stuck_card_keyboard": "App.jsx lines 426\u2013440: stat-card--stuck div has onClick but no role, no tabIndex, no onKeyDown. Not keyboard accessible.",
-    "flip_focus_management": "WorkerCard flip to info view does not move focus to Close button. Keyboard users navigate blind.",
-    "role_radio_on_button": "App.jsx lines 1153\u20131162 and 1165\u20131183: <button role='radio'> conflicting ARIA. Unchanged."
-  },
+  "overall_score": 3.1,
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "ShortcutToast on mobile \u2014 CONFIRMED for the 7th consecutive review",
-      "description": "Fresh mobile screenshot at 375x812 confirms the toast renders as plain unstyled text below the office card, outside its fixed-bottom container. The text '1 Office \u00b7 2 Dashboard \u00b7 R Refresh \u00b7 Esc Clear' floats below the office floor with no background, no border, no positioning \u2014 it has completely escaped its CSS. This has been photographed and described in every single review since #13. The fix is one line of CSS: `@media (hover: none) and (pointer: coarse) { .shortcut-toast { display: none; } }` \u2014 keyboard shortcuts are meaningless on touch-only devices. If you want to be thorough, add a JS guard in ShortcutToast: `if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return null` at the top of the component. Either way: 7 reviews, still zero action.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "Four conditional aria-live mounts \u2014 all still broken, all unchanged",
-      "description": "A persistent aria-live region must exist in the DOM BEFORE content is set \u2014 conditionally mounting an element with content already inside it bypasses the mutation observer that screen readers use. All four instances: (1) completionToast (App.jsx ~955), (2) plantToast (Office.jsx ~935), (3) ShortcutToast div (App.jsx ~543), (4) polling-paused-pill span (App.jsx ~1007). Fix once, fix all: add `<div id='live-region' aria-live='polite' aria-atomic='true' className='sr-only'></div>` to App root unconditionally, then write a `useAnnounce()` hook that imperatively sets its textContent. All four toast/notification triggers call announce() instead of conditional mounting. One hook, four WCAG 4.1.3 violations resolved.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "performance",
-      "title": "stableActivityLog useMemo is still a no-op \u2014 memo defeat on every poll",
-      "description": "App.jsx line 759: `const stableActivityLog = useMemo(() => activityLog, [activityLog])`. The dependency IS the state value \u2014 useMemo runs whenever activityLog changes, producing a new reference. Since activityLog is replaced wholesale on every syncFromGitHub call (every 30s), stableActivityLog produces a new reference every 30s. All four WorkerCard render sites pass this as activityEntries prop. React.memo does shallow compare: new reference = re-render. Every WorkerCard re-renders every 30s unconditionally. Fix: `useMemo(() => activityLog, [activityLog.length])` \u2014 only produces new reference when entry count changes, not on identity replacement. One-word change. This was flagged in reviews #15 through #19.",
+      "title": "NEW CRITICAL: Activity log permanently empty on live site — JSON format mismatch",
+      "description": "activity.json returns {\"entries\": [...]} — an object, not an array. App.jsx syncFromGitHub does: setActivityLog(Array.isArray(activity) ? activity : []). Since the payload is an object, Array.isArray is false, and activityLog is unconditionally set to [] every poll. No error thrown, no activityError set — HTTP fetch succeeds (200 OK). Users see 'No activity yet…' forever, with zero indication. 50 entries silently discarded every 30s. Fix: setActivityLog(Array.isArray(activity) ? activity : (activity.entries ?? [])). One-line change.",
       "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "NEW: Luna SVG gradient ID collision \u2014 visual rendering bug with multiple Luna instances",
-      "description": "Office.jsx line 252: `const gradId = 'luna-hair-${workerId}'` evaluates to the hardcoded string 'luna-hair-luna' every time, because workerId is always 'luna' for this branch. SVG gradient IDs must be globally unique in the DOM. When Luna appears simultaneously as a desk character (working/ghost variant at a desk) AND is also rendered in the ConferenceTable's meetingWorkers map (char--seated), or in CharacterAvatar used in the hover card, two SVG elements exist with `id='luna-hair-luna'`. Browsers use the first matching ID \u2014 Luna's hair gradient in the second render instance will display incorrectly (wrong color or fallback to black). Fix: use React's `useId()` hook, or generate a unique suffix per render (e.g., pass a `instanceId` prop, or use `Math.random().toString(36).slice(2)` stored in a ref). The ConferenceTable renders at size={16} so this collision is observable when a huddle meeting is active.",
+      "title": "NEW CRITICAL: workers.json missing `id` field — React key chaos and custom avatar art degraded to emoji",
+      "description": "Live workers.json has no `id` field on worker objects (confirmed on GitHub raw). Cascading failures: (1) key={w.id} at App.jsx lines 1112, 1125 = key={undefined} — React key collision, undefined behavior in DOM reconciliation. (2) CharacterAvatar receives workerId={undefined}, misses all specific-worker SVG branches, falls to if(emoji) branch — users see 🎨 or 🔍 emoji glyphs instead of the hand-crafted SVG character portraits. The custom art is in the code but invisible on production. (3) handleWorkerClick calls setFocusedWorker(worker.id) = setFocusedWorker(undefined). On next render, focusedWorker===w.id = undefined===undefined = TRUE for ALL workers simultaneously. Clicking any character focuses all cards at once. Fix: add id field to workers.json, or normalize in syncFromGitHub: data.workers.map(w => ({ id: w.name?.toLowerCase(), ...w })).",
       "effort": "small"
     },
     {
       "priority": "high",
-      "category": "code",
-      "title": "Office.jsx now 1245 lines \u2014 grew between reviews, not shrinking",
-      "description": "The file was 1218 lines when first flagged, now 1245. It's growing. Concrete extraction plan: (1) `src/components/CharacterAvatar.jsx` \u2014 ~250 lines of per-worker SVG art, pure memo, no office state. (2) `src/components/WallClock.jsx` \u2014 ~55 lines. (3) `src/components/ConferenceTable.jsx` \u2014 ~95 lines. (4) `src/components/VibeShockwave.jsx` \u2014 ~30 lines. (5) `src/components/AwaySign.jsx` \u2014 ~35 lines. (6) Move `formatIdleDuration` + `AWAY_MESSAGES` to `src/utils/time.js`. Extracting CharacterAvatar alone reduces Office.jsx by 250 lines to ~995. At minimum, extract CharacterAvatar \u2014 it has zero dependencies on office-level state.",
+      "category": "bug",
+      "title": "NEW: workers.json role uses short names — ROLE_EMOJIS and ROLE_COLORS lookups silently fail",
+      "description": "Live workers.json has role: 'frontend' for Maya. ROLE_EMOJIS and ROLE_COLORS are keyed by full names ('Frontend Engineer', 'Backend Engineer', etc.). ROLE_EMOJIS['frontend'] is undefined → getRoleEmoji returns '🤖' fallback. ROLE_COLORS['frontend'] is undefined → progress ring, hover card, desk lamp all use gray (#6b7280) instead of the correct purple accent. The custom color theming per role is invisible on production. Fix: normalize role field in fetchWorkersFromGitHub, or add a role-alias map in constants.js, and document the expected contract.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "NEW: No ErrorBoundary — any thrown render error = white screen with no recovery path",
+      "description": "Zero error boundary coverage in App.jsx, Office.jsx, or main.jsx. Risk surfaces: CharacterAvatar renders dynamic SVG per worker ID; ProgressBar does Date arithmetic on worker.startedAt; ActivityLogEntry calls roster?.find(); vibe streak effect reads and JSON.parses localStorage. Any one throws on malformed data and the entire React tree crashes to a blank white screen. Add a 20-line ErrorBoundary class component with componentDidCatch and a fallback UI with a retry button. Wrap it around at minimum the Office component and the dashboard worker grid.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "performance",
+      "title": "25 duplicate @keyframes across App.css and Office.css — persists unchanged since review #18",
+      "description": "Exact duplicate keyframe names confirmed: ambient-drift, badge-pop, bob, card-rise, cloud-drift, deep-glow, dust-drift, enter-office, fade-in-char, ghost-enter, ghost-float, manager-wobble, monitor-blink, new-border-pulse, plant-sway, pulse, pulse-live, shimmer, standby-pulse, star-twinkle, typing-bounce, wander-1 through wander-4 (25 total). Each block is parsed and stored twice. Built CSS total is ~90KB. Extract shared keyframes to src/styles/keyframes.css and import from both. This has been flagged in reviews 16, 17, 18, and now 19. It remains completely unaddressed.",
       "effort": "medium"
     },
     {
       "priority": "high",
+      "category": "accessibility",
+      "title": "Four conditional aria-live mounts still broken — screen readers get no announcements",
+      "description": "All four still conditionally mount with content pre-populated: (1) completionToast (App.jsx ~955), (2) plantToast (Office.jsx ~948), (3) ShortcutToast div (App.jsx ~543), (4) polling-paused-pill span (App.jsx ~1007). WCAG 4.1.3: the live region must exist before content changes. A conditionally-mounted element with aria-live bypasses screen reader mutation observers. Fix: add a persistent <div id='sr-announcer' aria-live='polite' aria-atomic='true' className='sr-only'></div> to App root. Expose a useAnnounce() hook that sets its textContent imperatively. Four callers replace conditional JSX mounting with announce('message'). One hook, four violations resolved.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
       "category": "bug",
-      "title": "Character keyboard handler still calls handleClick() without event \u2014 TypeError on touch+keyboard",
-      "description": "Office.jsx line 523: `handleClick()` invoked with no arguments in the onKeyDown handler. handleClick (lines 506\u2013513) immediately calls `e.stopPropagation()` when `window.matchMedia('(hover: none)').matches`. On a device where hover:none is true AND an external keyboard is attached (iPad + Bluetooth keyboard, Surface, Chromebook), pressing Enter/Space on a character calls handleClick(undefined), then undefined.stopPropagation() \u2192 TypeError. One character fix: `handleClick(e)` instead of `handleClick()`.",
+      "title": "activity.json entries use undocumented type values — 🔧 fallback shown for all real events",
+      "description": "ACTIVITY_ICONS maps: hire, complete, error, system. Live activity.json uses types: deploy, review, complete, hire. Types 'deploy' and 'review' are not in ACTIVITY_ICONS — render as 🔧 fallback. If the activity log is ever un-broken (finding #1), all deploy and review entries would show a wrench. Fix: add deploy: '🚀' and review: '🔍' to ACTIVITY_ICONS, or normalize types in fetchActivityFromGitHub.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "stableActivityLog useMemo is a no-op — WorkerCard memo bypassed every poll",
+      "description": "App.jsx line 759: const stableActivityLog = useMemo(() => activityLog, [activityLog]). The dependency IS the value. The memo fires every time activityLog changes (every 30s poll), returning the same activityLog reference anyway. Zero stability benefit. WorkerCard is React.memo'd but receives a new activityEntries reference every 30s, defeating the memo comparison. Fix: useMemo(() => activityLog, [activityLog.length]) — only new reference when count changes. One-word fix. Flagged in reviews 15–18.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "NEW: ConferenceTable meeting-worker positions use cx instead of cy for Y-axis calculation",
-      "description": "Office.jsx line 733: `const y = cx - orbitR * Math.cos(rad)` \u2014 uses `cx` (the X-center, value 52) where `cy` (the Y-center, also value 52) should be used. This is a copy-paste error from the outer chair-placement loop (line 691: `const y = cy - orbitR * Math.cos(rad)`). Currently benign because cx === cy === 52, so the result is numerically identical. But if the table were ever repositioned to a non-square center (e.g., cx=60, cy=52 for alignment reasons), the Huddle meeting-worker avatars would render at incorrect Y positions. Fix: declare both `cx` and `cy` in the inner scope, or reference `cy` from outer scope: `const { cx, cy } = { cx: 52, cy: 52 }`.",
+      "title": "confettiActive setTimeout has no cleanup ref — double-trigger drops first burst mid-animation",
+      "description": "App.jsx line 852: setTimeout(() => setConfettiActive(false), 2500) — ID not stored. If vibe rank jumps twice within 2.5s, the first timer still fires and cuts off the second confetti burst. Compare to workerConfettiTimerRef used correctly 6 lines later. Store in confettiTimerRef.current (add a ref), clear before setting on re-trigger. Also: if component ever unmounts (currently won't, but as a pattern), no cleanup path exists.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Ghost characters still keyboard-focusable with no action \u2014 tabIndex should be conditional",
-      "description": "Office.jsx line 525: `tabIndex={0}` on every Character div regardless of variant. Ghost-variant characters have no onClick (handleClick is undefined when !onWorkerClick), no role='button', no useful keyboard behavior. A keyboard user tabs into a ghost desk character, an aria-label is announced, Enter/Space does nothing. Fix: `tabIndex={handleClick ? 0 : -1}`. Ghost characters still display ghostBubble on focus (handleMouseEnter fires for ghost on line 456), so focus feedback exists \u2014 but the tab stop should be opt-in.",
+      "title": "Ghost character divs still keyboard-focusable with no action",
+      "description": "Office.jsx line 525: tabIndex={0} unconditional on all Character divs. Ghost-variant characters have no onClick (handleClick is undefined), no role='button', no onKeyDown. Keyboard users tab into ghost characters, get aria labels announced, press Enter/Space — nothing happens. Dead tab stop. Fix: tabIndex={handleClick ? 0 : -1}. Ghost OOO bubble on focus still works via onFocus.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "NEW: IDLE_BUBBLE_EMOJIS and AWAY_MESSAGES defined inside component scope \u2014 recreated each render",
-      "description": "Office.jsx line 390: `const IDLE_BUBBLE_EMOJIS = { 1: '\u2615', 2: '\ud83d\udcac', 3: '\ud83e\ude9f', 4: '\ud83e\uddd8' }` is defined inside the Character component body. It's a static constant with no dependency on props or state \u2014 it should be a module-level constant. Every render of every Character instance (there can be 5) allocates and GCs this object. Same applies to `getHour` (a static arrow function) defined inside WindowElement at line 603. Neither object needs to be inside the component. Move both outside their respective component functions.",
+      "title": "IDLE_BUBBLE_EMOJIS and getHour defined inside component functions — allocated on every render",
+      "description": "Office.jsx line 390: const IDLE_BUBBLE_EMOJIS = {1: '☕', 2: '💬', 3: '🪟', 4: '🧘'} is inside Character. Five Character instances × every re-render = new object allocation per render. Same for const getHour = () => new Date().getHours() inside WindowElement (line 603). Both are static, have no dependency on props or state. Hoist to module scope.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "vibeHistory sparkline blank on page load for returning users",
+      "description": "App.jsx line 581: useState([]) for vibeHistory. Sparkline only populates after first poll + teamVibe effect, which can take 2–30s. Data is already in localStorage. Fix: useState(() => { try { const r = localStorage.getItem('bloberto-vibe-history'); return r ? JSON.parse(r) : [] } catch { return [] } }). Returning users see historical vibe trend immediately instead of an empty chart.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "DeltaBadge renders \u2191/\u2193 arrows with no accessible label",
-      "description": "App.jsx lines 364\u2013371: DeltaBadge renders `\u21913` or `\u21932` as raw text. Screen readers announce '\u2191' as 'up arrow', leaving users to guess 'the active count went up by 3'. Add `aria-label={`${delta > 0 ? 'Increased' : 'Decreased'} by ${Math.abs(delta)}`}` to the span, and `aria-hidden='true'` to the directional glyph.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Stuck worker stat card click-only \u2014 keyboard users locked out of scroll-to-worker",
-      "description": "App.jsx lines 426\u2013440: stat-card--stuck is a bare `<div>` with onClick. No role, no tabIndex, no onKeyDown. Keyboard users cannot navigate to the stuck worker from the stats bar. Fix: role='button', tabIndex={0}, onKeyDown that calls the same scroll handler on Enter/Space.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Wander animation capped at 4 \u2014 5th idle worker duplicates path and tooltip",
-      "description": "Office.jsx line 1159: `(i % 4) + 1`. With 5 or more idle workers, index 4 wraps to wander-1 \u2014 same keyframe path, same \u2615 idle-bubble, same tooltip 'Heading to the coffee corner'. Two characters animate in lockstep. Feels buggy. Add char--wander-5 keyframe and a 5th wanderTooltips entry.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "vibeHistory sparkline lazy-loads from localStorage \u2014 blank on first render for returning users",
-      "description": "App.jsx line 581: `useState([])`. On every page load the sparkline is empty until the first poll's teamVibe.key effect runs (~2\u201330s depending on network). The data is in localStorage already. Fix: lazy initializer `useState(() => { try { const r = localStorage.getItem('bloberto-vibe-history'); return r ? JSON.parse(r) : [] } catch { return [] } })`.",
+      "title": "Stuck worker stat card click-only — keyboard users locked out of scroll-to-worker feature",
+      "description": "App.jsx lines 426–440: stat-card--stuck div has onClick with no role, tabIndex, or onKeyDown. Keyboard users cannot use this scroll-to-worker navigation affordance. Fix: add role='button', tabIndex={0}, onKeyDown that fires the scroll handler on Enter or Space.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "activityLogLenRef is dead code \u2014 written, never read",
-      "description": "App.jsx lines 758\u2013760: `const activityLogLenRef = useRef(0)` and a useEffect that updates it. The ref is never read anywhere in 1209 lines. Delete both lines.",
+      "title": "activityLogLenRef tracked but never read — confirmed dead code",
+      "description": "App.jsx lines 758–760: const activityLogLenRef = useRef(0) and a useEffect that writes to it. The ref is never read anywhere in 1209 lines. Was presumably an abandoned optimization attempt. Delete both lines.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "formatIdleDuration / formatDuration / getRelativeTime \u2014 three near-identical time formatters in two files",
-      "description": "Office.jsx defines formatIdleDuration (~318\u2013327). App.jsx defines getRelativeTime (~28) and formatDuration (~215). All three compute elapsed time from a timestamp with slightly different output strings. None live in src/utils/. This is textbook divergent drift \u2014 next time someone changes the 'hour threshold', they'll update one and break the others. Move to src/utils/time.js with a shared base.",
+      "title": "completionToast and plantToast use large inline style objects — theming and a11y hazard",
+      "description": "App.jsx ~955 and Office.jsx ~948: both toast elements use inline style={} with hardcoded background, border, borderRadius, padding, zIndex, animation. Cannot be targeted by prefers-reduced-motion, cannot use CSS custom properties for theming. Extract to .completion-toast and .plant-toast CSS classes. Only dynamic value (border color from worker role color) stays inline.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Three near-identical time formatters in two files — utility drift",
+      "description": "Office.jsx defines formatIdleDuration (compact: '<1m', '45m', '2h 15m'). App.jsx defines getRelativeTime ('just now', '45m ago') and formatDuration ('Working for 45m'). All compute elapsed ms from a timestamp, outputting slightly different strings. None live in src/utils/. Add src/utils/time.js with a shared base function. Next time an edge case is found (0ms case, locale formatting), it gets fixed in one place.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "accessibility",
-      "title": "role='radio' on <button> elements \u2014 conflicting ARIA semantics",
-      "description": "App.jsx lines 1153\u20131162 and 1165\u20131183: `<button role='radio' aria-checked={...}>`. Screen readers may announce 'radio button button'. The correct pattern for mutually-exclusive filters: use role='tab'/role='tablist', or switch to `<input type='radio'>` with labels. The outer radiogroup div is correct; the button element itself is the conflict.",
+      "title": "DeltaBadge arrows render without accessible text label",
+      "description": "App.jsx lines 364–371: DeltaBadge renders ↑3 or ↓2 as raw Unicode. Screen readers announce 'up arrow 3'. Add aria-label='increased by 3' (or decreased) to the span element and aria-hidden='true' to the glyph.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "Worker card flip does not move focus to Close button",
-      "description": "WorkerCard: clicking the info (\u2139\ufe0f) button flips to the back, but focus stays on the now-hidden front button. Keyboard users must Tab-hunt to find Close. Add a useEffect that calls focus() on the back-close button ref when isFlipped becomes true.",
+      "title": "Worker card flip does not move focus to Close button — keyboard users navigate blind",
+      "description": "WorkerCard: clicking the info button flips to activity history back view. Focus stays on the now-visually-hidden front button (tabIndex={-1} set but no focus transfer). Keyboard users must Tab forward to find Close. Fix: add a ref to the Close button, call .focus() in a useEffect when isFlipped becomes true.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "19 continuously-animating elements lack will-change \u2014 GPU hint missing",
-      "description": "App.jsx renders 12 ambient-particle spans; Office.jsx renders 7 more. All animate with no `will-change: transform`. Plus char--wander-* characters animate indefinitely during idle. Add `will-change: transform` to .ambient-particle and .char--wander-1 through -4 (soon -5) in CSS. Negligible on desktop, real jank on mid-range mobile.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "ProgressBar receives unused 'updatedAt' prop",
-      "description": "App.jsx line 166: updatedAt is destructured but never referenced inside ProgressBar \u2014 ETA uses startedAt. Every call site passes updatedAt={worker.updated_at}. Dead prop. Either remove from signature and all call sites, or use it as a fallback when startedAt is absent.",
+      "title": "19 continuously-animating ambient particles lack will-change: transform",
+      "description": "App.jsx renders 12 .ambient-particle spans; Office.jsx renders 7 more. All run indefinite CSS animations with no will-change hint. Add will-change: transform to .ambient-particle and .char--wander-1 through -4 in CSS to promote them to GPU compositing layers. Real improvement on mid-range Android devices.",
       "effort": "small"
     }
   ],
   "whats_good": [
-    "Live site healthy \u2014 fully rendered in under 4s, no console errors, no blank page. Puppeteer domcontentloaded navigation clean.",
-    "Crushing It vibe fully active: COFFEE TRIPLE SHOT label on coffee corner, CVO nameplate on Bloberto, \ud83c\udfc6 trophy on manager desk, full 6-chair conference table. Vibe-reactive theming is consistently executed across every UI surface.",
-    "Per-worker desk screen SVGs (Carlos: code lines, Maya: wireframe grid, Dave: blinking cursor, Sofia: bar chart, Luna: color blocks) are impressive craft. All correctly aria-hidden='true'.",
-    "Deep-work detection (>45 min at desk triggers char--deep-work gold glow + \ud83c\udfa7) is a smart personality-adding heuristic with no UX noise.",
-    "Favicon dynamic color-coding (canvas, no external deps) silently works in the background \u2014 professional touch.",
-    "AwaySign folded-corner sticky-note SVG with seed-based message rotation and data-tier coloring is genuinely charming detail.",
-    "Polling pause on 10-min inactivity with 15s check interval, resumed on any interaction \u2014 well-implemented. The polling-paused-pill UX is clear even if the aria-live on it is broken.",
-    "Reduce-motion coverage is comprehensive throughout both CSS files."
+    "Office floor view is genuinely beautiful on desktop. Dark grid, vibe-reactive border glow, desk lamps, window element, coffee corner, and conference table compose well. The overall art direction is consistently excellent.",
+    "Bloberto's SVG avatar renders correctly (hardcoded id in DEFAULT_BLOBERTO). The crown + blob + per-vibe facial expressions (beaming grin with star sparkles for crushing, sweat droplet for on-fire, droopy eyelids for slow-day) are impressive craft.",
+    "Vibe-reactive theming is comprehensive: CVO nameplate, trophy on desk, 6-chair conference table, COFFEE TRIPLE SHOT label, weather icon. Every UI surface responds to the same vibe data.",
+    "ShortcutToast first-time-user experience works correctly on desktop — keyboard shortcuts shown once, auto-dismissed in 7s, localStorage persistence prevents repeat shows. Clean interaction design.",
+    "Polling pause on 10-minute inactivity with 15-second check interval and resume-on-interaction is thoughtful and correct. Prevents unnecessary GitHub API calls for idle users.",
+    "ProgressBar milestone flash (25/50/75/100%) uses a Set-based tracker to prevent duplicate triggers and properly cleans up via useEffect return. Solid implementation detail.",
+    "prefers-reduced-motion coverage is comprehensive — 16 override blocks across both CSS files. Most animated elements have explicit no-animation fallbacks.",
+    "Tab keyboard navigation (ARIA tablist/tab/tabpanel roles, roving tabIndex, ArrowLeft/Right handler, hash sync) is correctly and completely implemented."
   ],
-  "summary": "Score drops from 3.4 to 3.3. Two new bugs found: (1) Luna SVG gradient ID collision \u2014 the hardcoded 'luna-hair-luna' ID causes incorrect gradient rendering when Luna appears in multiple CharacterAvatar instances simultaneously (desk + huddle). (2) ConferenceTable meeting-worker Y-position uses cx instead of cy \u2014 currently harmless since cx === cy === 52, but a copy-paste error waiting to bite. The ShortcutToast is now confirmed broken for the seventh consecutive review \u2014 at this point it's not a bug, it's a feature of this codebase. The four aria-live antipatterns, stableActivityLog no-op, and Office.jsx growing to 1245 lines remain completely unaddressed. The window element blown-out white rectangle is visible in every screenshot yet remains unfixed. The visual craft and fun factor remain excellent \u2014 the COFFEE TRIPLE SHOT label, the vibe-reactive nameplate changes, the per-worker desk screens \u2014 this is a genuinely delightful product buried under an increasingly long and embarrassingly fixable backlog."
+  "summary": "Score drops to 3.1 from 3.3. Three new critical production bugs discovered this review: (1) Activity log is permanently empty on live site — activity.json returns {entries:[...]} but code does Array.isArray(activity) ? activity : [] and never reads the entries key; 50 entries silently discarded every poll cycle. (2) workers.json has no id field — React key={undefined} on all worker cards, CharacterAvatar falls to emoji glyphs instead of custom SVG portraits, and clicking any worker in the office view focuses ALL cards simultaneously (undefined===undefined). (3) workers.json role uses short names ('frontend') not full names ('Frontend Engineer') — ROLE_COLORS and ROLE_EMOJIS lookups return undefined, all custom role theming falls back to gray/robot. Four data-layer fixes (add id, normalize role, change entries wrapper to array in activity.json, add activity type entries) would restore the majority of broken production features in under an hour. The code architecture and visual design remain genuinely excellent — the vibe system, Bloberto's expressive SVG art, and per-worker desk screens are high-quality work. The gap between the code's potential and what users actually experience is growing with each review."
 }
