@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T08:08:00Z",
+  "lastUpdated": "2026-03-08T08:10:00Z",
   "workers": [
     {
       "name": "Carlos",
@@ -42,19 +42,19 @@
       "task": "QA review #11 \u2014 full site analysis",
       "startedAt": "2026-03-08T07:45:00Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T07:45:00Z",
+      "updated_at": "2026-03-08T08:10:00Z",
       "progress": 10
     },
     {
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
-      "status": "working",
-      "task": "Chalk-erase transition + Window vibe tint",
+      "status": "idle",
+      "task": "Shipped: Chalk-erase transition + Window vibe tint",
       "startedAt": "2026-03-08T08:08:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T08:08:00Z",
-      "progress": 5
+      "updated_at": "2026-03-08T08:10:00Z",
+      "progress": 100
     }
   ],
   "roster": [
