@@ -1,15 +1,15 @@
 {
-  "lastUpdated": "2026-03-08T07:34:00Z",
+  "lastUpdated": "2026-03-08T07:35:00Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
       "status": "working",
-      "task": "Mobile Viewport Fill \u2014 Kill the Dead Zone (Luna #36.1)",
-      "startedAt": "2026-03-08T07:07:00Z",
+      "task": "Implementing Luna #37: Deep Work Focus Halo + Error Room Tint",
+      "startedAt": "2026-03-08T07:35:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T07:07:00Z",
+      "updated_at": "2026-03-08T07:35:00Z",
       "progress": 0
     },
     {
@@ -50,10 +50,10 @@
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
       "status": "working",
-      "task": "Window Vibe Tint \u2014 Sky Reflects Team Energy (Luna #36.2)",
-      "startedAt": "2026-03-08T07:07:00Z",
+      "task": "Implementing Luna #37: Desk Monitor Cursor Blink + Character Click Sonar Ping",
+      "startedAt": "2026-03-08T07:35:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T07:07:00Z",
+      "updated_at": "2026-03-08T07:35:00Z",
       "progress": 0
     }
   ],
