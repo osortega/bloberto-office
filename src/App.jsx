@@ -579,7 +579,7 @@ export default function App() {
   const workerConfettiTimerRef = useRef(null)
   const completionToastTimerRef = useRef(null)
   const [vibeHistory, setVibeHistory] = useState([])
-
+  const [pollingPaused, setPollingPaused] = useState(false)
   // ── Hash-based tab sync (browser back/forward) ──
   useEffect(() => {
     const handleHashChange = () => {
@@ -610,7 +610,10 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    const touch = () => { lastActivity.current = Date.now() }
+    const touch = () => {
+      lastActivity.current = Date.now()
+      setPollingPaused(false)
+    }
     window.addEventListener('mousemove', touch)
     window.addEventListener('keydown', touch)
     window.addEventListener('touchstart', touch)
@@ -619,6 +622,16 @@ export default function App() {
       window.removeEventListener('keydown', touch)
       window.removeEventListener('touchstart', touch)
     }
+  }, [])
+
+  // Track whether polling is paused due to inactivity
+  useEffect(() => {
+    const check = () => {
+      setPollingPaused(Date.now() - lastActivity.current > IDLE_TIMEOUT)
+    }
+    check()
+    const interval = setInterval(check, 15_000)
+    return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
@@ -977,6 +990,15 @@ export default function App() {
             {vibeStreak >= 3 && <span className="streak-icon" key={vibeStreak} aria-label={`Vibe streak: ${vibeStreak}`}>{vibeStreak >= 10 ? '🏆' : vibeStreak >= 5 ? '🔥' : '👑'} x{vibeStreak}</span>}
           </span>
           <button className='sync-now-btn' onClick={() => syncFromGitHub()} disabled={isSyncing} aria-label='Sync now' title='Refresh data (R)'>↺</button>
+          {pollingPaused && (
+            <span
+              className="polling-paused-pill"
+              title="Auto-refresh paused due to inactivity"
+              aria-live="polite"
+            >
+              ⏸ Paused · move mouse to refresh
+            </span>
+          )}
           <button
             className="theme-toggle"
             onClick={toggleTheme}

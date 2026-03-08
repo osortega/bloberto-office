@@ -833,11 +833,14 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   // Ficus milestone burst
   const prevPlantStageRef = useRef(plantStage)
   const [plantMilestone, setPlantMilestone] = useState(false)
+  const [plantToast, setPlantToast] = useState(false)
   useEffect(() => {
     if (prevPlantStageRef.current !== plantStage && plantStage !== 'seedling') {
       setPlantMilestone(true)
-      const t = setTimeout(() => setPlantMilestone(false), 1800)
-      return () => clearTimeout(t)
+      setPlantToast(true)
+      const t1 = setTimeout(() => setPlantMilestone(false), 1800)
+      const t2 = setTimeout(() => setPlantToast(false), 3000)
+      return () => { clearTimeout(t1); clearTimeout(t2) }
     }
     prevPlantStageRef.current = plantStage
   }, [plantStage])
@@ -912,6 +915,31 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
   return (
     <div className="office-wrap">
+      {plantToast && (
+        <div
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'var(--surface2)',
+            border: '2px solid #22c55e',
+            borderRadius: '12px',
+            padding: '0.6rem 1.2rem',
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            color: 'var(--text)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.4), 0 0 12px #22c55e55',
+            zIndex: 9999,
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            animation: 'badge-pop 0.3s cubic-bezier(0.34,1.56,0.64,1) both',
+          }}
+        >
+          🌱 The office ficus leveled up!
+        </div>
+      )}
       <div
         className="office-floor" data-vibe={vibe} data-has-error={hasAnyError || undefined} data-full-sync={isFullSync || undefined}
         role="region"
