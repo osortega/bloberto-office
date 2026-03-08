@@ -1,29 +1,49 @@
 {
-  "lastUpdated": "2026-03-08T02:36:00Z",
+  "lastUpdated": "2026-03-08T02:45:41Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
-      "emoji": "⚙️",
+      "emoji": "\u2699\ufe0f",
       "status": "working",
       "task": "Implementing keyboard shortcut discovery toast",
-      "startedAt": "2026-03-08T02:36:00Z"
+      "startedAt": "2026-03-08T02:36:00Z",
+      "id": "carlos",
+      "updated_at": "2026-03-08T02:36:00Z",
+      "progress": 50
     },
     {
       "name": "Dave",
       "role": "DevOps Engineer",
-      "emoji": "🚀",
+      "emoji": "\ud83d\ude80",
       "status": "working",
       "task": "Implementing door animation on worker arrivals/exits",
-      "startedAt": "2026-03-08T02:36:00Z"
+      "startedAt": "2026-03-08T02:36:00Z",
+      "id": "dave",
+      "updated_at": "2026-03-08T02:36:00Z",
+      "progress": 50
     },
     {
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙",
+      "emoji": "\ud83c\udf19",
       "status": "idle",
       "task": "Completed creative review #30",
-      "startedAt": "2026-03-08T02:30:00Z"
+      "startedAt": "2026-03-08T02:30:00Z",
+      "id": "luna",
+      "updated_at": "2026-03-08T02:30:00Z",
+      "progress": 100
+    },
+    {
+      "name": "Sofia",
+      "role": "QA & Product Analyst",
+      "emoji": "\ud83d\udd0d",
+      "status": "working",
+      "task": "QA review #3 \u2014 analyzing live site and source code",
+      "startedAt": "2026-03-08T02:45:41Z",
+      "id": "sofia",
+      "updated_at": "2026-03-08T02:45:41Z",
+      "progress": 10
     }
   ]
 }
