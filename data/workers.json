@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-03-08T03:10:00Z",
+  "lastUpdated": "2026-03-08T03:15:00Z",
   "workers": [
     {
       "name": "Carlos",
@@ -38,12 +38,12 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "Completed QA review #3 \u2014 21 findings, schema bugs fixed",
-      "startedAt": "2026-03-08T02:45:53Z",
+      "status": "working",
+      "task": "QA review #4 \u2014 analyzing live site and codebase",
+      "startedAt": "2026-03-08T03:15:00Z",
       "id": "sofia",
-      "updated_at": "2026-03-08T02:45:53Z",
-      "progress": 100
+      "updated_at": "2026-03-08T03:15:00Z",
+      "progress": 10
     },
     {
       "name": "Maya",
