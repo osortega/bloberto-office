@@ -1,16 +1,16 @@
 {
-  "lastUpdated": "2026-03-08T05:21:53Z",
+  "lastUpdated": "2026-03-08T05:22:04Z",
   "workers": [
     {
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "⚙️",
-      "status": "idle",
-      "task": "Implemented office aisle marker between desk rows (Luna #33)",
-      "startedAt": "2026-03-08T04:26:00Z",
+      "status": "working",
+      "task": "Fix 2 HIGH bugs: ProgressBar ETA bug + React.memo defeat (QA #8)",
+      "startedAt": "2026-03-08T05:22:04Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T04:42:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T05:22:04Z",
+      "progress": 0
     },
     {
       "name": "Dave",
@@ -49,12 +49,12 @@
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "🎨",
-      "status": "idle",
-      "task": "Implemented vibe-change radial shockwave animation (Luna #33)",
-      "startedAt": "2026-03-08T04:36:00Z",
+      "status": "working",
+      "task": "Fix 2 HIGH bugs: ShortcutToast timer leak + Office.css broken brace (QA #8)",
+      "startedAt": "2026-03-08T05:22:04Z",
       "id": "maya",
-      "updated_at": "2026-03-08T04:40:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T05:22:04Z",
+      "progress": 0
     }
   ],
   "roster": [

@@ -196,5 +196,17 @@
     "worker": "Sofia",
     "message": "QA review #8 complete — 11 findings (4 high, 5 medium, 2 low). Overall: 3.5/5. 3 HIGH-PRIORITY bugs STILL UNFIXED from #7. New: CSS brace breakage in Office.css.",
     "timestamp": "2026-03-08T05:21:53Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Maya",
+    "message": "Assigned to fix ShortcutToast timer leak + Office.css broken brace structure (QA #8 high-priority)",
+    "timestamp": "2026-03-08T05:22:04Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Carlos",
+    "message": "Assigned to fix ProgressBar ETA bug + React.memo defeat (QA #8 high-priority)",
+    "timestamp": "2026-03-08T05:22:04Z"
   }
 ]
