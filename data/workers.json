@@ -5,10 +5,11 @@
       "name": "Maya",
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
-      "status": "working",
-      "task": "Worker Progress Ring on Office Avatars (Luna #24 idea #1)",
+      "status": "idle",
+      "task": "",
       "progress": 0,
-      "started": "2026-03-07T23:37:00Z"
+      "started": null,
+      "updated_at": "2026-03-08T00:00:39Z"
     },
     {
       "id": "dave",
@@ -26,21 +27,21 @@
       "name": "Luna",
       "role": "Creative Director",
       "emoji": "\ud83c\udf19",
-      "status": "idle",
-      "task": "",
+      "status": "working",
+      "task": "Creative Review #25",
       "progress": 0,
-      "started": null
+      "started": "2026-03-08T00:00:39Z"
     },
     {
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\ud83d\udd27",
-      "status": "working",
-      "task": "Last Action Timestamp on Ghost Characters (Luna #24 idea #2)",
+      "status": "idle",
+      "task": "",
       "progress": 0,
-      "started": "2026-03-07T23:37:00Z",
-      "updated_at": "2026-03-07T23:12:00Z"
+      "started": null,
+      "updated_at": "2026-03-08T00:00:39Z"
     },
     {
       "id": "sofia",
@@ -81,5 +82,5 @@
       "role": "Creative Director"
     }
   ],
-  "last_updated": "2026-03-07T23:37:00Z"
+  "last_updated": "2026-03-08T00:00:39Z"
 }
