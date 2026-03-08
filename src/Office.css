@@ -1110,3 +1110,172 @@
 @media (prefers-reduced-motion: reduce) {
   .desk--active { animation: none; }
 }
+
+/* ── Ghost Desk — workers idle >15 min ── */
+@keyframes ghost-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-4px); }
+}
+
+.desk--ghost .desk-character {
+  opacity: 0.25;
+  animation: ghost-float 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk--ghost .desk-character { animation: none; }
+}
+
+/* ── Fern the Office Ficus — vibeStreak growth stages ── */
+.office-plant--ficus {
+  --pot-h: 12px;
+  --stem-h: 0px;
+  width: 36px;
+  height: 60px;
+  pointer-events: auto;
+  cursor: default;
+  animation-duration: 7s;
+}
+
+.office-plant--ficus .ficus-pot {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: var(--pot-h);
+  background: #c2410c;
+  border-radius: 1px 1px 4px 4px;
+}
+
+.office-plant--ficus .ficus-pot::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  height: 4px;
+  background: #9a3412;
+  border-radius: 2px;
+}
+
+.office-plant--ficus .ficus-stem {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  bottom: var(--pot-h);
+  height: var(--stem-h);
+  background: #15803d;
+  border-radius: 2px 2px 0 0;
+}
+
+.office-plant--ficus .ficus-foliage {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 45% 40% 50% 45%;
+  background: #22c55e;
+  bottom: calc(var(--pot-h) + var(--stem-h) - 4px);
+}
+
+/* Stage 0 — seedling */
+.office-plant--seedling { --stem-h: 4px; }
+.office-plant--seedling .ficus-foliage { width: 8px; height: 7px; }
+
+/* Stage 1 — sprout */
+.office-plant--sprout { --stem-h: 9px; }
+.office-plant--sprout .ficus-foliage { width: 13px; height: 11px; }
+.office-plant--sprout .ficus-foliage::before {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 8px;
+  border-radius: 50% 40% 50% 40%;
+  background: #16a34a;
+  top: 2px;
+  left: -7px;
+  transform: rotate(-30deg);
+}
+
+/* Stage 2 — small-plant */
+.office-plant--small-plant { --stem-h: 16px; }
+.office-plant--small-plant .ficus-foliage { width: 18px; height: 14px; }
+.office-plant--small-plant .ficus-foliage::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 10px;
+  border-radius: 50% 40% 50% 40%;
+  background: #16a34a;
+  top: 2px;
+  left: -9px;
+  transform: rotate(-25deg);
+}
+.office-plant--small-plant .ficus-foliage::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 10px;
+  border-radius: 40% 50% 40% 50%;
+  background: #16a34a;
+  top: 2px;
+  right: -9px;
+  transform: rotate(25deg);
+}
+
+/* Stage 3 — leafy */
+.office-plant--leafy { --stem-h: 22px; }
+.office-plant--leafy .ficus-foliage { width: 24px; height: 18px; background: #16a34a; }
+.office-plant--leafy .ficus-foliage::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 14px;
+  border-radius: 50% 40% 50% 40%;
+  background: #22c55e;
+  top: 1px;
+  left: -13px;
+  transform: rotate(-20deg);
+}
+.office-plant--leafy .ficus-foliage::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 14px;
+  border-radius: 40% 50% 40% 50%;
+  background: #22c55e;
+  top: 1px;
+  right: -13px;
+  transform: rotate(20deg);
+}
+
+/* Stage 4 — blooming */
+.office-plant--blooming { --stem-h: 26px; }
+.office-plant--blooming .ficus-foliage {
+  width: 28px;
+  height: 22px;
+  background: #15803d;
+  box-shadow: -15px 4px 0 4px #166534, 15px 4px 0 4px #166534, 0 -10px 0 5px #16a34a;
+}
+.office-plant--blooming .ficus-foliage::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fbbf24;
+  top: -18px;
+  left: 5px;
+  box-shadow: 10px 6px 0 #fb923c, -8px 8px 0 #fbbf24;
+}
+.office-plant--blooming .ficus-foliage::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f9a8d4;
+  top: -16px;
+  right: 5px;
+}

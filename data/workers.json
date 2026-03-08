@@ -21,17 +21,6 @@
       "progress": 10,
       "started": "2026-03-08T01:06:00Z",
       "updated_at": "2026-03-08T01:06:00Z"
-    },
-    {
-      "id": "maya-sofia-fixes",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83e\udde9",
-      "status": "working",
-      "task": "Fix 5 high-priority bugs + 1 perf issue from Sofia QA review",
-      "progress": 5,
-      "started": "2026-03-08T01:46:00Z",
-      "updated_at": "2026-03-08T01:46:00Z"
     }
   ],
   "roster": [

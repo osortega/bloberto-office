@@ -377,6 +377,8 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       onFocus={handleMouseEnter}
       onBlur={handleMouseLeave}
       onClick={handleClick}
+      onKeyDown={handleClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick() } } : undefined}
+      role={handleClick ? 'button' : undefined}
       tabIndex={0}
     >
       {variant === 'manager' && isSyncing && (
@@ -498,7 +500,7 @@ function WindowElement() {
   )
 }
 
-export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick }) {
+export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0 }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
 
@@ -506,6 +508,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     () => [...workers, ...effectiveRoster].find(w => w.id === 'bloberto') ?? DEFAULT_BLOBERTO,
     [workers, effectiveRoster],
   )
+
+  const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming']
+  const plantStage = plantStageNames[Math.min(Math.floor(vibeStreak / 5), 4)]
 
   const nonMgr        = workers.filter(w => w.id !== 'bloberto')
   const workingWorkers = nonMgr.filter(w => w.status === 'working')
@@ -559,10 +564,19 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           const occ = deskOccupants[desk.id]
           const hasError = occ && !occ.ghost && occ.worker.status === 'error'
           const isWorking = occ && !occ.ghost && occ.worker.status === 'working'
+          const isGhostDesk = isWorking && occ.worker.updated_at &&
+            (Date.now() - new Date(occ.worker.updated_at).getTime()) > 900000
+          const ghostDeskTitle = isGhostDesk ? (() => {
+            const diff = Date.now() - new Date(occ.worker.updated_at).getTime()
+            const mins = Math.floor(diff / 60000)
+            const hours = Math.floor(diff / 3600000)
+            return `Last seen: ${mins < 60 ? `${mins}m ago` : `${hours}h ago`}`
+          })() : undefined
           return (
             <div
               key={desk.id}
-              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}`}
+              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}${isGhostDesk ? ' desk--ghost' : ''}`}
+              title={ghostDeskTitle}
               style={{
                 left: `${desk.left}%`,
                 top: `${desk.top}%`,
@@ -581,7 +595,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                   <div className="desk__nameplate desk__nameplate--vacant">📋 Vacant</div>
                 </>
               ) : (
-                <>
+                <div className="desk-character">
                   <div className="desk__monitor" />
                   {!occ.ghost && (
                     <div
@@ -590,7 +604,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                       {occ.worker.name.split(' ')[0]}
                     </div>
                   )}
-                </>
+                </div>
               )}
             </div>
           )
@@ -658,6 +672,18 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
         {/* Office window — time-aware sky view */}
         <WindowElement />
+
+        {/* Fern the office ficus — grows with vibeStreak */}
+        <div
+          className={`office-plant office-plant--ficus office-plant--${plantStage}`}
+          style={{ left: '87%', top: '72%' }}
+          title="Fern the office ficus"
+          aria-hidden="true"
+        >
+          <div className="ficus-pot" />
+          <div className="ficus-stem" />
+          <div className="ficus-foliage" />
+        </div>
 
         {/* Decorative plants */}
         <div className="office-plant" style={{ left: '85%', top: '55%' }}>

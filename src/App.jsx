@@ -171,9 +171,14 @@ function StatusBadge({ status }) {
 
 function ProgressBar({ progress, updatedAt }) {
   const milestonesRef = useRef(new Set())
+  const prevProgressRef = useRef(progress)
   const [flashClass, setFlashClass] = useState('')
 
   useEffect(() => {
+    if (progress < prevProgressRef.current) {
+      milestonesRef.current = new Set()
+    }
+    prevProgressRef.current = progress
     const MILESTONES = [25, 50, 75, 100]
     for (const m of MILESTONES) {
       if (progress >= m && !milestonesRef.current.has(m)) {
@@ -281,7 +286,10 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
                         className={`task-tag ${className}${isActive ? ' task-tag--active' : ''}`}
                         style={{ cursor: onTagClick ? 'pointer' : undefined }}
                         onClick={onTagClick ? (e) => { e.stopPropagation(); onTagClick(label) } : undefined}
+                        onKeyDown={onTagClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onTagClick(label) } } : undefined}
                         title={isActive ? `Clear filter: ${label}` : `Filter by: ${label}`}
+                        tabIndex={onTagClick ? 0 : undefined}
+                        role={onTagClick ? 'button' : undefined}
                       >
                         {emoji} {label}{isActive ? ' ×' : ''}
                       </span>
@@ -342,7 +350,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
   const errorCount = workers.filter((w) => w.status === 'error').length
 
   const stuckWorkers = useMemo(
-    () => workers.filter((w) => w.status === 'working' && (Date.now() - new Date(w.started).getTime()) > 7_200_000),
+    () => workers.filter((w) => w.status === 'working' && (Date.now() - new Date(w.updated_at).getTime()) > 7_200_000),
     [workers]
   )
 
@@ -601,8 +609,8 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable || e.isComposing) return
-      if (e.key === '1') { setTab('office'); window.location.hash = '#office' }
-      else if (e.key === '2') { setTab('dashboard'); window.location.hash = '#dashboard' }
+      if (e.key === '1') { setTab('office'); window.location.hash = 'office' }
+      else if (e.key === '2') { setTab('dashboard'); window.location.hash = 'dashboard' }
       else if (e.key === 'Escape') document.activeElement?.blur()
       else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && !isSyncing) syncFromGitHub()
     }
@@ -634,8 +642,11 @@ export default function App() {
     }
   }, [syncFromGitHub])
 
-  const activeWorkers = allWorkers.filter(
-    (w) => w.status === 'working' || w.status === 'idle' || w.status === 'error'
+  const activeWorkers = useMemo(
+    () => allWorkers.filter(
+      (w) => w.status === 'working' || w.status === 'idle' || w.status === 'error'
+    ),
+    [allWorkers]
   )
 
   const teamVibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers])

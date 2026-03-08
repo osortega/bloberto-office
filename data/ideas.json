@@ -2,63 +2,71 @@
   "creative_director": "Luna",
   "review_number": 27,
   "timestamp": "2026-03-08T01:00:00Z",
-  "theme": "The Office Has Memory — Moments That Leave a Mark",
+  "theme": "Turn every empty corner into a conversation — the dead floor, the dark monitor, the flat log all have stories to tell",
   "ideas": [
     {
       "priority": "must",
+      "category": "feature",
+      "title": "Activity Log: Filter by Worker",
+      "description": "The activity log already filters by event type (Hire / Completions / Errors) but has NO per-worker filter. Add a second row of chips to the filter bar — one chip per roster member (their emoji + first name). Clicking a chip sets a worker-name filter variable; entries get double-filtered (type AND worker). Clicking the active chip clears it. The roster array is already available in App.jsx; this is ~15 lines of logic and ~3 lines of JSX. WHY: The single most common question when watching this dashboard is 'what did [person] do today?' Right now the answer requires manually scrolling every entry. This makes it a single click.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "must",
       "category": "office-life",
-      "title": "Standup Circle — Meeting Mode",
-      "description": "Add a 'Standup' trigger (manual button or time-based, e.g. 9:55 AM) that temporarily pulls all worker avatars off their desks and arranges them in a small circle in the center of the office floor. Each avatar faces inward. A 'talking stick' (tiny microphone emoji) rotates clockwise around the circle every 8 seconds. After 90 seconds (or manual dismiss), everyone returns to their desks with a slide animation. Build as a separate office layout mode passed as a prop: officeMode: 'standup' | 'work'. WHY: Standups are the ritual heartbeat of any dev team. Visualizing them makes the dashboard feel like it tracks team rhythms, not just task throughput. It also creates an obvious, shareable moment — a screenshot of your team in standup circle is immediately recognizable and fun.",
+      "title": "Conference Table in the Lower Floor",
+      "description": "The bottom 30-35% of the office floor is completely empty dead space — only the door sits there. Add a round conference table centered at ~left:40%, top:70%, implemented as a CSS circle (~13% diameter) with 6 SVG chair arcs arranged around it. The table reacts to vibe: 'crushing' — all 6 chairs show colored role-color dots; 'in-flow' — 3-4 chairs occupied; 'slow-day' — one lone chair pulled out, a coffee cup on the surface; 'on-fire' — a red emergency indicator appears, chairs scattered; 'after-hours' — lamp off, one chair spun sideways. WHY: A round conference table is the single biggest visual upgrade available. The lower third has zero story right now. Making it vibe-reactive gives it three dimensions of narrative without adding any data complexity.",
       "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "visual",
-      "title": "Growing Office Plant Tracks Vibe Streak",
-      "description": "Place a small potted plant (pure CSS, using border-radius and gradients — no images) in the bottom corner of the office floor. The plant has 5 growth stages rendered as CSS classes: seedling → sprout → small plant → leafy → blooming. It advances one stage for every 5-unit increase in vibe streak (using the existing vibeStreak state). If the streak resets to 0, the plant wilts (drooping leaves CSS transform) and slowly recovers over 60 seconds rather than snapping back. On hover: 'Fern the office ficus. Growing with your momentum.' WHY: Streaks are abstract numbers. A plant externalizes the streak as something organic and alive — you feel the loss of a reset more when you see the plant droop. It also rewards consistent performance with a visible flourishing office environment.",
+      "title": "Worker SVG Avatar in Dashboard Cards",
+      "description": "Dashboard worker cards render a role emoji as the avatar while the Office tab renders the custom CharacterAvatar SVG for the same workers. They look like different products. Fix: move CharacterAvatar into a shared file (src/components/CharacterAvatar.jsx), import in App.jsx, and replace the .worker-avatar div — which currently calls getRoleEmoji() — with CharacterAvatar sized at 40px. All required props are already on the worker object. WHY: Visual identity consistency across tabs = the product feels cohesive. Right now it feels like two UIs bolted together. Luna's crescent moon, Carlos's hat, Maya's gradient hair — these identities should be everywhere, not just in the Office.",
       "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "should",
-      "category": "delight",
-      "title": "High-Five Spark Between Back-to-Back Completions",
-      "description": "When two different workers both complete a task within 30 seconds of each other, render a brief SVG lightning arc (a curved, animated stroke) between their two desk positions on the office floor. The arc appears over 300ms, glows for 500ms, then fades. The color is a blend of both workers' role colors. Track last-completion timestamp per worker in a ref; on each new completion, check if any other worker completed within the 30s window. WHY: Simultaneous shipping is a team moment, not two individual moments. A visual connection between workers who are 'in sync' creates the feeling of a collaborative flow state that text logs completely miss. It's also a subtle, beautiful reward for coordinated work.",
-      "effort": "medium",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Error Weather: Rain on the Office Window",
-      "description": "The existing day/night window background is static. Wire it to recent error rate: when errors per minute exceed a threshold (e.g. 2+ errors in 5 minutes), CSS-animated rain drops appear on the window (vertical lines falling at varying speeds and opacities, pure CSS). Heavy error rate = heavy rain. Zero errors for 5 minutes = rain fades and sun or stars reappear. Implement as a separate WeatherLayer component that reads a derived errorIntensity prop (0–1 scale). WHY: Error spikes are anxiety-inducing. Externalizing that anxiety as weather is psychologically smart — it acknowledges the storm without alarming anyone, and it provides an ambient signal that something needs attention without a red alert. When the rain clears, the relief is palpable.",
+      "title": "Bloberto's Monitor Displays Live Team Stats",
+      "description": "The manager desk monitor is just a dark rectangle with a glow — completely inert despite being front-and-center. Add SVG content inside .mgr-desk__monitor showing real data in a pixel-art aesthetic: a 3-bar mini chart (working / idle / error counts, each bar ~8px wide), a blinking 2-letter vibe abbreviation ('CR' crushing, 'FL' flow, 'SD' slow, 'FR' on-fire, 'AH' after-hours), and a tiny pulse line that twitches when error count > 0. All rendered as child SVG elements, sized to fit within the existing element. Updates passively on each data sync. WHY: Bloberto's desk is the visual anchor of the entire office and his monitor literally faces you at all times. Making it a live command display makes him feel like he's actually managing — not just sitting there glowing.",
       "effort": "medium",
-      "assigned_to": "sofia"
-    },
-    {
-      "priority": "could",
-      "category": "storytelling",
-      "title": "Ghost Desk for Long-Idle Workers",
-      "description": "When a worker slot has had no activity (no task start, no completion, no error) for more than 15 minutes, replace their character sprite with a semi-transparent ghostly silhouette at 25% opacity with a slow float animation (translateY ±4px, 4s ease-in-out). A small tooltip on hover: 'Last seen X minutes ago.' When they become active again, the ghost dissolves in a ripple effect and the full-color character reappears. WHY: Right now a long-idle worker looks exactly like a worker mid-task. Ghost desks communicate absence without a disruptive alert — it's a compassionate, ambient signal that lets the team notice without calling anyone out.",
-      "effort": "small",
       "assigned_to": "dave"
     },
     {
-      "priority": "could",
+      "priority": "should",
       "category": "feature",
-      "title": "Session XP Badges on Worker Cards",
-      "description": "Track a per-session completion count per worker in a sessionStorage map (reset on page reload). Display a small badge pill on each worker card: '✦ 3', '✦ 10', etc. At milestone counts (5, 10, 25, 50), the badge briefly animates (scale bounce + color flash in the worker's role color) and the milestone number is bold. Badge is hidden at 0. Persist only for the current browser session — this is a 'today's score', not a permanent leaderboard. WHY: Task completions are the atomic unit of team output but they vanish into the log. A live session badge makes each worker's contribution visible at a glance, creates friendly competition, and gives a satisfying sense of accumulation during long sessions.",
+      "title": "Stand-Up Mode: Collapsible One-Liner per Worker",
+      "description": "Add a 'Stand-Up' toggle button in the Dashboard's 'Active Workers' section header. When on, worker cards collapse to a single-line strip: [emoji] [Name] · [task text 35 chars] · [duration] · [progress%]. All cards become a scannable ~200px block instead of a scrolling grid. Include a copy-to-clipboard button that exports all lines as plain text (e.g. 'Maya: Fix login redirect - 45m - 70%'). Toggle state stored in sessionStorage. WHY: This dashboard is currently a monitor; Stand-Up Mode makes it a tool. A PM can open this, hit the button, and read out the whole team status in 10 seconds. It turns a passive viewer into an active participant in the team's workflow.",
       "effort": "small",
       "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Live Activity Ticker at Office Floor Bottom",
+      "description": "Add a ticker-tape strip (height: 18px) fixed to the bottom edge of the office-floor div, above the door. It continuously scrolls the last 4 activity log entries leftward via CSS keyframes on a wide inner span. Format: '[icon] [name] [message] · [relTime]' repeating. When a new entry arrives, the string regenerates and the animation resets by toggling a key. No interactivity needed — pure CSS animation, pure JSX string assembly. WHY: The office floor's bottom third is dead space. A scrolling ticker transforms the floor edge into a data stream that creates newsroom energy and makes the space feel alive even when everyone is idle.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Per-Worker Ship Streak Badge",
+      "description": "The team vibe streak rewards the collective but individual workers have no personal recognition. In WorkerCard, count activityEntries filtered to entries where worker matches, type is 'complete', and timestamp is 'Just now' / 'Earlier today' — activityEntries and getTimeGroup are already available. If count >= 2, render a small badge beside the worker name: fire x2. At 3+: fire fire x3. WHY: Global vibes celebrate the team; individual streaks celebrate the person. This creates a lightweight achievement layer that rewards grinders and gives visitors a 'who's hot today' at a glance — zero backend required.",
+      "effort": "small",
+      "assigned_to": "sofia"
     },
     {
       "priority": "wild",
-      "category": "office-life",
-      "title": "Code Red — Multi-Error Panic Mode",
-      "description": "When 3 or more workers hit errors within a 60-second window, trigger a 10-second 'Code Red' state: the office floor background pulses with a very subtle red tint (max opacity 0.08, 3 slow pulses), all character avatars display a tiny 🚨 badge, and a banner appears at the top: 'The team is in the weeds. Ship something.' The state auto-dismisses after 10 seconds or when any worker completes a task, whichever comes first. Dismissal triggers a brief green flash. Respect the existing reducedMotion flag — in reduced motion mode, just show the banner with no pulses. WHY: Coordinated failure is qualitatively different from individual failure. When the whole team is erroring at once, something systemic is wrong — a bad deploy, a flaky dependency, a blocked queue. Code Red names that moment explicitly and creates urgency without a Slack ping. The 'ship something' prompt is a gentle, gamified nudge toward resolution.",
-      "effort": "medium",
-      "assigned_to": "sofia"
+      "category": "delight",
+      "title": "Double-Click Bloberto: Auto-Generated Strategy Deck",
+      "description": "Add onDoubleClick (plus mobile long-press 500ms) to the Bloberto Character. It opens a full-screen modal: 'Q-[current quarter] Velocity Review — auto-generated by Bloberto AI'. Three slides navigable with arrow keys, Escape to close. Slide 1 'Team Velocity Overview': real live numbers (working count, total, vibe label) overlaid on a satirical SVG bar chart with fake axes labeled Synergy, Alignment, Vibes TBD. Slide 2 'Star Player Spotlight': pulls the highest-progress active worker, renders their CharacterAvatar at 80px with a randomly-selected fake title ('Chief Velocity Officer', 'Senior Mover of Needles', 'Principal Loop Closer'). Slide 3 'Strategic Insights': one quote from an extended satire bank plus a randomly-generated action item. WHY: Bloberto has the richest personality in the product but no deep interaction path. A fake strategy deck is both hilarious and gives him a hidden layer that curious users discover and share. It's the feature that turns a passive dashboard into a product people send links to.",
+      "effort": "large",
+      "assigned_to": "tbd"
     }
   ],
   "hire_proposals": []

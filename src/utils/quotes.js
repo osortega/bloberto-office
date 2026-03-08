@@ -33,3 +33,16 @@ export const VIBE_QUOTES = {
     'Just me and the servers. As it should be.',
   ],
 }
+
+export const VIBE_TRANSITION_QUOTES = {
+  'slow-day:crushing': "Wait. Is this... momentum? Don't jinx it. 👀",
+  'crushing:on-fire': 'Uh. Something just caught fire. Not metaphorically. 🚨',
+  'in-flow:slow-day': 'Ok who turned off the vibes. I\'ll wait. 😐',
+  'on-fire:crushing': 'Crisis resolved. I barely sweated. 💅',
+  'slow-day:in-flow': 'There it is. The rhythm. Don\'t lose it.',
+  'crushing:slow-day': 'We peaked. It was beautiful while it lasted. 🫠',
+  'in-flow:crushing': 'OH. We\'re not just flowing. We\'re CRUSHING. 🤯',
+  'after-hours:in-flow': 'Night crew came to work. Respect. 🫡',
+  'in-flow:on-fire': 'Flow interrupted. Something broke. Classic. 💀',
+  'on-fire:in-flow': "Fire's out. Back to business. 😮‍💨",
+}
