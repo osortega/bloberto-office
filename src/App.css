@@ -574,8 +574,32 @@
 }
 
 .footer span { color: var(--accent2); }
-.footer-tagline { animation: footer-tag-in 0.5s ease both; }
+.footer-tagline { animation: footer-shimmer 0.25s ease both; }
+@keyframes footer-shimmer {
+  from { opacity: 0; filter: blur(4px); }
+  to   { opacity: 1; filter: blur(0); }
+}
 @keyframes footer-tag-in { from { opacity: 0; } to { opacity: 1; } }
+
+.footer-sparkle {
+  display: inline-block;
+  margin-right: 0.2em;
+  cursor: pointer;
+  animation: twinkle 1s ease both;
+}
+@keyframes twinkle {
+  0%,  40%, 80%, 100% { opacity: 1;   transform: scale(1); }
+  20%, 60%            { opacity: 0.2; transform: scale(0.85); }
+}
+
+.header-badge .honorific-in {
+  display: inline-block;
+  animation: honorific-in 0.4s ease-out both;
+}
+@keyframes honorific-in {
+  from { opacity: 0; filter: blur(6px); letter-spacing: 0.3em; }
+  to   { opacity: 1; filter: blur(0);   letter-spacing: normal; }
+}
 
 /* ---- Responsive ---- */
 @media (max-width: 900px) {

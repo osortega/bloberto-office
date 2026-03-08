@@ -1000,7 +1000,7 @@ export default function App() {
         </div>
         <div className="header-right">
           <div className="header-badge">
-            {greeting}, <span>{HONORIFICS[teamVibe.key] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
+            {greeting}, <span key={teamVibe.key} className="honorific-in">{HONORIFICS[teamVibe.key] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
             {new Date().toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'short',
@@ -1216,12 +1216,12 @@ export default function App() {
       <footer className="footer">
         Built with 💜 and mild existential dread by <span>🫠 Bloberto</span>
         &nbsp;&middot;&nbsp; <span
-          key={teamVibe.key}
+          key={`${teamVibe.key}-${quoteBonus}`}
           className="footer-tagline"
           style={{ cursor: 'pointer' }}
           title="tap for another thought"
           onClick={() => { setShowBonus(prev => !prev); setQuoteBonus(prev => prev + 1) }}
-        >&ldquo;{showBonus ? BONUS_TAGLINES[quoteBonus % BONUS_TAGLINES.length] : (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.')}&rdquo;</span><span style={{ opacity: 0.3, fontSize: '0.7em' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
+        ><span className="footer-sparkle">✦</span>&ldquo;{showBonus ? BONUS_TAGLINES[quoteBonus % BONUS_TAGLINES.length] : (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.')}&rdquo;</span><span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
         <span>v1.0.0-chaos</span>
       </footer>
     </div>

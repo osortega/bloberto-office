@@ -1,63 +1,71 @@
 {
   "creative_director": "Luna",
-  "review_number": 52,
-  "timestamp": "2026-03-08T20:01:03Z",
-  "theme": "Your office has amnesia — every missed micro-detail is a missed micro-laugh",
-  "visual_observations": "Desktop (1280x800): Crushing It / LEGEND tier. Luna at top-left desk with witch-hat character. Bloberto center-top with purple glowing border, CVO label. Carlos and Maya at desks in working state. Dave bottom-left, Sofia center-bottom with red ! error badge. VACANT desk bottom-right — still bare VACANT text. Conference table bottom-left empty; ambient text reads everyone is at their desk. Right wall: COFFEE TRIPLE SHOT cup, cactus, tall amber-orange rectangle (the whiteboard — unidentifiable from distance, no visible label), small green plant, gold sun weather icon. Entrance door at bottom center labeled Entrance. Shortcut toast bottom-right visible. Mobile (375x812): Keyboard shortcut bar renders BELOW the office-floor card boundary — outside the container, floating in document body. Office elements survive breakpoint but shortcut text is exposed and irrelevant on touchscreen.",
+  "review_number": 53,
+  "timestamp": "2026-03-08T20:31:27Z",
+  "theme": "The best interactions in this office are invisible — let's fix that",
+  "visual_observations": "Desktop (1280x800): Office floor renders cleanly with grid background and purple border. Bloberto center-top with purple glow desk, CVO label. Luna top-left with her crescent moon avatar and colorful block desk screen. Carlos and Maya working at middle desks with their screen SVGs visible. Dave and Sofia at bottom desks — Sofia shows red ! error badge. VACANT desk bottom-right: completely dead, just the text 'VACANT' against empty grid. Conference table bottom-left renders as a circle with 6 orbit chair-dots, currently empty, ambient label reads 'everyone is at their desk'. Right wall: COFFEE TRIPLE SHOT cup, green cactus, the amber/orange window rectangle (sky gradient), small green plant, ☀️ weather icon. Bottom: Entrance door labeled ENTRANCE. Shortcut toast renders inside the office floor boundary on desktop (correct). Header greeting: 'Good evening, LEGEND 🔥 · Sunday, Mar 8' with 🔥 Crushing It vibe badge. Footer shows vibe-specific tagline with a faint '1/9' counter nobody sees. Mobile (375x812): Same office renders but keyboard shortcut bar floats BELOW the office card in document body — confirmed still broken from review #52. Conference table chairs readable at this scale. VACANT desk even more prominent as dead corner on mobile.",
   "ideas": [
     {
       "priority": "must",
-      "category": "visual",
-      "title": "Kill the Keyboard Shortcut Toast on Mobile",
-      "description": "On mobile (375x812), the shortcut toast renders OUTSIDE the office floor boundary — floating below the card in document body. On a touchscreen there is no keyboard, making this broken AND meaningless. Fix: add @media (pointer: coarse) { .shortcut-toast { display: none !important; } } to App.css. Also audit the absolute positioning to be contained within the app root on desktop. WHY: A floating keyboard shortcut hint on a device with no keyboard is textbook broken UI. It is the first debris a mobile user sees below the office floor — and it should simply not exist.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "The Whiteboard Needs a Label So It Looks Like One",
-      "description": "The whiteboard renders as a tall amber-orange gradient rectangle on the right wall. From desktop viewing distance it looks like a decorative color swatch — there is NO visual affordance that it IS a whiteboard. The VIBE_WHITEBOARD content is only readable on close inspection. Fix: add a masking-tape strip label across the top edge of .office-whiteboard via a CSS ::before pseudo-element: a 3px-high strip in a slightly different hue with the text WHITEBOARD in font-size: 0.45rem; letter-spacing: 0.15em; opacity: 0.5. No JS changes. WHY: An element that looks like a color swatch teaches nobody. One CSS pseudo-element makes it legible as the information-dense vibe panel it actually is.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "should",
-      "category": "storytelling",
-      "title": "Conference Table Remembers Its Last Huddle",
-      "description": "When a meeting ends (meetingWorkers drops from 2+ to 0), the Huddle badge disappears and the table returns to ambient text — as if the meeting never happened. Add a lastHuddleRef in Office. When meetingWorkers.length >= 2, store { names, endedAt: null }. When it drops to 0, set endedAt: Date.now(). Pass lastHuddle to ConferenceTable and render a muted caption: Last: Dave, Sofia · 4m ago — hidden when null or older than 30 minutes. WHY: The office has no memory. A conference table that shows who last sat there turns a decorative circle into a temporal record without any new API calls.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "could",
       "category": "delight",
-      "title": "The Entrance Door Announces by Name",
-      "description": "The door shows 🚪✨ on doorEvent===arrive — a visual event with zero information about WHO arrived. App.jsx already fires doorEvent on roster diffs. Extend it: when a worker joins activeWorkers, set doorEvent to { type: arrive, name: worker.name }. In the door JSX, replace static icon with a two-line arrival notice: icon line 1, {name} is here line 2 — in a tiny badge that slides up from the door for 2.5s then fades. Similarly for departures: {name} left. Use data-arrival-name attribute and drive content via existing CSS classes. WHY: 🚪✨ is visual noise. ✨ Carlos is back is a micro-story.",
+      "title": "The Footer Tagline Easter Egg Is Invisible",
+      "description": "The footer tagline is already clickable and cycles through 9 bonus quotes — one of the best hidden features in the app. But the only affordance is a browser title tooltip that says 'tap for another thought' and a `1/9` counter at 0.3 opacity that blends into nothing. On mobile there is zero affordance; title tooltips don't fire on touch. Fix: (1) Bump the counter opacity to 0.55 and give it a `font-variant-numeric: tabular-nums` style so it reads clearly as `1/9`. (2) Add a tiny ✦ sparkle icon immediately before the opening quote mark — styled as `cursor: pointer` with a `@keyframes twinkle` that pulses twice on first load (localStorage flag). (3) On tap/click, add a brief CSS text shimmer (`@keyframes quote-swap`: opacity 0→1 + blur 4px→0, 0.25s ease). WHY: This mechanic is already built and delightful. People just don't know it exists. One sparkle and a readable counter turns a secret into a discoverable moment.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "must",
+      "category": "storytelling",
+      "title": "VACANT Desk Posts a Vibe-Based Job Ad",
+      "description": "The VACANT desk is the only dead corner in the entire office floor — no character, no screen SVG, no interaction, just the word VACANT against empty grid. Add a hover state that pops up a micro job-posting card. No backend needed; build a static VACANT_ADS map keyed by vibeKey: `crushing: { title: 'Staff Wizard', req: 'Must maintain velocity without asking what velocity means' }`, `on-fire: { title: 'URGENT: Firefighter', req: 'Start Monday. Like, this Monday.' }`, `slow-day: { title: 'Chaos Wrangler', req: 'Previous experience with vibe collapse preferred' }`, `in-flow: { title: 'Flow Keeper', req: 'Do not disrupt the rhythm. That is the job.' }`, `after-hours: { title: 'Night Watch', req: 'The servers need company.' }`. Render the ad as a `.vacant-job-card` positioned above the desk on hover — styled like a sticky-note with role title, one funny requirement, and a winking 👀 CTA. WHY: Every other desk tells a story. The VACANT desk tells nothing. A vibe-reactive job ad turns the emptiest spot on the floor into the funniest.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
+      "priority": "should",
+      "category": "visual",
+      "title": "Desk Screens React to Task Type, Not Just Errors",
+      "description": "Each worker has a custom desk screen SVG that is beautiful and totally static. The `_error` screen variants already exist and auto-apply on `status === error`. But when Carlos is deploying (task matches Ship tag), his screen still shows calm blue bars. When Maya is fixing a bug, her wireframe screen is serene. The `getTaskTags()` function already parses the task string — that data just isn't wired to the desk screen SVG selector. Fix: In Office.jsx, derive a `screenVariant` from the worker's task tags: `error` (existing) → error SVG; `ship/deploy` → add a `_deploy` variant (green/pulse, terminal-like); `bug` (non-error status) → a `_debug` variant (amber, flickery). Pass `screenVariant` to the desk SVG selector alongside `worker.id`. Only 2-3 new SVG variants needed; the wiring logic is 10 lines. WHY: The desk screens are the most visible evidence of what each person is doing right now. When they never change, they become wallpaper.",
+      "effort": "medium",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "should",
+      "category": "delight",
+      "title": "The Honorific Should Type Itself In",
+      "description": "The header greeting includes a vibe-reactive honorific: 'LEGEND 🔥' (crushing), 'captain 🚨' (on-fire), 'boss' (in-flow), 'chief... you still there? 😐' (slow-day), 'night owl 🌙' (after-hours). These are among the most personality-rich words on the page. When vibe changes and the honorific swaps, it does so instantly — a cold text replacement. Fix: Wrap the honorific in a `<span key={teamVibe.key} className='honorific'>`. Add `@keyframes honorific-in { from { opacity: 0; filter: blur(6px); letter-spacing: 0.3em; } to { opacity: 1; filter: blur(0); letter-spacing: normal; } }` with a 0.4s ease-out. The `key` change triggers React to remount the span, firing the animation on every vibe change. No JS logic changes needed. WHY: The honorific is the most personal text in the app. When it changes, it should feel like Bloberto is re-evaluating you. That moment deserves drama.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
       "priority": "could",
-      "category": "office-life",
-      "title": "Fern Gets a Visible Nameplate",
-      "description": "The office ficus has title=Fern the office ficus — a beautiful detail that 95% of users never discover because browser title tooltips are invisible unless hovered, and the plant is small. Add a .ficus-nameplate div below .ficus-pot: a tiny plant-tag SVG with Fern as text. Style as a 2x0.7rem cream-colored label on a thin green stick at font-size 0.38rem opacity 0.7. When plantStage === blooming, append a flower emoji. No JS changes needed — the class already exists. WHY: Fern has a name, a growth arc, and personality tied to team morale. Hiding her name in a title attribute is a storytelling failure. A visible label turns a background prop into a character.",
+      "category": "delight",
+      "title": "The Wall Clock Has No Opinion About the Time",
+      "description": "The WallClock component renders a real-time SVG analog clock that updates every 60 seconds. It already changes stroke and fill colors by vibe. It literally knows what time it is and what the vibe is — and says nothing. Add a `data-tooltip` attribute (using the existing CSS tooltip system) with a vibe-keyed comment: `crushing: 'Peak hours. Nobody's watching the clock except the clock.'`, `on-fire: 'Time has no meaning during an incident.'`, `slow-day: 'You've checked this three times in the last hour.'`, `in-flow: 'Don't look. It breaks the flow.'`, `after-hours: 'Still here? So am I. I'm a clock. That's fine for me.'`. Also render the digital time string (h:mm AM/PM) inside the tooltip. WHY: A clock that knows the vibe and has a dry comment about the time is a micro-interaction that rewards the curious user who wonders what that tiny SVG is.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
       "priority": "could",
-      "category": "delight",
-      "title": "Vibe Weather Station Forecast Tooltip",
-      "description": "The .vibe-weather div renders a single emoji icon in the office floor corner. No label, no text — just an emoji floating in the grid. Add a VIBE_FORECAST constant: crushing = Clear skies 100% shipped, on-fire = Storm warning avoid eye contact, in-flow = Light focus flow state detected, slow-day = Dense fog questionable velocity, after-hours = Night watch 18C eerily quiet. Render as a data-tooltip on the vibe-weather div using the existing CSS tooltip system. On mobile render as a tiny 2-word sub-label below the emoji. WHY: The weather metaphor already exists. Making it speak a forecast doubles the comedy for zero new infrastructure.",
+      "category": "feature",
+      "title": "Clicking a Character Has No Affordance",
+      "description": "Clicking any non-manager character in the Office floor triggers a 700ms ping animation AND navigates to the Dashboard tab with that worker's card focused and scrolled into view. This is the most useful interaction in the entire office floor. Almost nobody discovers it. The characters show `cursor: pointer` (good) but there is no hover tooltip, no visual hint, and no label suggesting that clicking does anything. Fix: (1) Add `data-tooltip='click to inspect {firstName}'` to each clickable character `<div>`. (2) On hover (desktop), show a tiny `↗ Dashboard` pill that fades in below the character name using `.char__name::after` — appear after 400ms hover delay so it doesn't flash constantly. (3) On mobile, the `pinnedCard` mechanism already shows a hover-card on tap-first — make the 'ℹ️' icon on that pinned card explicitly say 'View in Dashboard'. WHY: Character-click-to-navigate is the bridge between the visual office and the data dashboard. Right now it's a secret. It shouldn't be.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Conference Table Label Changes Silently",
+      "description": "The `.conf-ambient-label` already shows 5 vibe-specific messages: 'everyone is at their desk' (crushing), 'no meetings. fix it.' (on-fire), 'reserve the table' (in-flow), 'open office hours' (slow-day), 'locked up' (after-hours). These are excellent micro-copy. But when vibe changes and the label swaps, it does so with a hard cut — no animation, no emphasis. The joke lands but without a rimshot. Fix: Add `key={vibe}` to the `<div className='conf-ambient-label'>` element. Add a CSS entry animation: `@keyframes label-arrive { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }` applied to `.conf-ambient-label` with `animation: label-arrive 0.4s ease`. The key swap triggers remount on vibe change, firing the animation. No JS logic changes. WHY: 'no meetings. fix it.' is three words of comedy gold. Right now it materializes quietly. It deserves a tiny entrance.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "wild",
-      "category": "storytelling",
-      "title": "Bloberto's Desk Has a Mood Ring Strip",
-      "description": "Bloberto manager desk shows: avatar, name, CVO title, glowing border — but no history. Add a row of 5 mini colored dots (.mgr-mood-ring) below the CVO label — each 5x5px, colored by vibe palette, fed by the last 5 entries of vibeHistory[] passed to the manager desk JSX. Dots ordered oldest-to-newest left-to-right with staggered CSS fade-in via --i index. Hover any dot shows a micro-tooltip: Crushing It 4m ago. WHY: Bloberto is the vibe barometer. His desk showing last 5 mood states turns him from a static manager into a living history chart. A volatile strip tells a very different story than 5 calm purple dots. The team mood — rendered on the boss nameplate.",
+      "category": "office-life",
+      "title": "The Entrance Door Gets Ambient Visitor Events",
+      "description": "Between real worker arrivals and departures, the Entrance door sits static and dark — just a labeled door at the bottom of the floor. Real offices have ambient interruptions: deliveries, wrong-floor visitors, mysterious stakeholders. Add a pure front-end ambient event system: a `useEffect` with a randomized interval (8–15 minutes, seeded differently per browser session) fires a `visitorEvent` state containing a randomly chosen visitor from a static VISITORS array: `[{ emoji: '📦', label: 'Delivery' }, { emoji: '🍕', label: 'Lunch order' }, { emoji: '📋', label: 'The Board' }, { emoji: '🦆', label: 'Wrong floor (sorry)' }, { emoji: '🧑‍💻', label: 'External consultant' }, { emoji: '🌮', label: 'Catering arrived' }]`. When triggered: the door plays the existing arrive animation, a `.visitor-badge` label slides up (same as the proposed door name badge from review #52, but for visitors), and auto-dismisses after 3 seconds. The worker roster is never touched. WHY: The door is the office's threshold. Making it react to imaginary visitors — at quiet random intervals — turns a static floor into a breathing space. You never know when The Board is dropping by.",
       "effort": "medium",
       "assigned_to": "dave"
     }

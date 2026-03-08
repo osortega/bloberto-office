@@ -586,6 +586,66 @@
   letter-spacing: 0.04em;
 }
 
+/* ── Vacant desk job-posting hover card ── */
+.vacant-job-card {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  min-width: 150px;
+  max-width: 180px;
+  padding: 8px 10px 10px;
+  background: #fef08a;
+  color: #1a1a1a;
+  border-radius: 3px;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.5);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  z-index: 60;
+  pointer-events: none;
+  animation: vacant-card-in 0.18s ease-out;
+}
+.vacant-job-card::before {
+  content: '📌';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+}
+.desk--vacant:hover .vacant-job-card {
+  display: block;
+}
+.desk--vacant:hover {
+  animation: none;
+  opacity: 0.9;
+}
+.vacant-job-card strong {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #111;
+}
+.vacant-job-req {
+  margin: 0 0 5px;
+  font-style: italic;
+  color: #333;
+}
+.vacant-job-cta {
+  display: block;
+  font-size: 0.65rem;
+  color: #555;
+  border-top: 1px dashed #bbb;
+  padding-top: 4px;
+  margin-top: 2px;
+}
+@keyframes vacant-card-in {
+  from { opacity: 0; transform: translateX(-50%) rotate(-2deg) translateY(5px); }
+  to   { opacity: 1; transform: translateX(-50%) rotate(-2deg) translateY(0); }
+}
+
 /* ── Manager nameplate vibe fade ── */
 @keyframes vibe-title-fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 .mgr-desk__nameplate--vibe { animation: vibe-title-fade 0.35s ease forwards; }
@@ -2248,4 +2308,9 @@
   white-space: nowrap;
   opacity: 0.45;
   letter-spacing: 0.04em;
+  animation: label-arrive 0.4s ease;
+}
+@keyframes label-arrive {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 0.45; transform: translateX(-50%) translateY(0); }
 }

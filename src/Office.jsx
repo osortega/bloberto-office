@@ -113,6 +113,14 @@ const VIBE_WEATHER_ICONS = {
   'after-hours':'🌙',
 }
 
+const VACANT_ADS = {
+  'crushing':     { title: 'Staff Wizard',          req: 'Must maintain velocity without asking what velocity means' },
+  'on-fire':      { title: 'URGENT: Firefighter',   req: 'Start Monday. Like, this Monday.' },
+  'slow-day':     { title: 'Chaos Wrangler',         req: 'Previous experience with vibe collapse preferred' },
+  'in-flow':      { title: 'Flow Keeper',            req: 'Do not disrupt the rhythm. That is the job.' },
+  'after-hours':  { title: 'Night Watch',            req: 'The servers need company.' },
+}
+
 
 const CharacterAvatar = memo(function CharacterAvatar({ workerId, role, name, size = 40, emoji, vibeKey }) {
   const roleColor = ROLE_COLORS[role] ?? '#6b7280'
@@ -808,7 +816,7 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], lastHuddle }) {
       </svg>
 
       {meetingWorkers.length === 0 && (
-        <div className="conf-ambient-label">
+        <div key={vibe} className="conf-ambient-label">
           {vibe === 'crushing' ? 'everyone is at their desk' :
            vibe === 'on-fire' ? 'no meetings. fix it.' :
            vibe === 'in-flow' ? 'reserve the table' :
@@ -1200,6 +1208,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                 <>
                   <div className="desk__monitor desk__monitor--vacant" />
                   <div className="desk__nameplate desk__nameplate--vacant">📋 Vacant</div>
+                  <div className="vacant-job-card" aria-hidden="true">
+                    <strong>{(VACANT_ADS[vibe] ?? VACANT_ADS['in-flow']).title}</strong>
+                    <p className="vacant-job-req">{(VACANT_ADS[vibe] ?? VACANT_ADS['in-flow']).req}</p>
+                    <span className="vacant-job-cta">👀 Apply (just kidding)</span>
+                  </div>
                 </>
               ) : (
                 <div className="desk-character">
