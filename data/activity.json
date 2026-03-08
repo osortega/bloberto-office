@@ -1,6 +1,18 @@
 {
   "entries": [
     {
+      "type": "deploy",
+      "worker": "Dave",
+      "message": "Nameplate Reveal Animation \u2014 pop animation on vibe change",
+      "timestamp": "2026-03-08T16:09:30Z"
+    },
+    {
+      "type": "deploy",
+      "worker": "Carlos",
+      "message": "Vibe Aura on Office Border \u2014 CSS vibe-reactive borders added",
+      "timestamp": "2026-03-08T16:09:00Z"
+    },
+    {
       "type": "review",
       "worker": "Luna",
       "message": "Creative review #47 complete \u2014 7 ideas proposed",
@@ -294,18 +306,6 @@
       "worker": "Maya",
       "message": "Assigned to fix ShortcutToast timer leak + Office.css broken brace structure (QA #8 high-priority)",
       "timestamp": "2026-03-08T05:22:04Z"
-    },
-    {
-      "type": "hire",
-      "worker": "Carlos",
-      "message": "Assigned to fix ProgressBar ETA bug + React.memo defeat (QA #8 high-priority)",
-      "timestamp": "2026-03-08T05:22:04Z"
-    },
-    {
-      "type": "complete",
-      "worker": "Luna",
-      "message": "Creative review #34 complete \u2014 7 ideas: Wall Clock, Whiteboard Thermometer, Trophy Shelf, Task Color Chips, Conference Standup, Deploy Ticker, Panic Lap",
-      "timestamp": "2026-03-08T05:30:59Z"
     }
   ]
 }

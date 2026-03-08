@@ -59,8 +59,14 @@
   box-shadow:
     0 8px 40px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 1s ease, box-shadow 1s ease;
 }
+
+.office-floor[data-vibe='crushing'] { border-color: #a78bfa; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(167,139,250,0.18), inset 0 0 30px rgba(167,139,250,0.05); }
+.office-floor[data-vibe='on-fire'] { border-color: #ef4444; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(239,68,68,0.22); }
+.office-floor[data-vibe='in-flow'] { border-color: #2dd4bf; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(45,212,191,0.15); }
+.office-floor[data-vibe='slow-day'] { border-color: #475569; box-shadow: 0 8px 40px rgba(0,0,0,0.35); }
+.office-floor[data-vibe='after-hours'] { border-color: #6366f1; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 80px rgba(99,102,241,0.25); }
 
 .office-floor[data-vibe="crushing"] { --grid-line: rgba(139,92,246,0.18); border-color: #a78bfa; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(167,139,250,0.18), inset 0 0 30px rgba(167,139,250,0.05); }
 .office-floor[data-vibe="on-fire"] { --grid-line: rgba(249,115,22,0.15); border-color: #ef4444; box-shadow: 0 8px 40px rgba(0,0,0,0.35), 0 0 60px rgba(239,68,68,0.22); }
@@ -522,6 +528,15 @@
 /* ── Manager nameplate vibe fade ── */
 @keyframes vibe-title-fade { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 .mgr-desk__nameplate--vibe { animation: vibe-title-fade 0.35s ease forwards; }
+
+/* ── Nameplate reveal pop ── */
+.nameplate-pop {
+  animation: nameplate-reveal 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes nameplate-reveal {
+  from { transform: scale(0.7); opacity: 0; filter: brightness(2); }
+  to { transform: scale(1); opacity: 1; filter: brightness(1); }
+}
 
 /* ── Idle desk — dim lamp, no monitor glow ── */
 .desk--idle .desk-lamp ellipse:first-child { opacity: 0.3; }

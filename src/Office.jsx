@@ -879,6 +879,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const [vibeCaption, setVibeCaption] = useState(null)
   const isFirstVibe = useRef(true)
   const pingTimerRef = useRef(null)
+  const prevVibeForNameplate = useRef(vibe)
+  const nameplateRef = useRef(null)
 
   const handleCharClick = (worker) => {
     if (pingTimerRef.current) clearTimeout(pingTimerRef.current)
@@ -895,6 +897,17 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     }
     prevAvgProgress.current = avgProgress
   }, [avgProgress])
+
+  useEffect(() => {
+    if (prevVibeForNameplate.current !== vibe) {
+      prevVibeForNameplate.current = vibe
+      if (nameplateRef.current) {
+        nameplateRef.current.classList.add('nameplate-pop')
+        const t = setTimeout(() => nameplateRef.current?.classList.remove('nameplate-pop'), 600)
+        return () => clearTimeout(t)
+      }
+    }
+  }, [vibe])
 
   useEffect(() => {
     if (isFirstVibe.current) { isFirstVibe.current = false; return; }
@@ -998,7 +1011,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
         <div className="mgr-desk" data-vibe={vibe}>
           <div className="mgr-desk__monitor" data-vibe={vibe} />
-          <div key={vibe} className="mgr-desk__nameplate mgr-desk__nameplate--vibe">
+          <div key={vibe} ref={nameplateRef} className="mgr-desk__nameplate mgr-desk__nameplate--vibe">
             {vibe === 'crushing' ? 'CVO' : vibe === 'on-fire' ? 'INCIDENT CMD' : vibe === 'in-flow' ? 'MANAGER' : vibe === 'slow-day' ? 'DIR. OF VIBES' : vibe === 'after-hours' ? 'NIGHT WATCH' : 'MANAGER'}
           </div>
           {vibe === 'on-fire' && (

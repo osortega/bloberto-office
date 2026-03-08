@@ -1,21 +1,13 @@
 {
   "workers": [
     {
-      "name": "Carlos",
-      "role": "backend",
-      "emoji": "\u2699\ufe0f",
+      "name": "Maya",
+      "role": "frontend",
+      "emoji": "\ud83c\udfa8",
       "status": "working",
-      "task": "Vibe Aura on Office Border - CSS",
-      "started_at": "2026-03-08T16:06:00Z"
-    },
-    {
-      "name": "Dave",
-      "role": "devops",
-      "emoji": "\ud83d\ude80",
-      "status": "working",
-      "task": "Nameplate Reveal Animation",
-      "started_at": "2026-03-08T16:06:00Z"
+      "task": "Ghost Desk Sleep Mode monitors",
+      "started_at": "2026-03-08T16:10:00Z"
     }
   ],
-  "updated_at": "2026-03-08T16:06:00Z"
+  "updated_at": "2026-03-08T16:10:00Z"
 }
