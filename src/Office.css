@@ -387,6 +387,11 @@
   opacity: 0.65;
 }
 
+[data-vibe='after-hours'] .office-door__label {
+  color: rgba(99, 102, 241, 0.45);
+  letter-spacing: 0.14em;
+}
+
 /* ── Door animation ── */
 @keyframes door-swing-arrive {
   0%   { transform: translateX(-50%) perspective(200px) rotateY(0deg); }

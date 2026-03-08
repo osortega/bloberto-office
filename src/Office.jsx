@@ -1153,10 +1153,10 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
 
         {/* Door — bottom center */}
-        <div className={`office-door${doorEvent ? ` office-door--${doorEvent}` : ''}`}>
+        <div className={`office-door${doorEvent ? ` office-door--${doorEvent}` : ''}`} data-vibe={vibe}>
           {doorEvent === 'arrive' && <span className="office-door__notify-dot" aria-hidden="true" />}
-          <span className="office-door__icon">{doorEvent === 'arrive' ? '🚪✨' : '🚪'}</span>
-          <span className="office-door__label">Entrance</span>
+          <span className="office-door__icon">{vibe === 'after-hours' ? '🔒' : doorEvent === 'arrive' ? '🚪✨' : '🚪'}</span>
+          <span className="office-door__label">{vibe === 'after-hours' ? 'Locked' : 'Entrance'}</span>
           <span className="sr-only">Exit and entrance</span>
         </div>
 
