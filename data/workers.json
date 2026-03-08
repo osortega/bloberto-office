@@ -1,21 +1,21 @@
 {
   "workers": [
     {
-      "name": "Maya",
-      "emoji": "🎨",
-      "role": "Frontend Engineer",
+      "name": "Sofia",
+      "emoji": "🔍",
+      "role": "QA Engineer",
       "status": "working",
-      "task": "Implementing footer tagline easter egg visibility + honorific typing animation",
-      "started_at": "2026-03-08T21:30:00Z"
+      "task": "Adding wall clock vibe-reactive tooltip with time display",
+      "started_at": "2026-03-08T21:32:00Z"
     },
     {
       "name": "Carlos",
       "emoji": "⚙️",
       "role": "Backend Engineer",
       "status": "working",
-      "task": "Implementing VACANT desk vibe-reactive job ad cards",
-      "started_at": "2026-03-08T21:30:00Z"
+      "task": "Adding click-to-inspect affordance on office characters",
+      "started_at": "2026-03-08T21:32:00Z"
     }
   ],
-  "updated_at": "2026-03-08T21:30:00Z"
+  "updated_at": "2026-03-08T21:32:00Z"
 }
