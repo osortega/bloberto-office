@@ -720,6 +720,21 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const workingWorkers = nonMgr.filter(w => w.status === 'working')
   const idleWorkers    = nonMgr.filter(w => w.status !== 'working')
 
+  const avgProgress = Math.round(
+    workingWorkers.reduce((s, w) => s + (w.progress || 0), 0) / Math.max(workingWorkers.length, 1)
+  )
+
+  const [showDone, setShowDone] = useState(false)
+  const prevAvgProgress = useRef(avgProgress)
+  useEffect(() => {
+    if (avgProgress === 100 && prevAvgProgress.current !== 100) {
+      setShowDone(true)
+      const t = setTimeout(() => setShowDone(false), 3000)
+      return () => clearTimeout(t)
+    }
+    prevAvgProgress.current = avgProgress
+  }, [avgProgress])
+
   // Roster members not currently active → ghost at empty desk
   const activeIds   = useMemo(() => new Set(workers.map(w => w.id)), [workers])
   const ghostRoster = effectiveRoster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id))
@@ -756,11 +771,25 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
         {/* Whiteboard — left wall, vibe-reactive */}
         <div
-          className={`office-whiteboard${vibe === 'on-fire' ? ' office-whiteboard--urgent' : ''}`}
-          aria-label={`Whiteboard: ${VIBE_WHITEBOARD[vibe] ?? VIBE_WHITEBOARD['in-flow']}`}
+          className={`office-whiteboard${vibe === 'on-fire' ? ' office-whiteboard--urgent' : ''}${showDone ? ' office-whiteboard--done' : ''}`}
+          aria-label={`Whiteboard: ${showDone ? 'DONE!' : (VIBE_WHITEBOARD[vibe] ?? VIBE_WHITEBOARD['in-flow'])}${workingWorkers.length > 0 ? ` ${avgProgress}%` : ''}`}
           role="img"
         >
-          {VIBE_WHITEBOARD[vibe] ?? VIBE_WHITEBOARD['in-flow']}
+          <span className={showDone ? 'wb-vibe-text wb-vibe-text--done' : 'wb-vibe-text'}>
+            {showDone ? '✅ DONE!' : (VIBE_WHITEBOARD[vibe] ?? VIBE_WHITEBOARD['in-flow'])}
+          </span>
+          <div
+            className="wb-progress-track"
+            style={{ opacity: workingWorkers.length > 0 ? 1 : 0 }}
+          >
+            <div
+              className={`wb-progress-fill${avgProgress === 100 ? ' wb-progress-fill--complete' : ''}`}
+              style={{ width: avgProgress + '%' }}
+            />
+          </div>
+          {workingWorkers.length > 0 && (
+            <span className="wb-progress-pct">{avgProgress}%</span>
+          )}
         </div>
         <div className="mgr-desk">
           <div className="mgr-desk__monitor" data-vibe={vibe} />
