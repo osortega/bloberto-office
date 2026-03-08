@@ -124,5 +124,17 @@
     "worker": "Sofia",
     "message": "QA review #6 complete \u2014 11 findings (3 high, 5 medium, 3 low). Overall: 3.6/5. 3 high-priority bugs STILL unfixed from #4/#5.",
     "timestamp": "2026-03-08T04:25:00Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Maya",
+    "message": "Assigned to fix vibeStreak prop + hover card status labels (QA #6 high-priority)",
+    "timestamp": "2026-03-08T04:26:00Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Carlos",
+    "message": "Assigned to fix roster key in workers.json + stuck worker formatDuration bug (QA #6 high-priority)",
+    "timestamp": "2026-03-08T04:26:00Z"
   }
 ]

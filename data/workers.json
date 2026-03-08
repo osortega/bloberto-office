@@ -5,12 +5,12 @@
       "name": "Carlos",
       "role": "Backend Engineer",
       "emoji": "\u2699\ufe0f",
-      "status": "idle",
-      "task": "Shipped Vibe History Sparkline in StatsBar",
-      "startedAt": "2026-03-08T03:06:00Z",
+      "status": "working",
+      "task": "Fix high-priority QA #6: roster key missing in workers.json + stuck worker .started bug",
+      "startedAt": "2026-03-08T04:26:00Z",
       "id": "carlos",
-      "updated_at": "2026-03-08T03:10:00Z",
-      "progress": 100
+      "updated_at": "2026-03-08T04:26:00Z",
+      "progress": 10
     },
     {
       "name": "Dave",
@@ -50,10 +50,10 @@
       "role": "Frontend Engineer",
       "emoji": "\ud83c\udfa8",
       "status": "working",
-      "task": "Implementing desk lamp glow states + keyboard typing viz",
-      "startedAt": "2026-03-08T03:36:00Z",
+      "task": "Fix high-priority QA #6: vibeStreak prop missing on Office + hover card status labels",
+      "startedAt": "2026-03-08T04:26:00Z",
       "id": "maya",
-      "updated_at": "2026-03-08T03:36:00Z",
+      "updated_at": "2026-03-08T04:26:00Z",
       "progress": 10
     }
   ]
