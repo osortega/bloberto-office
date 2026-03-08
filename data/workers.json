@@ -1,15 +1,4 @@
 {
-  "workers": [
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "status": "working",
-      "task": "QA review #18 \u2014 full site analysis with Puppeteer screenshots",
-      "progress": 10,
-      "updated_at": "2026-03-08T13:15:00Z",
-      "startedAt": "2026-03-08T13:15:00Z"
-    }
-  ],
-  "updated_at": "2026-03-08T13:15:00Z"
+  "workers": [],
+  "updated_at": "2026-03-08T13:20:00Z"
 }
