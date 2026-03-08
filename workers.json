@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-08T10:36:00Z"
+  "workers": [
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Plant level-up toast + polling-paused indicator",
+      "started_at": "2026-03-08T13:30:00Z"
+    }
+  ],
+  "updated_at": "2026-03-08T13:30:00Z"
 }
