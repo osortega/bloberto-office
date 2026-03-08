@@ -1,81 +1,65 @@
 {
   "creative_director": "Luna",
-  "review_number": 40,
-  "timestamp": "2026-03-08T10:01:07Z",
-  "theme": "The office has a heartbeat - now give it a nervous system",
-  "visual_observations": "Screenshots taken 10:02 UTC at 1280x800 desktop and 375x812 mobile. Vibe at capture time: Crushing It with FULL SYNC banner live in the office header confirming isFullSync logic and full-sync-banner are implemented. Key observations: (1) Luna appears in two distinct positions simultaneously - top-left desk (moon avatar, nameplate Luna) AND as a wandering idle character in the center-lower floor area (LUNA in large purple bold text floating near the conference table). This dual-render is suspicious; if Luna is status=working she should not be wandering - possible live data bug or dual-ID collision in workers.json vs roster. (2) A floating paper-texture task card (SHIP_IT / 14%) hovers at the left edge of the office floor - this does NOT appear in /workspace/src/Office.jsx and is likely a newly deployed feature representing a code drift gap worth formalizing into a spec. (3) Whiteboard shows SHIP_IT cleanly with no wrap - confirms mobile whiteboard fix was shipped. (4) Conference table: 6 chairs visible in crushing vibe, no huddle badge visible even though Luna appears idle - meetingWorkers requires 2+ idle workers but Luna may be the only wanderer. (5) Mgr desk shows CVO nameplate correctly. (6) Monitor glow on mgr-desk__monitor present with data-vibe wired up. (7) Mobile: office floor is compressed into a small rectangle with massive dead space below it - characters render at only 10-14px effective size, practically unreadable. (8) Plants, cactus, door, wall clock all rendering correctly. (9) Desk lamps glowing yellow for active desks. (10) No weather widget visible, no starfield on floor, no ghost desk dust aura, no progress ring burst - these 4 carry forward from review 39.",
+  "review_number": 41,
+  "timestamp": "2026-03-08T11:05:00Z",
+  "theme": "Polish the edges, animate the gaps — small details that make the office breathe",
+  "visual_observations": "Review #41 based on full source code analysis of Office.jsx (1163 lines), Office.css (1923 lines), App.jsx (1177 lines), App.css (1063 lines). Prior review items checked: desk monitor screens ✅, progress ring burst ✅, bloberto stress tells ✅, vibe weather widget ✅, wall clock ✅. Four items still unimplemented from prior reviews carried forward.",
   "ideas": [
     {
       "priority": "must",
       "category": "visual",
-      "title": "Desk Monitor Screen Content - Six Blank Screens, Six Wasted Stories",
-      "description": "The desk monitors render as blank dark rectangles with zero content. With six desks in crushing-it mode, that is six missed storytelling moments. Add a DESK_SCREEN_SVG object in Office.jsx keyed by worker.id returning a tiny inline SVG to render inside .desk__monitor when isWorking. Carlos: 3 blue horizontal code-line rects of varying widths. Maya: nested purple rectangles mimicking a UI wireframe. Dave: orange monospace terminal with 2 text lines and a blinking cursor rect. Sofia: green mini bar chart with 4 bars at different heights. Luna: purple color swatches side-by-side with a tiny star path above. In the desk rendering block after the desk__monitor div, add: {isWorking and DESK_SCREEN_SVG[occ.worker.id] exists render a div.desk-monitor-screen}. The .desk-monitor-screen is positioned absolute to fill the monitor area: position absolute; left calc(50% - 19%); top 8%; width 38%; height 44%; border-radius 2px; overflow hidden; pointer-events none; z-index 1. Add .office-floor[data-vibe=crushing] .desk-monitor-screen { filter: brightness(1.25) } and a screen-idle keyframe animation for slow-day vibe. WHY: The monitor is the worker window into their craft. Right now it is literally a black rectangle. In a dashboard meant to feel like a living office, six dark monitors is the equivalent of a movie set where every computer is a prop with a blank screen. Giving each a screen turns furniture into a workstation.",
-      "effort": "medium",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "delight",
-      "title": "Progress Ring 100% Burst - A Completion Worth Celebrating",
-      "description": "Carried forward from review 39, still not implemented. When worker.progress hits 100, the ring quietly turns green but there is zero spatial event on the office floor. Add in the Character component in Office.jsx: const [justCompleted, setJustCompleted] = useState(false) and const prevProgressRef = useRef(worker.progress). Add a useEffect watching worker.progress: if worker.progress is 100 or more and prevProgressRef.current is below 100 then setJustCompleted(true) and clear after 1400ms. Add data-complete={justCompleted || undefined} to the char div. In Office.css: .char[data-complete]::after { content: checkmark emoji; position: absolute; top: -4px; left: 50%; font-size: 10px; animation: complete-burst 1.4s ease-out forwards; z-index: 12; } @keyframes complete-burst { 0% { opacity: 1; transform: translateX(-50%) scale(0.5) translateY(0); } 60% { opacity: 1; transform: translateX(-50%) scale(1.3) translateY(-18px); } 100% { opacity: 0; transform: translateX(-50%) scale(1) translateY(-28px); } }. Also add a green ring glow: .char[data-complete] .char__avatar { animation: complete-glow 0.5s ease-out 2 both; } @keyframes complete-glow { 50% { box-shadow: 0 0 0 4px rgba(34,197,94,0.5); } }. WHY: The completion toast in App.jsx fires at the global level, but on the office floor itself nothing happens when a worker finishes. A burst makes the moment belong to the character AND the space, not just the header.",
-      "effort": "small",
-      "assigned_to": "sofia"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Bloberto Stress Tells on On-Fire - The Boss Desk Shows the Pressure",
-      "description": "Bloberto avatar already has a worried face and sweat droplet during on-fire vibe, but his desk is completely static regardless of vibe. The mgr-desk__monitor has data-vibe wired up but the parent mgr-desk div does not. Fix: add data-vibe={vibe} to the mgr-desk div in Office.jsx (currently absent, one-character change). In Office.css add: .mgr-desk[data-vibe=on-fire] .mgr-desk__nameplate { animation: nameplate-shake 0.35s ease-in-out infinite; color: #ef4444; } @keyframes nameplate-shake { 30% { transform: translateX(-2px) rotate(-0.5deg); } 70% { transform: translateX(2px) rotate(0.5deg); } }. In the mgr-desk JSX block, add {vibe === on-fire and a div.mgr-desk__coffee with a coffee emoji} positioned absolute at bottom: 3%; right: 4%; with .mgr-desk__coffee { font-size: 0.42rem; opacity: 0.65; animation: coffee-wobble 2.5s ease-in-out infinite; } @keyframes coffee-wobble { 50% { transform: rotate(5deg) translateY(-2px); } }. For crushing vibe, add a trophy emoji prop similarly. WHY: Bloberto face changes but his desk does not. A shaking nameplate and an emergency coffee cup on the boss desk during on-fire adds the workplace anxiety that the avatar worried brows are already communicating.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Vibe Forecast Weather Widget - One Glyph That Reads the Room",
-      "description": "Carried forward from reviews 37, 38, and 39 - still not implemented after four reviews. Add a tiny weather widget in the lower-right corner just above the cactus. In Office.jsx define: const VIBE_WEATHER_ICONS = { on-fire: storm emoji, crushing: sun emoji, in-flow: partly-cloudy emoji, slow-day: rain emoji, after-hours: moon emoji }. Above the cactus div add a div.vibe-weather.vibe-weather--{vibe} with aria-hidden and the icon. CSS: .vibe-weather { position: absolute; right: 3%; bottom: 26%; font-size: 0.85rem; pointer-events: none; z-index: 1; opacity: 0.55; transition: opacity 0.6s ease; } .vibe-weather--on-fire { animation: wx-urgent 1.4s ease-in-out infinite; } @keyframes wx-urgent { 50% { transform: scale(1.18) rotate(6deg); } } .vibe-weather--crushing { animation: wx-sunny 3s ease-in-out infinite; } @keyframes wx-sunny { 50% { transform: scale(1.1) rotate(15deg); } } .vibe-weather--slow-day { animation: wx-rain 2.5s ease-in-out infinite; } @keyframes wx-rain { 50% { transform: translateY(2px); opacity: 0.35; } }. WHY: Weather glyphs are read in under a second and understood universally. This is a tiny ambient oracle in the corner confirming the room emotional forecast. It has been on the roadmap for four reviews. Two JSX lines and ten CSS lines, zero excuses.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Mobile Office Scale Fix - The Floor Deserves the Full Viewport",
-      "description": "On mobile at 375px, the office floor becomes a 375x281px rectangle where characters render at 10-14px effective size. Names, idle timers, and desk lamps are practically invisible. There is also massive dead space below the floor. Three-part fix in Office.css: (1) Add @media (max-width: 480px) { .char__avatar { transform: scale(0.82); } .char__name { font-size: 0.35rem; } .idle-duration { font-size: 0.28rem; } .office-wrap { padding: 0.5rem; } .office-floor { border-radius: 8px; } .wb-vibe-text { font-size: 0.6rem; } }. (2) In App.css, reduce header and tab-toggle vertical padding on mobile: @media (max-width: 480px) { .header { padding: 0.5rem 1rem; } .tab-toggle { margin: 0.4rem 0; } } to give the floor more above-the-fold real estate. (3) Verify the office-floor aspect-ratio (4/3) and max-width are not over-constraining the floor on narrow viewports. WHY: The office view is the hero feature on mobile. Right now it is a tiny postage stamp surrounded by empty dark screen. A visitor opening the link on their phone should see the office filling the viewport, not a compressed widget requiring squinting.",
+      "title": "Mobile Office Scale Fix — The Floor Deserves the Full Viewport",
+      "description": "CARRIED FORWARD (reviews 39, 40). On mobile 375px, the office floor is a tiny postage stamp with characters at 10-14px. Names and idle timers are unreadable. Fix in Office.css: @media (max-width: 480px) { .office-wrap { padding: 0.3rem; } .office-floor { border-radius: 8px; min-height: 70vh; } .char__name { font-size: 0.32rem; } .idle-duration { font-size: 0.26rem; } .wb-vibe-text { font-size: 0.55rem; } .desk__nameplate { font-size: 0.28rem; } } In App.css: @media (max-width: 480px) { .header { padding: 0.4rem 0.8rem; } .tab-toggle { margin: 0.3rem 0; } .header h1 { font-size: 1rem; } }. WHY: The office is the hero feature. On mobile it's unusable. This has been carried forward three reviews — it's a must-fix.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
+      "priority": "should",
+      "category": "office-life",
+      "title": "Idle Character Ambient Micro-Bubbles — Wanderers Have Inner Lives",
+      "description": "CARRIED FORWARD (review 40). Idle workers wander silently. wanderTooltips exist but only on hover. Make them ambient. In Character component: const [idleBubble, setIdleBubble] = useState(false). useEffect when variant==='idle': setTimeout at 8000 + wanderIdx*3000ms, show bubble for 2200ms, then hide. Render div.idle-micro-bubble with activity emoji (coffee/whiteboard/window/zen based on wanderIdx). CSS: .idle-micro-bubble { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 0.5rem; background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1px 5px; animation: micro-bubble 2.2s ease-out forwards; pointer-events: none; z-index: 10; } @keyframes micro-bubble { 0% { opacity:0; transform: translateX(-50%) translateY(4px) scale(0.8); } 18% { opacity:1; transform: translateX(-50%) translateY(0) scale(1); } 75% { opacity:1; } 100% { opacity:0; transform: translateX(-50%) translateY(-8px); } }. WHY: Wandering with occasional thought bubbles transforms movement into personality.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "After-Hours Starfield Floor — The Office Becomes the Night Sky",
+      "description": "CARRIED FORWARD (reviews 38, 39, 40). During after-hours the floor is deep indigo but static. Add in Office.css: .office-floor[data-vibe='after-hours']::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(circle 1.5px at 7% 14%, rgba(255,255,255,0.55) 1px, transparent 1px), radial-gradient(circle 1px at 19% 38%, rgba(255,255,255,0.4) 1px, transparent 1px), radial-gradient(circle 1.5px at 34% 9%, rgba(200,200,255,0.5) 1px, transparent 1px), radial-gradient(circle 1px at 52% 22%, rgba(255,255,255,0.45) 1px, transparent 1px), radial-gradient(circle 1.5px at 68% 47%, rgba(200,200,255,0.5) 1px, transparent 1px), radial-gradient(circle 1px at 81% 11%, rgba(255,255,255,0.4) 1px, transparent 1px), radial-gradient(circle 1px at 12% 61%, rgba(255,255,255,0.35) 1px, transparent 1px), radial-gradient(circle 1.5px at 43% 72%, rgba(200,200,255,0.5) 1px, transparent 1px), radial-gradient(circle 1px at 74% 68%, rgba(255,255,255,0.4) 1px, transparent 1px), radial-gradient(circle 1px at 91% 33%, rgba(255,255,255,0.45) 1px, transparent 1px); background-size: 100% 100%; animation: starfield-twinkle 4s ease-in-out infinite; } @keyframes starfield-twinkle { 0%,100% { opacity:0.6; } 50% { opacity:1; } }. WHY: After-hours is the loneliest vibe. Stars on the floor make it poetic. Zero DOM, pure CSS.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "office-life",
+      "title": "Ghost Desk Dust Aura — Abandoned Desks Collect Memories",
+      "description": "CARRIED FORWARD (review 40). Ghost desks (.desk--ghost) look faded but not abandoned. Add in Office.css: .desk--ghost::before { content: ''; position: absolute; inset: -4px; border-radius: 8px; background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(148,163,184,0.12), transparent 70%); animation: ghost-dust 5s ease-in-out infinite; pointer-events: none; z-index: 0; } @keyframes ghost-dust { 0%,100% { opacity:0.4; transform: scale(1); } 50% { opacity:0.8; transform: scale(1.04); } } .desk--ghost::after { content: '···'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 0.4rem; color: rgba(148,163,184,0.35); letter-spacing: 0.3em; animation: desk-dust-float 7s ease-in-out infinite; pointer-events: none; } @keyframes desk-dust-float { 40% { opacity:0.7; transform: translateX(-50%) translateY(-6px); } 0%,80%,100% { opacity:0; transform: translateX(-50%) translateY(0); } }. WHY: OOO should feel like absence, not just inactivity.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
       "priority": "could",
-      "category": "storytelling",
-      "title": "Idle Character Ambient Micro-Bubbles - Wanderers Have Inner Lives",
-      "description": "Idle workers wander silently. The wanderTooltips map already has activity descriptions per wander path (coffee corner, whiteboard, window, zen) but they only appear on hover. Make them ambient. Add const [idleBubble, setIdleBubble] = useState(false) to the Character component. Add a useEffect that fires when variant equals idle: set a timeout at 8000 + wanderIdx times 3000ms, then show the bubble for 2200ms. Render a div.idle-micro-bubble showing an activity emoji based on wanderIdx when idleBubble is true. CSS: .idle-micro-bubble { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 0.5rem; background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1px 5px; white-space: nowrap; animation: micro-bubble 2.2s ease-out forwards; pointer-events: none; z-index: 10; } @keyframes micro-bubble { 0% { opacity: 0; transform: translateX(-50%) translateY(4px) scale(0.8); } 18% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-8px); } }. WHY: A character wandering silently is movement. A character wandering with a tiny thought bubble occasionally floating up is personality. One emoji per character every 30 seconds transforms wandering from physics into narrative.",
+      "category": "delight",
+      "title": "Desk Keystroke Sound Variation — Each Worker Types Differently",
+      "description": "The .desk-keystrokes div currently shows 'tap', 'clack', 'click' for ALL workers identically. Make it per-worker. In Office.jsx, define KEYSTROKE_WORDS = { carlos: ['git', 'push', '→'], maya: ['px', 'flex', '✦'], dave: ['sudo', 'grep', '$'], sofia: ['assert', 'pass', '✓'], luna: ['✨', 'hmm', '💡'] }. In the desk rendering, replace the hardcoded spans with: {(KEYSTROKE_WORDS[occ.worker.id] || ['tap','clack','click']).map((word, j) => <span key={j} style={{animationDelay: j*1.2+'s'}}>{word}</span>)}. WHY: Tiny personalization. Carlos pushes code, Maya tweaks pixels, Dave runs commands. It's a two-line change that adds character.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "visual",
-      "title": "After-Hours Starfield Floor - The Office Becomes the Night Sky",
-      "description": "Carried forward from reviews 38 and 39, still not implemented. During after-hours vibe the floor grid shifts to deep indigo but still looks like an office. In Office.css add: .office-floor[data-vibe=after-hours]::after { content: empty string; position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: twelve radial-gradient star points at various positions across the floor (radial-gradient(circle 1.5px at 7% 14%, rgba(255,255,255,0.55) 1px, transparent 1px) and eleven more at positions like 19% 38%, 34% 9%, 52% 22%, 68% 47%, 81% 11%, 12% 61%, 43% 72%, 74% 68%, 91% 33%, 28% 85%, 60% 90% with rgba white and blue-white colors between 0.4 and 0.6 opacity); background-size: 100% 100%; animation: starfield-twinkle 4s ease-in-out infinite; } @keyframes starfield-twinkle { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }. WHY: After-hours is the loneliest vibe. The floor should stop being a floor and become a universe to stare into. Zero DOM additions, four lines of CSS.",
-      "effort": "small",
-      "assigned_to": "tbd"
+      "category": "storytelling",
+      "title": "Team Sprint Victory Lap — When Everyone Ships, the Floor Goes Gold",
+      "description": "CARRIED FORWARD (review 40). When all workers hit 100% progress simultaneously, nothing special happens on the floor. Add: const allComplete = workingWorkers.length > 0 && workingWorkers.every(w => w.progress >= 100). Track rising edge with useRef, set victoryLap state for 6000ms. Add data-victory to office-floor. CSS: .office-floor[data-victory]::before { content:''; position:absolute; inset:0; pointer-events:none; z-index:0; background: radial-gradient(ellipse 80% 50% at 50% 100%, rgba(251,191,36,0.18), transparent 70%); animation: victory-gold 6s ease-in-out forwards; } @keyframes victory-gold { 0% { opacity:0; } 15% { opacity:1; } 75% { opacity:1; } 100% { opacity:0; } }. WHY: Individual completions are celebrated. Team completion should be the rarest, most earned event.",
+      "effort": "medium",
+      "assigned_to": "sofia"
     },
     {
       "priority": "could",
-      "category": "office-life",
-      "title": "Ghost Desk Dust Aura - Abandoned Desks Collect Memories",
-      "description": "Carried forward from review 39, still not implemented. Ghost workers (OOO) have .desk--ghost with a faded visual style but the desk just looks inactive, not truly abandoned. In Office.css add: .desk--ghost::before { content: empty string; position: absolute; inset: -4px; border-radius: 8px; background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(148,163,184,0.12), transparent 70%); animation: ghost-dust 5s ease-in-out infinite; pointer-events: none; z-index: 0; } @keyframes ghost-dust { 0%,100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.04); } }. Also: .desk--ghost::after { content: dot-dot-dot string; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 0.4rem; color: rgba(148,163,184,0.35); letter-spacing: 0.3em; animation: desk-dust-float 7s ease-in-out infinite; pointer-events: none; } @keyframes desk-dust-float { 40% { opacity: 0.7; transform: translateX(-50%) translateY(-6px); } 0%,80%,100% { opacity: 0; transform: translateX(-50%) translateY(0); } }. WHY: OOO is the office saying someone used to sit here. The dust aura turns absence into presence. No new JSX, just two CSS pseudo-elements.",
+      "category": "visual",
+      "title": "Coffee Corner Refill Animation — Steam Intensifies with More Idle Workers",
+      "description": "The coffee corner has static steam (3 spans). Scale steam intensity based on idle worker count. In Office.jsx, pass idleCount={idleWorkers.length} to the coffee-corner div via a data attribute: data-crowd={idleWorkers.length >= 3 ? 'busy' : idleWorkers.length >= 1 ? 'some' : 'empty'}. In Office.css: .coffee-corner[data-crowd='busy'] .coffee-steam span { animation-duration: 0.8s; } .coffee-corner[data-crowd='empty'] .coffee-steam { opacity: 0.3; }. WHY: More idle people = more coffee consumption = busier coffee corner. It's environmental storytelling through steam.",
       "effort": "small",
-      "assigned_to": "tbd"
-    },
-    {
-      "priority": "wild",
-      "category": "storytelling",
-      "title": "Team Sprint Victory Lap - When Everyone Ships, the Floor Erupts in Gold",
-      "description": "Individual completion toasts and confetti exist in App.jsx but there is no moment celebrating the entire team completing simultaneously. Add in Office.jsx: const allComplete = nonMgr.length > 0 and workingWorkers.length > 0 and workingWorkers.every(w => w.progress >= 100). Const [victoryLap, setVictoryLap] = useState(false). Track the rising edge with a prevAllCompleteRef: when allComplete flips from false to true, set victoryLap to true for 6000ms. Pass data-victory={victoryLap || undefined} to the office-floor div. Render a div.victory-banner with aria-live polite when victoryLap is true. CSS: .office-floor[data-victory]::before { content: empty; position: absolute; inset: 0; pointer-events: none; z-index: 0; background: radial-gradient(ellipse 80% 50% at 50% 100%, rgba(251,191,36,0.18), transparent 70%); animation: victory-gold 6s ease-in-out forwards; } @keyframes victory-gold { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }. .victory-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 0.65rem; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; color: #fbbf24; text-shadow: 0 0 20px rgba(251,191,36,0.8); z-index: 10; pointer-events: none; animation: victory-text 6s ease forwards; white-space: nowrap; } @keyframes victory-text { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0.7); } 15% { opacity: 1; transform: translate(-50%,-50%) scale(1.08); } 75% { opacity: 1; } 100% { opacity: 0; } }. Also give Bloberto a char--celebrating class during victoryLap that triggers a 360-degree spin: @keyframes bloberto-spin { 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }. WHY: Individual completion is celebrated. Team completion is invisible. When your whole team ships together, that is the rarest and most earned office event. It deserves a visual dimension no individual milestone gets: the floor erupts in gold and the boss spins with joy. This is the moment people screenshot and share.",
-      "effort": "medium",
-      "assigned_to": "sofia"
+      "assigned_to": "carlos"
     }
   ],
   "hire_proposals": []
