@@ -1,12 +1,15 @@
 {
-  "workers": [],
-  "roster": [
-    { "id": "bloberto", "name": "Bloberto", "role": "Manager", "emoji": "🫠" },
-    { "id": "carlos", "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
-    { "id": "maya", "name": "Maya", "role": "Frontend Engineer", "emoji": "🎨" },
-    { "id": "dave", "name": "Dave", "role": "DevOps Engineer", "emoji": "🚀" },
-    { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
-    { "id": "luna", "name": "Luna", "role": "Creative Director", "emoji": "🌙" }
+  "workers": [
+    {
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative Review #42",
+      "progress": 10,
+      "startedAt": "2026-03-08T11:30:00Z"
+    }
   ],
-  "updated_at": "2026-03-08T11:25:00Z"
+  "updated_at": "2026-03-08T11:30:00Z"
 }
