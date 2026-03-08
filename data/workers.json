@@ -1,42 +1,13 @@
 {
-  "workers": [],
-  "roster": [
+  "workers": [
     {
-      "id": "bloberto",
-      "name": "Bloberto",
-      "role": "Manager",
-      "emoji": "\ud83e\udee0"
-    },
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8"
-    },
-    {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d"
-    },
-    {
-      "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19"
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review cycle #44",
+      "started_at": "2026-03-08T12:30:00Z"
     }
   ],
-  "updated_at": "2026-03-08T12:24:00Z"
+  "updated_at": "2026-03-08T12:30:00Z"
 }
