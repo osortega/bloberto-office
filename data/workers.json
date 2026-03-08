@@ -1,11 +1,40 @@
 {
-  "workers": [],
-  "roster": [
-    { "name": "Sofia", "emoji": "🔍", "role": "QA Analyst" },
-    { "name": "Maya", "emoji": "🎨", "role": "Frontend Dev" },
-    { "name": "Carlos", "emoji": "⚙️", "role": "Backend Dev" },
-    { "name": "Dave", "emoji": "🔧", "role": "DevOps" },
-    { "name": "Luna", "emoji": "🌙", "role": "Creative Director" }
+  "workers": [
+    {
+      "name": "Luna",
+      "role": "creative-director",
+      "emoji": "\ud83c\udf19",
+      "status": "working",
+      "task": "Creative review #54",
+      "started_at": "2026-03-08T22:00:00Z"
+    }
   ],
-  "updated_at": "2026-03-08T21:53:00Z"
+  "roster": [
+    {
+      "name": "Sofia",
+      "emoji": "\ud83d\udd0d",
+      "role": "QA Analyst"
+    },
+    {
+      "name": "Maya",
+      "emoji": "\ud83c\udfa8",
+      "role": "Frontend Dev"
+    },
+    {
+      "name": "Carlos",
+      "emoji": "\u2699\ufe0f",
+      "role": "Backend Dev"
+    },
+    {
+      "name": "Dave",
+      "emoji": "\ud83d\udd27",
+      "role": "DevOps"
+    },
+    {
+      "name": "Luna",
+      "emoji": "\ud83c\udf19",
+      "role": "Creative Director"
+    }
+  ],
+  "updated_at": "2026-03-08T22:00:00Z"
 }
