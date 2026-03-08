@@ -1,13 +1,14 @@
 {
   "workers": [
     {
-      "name": "Sofia",
-      "emoji": "\ud83d\udd0d",
-      "role": "QA & Product Analyst",
-      "status": "idle",
-      "task": "QA review #20 complete \u2014 awaiting next assignment",
-      "started_at": "2026-03-08T14:15:00Z"
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review #47",
+      "started_at": "2026-03-08T15:00:00Z"
     }
   ],
-  "updated_at": "2026-03-08T14:45:00Z"
+  "updated_at": "2026-03-08T15:00:00Z"
 }
