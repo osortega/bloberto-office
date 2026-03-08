@@ -1,104 +1,104 @@
 {
   "analyst": "Sofia",
-  "reviewNumber": 5,
-  "timestamp": "2026-03-08T03:55:00Z",
+  "reviewNumber": 6,
+  "timestamp": "2026-03-08T04:15:00Z",
   "scores": {
     "visual": 4,
-    "ux": 4,
-    "responsiveness": 3,
+    "ux": 3,
+    "responsiveness": 2,
     "performance": 3,
     "accessibility": 3,
     "codeQuality": 3,
     "features": 4,
-    "funFactor": 5
+    "funFactor": 4
   },
   "overall_score": 3.6,
   "suggestions": [
     {
       "priority": "high",
-      "category": "performance",
-      "title": "Inline style object in completionToast creates new object every render",
-      "description": "The completionToast notification in App.jsx uses a massive inline style={{...}} object directly in JSX. This creates a new object reference every render cycle, defeating React.memo and causing unnecessary re-renders of the entire App tree. Extract to a CSS class or useMemo the style object.",
+      "category": "bug",
+      "title": "STILL UNFIXED: vibeStreak prop never passed to Office \u2014 Fern stuck as seedling forever",
+      "description": "App.jsx line 1043: <Office ... /> is missing vibeStreak={vibeStreak}. Was flagged in review #4. The fern plant will perpetually render as 'seedling' regardless of how long the team has been crushing it. Zero growth. Fern is sad. Fix: add vibeStreak={vibeStreak} to the Office JSX call in App.jsx.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "high",
-      "category": "code",
-      "title": "vibeStreak prop not passed to Office component",
-      "description": "App.jsx computes vibeStreak state but the <Office> component receives it as a prop for the Fern plant growth stages. Need to verify the prop is actually being passed — grep shows it IS passed, but the plant stage calculation uses Math.floor(vibeStreak / 5) which means the plant won't grow past seedling until streak=5. Consider lowering the threshold so users see growth sooner.",
+      "category": "bug",
+      "title": "STILL UNFIXED: workers.json missing 'roster' key \u2014 worker filter bar shows only 'All Workers'",
+      "description": "workers.json has a 'workers' array but no 'roster' array. App.jsx line 682 sets roster=[] when the roster key is absent. The worker filter bar (line 1148) iterates roster.map(...) which is empty, so only the 'All Workers' button ever appears. Fix: add a 'roster' key to workers.json listing the team members.",
       "effort": "small",
-      "assignee": "Maya"
+      "assignee": "Carlos"
     },
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "Tab panel switching lacks ARIA live region announcement",
-      "description": "When switching between Office and Dashboard tabs, screen readers get no announcement that content has changed. The tabpanel containers should have aria-live='polite' or use a visually hidden status message to announce the switch. Also, the tab role buttons don't manage focus correctly — after arrow key navigation, focus should move to the newly selected tab.",
-      "effort": "medium",
+      "category": "bug",
+      "title": "Stuck worker card renders literal 'null' \u2014 formatDuration called with undefined field",
+      "description": "StatsBar line 457: `formatDuration(stuckWorkers[0].started)`. The field is 'started' but workers.json uses 'updated_at' (and 'startedAt'). formatDuration(undefined) returns null. In the template literal this becomes the visible string 'null': e.g. '\ud83c\udfa8 Maya \u00b7 null'. Any user with a stuck worker will see this right now. Fix: change .started to .updated_at (or .startedAt) in StatsBar.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Mobile: massive blank space below office floor, office canvas tiny and unreadable",
+      "description": "On 375px wide viewport, the office floor has aspect-ratio: 4/3 and max-width: 900px. It renders at ~330px \u00d7 ~248px \u2014 barely big enough to read worker names. Whiteboard text ('SHIP IT') overlaps the leftmost desk column. Below the floor there is ~400px of dead space before the footer. Fix: on mobile, either increase the floor's min-height, add a scrollable/pannable canvas, or adopt a stacked list view for the office when viewport < 480px.",
+      "effort": "large",
       "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "useTimeTick(60000) causes full App re-render every minute",
-      "description": "The useTimeTick hook in App.jsx increments a counter every 60s to keep relative timestamps fresh. But since it's called at the App level, it forces the ENTIRE component tree to re-render every minute — including Office, all WorkerCards, StatsBar, etc. Move this hook into individual components that display relative times (ActivityLogEntry, WorkerCard duration) or use a context provider with selective subscriptions.",
+      "title": "React.memo on WorkerCard defeated every 30s \u2014 activityEntries is a new array ref each sync",
+      "description": "App.jsx sets state via setActivityLog(Array.isArray(activity) ? activity : []) on every sync, creating a new array reference. This reference is passed directly as activityEntries to every WorkerCard. Since React.memo does shallow comparison, ALL WorkerCards re-render on every 30s poll even if worker data didn't change. Fix: memoize activityEntries or filter it per-worker before passing, so stable references are preserved.",
       "effort": "medium",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "vibe history localStorage race condition",
-      "description": "In App.jsx, vibeHistory is read from localStorage in StatsBar's useEffect AND written in App's useEffect. Both fire on teamVibe.key change. The StatsBar read can get stale data if App's write hasn't flushed yet. Consolidate vibe history management into one place (App) and pass the array down as a prop.",
+      "title": "ShortcutToast timer leak on 'Got it' path \u2014 first setTimeout ref silently orphaned",
+      "description": "ShortcutToast lines 527\u2013531: when gotIt=true, timerRef.current is assigned at line 527 (setPhase fading-out after 500ms) then immediately overwritten at line 531 (setPhase hidden after 900ms). The cleanup effect (line 555) can only cancel the second timer. The first orphaned timer fires after unmount, calling setPhase on an unmounted component. Fix: use separate refs for the two timers, or calculate total delay and use a single setTimeout.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "VibeSparkline always lags one entry \u2014 child useEffect reads localStorage before parent writes it",
+      "description": "React runs child effects before parent effects in the same commit. StatsBar's useEffect (vibe.key dep) reads vibe history from localStorage before App.jsx's useEffect (teamVibe.key dep) has written the current entry. The sparkline always shows history minus the current vibe change. Fix: lift the vibe history state up into App.jsx, compute it alongside the streak, and pass it down as a prop to StatsBar/VibeSparkline.",
       "effort": "medium",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Mobile viewport: character names hidden but no alternative identification",
-      "description": "At ≤480px, .char__name { display: none } hides character names in the office view. But there's no alternative way to identify who's who — the avatars are tiny and hard to distinguish. Consider showing a single-letter badge or keeping names visible at a smaller font size instead of hiding them entirely.",
+      "title": "Worker hover card displays raw status string \u2014 STATUS_LABELS not used",
+      "description": "Character component (Office.jsx line 482) renders `<div>{worker.status}</div>` \u2014 shows lowercase 'working', 'idle', 'error' instead of the friendly labelled versions. STATUS_LABELS and STATUS_EMOJIS already exist in constants.js for exactly this purpose. Fix: replace `{worker.status}` with `{STATUS_EMOJIS[worker.status]} {STATUS_LABELS[worker.status]}`.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
-      "priority": "medium",
-      "category": "code",
-      "title": "ROLE_EMOJIS in constants.js has 'QA Engineer' but Sofia's role is 'QA & Product Analyst'",
-      "description": "Sofia's role string in workers.json is 'QA & Product Analyst' but ROLE_EMOJIS and ROLE_COLORS only have 'QA Engineer'. This means Sofia gets the fallback emoji (🤖) and default gray color (#6b7280) in the dashboard WorkerCards. Add 'QA & Product Analyst' to both maps, or normalize the role string.",
-      "effort": "small",
+      "priority": "low",
+      "category": "bug",
+      "title": "ETA calculation uses updated_at (sync timestamp) not actual task start \u2014 wildly inaccurate",
+      "description": "App.jsx ProgressBar line 193: workingMs is computed from worker.updated_at. This field reflects the last data sync timestamp, NOT when the worker started their task. workers.json already has a 'startedAt' field that's never used. A task that was 90% complete when the page loaded will show a tiny ETA because updated_at is recent. Fix: use worker.startedAt for ETA calculation. Also pass it through from the data model.",
+      "effort": "medium",
       "assignee": "Carlos"
     },
     {
-      "priority": "medium",
-      "category": "performance",
-      "title": "AwaySign component recalculates message on every render",
-      "description": "AwaySign selects its message using Math.floor(idleMinutes / 10) which changes every 10 minutes — fine. But the component is re-rendered every time the parent desk re-renders (every poll cycle). The string splitting logic (reduce for line1/line2) runs unnecessarily. Wrap in React.memo or useMemo the computed values.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
       "priority": "low",
-      "category": "visual",
-      "title": "Conference table positioned at left:38% with translate(-50%) — visually off-center",
-      "description": "The CSS for .conference-table uses left:38% + transform:translate(-50%,-50%). This positions the table's center at 38% from the left, which is noticeably left-of-center. Should be left:50% for true centering, or adjust to ~45% if intentionally offset to avoid the door.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "No favicon fallback for light theme",
-      "description": "The dynamic favicon generation uses solid colors on a transparent canvas. In light browser themes, the grey idle state (#9ca3af) can be hard to see against the tab bar. Add a subtle dark ring/border to the favicon circle for contrast.",
+      "category": "code",
+      "title": "Fading WorkerCards all get index={activeWorkers.length} \u2014 identical stagger delay for all",
+      "description": "App.jsx line 1102: `index={activeWorkers.length}` is hardcoded for every fading worker card. This means when multiple workers depart simultaneously, all fading cards get the same CSS --i variable and animate in lockstep instead of staggering. Fix: use a separate counter variable or the worker's original index from activeWorkers.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Dead CSS selectors referencing old class names",
-      "description": "Office.css has selectors for .office-worker, .office-worker--ghost, .office-worker--manager, and .worker-standby inside the prefers-reduced-motion block, but these classes don't exist anywhere in the JSX — the actual classes are .char, .char--ghost, .char--manager. These dead selectors should be cleaned up.",
+      "title": "STILL UNFIXED: completionToast uses 12 inline style declarations \u2014 CSS class pending",
+      "description": "App.jsx lines 942\u2013962: completionToast renders with a large inline style object (position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation). Was flagged review #4 as low priority conversion to CSS class. Still there. Fix: move to a .completion-toast class in App.css and use the border color as a CSS custom property.",
       "effort": "small",
       "assignee": "Maya"
     }

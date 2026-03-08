@@ -1,0 +1,6 @@
+QA Review #5 — Sofia — 2026-03-08 — Overall: 3/5
+
+TOP FINDINGS:
+1. [HIGH] vibeStreak + roster key STILL unfixed from review #4 — Fern is a permanent seedling and worker filter bar is broken; these are trivially small fixes that have now been open for 2 reviews.
+2. [HIGH] NEW BUG: Stuck worker stat card renders literal "null" — StatsBar calls formatDuration(stuckWorkers[0].started) but workers.json uses updated_at/startedAt, so any user with a stuck worker sees "🎨 Maya · null" in the UI right now.
+3. [MEDIUM] Mobile experience is borderline unusable — office floor renders at ~248px tall, whiteboard text clips over desks, and ~400px of dead space sits below the floor before the footer; needs a proper mobile layout pass.

@@ -1,74 +1,66 @@
 {
   "creative_director": "Luna",
-  "review_number": 32,
-  "timestamp": "2026-03-08T03:31:00Z",
-  "theme": "The floor between syncs — give every idle moment breath, shadow, and soul",
-  "visual_observations": "Desktop: the lower half of the floor is nearly empty — a wandering idle worker appears as a bare pulsing ring that reads as a loading spinner, not a person. The ficus plant growth stages are lovely but static. The window dark rectangle is easy to miss. No visual connection exists between co-workers despite them sharing tasks. Door arrivals animate the door widget but the floor itself is silent. Mobile: the wandering circle dominates the cramped lower floor and looks especially mechanical. Bottom half dead space is proportionally worse on small screens.",
+  "review_number": 33,
+  "timestamp": "2026-03-08T04:05:00Z",
+  "theme": "Every static object on this floor is a missed heartbeat — make the room breathe",
+  "visual_observations": "Desktop 1280×800, Crushing It vibe active. Six worker desks in two rows: Maya/Sofia/Carlos top, Maya/Dave/Sofia bottom. Trophy icons sit inert next to Maya and Sofia — no animation, no count. The coffee machine widget (top-right) is a frozen ☕ emoji above 'COFFEE' — the most visible static prop on the entire floor. The worker status dots ('•••') under each name carry zero information density; you cannot tell who is at 10% vs 90% on their task. The 'SHIP IT' sticky note floats untethered on the left edge — no visual connection to any desk or worker. The window widget (dark rectangle, top-right) reads as a dead black box; its function as a 'window to the outside' is completely lost. The aisle between the two desk rows is unmarked — the floor looks like a parking lot, not a workplace. The idle wandering ring in the lower floor is the only moving element in the bottom half, and it still reads as a loading spinner rather than a human presence.",
   "ideas": [
     {
       "priority": "must",
       "category": "delight",
-      "title": "Idle Worker Thought Clouds",
-      "description": "The wandering idle characters are currently bare pulsing rings with orbit dots — they look like loading spinners, not people on a break. Add a CSS cloud-shaped thought bubble (three stacked border-radius circles forming a classic thought cloud, distinct from the rectangular speech bubble style) that floats above wandering workers. Each worker has a curated IDLE_THOUGHTS entry in constants.js — Maya: ['🍕', '🎨', '😴', '🧋'], Carlos: ['☕', '🔧', '🤔', '🍜'], Dave: ['🚀', '💭', '🫠', '🎮'], Sofia: ['🔍', '🎵', '🧸', '🌙']. A thought picks randomly on each wander cycle start, floats up 14px, stays 3s, then fades over 1s before the next cycle. The cloud itself is 0.6rem, 40% opacity, pointer-events: none. The transition uses CSS @keyframes thought-float { 0% { opacity:0; transform: translateY(0) scale(0.6); } 20% { opacity: 0.9; transform: translateY(-6px) scale(1); } 80% { opacity: 0.7; transform: translateY(-14px) scale(1); } 100% { opacity: 0; transform: translateY(-18px) scale(0.8); } }. WHY: This is the single most impactful small change for the floor view. A drifting 🍕 above a wandering worker instantly reads as 'bored human daydreaming' rather than 'system process polling'. It costs 20 lines of CSS and 15 lines of JSX but transforms idle workers from mechanical orbiters into colleagues you recognise.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "storytelling",
-      "title": "Collaboration Arcs Between Shared-Tag Workers",
-      "description": "Workers share task types (Design, Bug, Ship, QA etc.) but the floor shows zero spatial relationship between them — there is no way to see who is working on the same problem. In Office.jsx, after computing workingWorkers, derive pairs: for each unique task tag (from getTaskTags()), collect workers sharing it, then enumerate pairs. Render these pairs as an SVG layer (position: absolute, inset: 0, pointer-events: none, z-index: 0) that sits beneath worker characters. Each pair gets a quadratic bezier path: M [desk1.cx, desk1.cy] Q [midX, midY - 12%floorHeight] [desk2.cx, desk2.cy]. Stroke is the tag's category color (Design = #a78bfa, Bug = #ef4444, Ship = #f97316, QA = #3b82f6) at 25% opacity, 1.2px width, stroke-dasharray: '6 4', animated with stroke-dashoffset decreasing from 40 to 0 over 2s linear infinite — giving the appearance of particles flowing between desks. Arc fades out when either worker's tag changes. WHY: The floor is a presence map but not a collaboration map. A flowing arc between 'Maya doing Design' and 'Carlos doing Design' communicates 'they're in the same problem space' with zero new data fields, zero API changes. It turns the floor into a live team topology.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "office-life",
-      "title": "Door Arrival Light Splash",
-      "description": "doorEvent='arrive' already animates the door widget at the bottom of the floor. But the floor itself stays completely silent — nothing environmental responds. When doorEvent === 'arrive' fires, render a short-lived light element inside .office-floor at the entrance position (bottom-center, matching the .office-door location): a div with clip-path: polygon(30% 100%, 70% 100%, 90% 0%, 10% 0%) — a trapezoid representing light spilling inward through the door. background: radial-gradient(ellipse at 50% 100%, rgba(255,250,230,0.4) 0%, transparent 70%). It flashes in 0.12s (opacity 0→0.5) then fades out 1.1s (opacity 0.5→0). A second radial blur disc (24px blur, rgba(255,250,200,0.12)) sits at the door center for an additional 0.6s. Component mounts on doorEvent='arrive', self-removes after 1.3s via useEffect timeout. WHY: Light through a door when someone arrives is the most elemental piece of environmental storytelling possible. The door already animates — the floor should react. This single addition makes arrivals feel physical and cinematic, not administrative.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Vacant Desk Personality Props",
-      "description": "Empty desks — no worker assigned from workingWorkers — are visual dead zones. The desk renders a dark monitor and nothing else. Add a DESK_PROPS map to constants.js: { 0: { emoji: '🪴', label: 'desk plant' }, 1: { emoji: '📚', label: 'stack of books' }, 2: { emoji: '🎧', label: 'headphones' }, 3: { emoji: '🫖', label: 'teapot' }, 4: { emoji: '🗒️', label: 'notepad' }, 5: { emoji: '🎲', label: 'desk toy' } }. In the desk render loop in Office.jsx, when a desk ID is not in the workingWorkers map, render the prop as a 0.6rem span centered inside the desk's monitor area (aria-label from label field, pointer-events: none). When a worker arrives at the desk, the prop fades out over 0.3s via a CSS transition on opacity. When they leave, it fades back in over 0.5s. WHY: A vacant desk is not an empty desk — it is somebody's desk when they're not there. Real-world empty desks have personality: a mug, a cactus, a sticky note. Props make absence feel like temporary departure rather than nonexistence. On the screenshots, 2-3 vacant desks are always visible and they read as dead grey rectangles. This costs ~15 lines total.",
+      "title": "Coffee Machine Steam Animation",
+      "description": "The coffee machine widget (top-right) is a frozen ☕ with a plain COFFEE label — the most conspicuously static prop on the entire floor. Add CSS steam: three pseudo-element wisps (::before, ::after, and a .steam-mid span) each 2px wide, 10px tall, with border-radius: 2px, positioned above the cup. Each warp upward on a keyframe: @keyframes steam-rise { 0% { opacity:0; transform: translateY(0) scaleX(1); } 40% { opacity: 0.55; transform: translateY(-6px) scaleX(1.4); } 100% { opacity:0; transform: translateY(-14px) scaleX(0.7); } }. Stagger delays: 0s, 0.4s, 0.8s, loop infinite 1.8s ease-in-out. Color: rgba(255,255,255,0.35). On vibe='crushing', speed up to 1.1s (add a CSS var --steam-dur that Office.jsx sets via inline style). On vibe='slow-day', slow to 3.5s. On vibe='after-hours', pause animation (animation-play-state: paused — nobody's making coffee). WHY: The coffee machine is spatially prominent and perfectly positioned for ambient life. Three lines of keyframe CSS and a span transforms it from dead clip-art into a room prop you can feel. It also becomes the first vibe-reactive environmental object that isn't a worker.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
-      "priority": "should",
-      "category": "storytelling",
-      "title": "After-Hours Cleaner Bot",
-      "description": "The after-hours vibe currently changes the grid line color to indigo and dims the manager monitor — that is the full extent of the night-shift narrative. Add a CSSonly cleaner bot that appears only when teamVibe.key === 'after-hours'. It is a single div (12×14px) styled as a small robot shape: a square body (#4b5563), two pixel-wheels (4×3px, bottom), an antenna (2×5px, top-center). No emoji — it should look like a tiny physical bot. It traverses the floor on a deterministic patrol path using a CSS keyframes animation: left-to-right across the bottom desk row (0%–30%, y=55%), diagonal to opposite corner (30%–45%), right-to-left across the top row (45%–70%, y=28%), back down center aisle (70%–100%). Total cycle: 40s linear infinite. It fades in (0.6s) when vibe enters after-hours, fades out (0.6s) when vibe changes. Suppress in prefers-reduced-motion. WHY: Night shift is a distinct office state but right now it's just a colour swap. A tiny autonomous bot slowly sweeping the empty floor is the most efficient possible environmental storytelling for after-hours. It makes the space feel inhabited-but-empty in exactly the right way.",
+      "priority": "must",
+      "category": "information",
+      "title": "Desk Progress Bar Strip",
+      "description": "The '•••' dots under each working worker's name have been read as a loading spinner or decorative filler in three consecutive user tests — they carry no task-progress meaning. Replace with a thin progress bar: a div.desk__progress-bar (position: absolute, bottom: 6%, left: 10%, width: 80%, height: 3px, border-radius: 2px, background: rgba(255,255,255,0.08)) containing a div.desk__progress-fill (height: 100%, border-radius: 2px, width: driven by worker.taskProgress%, transition: width 0.8s ease). Color the fill by task category: Design → #a78bfa, Bug → #ef4444, Ship → #f97316, QA → #3b82f6, default → var(--accent). When fill reaches 100%, play a 0.4s flash: @keyframes bar-complete { 0%,100% { opacity:1; } 50% { opacity:0.2; background: #ffffff; } }, then the bar resets to 0 on the next tick. Idle workers get opacity:0 on the bar. WHY: This single change converts the desk row from an avatar grid into a live task board. Six progress bars in view simultaneously give a team-wide delivery pulse at a glance — something the floor has never had. It costs ~20 lines of CSS/JSX and eliminates the '•••' ambiguity permanently.",
       "effort": "small",
-      "assigned_to": "dave"
+      "assigned_to": "carlos"
     },
     {
-      "priority": "could",
-      "category": "delight",
-      "title": "Rising Code Symbol Particles on Working Desks",
-      "description": "Working desks already have a typed-glyph bob animation and monitor glow. Add one more layer: an ephemeral code-symbol particle that rises from just above the desk monitor every 5-9 seconds (randomized per desk via CSS custom property --desk-seed). The particle is a single span inside .desk__monitor containing one character drawn randomly from the set ['{ }', '//', '→', '✓', '⌘', '&&', '▶']. It starts at opacity: 0, translateY: 0, then animates to opacity: 0.6 at 30%, then fades and rises to opacity: 0 at translateY: -16px over 0.9s ease-out. Use a CSS @keyframes code-rise, applied to the span via animation. Only render the span when desk status is working; remove it (or set animation: none) when idle. One span per desk, reused via CSS animation-iteration-count: infinite with varying animation-delay. WHY: The desk bob shows a person typing — but the desk itself never 'exhales' work. A single rising symbol every several seconds is subliminal: you don't consciously register it but the floor feels productive. It is the visual equivalent of keyboard sounds drifting through an open-plan office.",
+      "priority": "should",
+      "category": "storytelling",
+      "title": "SHIP IT Note Tether Line",
+      "description": "The 'SHIP IT' sticky note floats in dead space on the left edge with no visible connection to any worker or desk. A physical sticky note on a real office wall has a string, an arrow, or a position that implies ownership. In Office.jsx, identify the note's assigned worker from its metadata (or default to the nearest desk). Draw an SVG line from the note's right-center [noteEl.right, noteEl.centerY] to the assigned desk's left-center [desk.left, desk.centerY]. Style: stroke rgba(251,191,36,0.35), strokeWidth 1.5, strokeDasharray '5 4'. Animate stroke-dashoffset from 36 to 0 over 1.2s linear infinite — giving a slow 'electricity flowing toward the desk' feel. When the assigned worker is idle, transition stroke to rgba(239,68,68,0.5) over 0.4s. When the note content changes (new task), the line redraws with a 0.25s fade-out/in. The SVG layer is position: absolute, inset:0, pointer-events: none, z-index:1. WHY: The note is the only visible task artifact on the floor and it's spatially orphaned. A tether line makes it a real assignment — 'this sprint goal belongs to that person' — with one animated stroke.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
-      "priority": "wild",
-      "category": "feature",
-      "title": "Floor Productivity Heatmap Toggle",
-      "description": "The floor shows WHO is there but not HOW DENSE the work is spatially. Add a small 🌡️ button (20px, bottom-left of .office-floor, z-index 10, semi-transparent background with a 2px border matching --accent) that, when clicked, overlays a 7-second auto-dismissing heatmap layer. Implementation: a .floor-heatmap div (position: absolute, inset:0, pointer-events: none, z-index: 2) containing one .heatmap-node per active worker, positioned at that worker's desk coordinates. Each node is a 60×40px div with border-radius: 50%, filter: blur(18px), mix-blend-mode: screen, opacity: 0.55. Color by progress bucket: 0-30% = #ef4444 (red), 31-70% = #f59e0b (amber), 71-99% = #22c55e (green), idle/absent = hidden. On open, nodes scale from 0→1 over 0.4s staggered. A countdown border on the toggle button (CSS conic-gradient border depleting from 100%→0% over 7s) shows time remaining. Auto-close after 7s. A legend row (3 dots + labels: Blocked / In Progress / Crushing) appears at the bottom of the floor during active view. WHY: This collapses the entire team's progress state into one spatial scan — you see whether energy is distributed or stuck. It is the single biggest information-density upgrade the floor could get in one interaction. The 7-second auto-dismiss prevents it from becoming a permanent clutter layer.",
-      "effort": "medium",
+      "priority": "should",
+      "category": "delight",
+      "title": "Trophy Unlock Burst Animation",
+      "description": "Trophy icons next to Maya and Sofia's desks are fully static — no feedback, no history, no meaning communicated to someone looking at the floor for the first time. Two changes: (1) Add a counter badge — a span.trophy__count (position: absolute, top:-4px, right:-4px, min-width:12px, height:12px, background:var(--accent), border-radius:6px, font-size:0.45rem, color:#fff, display:flex, align-items:center, justify-content:center) showing the integer trophy count. (2) On a new trophy earned (detect via prev vs current trophy count in useEffect), play a burst: four ray divs (absolute, 8×2px, border-radius:1px, background:#fbbf24) rotate-translated outward from the trophy center at 0°/90°/180°/270°, animating from scale(0) opacity(1) at 0% to scale(1.8) opacity(0) at 100% over 0.55s ease-out. The trophy itself scales 1→1.35→1 over 0.4s. All cleanup via setTimeout. WHY: Trophies are the floor's only recognition mechanic and they're silent. A burst that lasts half a second communicates 'something good just happened here' to anyone watching. It is the minimum viable celebration.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "should",
+      "category": "office-life",
+      "title": "Window Widget Sky Gradient",
+      "description": "The window widget (dark rectangle, top-right) is a dead black box that reads as a broken image or an off monitor. It is the most evocative prop on the floor — a literal window to the outside world — but it shows nothing. Fix: in the window component, compute hourBucket from new Date().getHours(). Apply a CSS linear-gradient background accordingly: dawn 5-8h → linear-gradient(180deg, #f97316 0%, #fbbf24 60%, #93c5fd 100%); day 8-17h → linear-gradient(180deg, #1d4ed8 0%, #3b82f6 60%, #bfdbfe 100%); dusk 17-20h → linear-gradient(180deg, #7c3aed 0%, #f97316 40%, #fbbf24 100%); night 20-5h → linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%) with three 3×3px white dots (stars, positioned via %). Add a 6px circle .window__sun (background:#fbbf24 day/#f0abfc dusk/#e2e8f0 night for moon, border-radius:50%, position:absolute) at left: calc(10% + (var(--hour-frac) * 80%)), top:30%, where --hour-frac is a 0–1 CSS custom property set by JS from the current hour. WHY: The window is structurally identical to a weather widget and it costs 25 lines. A dawn sky at 6am and a night sky at midnight make the floor time-aware without a single API call.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "could",
+      "category": "visual",
+      "title": "Office Aisle Marker Between Desk Rows",
+      "description": "The two desk rows (top and bottom) share the same visual plane with nothing separating them — the floor looks like an unplanned parking lot rather than a workplace with circulation paths. Add a single horizontal .office-aisle div: position:absolute, left:4%, width:92%, top:52%, height:1px, background: repeating-linear-gradient(90deg, rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 8px, transparent 8px, transparent 16px). Centered on this line, add two tiny .aisle-arrow spans (▶ ◀, font-size:0.45rem, color:rgba(255,255,255,0.12), positioned left:48% and left:51%) suggesting bidirectional foot traffic. On vibe='crushing', aisle opacity bumps to 0.13 (everyone moving fast). On vibe='slow-day', drops to 0.04. On vibe='after-hours', the arrows flip to a single centered ▼ (cleaner-bot direction). WHY: Real open-plan offices are defined by their aisles as much as their desks. One horizontal 1px dashed line with two arrows takes 8 lines of CSS and converts the floor from a floating grid of boxes into a space with implied movement and direction.",
+      "effort": "small",
       "assigned_to": "carlos"
+    },
+    {
+      "priority": "wild",
+      "category": "delight",
+      "title": "Vibe-Change Radial Shockwave",
+      "description": "When teamVibe changes (e.g., slow-day → crushing), the floor currently crossfades grid colors over ~0.3s — a settings-panel transition, not an event. The whole team just shifted energy and the room whispers about it. Instead, fire a radial shockwave from Bloberto's desk center on every vibe change. Implementation: a .vibe-shockwave div (position:absolute, border-radius:50%, pointer-events:none, z-index:5) mounted via React state on vibeKey change. Initial state: width:0, height:0, centered at Bloberto desk coords, border: 2px solid [new vibe's accent color], opacity: 0.7. Animate via CSS @keyframes shockwave { to { width: 140%; height: 140%; opacity: 0; border-width: 0.5px; } } over 0.9s cubic-bezier(0.2, 0.8, 0.4, 1). Component self-removes via useEffect cleanup at 900ms. That is the entire implementation. WHY: A vibe change is the most significant state event in Bloberto's Office — it means the whole team's energy just shifted. A shockwave that blooms from the boss's desk and fades over a second transforms a CSS variable swap into a moment of communal narrative. It costs 15 lines and it will be the single most-noticed animation on the floor.",
+      "effort": "small",
+      "assigned_to": "maya"
     }
   ],
-  "hire_proposals": [
-    {
-      "name": "Noa",
-      "role": "Ambient Experience Designer",
-      "emoji": "🔊",
-      "justification": "Three consecutive reviews have now independently arrived at the same gap: Bloberto's Office is visually rich but aurally and kinetcially inert. Maya, Carlos, Dave and Sofia are strong engineers who implement motion well, but nobody owns the ambient layer as a system — which is why animations keep appearing as isolated features rather than a coherent motion language. Noa's mandate: (1) design and implement a unified timing/easing token set that all floor animations share, (2) build the opt-in Web Audio API soundscape (procedural keyboard hum, coffee machine, distant typing — no external audio files, default muted, WCAG 2.1 compliant with a prominent mute button), and (3) own seasonal and time-aware office variations so the floor feels different in December vs July. This is not a junior CSS role — it requires a rare combination of motion design taste, Web Audio API fluency, and systems thinking. The hire unblocks at least four backlogged ideas across reviews 31 and 32.",
-      "status": "pending-approval"
-    }
-  ]
+  "hire_proposals": []
 }
