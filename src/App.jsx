@@ -587,6 +587,7 @@ export default function App() {
   const [confettiActive, setConfettiActive] = useState(false)
   const [workerConfetti, setWorkerConfetti] = useState(null) // { name, color }
   const [completionToast, setCompletionToast] = useState(null) // { name, color }
+  const confettiTimerRef = useRef(null)
   const workerConfettiTimerRef = useRef(null)
   const completionToastTimerRef = useRef(null)
   const [vibeHistory, setVibeHistory] = useState([])
@@ -768,10 +769,6 @@ export default function App() {
     [allWorkers]
   )
 
-  const activityLogLenRef = useRef(0)
-  const stableActivityLog = useMemo(() => activityLog, [activityLog])
-  useEffect(() => { activityLogLenRef.current = activityLog.length }, [activityLog.length])
-
   const teamVibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers])
 
   // ── Diff activeWorkers vs previous snapshot ──
@@ -861,8 +858,9 @@ export default function App() {
     const vibeRanking = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }
     const prevKey = previousVibeKeyRef.current
     if (prevKey !== null && vibeRanking[teamVibe.key] > (vibeRanking[prevKey] ?? -1)) {
+      if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current)
       setConfettiActive(true)
-      setTimeout(() => setConfettiActive(false), 2500)
+      confettiTimerRef.current = setTimeout(() => setConfettiActive(false), 2500)
     }
     // Log vibe transition to activity feed
     if (prevKey !== null && prevKey !== teamVibe.key) {
@@ -1078,7 +1076,7 @@ export default function App() {
 
         {tab === 'office' ? (
           <div role="tabpanel" id="tabpanel-office" aria-labelledby="tab-office">
-            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={stableActivityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} vibeStreak={vibeStreak} />
+            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} vibeStreak={vibeStreak} />
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
@@ -1103,7 +1101,7 @@ export default function App() {
                     worker={activeWorkers[0]}
                     index={0}
                     isNew={newIds.has(activeWorkers[0].id)}
-                    activityEntries={stableActivityLog}
+                    activityEntries={activityLog.filter(e => e.worker === activeWorkers[0].name).slice(-3)}
                     isFocused={focusedWorker === activeWorkers[0].id}
                     selectedTag={selectedTag}
                     onTagClick={handleTagClick}
@@ -1126,7 +1124,7 @@ export default function App() {
                         worker={w}
                         index={i}
                         isNew={newIds.has(w.id)}
-                        activityEntries={stableActivityLog}
+                        activityEntries={activityLog.filter(e => e.worker === w.name).slice(-3)}
                         isFocused={focusedWorker === w.id}
                         selectedTag={selectedTag}
                         onTagClick={handleTagClick}
@@ -1139,7 +1137,7 @@ export default function App() {
                         worker={w}
                         index={activeWorkers.length}
                         isFading
-                        activityEntries={stableActivityLog}
+                        activityEntries={activityLog.filter(e => e.worker === w.name).slice(-3)}
                         selectedTag={selectedTag}
                         onTagClick={handleTagClick}
                         isDimmed={selectedTag !== null && !getTaskTags(w.task).some(t => t.label === selectedTag)}

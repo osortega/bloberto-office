@@ -1,28 +1,5 @@
 {
-  "workers": [
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f",
-      "status": "working",
-      "task": "Fix confetti timer leak + Luna SVG gradient ID collision + dead activityLogLenRef (QA #10 high-priority)",
-      "progress": 0,
-      "updated_at": "2026-03-08T17:45:34Z",
-      "startedAt": "2026-03-08T17:45:34Z"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8",
-      "status": "working",
-      "task": "Fix stableActivityLog useMemo defeating React.memo + hover card time bug (QA #10 high-priority)",
-      "progress": 0,
-      "updated_at": "2026-03-08T17:45:34Z",
-      "startedAt": "2026-03-08T17:45:34Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     {
       "id": "carlos",
@@ -55,5 +32,5 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "updated_at": "2026-03-08T17:45:34Z"
+  "updated_at": "2026-03-08T17:48:35Z"
 }

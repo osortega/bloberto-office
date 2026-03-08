@@ -4,6 +4,8 @@ import { getTeamVibeKey } from './utils/vibe.js'
 import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
 import { VIBE_QUOTES, VIBE_TRANSITION_QUOTES } from './utils/quotes.js'
 
+let _gradIdx = 0
+
 const DESK_SCREEN_SVG = {
   carlos: (
     <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -249,7 +251,7 @@ const CharacterAvatar = memo(function CharacterAvatar({ workerId, role, name, si
   }
 
   if (workerId === 'luna') {
-    const gradId = `luna-hair-${workerId}`
+    const gradId = useRef(`luna-hair-${workerId}-${_gradIdx++}`).current
     return (
       <svg width={size} height={size} viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label={ariaLabel}>
         <defs>
@@ -599,8 +601,11 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
             </div>
           )}
           <div>{STATUS_EMOJIS[worker.status]} {STATUS_LABELS[worker.status]}</div>
-          {worker.updated_at && (
-            <div className="hover-time">⏱ {formatIdleDuration(worker.updated_at)}</div>
+          {variant === 'working' && worker.startedAt && (
+            <div className="hover-time">on task for {formatIdleDuration(worker.startedAt)}</div>
+          )}
+          {variant === 'idle' && worker.updated_at && (
+            <div className="hover-time">idle for {formatIdleDuration(worker.updated_at)}</div>
           )}
         </div>
       )}

@@ -362,6 +362,18 @@
       "worker": "Maya",
       "message": "Assigned 2 fixes from QA #10: stableActivityLog useMemo + hover card time bug",
       "timestamp": "2026-03-08T17:45:43Z"
+    },
+    {
+      "type": "complete",
+      "worker": "Carlos",
+      "message": "Fixed confetti timer leak, Luna SVG gradient ID collision, removed dead activityLogLenRef",
+      "timestamp": "2026-03-08T17:48:35Z"
+    },
+    {
+      "type": "complete",
+      "worker": "Maya",
+      "message": "Fixed stableActivityLog useMemo defeating React.memo, fixed hover card time-since bug for working workers",
+      "timestamp": "2026-03-08T17:48:35Z"
     }
   ]
 }
