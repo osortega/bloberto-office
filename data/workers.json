@@ -49,11 +49,11 @@
       "name": "Sofia",
       "role": "QA Engineer",
       "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "",
+      "status": "working",
+      "task": "QA Review #35 \u2014 Full site analysis with Puppeteer screenshots",
       "progress": 0,
-      "started": null,
-      "updated_at": "2026-03-07T23:50:00Z"
+      "started": "2026-03-08T00:15:00Z",
+      "updated_at": "2026-03-08T00:15:00Z"
     }
   ],
   "roster": [
@@ -83,5 +83,5 @@
       "role": "Creative Director"
     }
   ],
-  "last_updated": "2026-03-08T00:07:37Z"
+  "last_updated": "2026-03-08T00:15:00Z"
 }
