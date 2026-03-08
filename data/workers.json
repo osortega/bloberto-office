@@ -1,11 +1,14 @@
 {
-  "workers": [],
-  "roster": [
-    { "id": "carlos", "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
-    { "id": "maya", "name": "Maya", "role": "Frontend Engineer", "emoji": "🎨" },
-    { "id": "dave", "name": "Dave", "role": "DevOps Engineer", "emoji": "🚀" },
-    { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
-    { "id": "luna", "name": "Luna", "role": "Creative Director", "emoji": "🌙" }
+  "workers": [
+    {
+      "name": "Luna",
+      "emoji": "🌙",
+      "role": "creative-director",
+      "status": "working",
+      "task": "Creative review #46 — reviewing site and writing ideas",
+      "started_at": "2026-03-08T14:00:00Z",
+      "updated_at": "2026-03-08T14:00:00Z"
+    }
   ],
-  "updated_at": "2026-03-08T13:55:00Z"
+  "updated_at": "2026-03-08T14:00:00Z"
 }
