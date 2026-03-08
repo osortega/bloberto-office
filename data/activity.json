@@ -346,5 +346,17 @@
     "type": "complete",
     "worker": "Sofia",
     "message": "QA review #13 complete \u2014 10 findings (2 high, 4 medium, 4 low). Overall: 3.6/5. Key: stableActivityLog stale data bug, mobile dead zone, App.jsx monolith, no ErrorBoundary."
+  },
+  {
+    "timestamp": "2026-03-08T10:23:00Z",
+    "type": "hire",
+    "worker": "Carlos",
+    "message": "Assigned: Fix stableActivityLog stale data bug (Sofia #13)"
+  },
+  {
+    "timestamp": "2026-03-08T10:23:00Z",
+    "type": "hire",
+    "worker": "Maya",
+    "message": "Assigned: Fix mobile dead zone + touch targets (Sofia #13)"
   }
 ]
