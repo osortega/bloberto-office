@@ -191,8 +191,8 @@ function ProgressBar({ progress, updatedAt, startedAt }) {
   }, [progress])
 
   const workingMs = startedAt ? Date.now() - new Date(startedAt).getTime() : null
-  const workingMins = workingMs ? workingMs / 60000 : 0
-  const eta = (progress > 5 && workingMins > 1) ? Math.round((workingMins / progress) * (100 - progress)) : null
+  const workingMins = workingMs != null && workingMs > 0 ? workingMs / 60000 : 0
+  const eta = (progress > 5 && progress < 100 && workingMins > 1) ? Math.round((workingMins / progress) * (100 - progress)) : null
 
   return (
     <div className="progress-wrapper">
@@ -454,7 +454,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive }) {
           <span className="stat-label">⚠️ Stuck</span>
           <span className="stat-value">
             {stuckWorkers.length === 1
-              ? `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].startedAt)}`
+              ? `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].updated_at || stuckWorkers[0].startedAt)}`
               : `${stuckWorkers.length} workers`}
           </span>
         </div>
@@ -522,6 +522,7 @@ function ShortcutToast() {
 
   const dismiss = useCallback((gotIt = false) => {
     localStorage.setItem('bloberto-shortcuts-shown', '1')
+    clearTimeout(timerRef.current)
     if (gotIt) {
       setPhase('gotit')
       timerRef.current = setTimeout(() => {
@@ -759,7 +760,11 @@ export default function App() {
     [allWorkers]
   )
 
-  const stableActivityLog = useMemo(() => activityLog, [JSON.stringify(activityLog)])
+  const activityLogLenRef = useRef(0)
+  const stableActivityLog = useMemo(() => {
+    activityLogLenRef.current = activityLog.length
+    return activityLog
+  }, [activityLog.length])
 
   const teamVibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers])
 

@@ -1403,7 +1403,10 @@
 [data-vibe='crushing'] .aisle-arrow { color: rgba(255,255,255,0.18); }
 [data-vibe='slow-day'] .office-aisle { opacity: 0.4; }
 [data-vibe='after-hours'] .aisle-arrow { font-size: 0; }
-[data-vibe='after-hours'] .office-aisle::after { content: '▾'; font-size: 0.45rem; color: rgba(255,255,255,0.08); }
+[data-vibe='after-hours'] .office-aisle::after {
+  content: '▾';
+  font-size: 0.45rem;
+  color: rgba(255,255,255,0.08);
   position: absolute;
   left: 38%;
   top: 68%;

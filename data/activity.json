@@ -214,5 +214,17 @@
     "worker": "Luna",
     "message": "Creative review #34 complete \u2014 7 ideas: Wall Clock, Whiteboard Thermometer, Trophy Shelf, Task Color Chips, Conference Standup, Deploy Ticker, Panic Lap",
     "timestamp": "2026-03-08T05:30:59Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Maya",
+    "message": "Fixed ShortcutToast timer leak + Office.css broken brace (QA #8 HIGH)",
+    "timestamp": "2026-03-08T05:33:52Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "Fixed ProgressBar ETA bug + React.memo defeat + stuck worker null display (QA #8 HIGH)",
+    "timestamp": "2026-03-08T05:33:52Z"
   }
 ]
