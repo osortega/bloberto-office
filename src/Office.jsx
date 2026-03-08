@@ -54,6 +54,56 @@ const DESK_SCREEN_SVG = {
       <path d="M35,3.5 L35.7,5.3 L37.4,5.4 L36.2,6.5 L36.5,8.3 L35,7.4 L33.5,8.3 L33.8,6.5 L32.6,5.4 L34.3,5.3 Z" fill="#fbbf24" />
     </svg>
   ),
+  carlos_error: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#1a0000" />
+      <rect x="2" y="3" width="28" height="2" rx="1" fill="#ef4444" opacity="0.9"><animate attributeName="opacity" values="0.9;0.3;0.9" dur="0.6s" repeatCount="indefinite" /></rect>
+      <rect x="2" y="8" width="20" height="2" rx="1" fill="#ef4444" opacity="0.7"><animate attributeName="opacity" values="0.7;0.2;0.7" dur="0.8s" repeatCount="indefinite" /></rect>
+      <text x="3" y="17" fontSize="4.5" fill="#ef4444" fontFamily="monospace">PANIC</text>
+    </svg>
+  ),
+  maya_error: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#1a0000" />
+      <rect x="1" y="1" width="36" height="16" rx="1" fill="none" stroke="#ef4444" strokeWidth="0.8"><animate attributeName="stroke-opacity" values="1;0.3;1" dur="0.7s" repeatCount="indefinite" /></rect>
+      <text x="7" y="11" fontSize="5" fill="#ef4444" fontFamily="monospace">PANIC</text>
+    </svg>
+  ),
+  dave_error: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#1a0000" />
+      <polyline points="2,9 6,9 8,4 10,14 12,9 16,9 18,5 20,13 22,9 36,9" fill="none" stroke="#ef4444" strokeWidth="1.2"><animate attributeName="stroke-opacity" values="1;0.3;1" dur="0.5s" repeatCount="indefinite" /></polyline>
+      <text x="3" y="17" fontSize="4.5" fill="#ef4444" fontFamily="monospace">PANIC</text>
+    </svg>
+  ),
+  sofia_error: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#1a0000" />
+      <rect x="4"  y="14" width="5" height="2" rx="0.5" fill="#ef4444" opacity="0.9"><animate attributeName="height" values="2;8;2" dur="0.6s" repeatCount="indefinite" /><animate attributeName="y" values="14;8;14" dur="0.6s" repeatCount="indefinite" /></rect>
+      <rect x="11" y="14" width="5" height="2" rx="0.5" fill="#ef4444" opacity="0.8"><animate attributeName="height" values="2;10;2" dur="0.8s" repeatCount="indefinite" /><animate attributeName="y" values="14;6;14" dur="0.8s" repeatCount="indefinite" /></rect>
+      <rect x="18" y="14" width="5" height="2" rx="0.5" fill="#ef4444" opacity="0.85"><animate attributeName="height" values="2;6;2" dur="0.5s" repeatCount="indefinite" /><animate attributeName="y" values="14;10;14" dur="0.5s" repeatCount="indefinite" /></rect>
+      <rect x="25" y="14" width="5" height="2" rx="0.5" fill="#ef4444" opacity="0.9"><animate attributeName="height" values="2;12;2" dur="0.7s" repeatCount="indefinite" /><animate attributeName="y" values="14;4;14" dur="0.7s" repeatCount="indefinite" /></rect>
+      <text x="3" y="17" fontSize="3.5" fill="#ef4444" fontFamily="monospace">PANIC</text>
+    </svg>
+  ),
+  luna_error: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#1a0000" />
+      <rect x="1"  y="3" width="7" height="12" rx="1" fill="#ef4444"><animate attributeName="opacity" values="0.9;0.2;0.9" dur="0.5s" repeatCount="indefinite" /></rect>
+      <rect x="9"  y="3" width="7" height="12" rx="1" fill="#dc2626"><animate attributeName="opacity" values="0.8;0.3;0.8" dur="0.7s" repeatCount="indefinite" /></rect>
+      <rect x="17" y="3" width="7" height="12" rx="1" fill="#ef4444"><animate attributeName="opacity" values="0.85;0.2;0.85" dur="0.6s" repeatCount="indefinite" /></rect>
+      <rect x="25" y="3" width="7" height="12" rx="1" fill="#dc2626"><animate attributeName="opacity" values="0.9;0.3;0.9" dur="0.4s" repeatCount="indefinite" /></rect>
+      <text x="3" y="17" fontSize="4.5" fill="#ef4444" fontFamily="monospace">PANIC</text>
+    </svg>
+  ),
+}
+
+const BLOBERTO_TITLES = {
+  crushing:      'CVO',
+  'on-fire':     'CFO',
+  'slow-day':    'CDO',
+  'in-flow':     'CPO',
+  'after-hours': 'CISO',
 }
 
 const VIBE_WEATHER_ICONS = {
@@ -376,6 +426,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   const [pinnedCard, setPinnedCard] = useState(false)
   const [justCompleted, setJustCompleted] = useState(false)
   const [idleBubble, setIdleBubble] = useState(false)
+  const [errorBubble, setErrorBubble] = useState(null)
   const timerRef = useRef(null)      // hover auto-hide timeout
   const ambientRef = useRef(null)    // ambient broadcast interval
   const isHoveringRef = useRef(false) // prevents ambient overlap with hover
@@ -403,6 +454,23 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
     }, showDelay)
     return () => { clearInterval(interval); clearTimeout(initialTimeout) }
   }, [variant, wanderIdx])
+
+  // Error micro-bubbles — distress messages for workers in error state
+  const ERROR_BUBBLE_MESSAGES = ['💀', '⚠️ help?', 'it was fine locally', '🧨', 'send help', 'undefined is not a function']
+  useEffect(() => {
+    const isErr = variant === 'error' || worker.status === 'error'
+    if (!isErr) return
+    const pick = () => ERROR_BUBBLE_MESSAGES[Math.floor(Math.random() * ERROR_BUBBLE_MESSAGES.length)]
+    const interval = setInterval(() => {
+      setErrorBubble(pick())
+      setTimeout(() => setErrorBubble(null), 2200)
+    }, 12000)
+    const initialTimeout = setTimeout(() => {
+      setErrorBubble(pick())
+      setTimeout(() => setErrorBubble(null), 2200)
+    }, 2000 + wanderIdx * 1500)
+    return () => { clearInterval(interval); clearTimeout(initialTimeout) }
+  }, [variant, worker.status])
 
   // Progress ring 100% burst
   useEffect(() => {
@@ -585,6 +653,9 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       <div className="char__name">{firstName}</div>
       {variant === 'idle' && idleBubble && (
         <div className="idle-micro-bubble">{IDLE_BUBBLE_EMOJIS[wanderIdx] || '💭'}</div>
+      )}
+      {errorBubble && (
+        <div className="idle-micro-bubble" data-type="error">{errorBubble}</div>
       )}
       {variant === 'working' && (
         <div className="typing-dots">
@@ -1049,7 +1120,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         <div className="mgr-desk" data-vibe={vibe}>
           <div className="mgr-desk__monitor" data-vibe={vibe} />
           <div key={vibe} ref={nameplateRef} className="mgr-desk__nameplate mgr-desk__nameplate--vibe">
-            {vibe === 'crushing' ? 'CVO' : vibe === 'on-fire' ? 'INCIDENT CMD' : vibe === 'in-flow' ? 'MANAGER' : vibe === 'slow-day' ? 'DIR. OF VIBES' : vibe === 'after-hours' ? 'NIGHT WATCH' : 'MANAGER'}
+            {BLOBERTO_TITLES[vibe] ?? 'CVO'}
           </div>
           {vibe === 'on-fire' && (
             <div className="mgr-desk__coffee" aria-hidden="true">☕</div>
@@ -1116,9 +1187,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                       <div className="desk-monitor-screen--sleep" />
                     </div>
                   )}
-                  {isWorking && (DESK_SCREEN_SVG[occ.worker.id] || true) && (
+                  {(isWorking || hasError) && (DESK_SCREEN_SVG[occ.worker.id] || true) && (
                     <div className="desk-monitor-screen">
-                      {DESK_SCREEN_SVG[occ.worker.id] || (
+                      {DESK_SCREEN_SVG[hasError ? (occ.worker.id + '_error') : occ.worker.id] || DESK_SCREEN_SVG[occ.worker.id] || (
                         <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                           <rect width="38" height="18" fill="#05050f" />
                           <rect x="2" y="3" width="28" height="2" rx="1" fill={ROLE_COLORS[occ.worker.role] ?? '#6b7280'} opacity="0.9" />

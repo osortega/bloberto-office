@@ -2211,6 +2211,12 @@
   100% { opacity: 0; transform: translateX(-50%) translateY(-8px); }
 }
 
+.idle-micro-bubble[data-type='error'] {
+  background: rgba(60, 0, 0, 0.75);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
 @media (hover: none) {
   .char-hover-card { pointer-events: auto; }
 }
