@@ -945,6 +945,11 @@
   animation-duration: 8s;
 }
 
+/* ── Error Room Tint ── */
+.office-floor[data-has-error]::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 70% 55% at center, transparent 25%, rgba(239,68,68,0.07) 100%); pointer-events:none; z-index:0; animation:error-room-throb 1.8s ease-in-out infinite; border-radius:14px; }
+@keyframes error-room-throb { 0%,100%{opacity:0.55} 50%{opacity:1} }
+.office-floor[data-has-error] { border-color: rgba(239,68,68,0.35) !important; }
+
 /* ---- Ambient Dust Particles ---- */
 .office-floor::before {
   content: '';
@@ -1144,6 +1149,9 @@
   0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 193, 7, 0.4)); }
   50% { filter: drop-shadow(0 0 14px rgba(255, 193, 7, 0.85)); }
 }
+.char--deep-work .char__avatar { border-color: #6366f1 !important; animation: deep-focus-halo 3s ease-in-out infinite !important; }
+@keyframes deep-focus-halo { 0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,0), 0 3px 10px rgba(0,0,0,0.4); } 50% { box-shadow: 0 0 0 6px rgba(99,102,241,0.45), 0 0 18px rgba(99,102,241,0.2), 0 3px 10px rgba(0,0,0,0.4); } }
+.char--deep-work .char__name::after { content: ' 🎧'; }
 
 /* ── Error Glitch ── */
 .char--glitch .char__avatar {
@@ -1606,3 +1614,12 @@
   50% { opacity: 0.15; }
   100% { transform: translateY(-18px); opacity: 0; }
 }
+
+/* ── Feature: Desk Monitor Cursor Blink (Luna #37.2) ── */
+.desk:hover .desk__monitor:not(.desk__monitor--vacant) { position: relative; }
+.desk:hover .desk__monitor:not(.desk__monitor--vacant)::before { content:'▋'; position:absolute; bottom:2px; left:3px; font-size:5px; line-height:1; color:var(--role-color, #a78bfa); opacity:0.75; animation:cursor-blink 0.9s step-start infinite; }
+@keyframes cursor-blink { 0%,100%{opacity:0.75} 50%{opacity:0} }
+
+/* ── Feature: Character Click Sonar Ping (Luna #37.4) ── */
+.char--pinged .char__avatar::after { content:''; position:absolute; inset:-3px; border-radius:50%; border:2px solid var(--role-color, var(--accent)); animation:sonar-ping 0.7s ease-out forwards; pointer-events:none; }
+@keyframes sonar-ping { from{opacity:0.9;transform:scale(0.85)} to{opacity:0;transform:scale(2.4)} }

@@ -304,7 +304,7 @@ function AwaySign({ workerId, idleMinutes }) {
   )
 }
 
-const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick }) {
+const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick, isPinged = false }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
   const isManager = worker.id === 'bloberto'
@@ -401,6 +401,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
     classes.push('char--deep-work')
   }
   if (isError) classes.push('char--glitch')
+  if (isPinged) classes.push('char--pinged')
 
   const extraProps = (tooltip && variant !== 'ghost') ? { 'data-tooltip': tooltip } : {}
 
@@ -719,12 +720,22 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const nonMgr        = workers.filter(w => w.id !== 'bloberto')
   const workingWorkers = nonMgr.filter(w => w.status === 'working')
   const idleWorkers    = nonMgr.filter(w => w.status !== 'working')
+  const hasAnyError    = nonMgr.some(w => w.status === 'error')
 
   const avgProgress = Math.round(
     workingWorkers.reduce((s, w) => s + (w.progress || 0), 0) / Math.max(workingWorkers.length, 1)
   )
 
   const [showDone, setShowDone] = useState(false)
+  const [pingedId, setPingedId] = useState(null)
+  const pingTimerRef = useRef(null)
+
+  const handleCharClick = (worker) => {
+    if (pingTimerRef.current) clearTimeout(pingTimerRef.current)
+    setPingedId(worker.id)
+    pingTimerRef.current = setTimeout(() => setPingedId(null), 700)
+    if (onWorkerClick) onWorkerClick(worker)
+  }
   const prevAvgProgress = useRef(avgProgress)
   useEffect(() => {
     if (avgProgress === 100 && prevAvgProgress.current !== 100) {
@@ -758,7 +769,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   return (
     <div className="office-wrap">
       <div
-        className="office-floor" data-vibe={vibe}
+        className="office-floor" data-vibe={vibe} data-has-error={hasAnyError || undefined}
         role="region"
         aria-label="Virtual office visualization showing team members at desks"
       >
@@ -920,7 +931,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               delay={i * 0.12}
               tooltip={occ.ghost ? occ.worker.role : occ.worker.task}
               activityEntries={occ.ghost ? activityEntries : []}
-              onClick={!occ.ghost && onWorkerClick ? onWorkerClick : undefined}
+              onClick={!occ.ghost && onWorkerClick ? handleCharClick : undefined}
+              isPinged={pingedId === occ.worker.id}
             />
           )
         })}
@@ -942,7 +954,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               wanderIdx={wIdx}
               delay={i * 0.2}
               tooltip={wanderTooltips[wIdx]}
-              onClick={onWorkerClick || undefined}
+              onClick={onWorkerClick ? handleCharClick : undefined}
+              isPinged={pingedId === w.id}
             />
           )
         })}
