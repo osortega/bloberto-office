@@ -1,57 +1,57 @@
 {
   "creative_director": "Luna",
-  "review_number": 43,
-  "timestamp": "2026-03-08T12:05:00Z",
-  "theme": "Clean up the carry-forwards — the whiteboard is still blinding and the nameplate ghost persists",
-  "visual_observations": "Code review confirms: (1) Nameplate dual-render bug STILL unfixed — Office.jsx line 1017 condition is !occ.ghost without !occ.idle, so idle workers show nameplate at desk AND wandering character. (2) max-height: 320px mobile issue is FIXED — grep returns no results, the offending line was removed. (3) Whiteboard #f0f0e8 background STILL unfixed at Office.css line 1094 — blazing white on dark mode. (4) Wandering char name size FIXED — now 0.32rem at line 669 with hover reveal. Two of four review #42 MUSTs resolved, two remaining.",
+  "review_number": 44,
+  "timestamp": "2026-03-08T12:30:00Z",
+  "theme": "Polish what's there — the office looks alive, now make it feel intentional",
+  "visual_observations": "Desktop: Office view is cohesive dark theme, Bloberto at manager desk with CVO title, 6 team desks populated. Luna appears at TWO desks (row 1 working + row 2 ghost) — the dual-render bug persists because workers.json entries lacked 'id' field causing activeIds matching to fail. Dashboard: Clean stats cards, Luna shows as active with progress bar. Whiteboard is properly dark-themed now. Mobile: Layout works but character names at desks are hard to read. Coffee machine, plants, and decorations add life. Overall vibe badge 'Crushing It' with fire emoji works well.",
   "ideas": [
     {
       "priority": "must",
       "category": "office-life",
-      "title": "Luna Dual-Render Bug — Nameplate Condition Missing Idle Guard (carry-forward #3)",
-      "description": "Third consecutive carry-forward. Office.jsx line 1017: condition is `!occ.ghost` but needs `!occ.ghost && !occ.idle`. When a worker is idle/wandering, their name renders at the desk nameplate AND as a wandering character label. One-line fix. WHY: This has been identified for three reviews. The fix is literally adding '&& !occ.idle' to one condition.",
+      "title": "Workers.json ID Field Standardization",
+      "description": "The dual-render bug (Luna appearing at 2 desks) is caused by workers.json entries missing the 'id' field. The Office component uses w.id to build activeIds Set for ghost filtering. Without id, activeIds contains 'undefined' and roster members aren't filtered. FIX: Ensure all workers.json entries include an 'id' field matching their roster id (lowercase name). WHY: This is a data contract bug that causes visual duplication of any working team member.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
-      "priority": "must",
+      "priority": "should",
       "category": "visual",
-      "title": "Whiteboard Dark Mode — #f0f0e8 Still Burning Eyes (carry-forward #1)",
-      "description": "Office.css line 1094 still has background: #f0f0e8 with no dark-mode variant. Fix: change base to #14122a, add [data-theme='light'] .office-whiteboard { background: #f0f0e8; }. Add vibe-specific border accents. WHY: The whiteboard is the most prominent wall element and it's a flashbang on dark mode.",
+      "title": "Mobile Desk Name Readability",
+      "description": "On mobile (375px), desk nameplates are barely legible — the text is tiny and low contrast against the dark desk background. Bump mobile nameplate font-size to 0.38rem and add a subtle text-shadow for legibility. WHY: Mobile viewers can't tell who's at which desk without squinting.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "office-life",
-      "title": "Idle Desk Vacated Glyph (carry-forward #1)",
-      "description": "Companion to the nameplate fix. When occ.idle hides the nameplate, show a subtle 'away' indicator: {occ.idle && <div className='desk__nameplate desk__nameplate--away'>↪ away</div>}. CSS: opacity 0.3, italic, 0.28rem. WHY: Empty desk with no label looks broken — 'away' tells the right story.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "feature",
-      "title": "Task Card / Sprint Card Formalization (carry-forward #1)",
-      "description": "The deployed site shows a floating task card that doesn't exist in /workspace/src. Add a SprintCard component to Office.jsx that renders when workers are active. Shows task name (truncated), mini progress bar, percentage. WHY: Feature exists in production but not in source — next clean build loses it.",
+      "category": "delight",
+      "title": "Desk Hover Card with Worker Details",
+      "description": "When hovering a desk (or tapping on mobile), show a mini-card with: worker name, role, current task, time on task. Currently you get a basic tooltip. A styled hover card would make the office feel interactive. WHY: Visitors want to know what each character is doing without switching to Dashboard.",
       "effort": "medium",
-      "assigned_to": "sofia"
+      "assigned_to": "carlos"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "On-Fire Floor Heat Shimmer (carry-forward #1)",
-      "description": "When data-vibe='on-fire', add a subtle upward-drifting orange shimmer via ::before pseudo-element on office-floor. Pure CSS, zero JSX. WHY: on-fire vibe should feel different from the floor up, not just the color scheme.",
+      "title": "On-Fire Floor Heat Shimmer",
+      "description": "When data-vibe='on-fire', add a subtle upward-drifting orange shimmer via ::before pseudo-element on office-floor. Pure CSS keyframe animation. WHY: The on-fire vibe should feel different from the floor up, reinforcing the energy visually.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Office Tab Worker Count Badge (carry-forward #1)",
-      "description": "Add a live worker count badge (e.g., 3/5) to the Office tab button so Dashboard viewers can see team activity at a glance without switching tabs. WHY: Eliminates unnecessary tab switches for status checks.",
+      "title": "Office Tab Worker Count Badge",
+      "description": "Add a small badge (e.g., '1' or '3/5') next to the Office tab button showing active worker count. WHY: Dashboard viewers can see team activity at a glance without switching tabs.",
       "effort": "small",
       "assigned_to": "carlos"
+    },
+    {
+      "priority": "wild",
+      "category": "storytelling",
+      "title": "Daily Office Narrative Log",
+      "description": "Auto-generate a short narrative paragraph from activity.json: 'Luna spent the morning reviewing designs while Carlos shipped 3 bug fixes...' Display in a collapsible section on Dashboard. WHY: Turns raw activity data into a story people want to read. Makes the office feel like it has history.",
+      "effort": "large",
+      "assigned_to": "sofia"
     }
   ],
   "hire_proposals": []

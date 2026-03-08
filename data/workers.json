@@ -1,13 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Luna",
-      "role": "Creative Director",
-      "emoji": "🌙",
-      "status": "working",
-      "task": "Creative review cycle #44",
-      "started_at": "2026-03-08T12:30:00Z"
-    }
-  ],
-  "updated_at": "2026-03-08T12:30:00Z"
+  "workers": [],
+  "updated_at": "2026-03-08T12:42:00Z"
 }
