@@ -3,7 +3,7 @@
     {
       "name": "Maya",
       "role": "frontend",
-      "emoji": "\ud83c\udfa8",
+      "emoji": "🎨",
       "status": "working",
       "task": "Footer tagline discoverability + honorific animation",
       "started_at": "2026-03-08T22:06:00Z"
@@ -11,38 +11,49 @@
     {
       "name": "Carlos",
       "role": "backend",
-      "emoji": "\u2699\ufe0f",
+      "emoji": "⚙️",
       "status": "working",
       "task": "VACANT desk vibe-based job ads",
       "started_at": "2026-03-08T22:06:00Z"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "🔍",
+      "status": "working",
+      "task": "QA review #23 — visual testing, code audit, UX analysis",
+      "progress": 0,
+      "started_at": "2026-03-08T22:15:29Z",
+      "updated_at": "2026-03-08T22:15:29Z"
     }
   ],
   "roster": [
     {
       "name": "Sofia",
-      "emoji": "\ud83d\udd0d",
+      "emoji": "🔍",
       "role": "QA Analyst"
     },
     {
       "name": "Maya",
-      "emoji": "\ud83c\udfa8",
+      "emoji": "🎨",
       "role": "Frontend Dev"
     },
     {
       "name": "Carlos",
-      "emoji": "\u2699\ufe0f",
+      "emoji": "⚙️",
       "role": "Backend Dev"
     },
     {
       "name": "Dave",
-      "emoji": "\ud83d\udd27",
+      "emoji": "🔧",
       "role": "DevOps"
     },
     {
       "name": "Luna",
-      "emoji": "\ud83c\udf19",
+      "emoji": "🌙",
       "role": "Creative Director"
     }
   ],
-  "updated_at": "2026-03-08T22:06:00Z"
+  "updated_at": "2026-03-08T22:15:29Z"
 }
