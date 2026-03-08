@@ -1758,3 +1758,65 @@
     letter-spacing: 0.06em;
   }
 }
+
+/* Vibe Caption */
+.vibe-caption {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.48rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 3px 14px;
+  z-index: 6;
+  white-space: nowrap;
+  animation: caption-rise 2.8s cubic-bezier(0.22,1,0.36,1) forwards;
+  pointer-events: none;
+}
+
+@keyframes caption-rise {
+  0% { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+}
+
+/* Conference Table Meeting */
+.conf-meeting-badge {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.38rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 5;
+}
+
+.conference-table[data-meeting] .conf-meeting-badge {
+  opacity: 1;
+}
+
+.char--seated {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.char--seated .char__avatar {
+  width: 16px;
+  height: 16px;
+  border-width: 1px;
+}

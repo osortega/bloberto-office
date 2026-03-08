@@ -540,7 +540,7 @@ function WindowElement() {
 // Chair positions around the table (angle in degrees, radius from center)
 const CHAIR_ANGLES = [0, 60, 120, 180, 240, 300]
 
-function ConferenceTable({ vibeKey }) {
+function ConferenceTable({ vibeKey, meetingWorkers = [] }) {
   const vibe = vibeKey || 'in-flow'
 
   // How many chairs are visible per vibe
@@ -564,7 +564,7 @@ function ConferenceTable({ vibeKey }) {
   const cx = 52, cy = 52, tableR = 28, chairR = 6, orbitR = 38
 
   return (
-    <div className="conference-table" aria-label="Conference table" role="img">
+    <div className="conference-table" data-meeting={meetingWorkers.length >= 2 || undefined} aria-label="Conference table" role="img" style={{ position: 'relative' }}>
       <svg width="104" height="104" viewBox="0 0 104 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: tableOpacity }}>
         <defs>
           <filter id="conf-fire-glow" x="-40%" y="-40%" width="180%" height="180%">
@@ -609,6 +609,24 @@ function ConferenceTable({ vibeKey }) {
           <text x={cx} y={cy + 5} textAnchor="middle" fontSize="14" role="img" aria-label="coffee">☕</text>
         )}
       </svg>
+
+      {meetingWorkers.length >= 2 && (
+        <>
+          <div className="conf-meeting-badge">Huddle</div>
+          {meetingWorkers.map((w, i) => {
+            const angle = CHAIR_ANGLES[i];
+            const rad = (angle * Math.PI) / 180;
+            const cx = 52, orbitR = 38;
+            const x = cx + orbitR * Math.sin(rad);
+            const y = cx - orbitR * Math.cos(rad);
+            return (
+              <div key={w.id} className="char--seated" style={{ left: x + 'px', top: y + 'px' }}>
+                <CharacterAvatar workerId={w.id} role={w.role} name={w.name} size={16} emoji={w.emoji} />
+              </div>
+            );
+          })}
+        </>
+      )}
     </div>
   )
 }
@@ -732,6 +750,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const nonMgr        = workers.filter(w => w.id !== 'bloberto')
   const workingWorkers = nonMgr.filter(w => w.status === 'working')
   const idleWorkers    = nonMgr.filter(w => w.status !== 'working')
+  const meetingWorkers = idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : []
   const hasAnyError    = nonMgr.some(w => w.status === 'error')
   const isFullSync     = nonMgr.length > 0 && idleWorkers.length === 0 && workingWorkers.length === nonMgr.length
 
@@ -741,6 +760,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
   const [showDone, setShowDone] = useState(false)
   const [pingedId, setPingedId] = useState(null)
+  const [vibeCaption, setVibeCaption] = useState(null)
+  const isFirstVibe = useRef(true)
   const pingTimerRef = useRef(null)
 
   const handleCharClick = (worker) => {
@@ -758,6 +779,20 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     }
     prevAvgProgress.current = avgProgress
   }, [avgProgress])
+
+  useEffect(() => {
+    if (isFirstVibe.current) { isFirstVibe.current = false; return; }
+    const CAPTIONS = {
+      crushing: '\u{1F680} Team locked in',
+      'on-fire': '\u{1F525} All hands',
+      'in-flow': '\u26A1 In the zone',
+      'slow-day': '\u2601\uFE0F Easy does it',
+      'after-hours': '\u{1F319} Burning the midnight oil'
+    };
+    setVibeCaption(CAPTIONS[vibe] || null);
+    const t = setTimeout(() => setVibeCaption(null), 2800);
+    return () => clearTimeout(t);
+  }, [vibe])
 
   // Roster members not currently active → ghost at empty desk
   const activeIds   = useMemo(() => new Set(workers.map(w => w.id)), [workers])
@@ -892,7 +927,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         })}
 
         {/* Conference table — lower center */}
-        <ConferenceTable vibeKey={vibe} />
+        <ConferenceTable vibeKey={vibe} meetingWorkers={meetingWorkers} />
+
+        {vibeCaption && <div className="vibe-caption" aria-live="polite">{vibeCaption}</div>}
 
         {/* Office aisle marker between desk rows */}
         <div className="office-aisle" aria-hidden="true">
