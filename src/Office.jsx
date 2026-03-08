@@ -646,6 +646,64 @@ function VibeShockwave({ vibeKey }) {
   )
 }
 
+function WallClock({ vibeKey }) {
+  const [time, setTime] = useState(() => new Date())
+
+  useEffect(() => {
+    const id = setInterval(() => setTime(new Date()), 60000)
+    return () => clearInterval(id)
+  }, [])
+
+  const h = time.getHours()
+  const m = time.getMinutes()
+  const hourDeg = (h % 12) * 30 + m * 0.5
+  const minuteDeg = m * 6
+
+  const isAfterHours = vibeKey === 'after-hours'
+  const faceFill = isAfterHours ? '#1e1b4b' : 'var(--surface2, #1e1b4b)'
+  const minuteColor = isAfterHours ? '#6366f1' : 'var(--accent, #a855f7)'
+  const isCrushing = vibeKey === 'crushing'
+  const isSlowDay = vibeKey === 'slow-day'
+
+  const displayH = h % 12 || 12
+  const displayM = String(m).padStart(2, '0')
+
+  return (
+    <svg
+      className="office-wall-clock"
+      width="22" height="22" viewBox="0 0 22 22"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-label={`Wall clock showing ${displayH}:${displayM}`}
+      role="img"
+      style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'none' }}
+    >
+      {/* Clock face */}
+      <circle cx="11" cy="11" r="9" fill={faceFill} stroke="var(--border)" strokeWidth="1" />
+
+      {/* Hour hand */}
+      <g style={{ transformOrigin: '11px 11px', transform: `rotate(${hourDeg}deg)` }}>
+        <line x1="11" y1="11" x2="11" y2={11 - 4.5}
+          stroke="var(--text)" strokeWidth="1.5" strokeLinecap="round" />
+      </g>
+
+      {/* Minute hand — slow-day gets a sluggish transition; crushing gets frantic tick */}
+      <g style={{
+        transformOrigin: '11px 11px',
+        transform: `rotate(${minuteDeg}deg)`,
+        transition: isSlowDay ? 'transform 2s ease' : 'none',
+      }}>
+        <g className={isCrushing ? 'clock-minute-hand--frantic' : ''}>
+          <line x1="11" y1="11" x2="11" y2={11 - 6.5}
+            stroke={minuteColor} strokeWidth="1" strokeLinecap="round" />
+        </g>
+      </g>
+
+      {/* Center dot */}
+      <circle cx="11" cy="11" r="1.2" fill="var(--text)" />
+    </svg>
+  )
+}
+
 export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0, doorEvent = null }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
@@ -692,6 +750,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
         <VibeShockwave vibeKey={vibe} />
         <div className="office-sign">🏢 Bloberto&apos;s HQ</div>
+
+        {/* Wall clock — top wall, between sign and manager area */}
+        <WallClock vibeKey={vibe} />
 
         {/* Whiteboard — left wall, vibe-reactive */}
         <div

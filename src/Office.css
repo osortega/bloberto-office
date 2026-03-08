@@ -81,6 +81,25 @@
   z-index: 1;
 }
 
+/* ── Office Wall Clock ── */
+.office-wall-clock {
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+}
+
+@keyframes clock-frantic-tick {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(4deg); }
+  50%  { transform: rotate(0deg); }
+  75%  { transform: rotate(-4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.clock-minute-hand--frantic {
+  animation: clock-frantic-tick 0.25s steps(2) infinite;
+  transform-origin: 11px 11px;
+}
+
 /* ── Manager desk (top center, accent-bordered) ── */
 .mgr-desk {
   position: absolute;
