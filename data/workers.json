@@ -21,17 +21,6 @@
       "progress": 10,
       "started": "2026-03-08T01:06:00Z",
       "updated_at": "2026-03-08T01:06:00Z"
-    },
-    {
-      "id": "sofia-qa-review",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA & Product Analysis review of the live dashboard",
-      "progress": 5,
-      "started": "2026-03-08T01:15:00Z",
-      "updated_at": "2026-03-08T01:15:00Z"
     }
   ],
   "roster": [

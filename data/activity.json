@@ -1,4 +1,20 @@
 [
-  {"type":"hire","worker":"Luna","message":"Clocked in for creative review #27","timestamp":"2026-03-08T01:00:00Z"},
-  {"type":"complete","worker":"Luna","message":"Creative review #27 complete — 7 fresh ideas written (theme: The Office Has Memory)","timestamp":"2026-03-08T01:05:00Z"}
+  {
+    "type": "hire",
+    "worker": "Luna",
+    "message": "Clocked in for creative review #27",
+    "timestamp": "2026-03-08T01:00:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Luna",
+    "message": "Creative review #27 complete \u2014 7 fresh ideas written (theme: The Office Has Memory)",
+    "timestamp": "2026-03-08T01:05:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review complete \u2014 14 suggestions, 5 high-priority bugs found (overall: 3.6/5)",
+    "timestamp": "2026-03-08T01:45:00Z"
+  }
 ]
