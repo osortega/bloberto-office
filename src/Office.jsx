@@ -973,7 +973,10 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             />
           </div>
           {workingWorkers.length > 0 && (
-            <span className="wb-progress-pct">{avgProgress}%</span>
+            <>
+              <span className="wb-progress-pct">{avgProgress}%</span>
+              <span className="wb-progress-label">avg task progress</span>
+            </>
           )}
         </div>
         <div className="mgr-desk" data-vibe={vibe}>

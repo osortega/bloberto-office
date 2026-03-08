@@ -851,6 +851,16 @@ export default function App() {
       setConfettiActive(true)
       setTimeout(() => setConfettiActive(false), 2500)
     }
+    // Log vibe transition to activity feed
+    if (prevKey !== null && prevKey !== teamVibe.key) {
+      const VIBE_LABELS = { 'after-hours': 'After Hours', 'slow-day': 'Slow Day', 'on-fire': 'On Fire', 'in-flow': 'In Flow', 'crushing': 'Crushing It' }
+      setActivityLog(prev => [{
+        type: 'system',
+        worker: null,
+        message: `🌡️ Vibe: ${VIBE_LABELS[prevKey] ?? prevKey} → ${VIBE_LABELS[teamVibe.key] ?? teamVibe.key}`,
+        timestamp: new Date().toISOString()
+      }, ...prev].slice(0, 50))
+    }
     previousVibeKeyRef.current = teamVibe.key
 
     try {
