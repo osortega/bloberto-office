@@ -88,5 +88,17 @@
     "worker": "Carlos",
     "message": "Shipped Vibe History Sparkline \u2014 StatsBar now shows last 12 vibe changes as a color-coded sparkline",
     "timestamp": "2026-03-08T03:10:00Z"
+  },
+  {
+    "type": "hire",
+    "worker": "Sofia",
+    "message": "Clocked in for QA review #4",
+    "timestamp": "2026-03-08T03:15:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "QA review #4 complete \u2014 12 findings (3 high, 6 medium, 3 low). Overall: 3.5/5. Fern bug, roster filter, sparkline clip identified.",
+    "timestamp": "2026-03-08T03:25:00Z"
   }
 ]
