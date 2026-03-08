@@ -344,6 +344,12 @@
       "worker": "Sofia",
       "message": "Clocked in for QA review #9",
       "timestamp": "2026-03-08T17:15:36Z"
+    },
+    {
+      "type": "complete",
+      "worker": "Sofia",
+      "message": "QA review #9 complete \u2014 10 findings (3 high, 4 medium, 3 low). Overall: 3.5/5. 7 of 10 issues persist from #19. New: confetti timer leak, dead activityLogLenRef.",
+      "timestamp": "2026-03-08T17:24:38Z"
     }
   ]
 }

@@ -1,101 +1,101 @@
 {
   "analyst": "Sofia",
-  "review_number": 19,
-  "timestamp": "2026-03-08T16:50:00Z",
-  "screenshot_desktop": "screenshot-qa19-desktop.png",
-  "screenshot_mobile": "screenshot-qa19-mobile.png",
+  "review_number": 9,
+  "timestamp": "2026-03-08T17:30:00Z",
+  "screenshot_note": "Puppeteer unavailable in this environment (pthread_create resource limit). Visual assessment based on code review, HTML structure, and screenshots from review #19 (same codebase, zero visual changes detected).",
   "scores": {
     "visual": 4,
     "ux": 4,
     "responsiveness": 4,
-    "performance": 3,
-    "accessibility": 4,
-    "code_quality": 3,
+    "performance": 2,
+    "accessibility": 3,
+    "code_quality": 2,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.9,
-  "summary": "The office is looking alive and polished. Vibe borders, nameplate pop animation, and role-colored lamps all landed nicely since #18. But the bones have recurring rot: WorkerCard memo is still getting smoked every 30s, the CSS monoliths keep growing (3198 lines, 120 keyframes), there is a reproducible SVG gradient ID collision when Luna goes idle, and two near-identical time-formatting functions live in separate files for no reason. Fun factor remains a solid 5. Score up slightly to 3.9 from 3.7, mostly for the visual polish ships.",
+  "overall_score": 3.5,
+  "fixes_since_last_review": "NONE. All 10 issues from review #19 remain open. Zero fixes landed.",
+  "summary": "The office is still visually gorgeous and delightful \u2014 vibe system reactive, avatars crisp, confetti still pops on shipping. But this is a full cycle of zero fixes: all 10 bugs from review #19 are still open, and three new technical debt items appeared. stableActivityLog is still a no-op useMemo defeating React.memo on every 30s poll. Luna's gradient ID collision silently corrupts her hair color when she goes idle. The confetti vibe-burst is now the only timer in the app without a cleanup ref \u2014 a memory leak waiting to happen. Time-formatting logic now has four independent copies spread across three files, growing worse each sprint. code_quality drops to 2 this round. Fun factor stays locked at 5 because honestly this office is a joy to look at. Needs a dedicated debt sprint before the next feature.",
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Luna SVG gradient ID collision when she goes idle",
-      "description": "CharacterAvatar for Luna creates a <linearGradient id=\"luna-hair-luna\"> inside its SVG. When Luna is idle, she renders TWICE in the DOM simultaneously: once as a wandering Character (idleWorkers.map) and once as a mini-avatar inside ConferenceTable (meetingWorkers slice of idleWorkers, requires >=2 idle workers). Two SVG elements in the same HTML document with the same gradient ID means the url(#luna-hair-luna) paint reference resolves to the first DOM occurrence regardless of which SVG it is in. The mini avatar in the conference table will render with the wrong or missing gradient. Fix: make gradId unique per render by appending a uuid/size/context suffix, e.g. luna-hair-luna- or pass a unique instanceId prop to CharacterAvatar.",
+      "title": "Luna SVG gradient ID collision when she goes idle (PERSISTS from #19)",
+      "description": "CharacterAvatar builds gradId as `luna-hair-${workerId}` which always yields 'luna-hair-luna'. When Luna is idle, she renders twice simultaneously: once as a wandering Character and once as a mini-avatar inside ConferenceTable (meetingWorkers requires >=2 idle workers). Two SVG elements in the same document sharing the same gradient ID means the second SVG picks up the wrong gradient definition, rendering Luna with broken or missing hair color in the conference table mini-avatar. Fix: pass a unique instanceId prop to CharacterAvatar and append it to gradId, e.g. `luna-hair-luna-desk` vs `luna-hair-luna-conf`. The simplest approach is a module-level counter: let _gradIdx = 0 at module scope, then inside the component const gradId = useRef(`luna-hair-${workerId}-${_gradIdx++}`).current.",
       "effort": "small",
-      "assignee": "Carlos"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "high",
       "category": "performance",
-      "title": "WorkerCard memo defeat \u2014 stableActivityLog is a no-op useMemo",
-      "description": "This was flagged in review #18 and remains unfixed. The line  returns the identical reference as activityLog \u2014 it provides zero stability. Every 30s sync creates a new activityLog array, which invalidates the memo, which passes a new activityEntries prop to every WorkerCard, which defeats React.memo and re-renders ALL worker cards on every poll cycle even when the worker data itself is unchanged. Fix: either extract per-worker activity slices outside WorkerCard so only the relevant subset is passed as a prop (), or use a custom memo comparator on WorkerCard that ignores activityEntries reference changes when the filtered slice is identical. Remove the no-op stableActivityLog memo \u2014 it is dead code that misleads future developers.",
+      "title": "stableActivityLog no-op useMemo defeats React.memo on WorkerCard (PERSISTS from #19)",
+      "description": "App.jsx line 772: `const stableActivityLog = useMemo(() => activityLog, [activityLog])` is functionally identical to writing `const stableActivityLog = activityLog`. The memo returns a new reference every time activityLog changes (every 30s poll), which passes a new activityEntries prop to every WorkerCard and defeats React.memo entirely \u2014 ALL worker cards re-render every 30s even when their individual data is unchanged. Fix: slice per-worker activity entries before WorkerCard receives them, e.g. compute a filtered subset in the map callback and pass only the worker's slice. Or add a custom comparator to React.memo that does a shallow equality check on the filtered slice. Either way, delete the stableActivityLog line \u2014 it is dead code that misleads.",
       "effort": "medium",
-      "assignee": "Maya"
+      "assigned_to": "Maya"
     },
     {
-      "priority": "medium",
+      "priority": "high",
       "category": "bug",
-      "title": "Hover card shows time-since-update, not time-on-task, for working workers",
-      "description": "The character hover card displays  with an hourglass icon, regardless of worker variant. For working workers, updated_at is the last data refresh timestamp, not when they started their task. So the hover card might show 2m when the worker has been on a task for 3 hours. The workers.json schema includes a startedAt field. Fix: for variant==='working', display formatIdleDuration(worker.startedAt || worker.updated_at) and label it clearly as 'on task'. For variant==='idle', keep updated_at with an 'idle for' label. Both labels should be explicit text, not just a clock emoji.",
+      "title": "Confetti vibe-burst setTimeout has no cleanup ref \u2014 stale state write on fast vibe change",
+      "description": "App.jsx lines 864-865: `setConfettiActive(true); setTimeout(() => setConfettiActive(false), 2500)` is the only timer in the entire app that does NOT store its ID in a ref. Every other timeout (workerConfettiTimerRef, completionToastTimerRef, doorEventTimerRef, newClearTimersRef, etc.) is properly tracked and cancelled. If teamVibe.key changes twice within 2.5s, the first stale timeout fires mid-second-confetti and kills it early. If the component unmounts during the confetti window, the callback still fires and calls setState on a dead component. Fix: add `const confettiTimerRef = useRef(null)` and replace the raw setTimeout with the same pattern used everywhere else: `if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current); confettiTimerRef.current = setTimeout(() => { setConfettiActive(false); confettiTimerRef.current = null }, 2500)`.",
       "effort": "small",
-      "assignee": "Maya"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "formatIdleDuration (Office.jsx) and formatDuration (App.jsx) are identical \u2014 extract to utils",
-      "description": "Office.jsx defines formatIdleDuration(updatedAt) and App.jsx defines formatDuration(updatedAt). They are functionally identical: both compute elapsed time from a timestamp and return a human string like \"3h 12m\". App.formatDuration prepends \"Working for\" while Office.formatIdleDuration does not, but the core logic is duplicated. Fix: create src/utils/time.js with a single formatElapsed(timestamp) helper and an optional prefix param. Import from both files. This also prevents future drift where one gets a bug fix the other does not.",
+      "title": "Four independent time-formatting functions \u2014 extract to utils/time.js (PERSISTS from #19, got worse)",
+      "description": "The codebase now has four separate time-formatting implementations: (1) getRelativeTime() App.jsx:28 \u2014 'Xm ago' / 'Xh ago' / 'Xd ago'. (2) formatDuration() App.jsx:215 \u2014 'Working for Xh Ym'. (3) formatIdleDuration() Office.jsx:318 \u2014 bare 'Xh Ym'. (4) Inline IIFE in ghost bubble Office.jsx:540-548 \u2014 exact duplicate of getRelativeTime. Plus a fifth partial copy in ghostDeskTitle Office.jsx:1050-1052. This was two duplicates in review #19; it is now four-plus. Fix: create src/utils/time.js with formatElapsed(ts) and getRelativeTime(ts), import from all call sites. Remove the inline IIFE and ghostDeskTitle inline code. Dead code elimination + single source of truth.",
       "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "completionToast and plantToast use inline style objects instead of CSS classes",
-      "description": "Both toast elements in App.jsx are rendered with large inline style={{ position: 'fixed', bottom: '2rem', ... }} objects containing 10+ properties. These are the only two UI elements in the entire codebase that bypass the CSS class system. This makes them impossible to theme via CSS variables, harder to animate consistently, and fragile if layout needs adjustment. The box-shadow even hardcodes rgba opacity inline. Fix: add .completion-toast and .plant-toast classes to App.css using existing CSS variables (--surface2, --text, etc.), move all the inline styles there, and reference the border-color via a CSS custom property passed as style={{'--toast-color': completionToast.color}}.",
-      "effort": "small",
-      "assignee": "Maya"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "No React ErrorBoundary \u2014 any render crash in Office.jsx takes down the entire app",
-      "description": "Office.jsx is 1263 lines of complex stateful rendering with SVG calculations, animation timers, and conditional logic. There is no ErrorBoundary anywhere in the component tree. If any render in Office or its children throws (e.g., a null dereference on worker data, a bad vibeKey, or an unexpected workers.json shape), the entire App unmounts and the user sees a blank screen. Fix: wrap the Office tabpanel and the dashboard tabpanel each in a lightweight ErrorBoundary that shows a friendly \"Something went wrong in the office \ud83e\udee0\" message with a retry button. This is a class component wrapper (~20 lines) or use react-error-boundary package.",
+      "title": "Hover card shows time-since-last-fetch, not time-on-task, for working workers (PERSISTS from #19)",
+      "description": "Office.jsx line 594: the char hover card renders `formatIdleDuration(worker.updated_at)` for ALL variants including 'working'. For working workers, updated_at is the last data-refresh timestamp, not when the task started. A worker who began a task 3h ago but whose data refreshed 2m ago shows '\u23f1 2m' \u2014 actively misleading. The workers.json schema includes startedAt. Fix: for variant==='working', use formatIdleDuration(worker.startedAt || worker.updated_at) with an explicit 'on task for' label. For variant==='idle', keep updated_at with an 'idle for' label. Replace the ambiguous clock emoji-only label with visible text so the context is unambiguous.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "completionToast and plantToast use 15-property inline style objects (PERSISTS from #19)",
+      "description": "App.jsx:969-992 and Office.jsx:958-982 each inline a massive style object (position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation). These objects recreate on every parent render, force style recalculation, and are unreadable. Flagged in #19, still unfixed. Fix: add .completion-toast and .plant-toast classes in the respective CSS files. Use a single inline style for the one dynamic property: `style={{ '--toast-color': completionToast.color }}` and reference it in CSS as `border-color: var(--toast-color); box-shadow: 0 0 12px var(--toast-color);`.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "No React ErrorBoundary \u2014 any render crash shows a blank screen (PERSISTS from #19)",
+      "description": "There is no ErrorBoundary anywhere in the component tree. A runtime error in CharacterAvatar, WorkerCard, or ConferenceTable unmounts the entire application. The app fetches live external JSON every 30s \u2014 unexpected worker shapes, null fields, or malformed data are plausible failure modes. With 92 keyframe animations in Office.css and complex SVG rendering, a one-off bad datum could brick the UI. Fix: create a minimal ErrorBoundary class component and wrap <Office>, the dashboard workers grid, and the <App> root in separate boundaries so a crash in one area degrades gracefully without killing the whole page.",
       "effort": "medium",
-      "assignee": "Carlos"
+      "assigned_to": "Dave"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "activityLogLenRef is dead code \u2014 created and updated but never read",
+      "description": "App.jsx line 771: `const activityLogLenRef = useRef(0)` and line 773: `useEffect(() => { activityLogLenRef.current = activityLog.length }, [activityLog.length])`. This ref is written but never read anywhere in the component. It has no effect on rendering or behavior. The accompanying useEffect runs on every activityLog.length change for no reason. Fix: delete both lines. If per-entry diffs were intended here, document the intent before the next engineer wastes time searching for the read site.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "accessibility",
-      "title": "Activity filter buttons use role=\"radio\" on <button> elements \u2014 semantic mismatch",
-      "description": "The activity type filter bar and the worker filter bar both render <button role=\"radio\" aria-checked={...}> elements inside a role=\"radiogroup\" div. Applying role=\"radio\" to a native <button> overrides its implicit button role but screen readers may announce the element inconsistently (e.g., NVDA announces \"button\" then ignores aria-checked). The keyboard contract for radio groups also differs from buttons \u2014 arrow keys should move between radio options, but these buttons only respond to click. Fix: either use actual <input type=\"radio\"> elements styled as buttons, or keep <button> and drop role=\"radio\"/aria-checked in favor of aria-pressed (toggle button semantics), which is what the interaction actually is.",
+      "title": "Activity filter buttons use role='radio' on <button> elements (PERSISTS from #19)",
+      "description": "App.jsx lines 1159-1196: both the type filter and worker filter bars place role='radio' on <button> elements inside role='radiogroup' containers. While not invalid, it creates confusing AT announcements \u2014 screen readers call these 'radio buttons' but they look and behave like toggle buttons, and keyboard navigation within the group may not follow expected radio button patterns. Fix option A (correct): replace with actual <input type='radio'> elements styled as pills. Fix option B (pragmatic): remove role='radiogroup'/'radio' and replace aria-checked with aria-pressed, turning them into a standard toolbar toggle group. Option B is lower effort and semantically more honest.",
       "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "performance",
-      "title": "IDLE_BUBBLE_EMOJIS object literal defined inside Character component body",
-      "description": "The constant  is declared inside the Character function body at line ~365. Since Character is a memoized component that still re-renders on prop changes, this object is reconstructed on every render of every idle character. It should be extracted as a module-level constant outside the component. Tiny fix, zero risk.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "VibeSparkline dots have no visual tooltip \u2014 accessibility-only hover data",
-      "description": "Each sparkline dot in the stats bar has an SVG <title> element containing the timestamp and vibe key. SVG titles are surfaced to screen readers and some browsers show a tooltip on hover, but behavior is inconsistent across browsers (Chrome does not show SVG title tooltips by default). Visual users hovering over the sparkline get no feedback. Fix: add a CSS-driven tooltip via the title attribute on a wrapper element or render a custom tooltip div on dot hover. Alternatively, add an aria-label to the entire sparkline like \"Vibe history: crushing, in-flow, crushing\" to at least make it useful for AT users regardless of the title bug.",
-      "effort": "small",
-      "assignee": "Dave"
+      "assigned_to": "Dave"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Footer version \"v1.0.0-chaos\" is a hardcoded string, not sourced from package.json",
-      "description": "The footer renders a hardcoded version string \"v1.0.0-chaos\" that has nothing to do with the package.json version field (which is currently \"0.0.0\"). Either both should be in sync or the footer version should pull from the build metadata. Fix: update package.json to a real semver (e.g. \"1.0.0\") and use Vite's define plugin to inject it:  in vite.config.js, then reference as  in the footer. The \"-chaos\" suffix can stay if you like the vibe.",
+      "title": "IDLE_BUBBLE_EMOJIS defined inside Character component body (PERSISTS from #19)",
+      "description": "Office.jsx line 390: `const IDLE_BUBBLE_EMOJIS = { 1: '\u2615', 2: '\ud83d\udcac', 3: '\ud83e\ude9f', 4: '\ud83e\uddd8' }` is declared inside the Character memo function body. This allocates a new object on every render of every Character instance. Since Character is memo-wrapped the frequency is low, but it violates the convention established by the rest of the file (AWAY_MESSAGES and DESK_SCREEN_SVG are module-level constants). Move IDLE_BUBBLE_EMOJIS to module scope alongside its siblings.",
       "effort": "small",
-      "assignee": "Dave"
+      "assigned_to": "Carlos"
     }
   ]
 }
