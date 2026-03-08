@@ -4,5 +4,11 @@
     "worker": "Luna",
     "message": "\ud83c\udf19 Creative review #50 complete \u2014 6 new ideas",
     "timestamp": "2026-03-08T18:50:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Bloberto",
+    "message": "\u267f Shipped accessibility fixes: global prefers-reduced-motion + keyboard focus rings (Luna review #50 MUST/SHOULD)",
+    "timestamp": "2026-03-08T19:05:00Z"
   }
 ]
