@@ -1,16 +1,16 @@
 {
   "workers": [
     {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA",
-      "emoji": "\ud83d\udd0d",
-      "status": "idle",
-      "task": "",
-      "progress": 0,
-      "updated_at": "2026-03-09T17:45:00Z",
-      "started_at": "2026-03-09T17:15:00Z"
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend",
+      "emoji": "\u2699\ufe0f",
+      "status": "working",
+      "task": "Fix 2 HIGH bugs from Sofia QA #46: footer quote cycling + onResume sync gap",
+      "progress": 10,
+      "updated_at": "2026-03-09T17:46:00Z",
+      "started_at": "2026-03-09T17:46:00Z"
     }
   ],
-  "updated_at": "2026-03-09T17:45:00Z"
+  "updated_at": "2026-03-09T17:46:00Z"
 }
