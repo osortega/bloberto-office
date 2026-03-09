@@ -1,27 +1,13 @@
 {
   "workers": [
     {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend",
-      "emoji": "\u2699\ufe0f",
-      "status": "idle",
-      "task": "",
-      "progress": 100,
-      "updated_at": "2026-03-09T21:48:00Z",
-      "started_at": "2026-03-09T21:46:00Z"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA",
-      "emoji": "\ud83d\udd0d",
+      "name": "Luna",
+      "role": "Creative Director",
       "status": "working",
-      "task": "QA review #52 \u2014 live site + codebase analysis",
-      "progress": 10,
-      "updated_at": "2026-03-09T22:45:00Z",
-      "started_at": "2026-03-09T22:45:00Z"
+      "task": "Creative review #72",
+      "started_at": "2026-03-09T23:00:00Z",
+      "progress": 10
     }
   ],
-  "updated_at": "2026-03-09T22:45:00Z"
+  "updated_at": "2026-03-09T23:00:00Z"
 }
