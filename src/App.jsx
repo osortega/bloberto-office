@@ -822,7 +822,7 @@ export default function App() {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable || e.isComposing) return
       if (e.key === '1') { setTab('office'); window.location.hash = 'office' }
       else if (e.key === '2') { setTab('dashboard'); window.location.hash = 'dashboard' }
-      else if (e.key === 'Escape') document.activeElement?.blur()
+      else if (e.key === 'Escape') { setSelectedTag(null); setWorkerFilter(null); setActivityFilter('all'); document.activeElement?.blur() }
       else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && !isSyncing) syncFromGitHub()
     }
     document.addEventListener('keydown', handleKeyDown)
@@ -952,7 +952,9 @@ export default function App() {
 
     // Streak eulogy
     if (prevStreakRef.current >= 3 && newStreak < 3) {
+      if (completionToastTimerRef.current) clearTimeout(completionToastTimerRef.current)
       setCompletionToast({ text: '💀 RIP the streak — it was beautiful while it lasted', type: 'info' })
+      completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3500)
     }
     prevStreakRef.current = newStreak
 
