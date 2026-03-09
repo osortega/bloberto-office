@@ -1,36 +1,13 @@
 {
-  "workers": [],
-  "roster": [
+  "workers": [
     {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "\u2699\ufe0f"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8"
-    },
-    {
-      "id": "dave",
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "\ud83d\ude80"
-    },
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d"
-    },
-    {
-      "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19"
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review #65 — visual audit and idea generation",
+      "started_at": "2026-03-09T06:00:00Z"
     }
   ],
-  "updated_at": "2026-03-09T05:45:26Z"
+  "updated_at": "2026-03-09T06:00:00Z"
 }
