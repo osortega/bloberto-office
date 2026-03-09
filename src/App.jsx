@@ -169,6 +169,7 @@ const TASK_TAG_DEFS = [
   { pattern: /test|qa|spec|review|coverage|lint/i,                   label: 'QA',     emoji: '🔵', className: 'task-tag--qa' },
   { pattern: /data|migration|schema|db|database|query/i,            label: 'Data',   emoji: '🟤', className: 'task-tag--data' },
   { pattern: /docs|readme|changelog|write/i,                         label: 'Docs',   emoji: '🟢', className: 'task-tag--docs' },
+  { pattern: /plan|roadmap|sprint|kickoff|standup|meeting|agenda|discuss|ceremony|sync/i, label: 'Plan', emoji: '🟡', className: 'task-tag--plan' },
 ]
 
 /**
@@ -1126,13 +1127,13 @@ export default function App() {
             left: '50%',
             transform: 'translateX(-50%)',
             background: 'var(--surface2)',
-            border: `2px solid ${completionToast.color || '#6366f1'}`,
+            border: `2px solid ${completionToast.type === 'info' ? '#6b7280' : completionToast.color || '#6366f1'}`,
             borderRadius: '12px',
             padding: '0.6rem 1.2rem',
             fontSize: '0.95rem',
             fontWeight: 600,
             color: 'var(--text)',
-            boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 12px ${(completionToast.color || '#6366f1')}55`,
+            boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 12px ${completionToast.type === 'info' ? 'rgba(107,114,128,0.35)' : `${(completionToast.color || '#6366f1')}55`}`,
             zIndex: 9999,
             whiteSpace: 'nowrap',
             pointerEvents: 'none',

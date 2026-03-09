@@ -1435,5 +1435,160 @@
     ],
     "hire_proposals": [],
     "_previous_review": 72
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 74,
+    "timestamp": "2026-03-09T23:01:09Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Puppeteer network timeout in container (same as reviews 70-73). Full code audit of App.jsx (1396 lines), Office.jsx (1561 lines), App.css, and Office.css. NOTE: The task requested review_number 72, but reviews #72 and #73 already exist in this file. This review is the honest next entry: #74, _previous_review 73.",
+    "theme": "Review #73 read the wrong version of the code — six 'unfixed' items were already fixed, one 'fixed' item was not. Time to reconcile with what is actually true.",
+    "visual_observations": [
+      "App.jsx:1390 — footer counter formula `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` renders '1/9' on page load with quoteBonus=0, before the user has clicked anything. The visitor is told they've seen 1 of 9 quotes while they've seen 0 of 8.",
+      "App.jsx:1129 — completionToast border is `completionToast.color || '#6366f1'`. The streak eulogy path at line 979 sets `{ text: '💀 RIP the streak…', type: 'info' }` with no `.color` field. The `type` property is never read anywhere in the render tree. Review #73 claimed this was fixed ('completionToast render branches on .type === \"info\" for muted styling') — it is not. The eulogy still glows purple.",
+      "Office.jsx:1480-1486 — wanderTooltips object is keyed 1-4 by slot index (`(i % 4) + 1`). Carlos gets '☕ Heading to the coffee corner' only if he is first idle. Still unfixed after reviews #72 and #73.",
+      "Office.jsx:735-739 — the idle micro-bubble emoji picker: `Math.floor(Date.now() / 12000) % length`. All idle workers cycle through their emoji arrays in time-based lockstep. At any given 12-second window, every idle worker shows index N from their respective array simultaneously. Carlos and Maya independently 'daydream' in perfect synchrony.",
+      "Office.jsx:1101-1110 — the ficus milestone useEffect's early return means `prevPlantStageRef.current` is never updated when the plant grows. It stays perpetually at 'seedling'. When vibeStreak drops and plantStage reverts to 'seedling', the condition `prevPlantStageRef.current !== plantStage` evaluates to `'seedling' !== 'seedling'` = false. Grief toast structurally impossible. The review history on this bug goes back to #65.",
+      "Office.jsx:435-439 — AwaySign still uses the generic AWAY_MESSAGES array indexed by `(seed + Math.floor(idleMinutes / 10)) % length`. No worker identity. The nameplate six lines below speaks Carlos's voice; the sticky note above speaks nobody's.",
+      "Office.jsx:787-807 — WindowElement renders stars only when `h >= 0 && h <= 4`. The evening block `h >= 20 && h <= 23` renders a deep purple gradient with zero stars. A real window at 10pm has stars. Still unfixed since review #72.",
+      "App.jsx:194 — `function ProgressBar({ progress, updatedAt, startedAt })` — `updatedAt` is destructured, passed at line 347, and never referenced inside the function body. Dead parameter. Three reviews, no action.",
+      "ActivityLog:135 — `const displayed = [...entries].reverse().slice(0, 20)`. The component always slices to 20 regardless of filtered count. The section header at App.jsx:1319 shows `filtered.length` which can exceed 20. With 25 system events filtered, the header says '25 of 50 events (filtered)' but the log body shows 20. The truncation is invisible.",
+      "Office.jsx:1278 — `<span className='wb-progress-label'>avg task progress</span>` renders unconditionally. When exactly one worker is active, the whiteboard says 'avg task progress' for a single number. Flagged in review #60 as 'should' — the oldest unfixed idea in this file at 14 reviews and counting."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "Review #73 Correction: Activity Log System Filter Was Already Present",
+        "was_flagged_in": [62, 63, 64, 65, 66, 67, 68, 69, 70, 71],
+        "how_fixed": "App.jsx:1330 — `{ key: 'system', label: '⚙️ System' }` has been in the filter bar array since review #72 fixed it. Review #73 incorrectly listed this as still unfixed."
+      },
+      {
+        "title": "Review #73 Correction: Luna SOLO_SPOTLIGHT_MESSAGES All Five Vibes Present",
+        "was_flagged_in": [67, 68, 69, 70, 71],
+        "how_fixed": "App.jsx:267 — luna entry has crushing, after-hours, on-fire, in-flow, and slow-day. All five covered. Review #73 incorrectly listed this as still missing three vibes."
+      },
+      {
+        "title": "Review #73 Correction: onResume Is Wired to visibilitychange",
+        "was_flagged_in": [73],
+        "how_fixed": "App.jsx:849-853 — `document.addEventListener('visibilitychange', handleVisibilityResume)` calls `onResume()` on `!document.hidden`. Review #73 incorrectly listed this as missing."
+      },
+      {
+        "title": "Review #73 Correction: VIBE_VERSIONS Connected in Footer",
+        "was_flagged_in": [71, 72, 73],
+        "how_fixed": "App.jsx:1391 — `{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}` replaces the hardcoded string. Review #73 incorrectly listed this as still hardcoded."
+      },
+      {
+        "title": "prefers-reduced-motion: Four CSS Blocks Confirmed",
+        "was_flagged_in": [70],
+        "how_fixed": "App.css:1007 (.confetti-layer display:none), App.css:1062 (.ambient-particle animation:none), App.css:1073 (.worker-card.error animation:none), App.css:1100 (.stat-card--stuck animation:none). Four targeted blocks covering the most intensive animations. Character wander/bob keyframes in Office.css not yet covered."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Streak Eulogy Border Is Still Purple — type: info Has Never Been Read by the Renderer",
+        "description": "App.jsx:979 — `setCompletionToast({ text: '💀 RIP the streak…', type: 'info' })`. App.jsx:1129 — the render reads `completionToast.color || '#6366f1'`. The `.type` field is never consulted. The `.color` field is never set on the eulogy path. Result: the death announcement glows in the same indigo as every shipping celebration. Review #73 claimed this was fixed in its `fixed_since_last_review` entry. The claim is false — no type-check branch exists in the current render code. Fix: in the completionToast style block, branch on `completionToast.type === 'info'` for border and boxShadow: use `var(--text-muted, #6b7280)` and `rgba(107,114,128,0.12)` respectively. One ternary per property, one line each. WHY: the data for grief styling has been set for four review cycles. The renderer just needs to look at it.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "wanderTooltips Still Tells the Wrong Story to the Wrong Person",
+        "description": "Office.jsx:1480-1486 — `wanderTooltips = { 1: '☕ Heading to the coffee corner', 2: '💬 Lingering by the whiteboard', 3: '🪟 Staring out the window', 4: '🧘 Taking a mindful moment' }` keyed by `(i % 4) + 1` where `i` is the position in idleWorkers that poll cycle. If Carlos is second idle, he gets the whiteboard. If Luna is third, she gets the window. The tooltip is the only hover moment in the entire office view where a visitor can read character identity — and it's a slot machine. Fix: add `WORKER_WANDER_TOOLTIPS` keyed by worker.id: `{ carlos: 'Probably chasing down that weird log entry', maya: 'Sketching something in her head', dave: 'Headphones on — he can hear you', sofia: 'Found something. She always finds something.', luna: 'Horizon-scanning. Leave her to it.' }`. In the idle render at line 1493, use `WORKER_WANDER_TOOLTIPS[w.id] ?? wanderTooltips[wIdx]`. WHY: flagged in reviews #72 and #73, two consecutive must-priority entries, still zero action.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Idle Micro-Bubble Emoji Picker Synchronizes All Workers to the Same Array Index",
+        "description": "Office.jsx:739 — the idle bubble renders: `(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor(Date.now() / 12000) % length]`. The index is derived from Unix time divided by 12 seconds — a global clock shared by every Character instance. At any given 12-second window, all idle workers show the same positional index from their respective arrays. Carlos and Maya don't independently daydream; they are puppets on the same timer. At 12:00:00 both show index 0 (Carlos: ☕, Maya: 💜). At 12:00:12 both show index 1 (Carlos: 📊, Maya: ✏️). The arrays are character-specific (correctly fixed in review #71) but the picker throws that specificity away. Fix: replace the time-based index with a worker-local counter. In the idle bubble useEffect, instead of `setIdleBubble(true)`, call `setIdleBubble(pick())` where `pick()` increments a `useRef` counter modulo the array length. The character picks their next thought independently when their personal timer fires. WHY: WORKER_IDLE_BUBBLES was added to give each character a voice. A synchronized clock makes it invisible.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "ActivityLog Internal Slice(0,20) Is Invisible to the Header Count",
+        "description": "App.jsx ActivityLog component line 135: `const displayed = [...entries].reverse().slice(0, 20)`. The component always caps at 20 regardless of how many filtered entries are passed. The section header at App.jsx:1319 computes `filtered.length` from the full filter expression and shows e.g. '25 of 50 events (filtered)'. If there are 25 system events but ActivityLog silently shows only 20, the user sees the header say '25' while the list contains 20 — a discrepancy with no explanation. Fix option A: pass a `maxEntries` prop to ActivityLog (default 20) and reference it in the slice; update the header count to `Math.min(filtered.length, maxEntries)` with a note '(first 20 shown)'. Fix option B: add a load-more button inside ActivityLog that expands the slice in increments of 10. WHY: the header is the trust anchor for the log. When it reports a different number than the user sees, they don't know whether they're missing information. And on a team with many vibe transitions in a single day, they are.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "ProgressBar Dead updatedAt Prop — Signature Promises Data It Never Uses",
+        "description": "App.jsx:194 — `function ProgressBar({ progress, updatedAt, startedAt })`. `updatedAt` is destructured and passed at WorkerCard line 347 as `updatedAt={worker.updated_at}`. Inside ProgressBar (lines 195-240), the identifier `updatedAt` does not appear once. `startedAt` is used for ETA calculation. `updatedAt` was presumably intended for a staleness indicator but was never wired. Flagged in reviews #71 and #72 as should-priority, unfixed. Two paths: (A) delete `updatedAt` from the destructure and the call site — clean the contract; (B) fulfill the original intent and render a subtle 'stalled' indicator when `updatedAt` is set, `progress < 100`, and `Date.now() - new Date(updatedAt).getTime() > 1_800_000` (30 minutes of no progress change). Path B converts a dead prop into a live warning. WHY: a function parameter that accepts data and ignores it tells the next developer that data mattered here. It didn't. The contract should be honest.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "AwaySign Sticky Note Speaks in the Voice of Nobody — Still Generic After Four Reviews",
+        "description": "Office.jsx:435-439 — `AwaySign` picks from `AWAY_MESSAGES = ['☕ Coffee run', '🧠 Deep think', '📞 On a call', …]` using a deterministic seed from `workerId + idleMinutes`. The same desk at the same idle duration always shows the same generic message regardless of who's sitting there. Six lines below, at Office.jsx:1394, the nameplate renders `WORKER_AWAY_DESK_LABELS[occ.worker.id]` — character-specific copy: carlos gets '↪ in the logs', luna gets '↪ reviewing'. Two systems, two personalities, one desk, right next to each other. The sticky note is larger, animated, and more visible than the nameplate. It should be the primary voice. Fix: add `WORKER_AWAY_MESSAGES` keyed by worker.id — `{ carlos: ['☕ In the logs', '🔌 Debugging', '📖 Reading docs'], maya: ['🎨 Sketching', '✏️ Wireframing', '💜 Mood-boarding'], dave: ['🎧 Headphones in', '⚙️ Pipeline check', '📦 Infra thinking'], sofia: ['🔍 Exploring', '🧪 Test design', '📋 Case writing'], luna: ['🌙 Daydreaming', '✨ Spec drafting', '💡 Ideas percolating'] }`. In `AwaySign`, pick from `WORKER_AWAY_MESSAGES[workerId]?.[seed % 3] ?? AWAY_MESSAGES[idx]`. WHY: the sticky note is the soul of the idle desk. It should know who left it.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Office Window at 10PM Is a Purple Void — Stars Only Render at Midnight",
+        "description": "Office.jsx:791 — `const isMidnight = hour >= 0 && hour <= 4`. Star spans render only inside the `{isMidnight && <> … </>}` block (lines 800-807). The evening block (hour >= 20 && hour <= 23) renders a deep purple gradient `('#4c1d95' to '#312e81')` with nothing inside it. A 10pm sky viewed through a real window has stars. The midnight path already has the pattern: four `<span className='office-window__star'>` elements with staggered positions. Extend: add a `const isEvening = hour >= 20 && hour <= 23` and render 2-3 stars at slightly sparser positions (e.g., left: 25%, 62%, 44% — avoiding the 4-star density of midnight). WHY: the window is a time clock. At 10pm it should look like night outside. Right now the evening sky is a solid purple rectangle that looks like an error state, not a view.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Whiteboard Says 'avg task progress' When One Person Is the Entire Average — Flagged 14 Reviews Ago",
+        "description": "Office.jsx:1278 — `<span className='wb-progress-label'>avg task progress</span>` renders unconditionally whenever `workingWorkers.length > 0`. When exactly one worker is active, their progress IS the average by definition, but the label calls it an average anyway. Flagged in review #60 as a 'should' item ('The Whiteboard Calls It an Average With One Person in the Room'). 14 reviews have passed. The fix is one ternary: `{workingWorkers.length === 1 ? 'task progress' : 'avg task progress'}`. One JSX operator. WHY: this is the oldest unfixed idea in the file and it is a one-word change. If 14 review cycles can't move a one-word fix, something is wrong with the triage process.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Ficus prevPlantStageRef Is Structurally Stuck at Seedling — Grief Detection Is Architecturally Impossible",
+        "description": "Office.jsx:1101-1110 — the ficus milestone useEffect: `if (prevPlantStageRef.current !== plantStage && plantStage !== 'seedling') { setPlantMilestone(true); …; return () => … }`. The early `return` exits the effect body, which means `prevPlantStageRef.current = plantStage` (line 1109) is never reached during a growth event. The ref stays at 'seedling' after initial mount. When the streak drops and `plantStage` reverts to 'seedling', the check `prevPlantStageRef.current !== plantStage` evaluates `'seedling' !== 'seedling'` = false — and the `plantStage !== 'seedling'` guard then has nothing to negate. No grief fires. This has been flagged since review #65 — nine reviews. The architectural reason is finally identifiable: the ref needs to be updated INSIDE the if branch (add `prevPlantStageRef.current = plantStage` before the return), and a separate grief clause needs its own check: `if (prev !== 'seedling' && plantStage === 'seedling') { /* grief toast */ }`. Two insertions fix a nine-review-old wound. WHY: the plant levels up with fanfare; it should regress with acknowledgment. The asymmetry makes the streak feel like a decoration rather than a living thing.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Footer Quote Counter Opens at 1/9 on Fresh Load — Visitor Told They Discovered Something They Haven't",
+        "description": "App.jsx:1390 — the counter formula `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` with `BONUS_TAGLINES.length = 8` produces denominator 9. On fresh load, `quoteBonus = 0`, so the counter reads `(0 % 9) + 1 = 1`, displayed as '1/9'. The visitor is on the default vibe tagline with zero clicks logged, yet the UI tells them they have seen 1 of 9 quotes. The denominator 9 bundles the default vibe tagline into the collection count, which is not a bonus discovery. Fix: show no counter when `quoteBonus === 0`. Once the user has clicked once, show `quoteBonus / BONUS_TAGLINES.length` — the true bonus-only count (1/8, 2/8, etc.). Alternatively, display `✦` (the sparkle) alone until first click, then switch to numbered format. WHY: discovery counters only delight when accurate. A wrong counter teaches visitors that UI numbers are decorative.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "vibeCaption Has No Cooldown — Oscillating Teams Spam the Overlay Every 30 Seconds",
+        "description": "Office.jsx:1180-1192 — `setVibeCaption` fires on every `[vibe]` change with a 2800ms auto-clear and no minimum interval guard. If one worker toggles between working and idle every poll cycle (30s), the vibe oscillates between 'in-flow' and 'slow-day', and the caption fires every 30 seconds indefinitely: '⚡ In the zone' → '☁️ Easy does it' → '⚡ In the zone'. The `isFirstVibe` guard correctly skips the initial mount but provides no per-transition cooldown. Fix: add `const lastCaptionTsRef = useRef(0)` and gate the setVibeCaption call: `if (Date.now() - lastCaptionTsRef.current < 90_000) return; lastCaptionTsRef.current = Date.now()`. 90 seconds between captions. WHY: the vibe caption is a punctuation mark, not a ticker. When it fires every 30 seconds it becomes ambient noise. When it fires every 90+ seconds, it's a genuine announcement.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "feature",
+        "title": "TASK_TAG_DEFS Has No Planning or Meeting Tag — A Whole Category of Work Stays Invisible",
+        "description": "App.jsx:164-172 — TASK_TAG_DEFS covers Bug, Ship, Design, QA, Data, and Docs. Tasks like 'roadmap planning', 'sprint standup prep', 'sync with stakeholders', 'retro facilitation', 'quarterly kickoff' match nothing and render no tag. This is particularly relevant for Bloberto (Manager) and Luna (Creative Director) whose work skews heavily toward planning and alignment. Add: `{ pattern: /plan|roadmap|sprint|standup|retro|kickoff|sync|agenda|meeting|align|discuss/i, label: 'Plan', emoji: '🗓️', className: 'task-tag--plan' }`. In App.css add `.task-tag--plan { background: rgba(234,179,8,0.15); color: #ca8a04; }`. WHY: the tag system is the dashboard's semantic layer. A category that affects a third of the team's time and appears in zero tags makes the system feel like it was designed for engineers only.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "The Conference Table Should Know How Long the Meeting Has Been Going",
+        "description": "Office.jsx:1152-1158 — when `meetingWorkers.length >= 2`, `lastHuddle.current.endedAt` stays null and the 'Huddle' badge renders with no duration. A meeting that has been going 47 minutes looks identical to one that just started. There's already a `lastHuddle` ref tracking names and endedAt — adding a start time is trivial. Add `startedAt: null` to the lastHuddle ref initial value, set it alongside the names capture when `meetingWorkers.length >= 2` transitions from <2 to >=2. In the `conf-meeting-badge` render, show duration: a `useMemo` or inline computation from `Date.now() - lastHuddle.current.startedAt` formatted as 'Xm'. Render as '🤝 Huddle · 12m'. At 30 minutes, escalate: 'Huddle · 30m ☕' (someone should check on them). At 60 minutes, the badge turns red: 'Huddle · 1h 😬'. WHY: meeting duration is the universal office anxiety. The conference table should participate in that feeling. It is already the most social piece of furniture in the office.",
+        "effort": "medium",
+        "assigned_to": "dave"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 73
   }
 ]

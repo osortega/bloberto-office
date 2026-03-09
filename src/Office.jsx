@@ -433,11 +433,19 @@ function formatIdleDuration(updatedAt) {
 }
 
 const AWAY_MESSAGES = ['☕ Coffee run', '🧠 Deep think', '📞 On a call', '🚶 Taking a lap', '🥪 Lunch', '🎧 Headphones in']
+const WORKER_AWAY_MESSAGES = {
+  carlos: ['☕ In the logs', '🧪 Tracing a bug', '📖 Reading docs', '🔌 Debugging'],
+  maya: ['🎨 Sketching', '🖌️ Wireframing', '💜 Mood-boarding', '✏️ Reviewing comps'],
+  dave: ['🎧 Headphones in', '⚙️ Pipeline watch', '📦 Infra thinking', '🚀 Deploy planning'],
+  sofia: ['🔍 Exploring', '🧪 Test design', '📋 Case writing', '🔎 Bug hunting'],
+  luna: ['🌙 Daydreaming', '✨ Spec drafting', '💡 Ideas percolating', '📐 Visual thinking'],
+}
 
 function AwaySign({ workerId, idleMinutes }) {
   const seed = workerId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
-  const idx = (seed + Math.floor(idleMinutes / 10)) % AWAY_MESSAGES.length
-  const message = AWAY_MESSAGES[idx]
+  const messages = WORKER_AWAY_MESSAGES[workerId] || AWAY_MESSAGES
+  const idx = (seed + Math.floor(idleMinutes / 10)) % messages.length
+  const message = messages[idx]
   const [line1, line2] = message.split(' ').reduce(
     ([a, b], word) => (a.length === 0 ? [word, b] : [a, b ? `${b} ${word}` : word]),
     ['', ''],
@@ -1478,12 +1486,20 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {/* Idle workers wandering the lower floor */}
         {idleWorkers.map((w, i) => {
           const wIdx = (i % 4) + 1
-          const wanderTooltips = {
+          const WORKER_WANDER_TOOLTIPS = {
+            carlos: ['☕ Checking server metrics', '📊 Reviewing the logs', '🔌 Debugging in his head'],
+            maya: ['💜 Studying the color palette', '✏️ Sketching on a napkin', '🎨 Rearranging the mood board'],
+            dave: ['🎧 Lost in a podcast', '⚙️ Thinking about pipelines', '🚀 Planning the next deploy'],
+            sofia: ['🔍 Mentally writing test cases', '📋 Reviewing edge cases', '🧪 Pondering coverage gaps'],
+            luna: ['🌙 Dreaming up the next feature', '✨ Staring at nothing productively', '📐 Mentally redesigning everything'],
+          }
+          const workerTooltips = WORKER_WANDER_TOOLTIPS[w.id]
+          const tooltip = workerTooltips ? workerTooltips[i % workerTooltips.length] : {
             1: '☕ Heading to the coffee corner',
             2: '💬 Lingering by the whiteboard',
             3: '🪟 Staring out the window',
             4: '🧘 Taking a mindful moment',
-          }
+          }[wIdx]
           return (
             <Character
               key={w.id}
@@ -1491,7 +1507,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               variant="idle"
               wanderIdx={wIdx}
               delay={i * 0.2}
-              tooltip={wanderTooltips[wIdx]}
+              tooltip={tooltip}
               onClick={onWorkerClick ? handleCharClick : undefined}
               isPinged={pingedId === w.id}
               pingReaction={pingedId === w.id && pingReaction ? pingReaction : null}

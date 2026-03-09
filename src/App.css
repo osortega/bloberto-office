@@ -887,6 +887,7 @@
 .task-tag--qa     { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
 .task-tag--data   { background: rgba(180, 83, 9, 0.15);   color: #b45309; }
 .task-tag--docs   { background: rgba(34, 197, 94, 0.15);  color: #22c55e; }
+.task-tag--plan   { background: rgba(234, 179, 8, 0.15);  color: #ca8a04; }
 
 .skeleton {
   background: var(--surface2);
