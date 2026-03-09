@@ -1000,6 +1000,7 @@
   height: 100%;
   position: relative;
   transition: background 3s ease;
+  filter: brightness(0.7) saturate(0.85);
 }
 
 /* Vibe tint overlays — single consolidated system */

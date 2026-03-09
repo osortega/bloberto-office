@@ -1053,7 +1053,7 @@ export default function App() {
   const errorCount = activeWorkers.filter(w => w.status === 'error').length
 
   const currentHour = new Date().getHours()
-  const isAfterHours = currentHour < 5
+  const isAfterHours = currentHour < 5 || currentHour >= 20
   const greeting =
     isAfterHours
       ? (currentHour % 2 === 0 ? '🌃 Burning the midnight oil' : '🦉 Still at it')
