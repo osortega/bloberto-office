@@ -1,66 +1,75 @@
 {
   "creative_director": "Luna",
-  "review_number": 57,
-  "timestamp": "2026-03-09T00:00:55Z",
-  "theme": "The floor and dashboard are siblings who never talk — make them tell the same story",
-  "visual_observations": "Desktop (screenshot-current.png, 1280x800): Crushing It vibe — purple border glow on office floor, Bloberto at center-top with CVO nameplate. Luna top-left (4-column SVG monitor: purple/lavender/violet/indigo bars with gold star), Carlos middle-top (blue line code SVG), Maya right-top (purple wireframe SVG), Dave left-middle (orange terminal with blinking cursor), Sofia center-middle (green bar chart SVG + pinned magnifying glass). Vacant desk bottom-right showing '📋 Vacant'. Conference table bottom-left: 6 purple chairs, 'everyone is at their desk' ambient label. Coffee corner top-right: steam animation, 'COFFEE TRIPLE SHOT' label. Window right wall: amber-purple dusk gradient. Vibe weather icon (☀️) visible near top-right but tiny and unlabeled. Aisle still has two static arrows — no vibe reaction visible. Shortcut toast inside a rounded card bottom-right. Dashboard (screenshot-dashboard.png): ON THE CLOCK: 1, ACTIVE: 1 (lone wolf), IDLE: 0 (all hands on deck), LIVE: 11:19:27 PM, TEAM VIBE: Crushing It. Sparkline has 2 barely-visible colored dots — sparkline-legend pills ARE rendered but tiny. Solo card for Sofia: QA, WORKING, 'QA review #24 — visual testing + code analysis', 10% progress, 'Working for <1m'. Solo spotlight message: '🌟 Running solo today. Carrying the whole team on one pair of hands.' Mobile (screenshot-mobile.png): Office very compressed — Sofia visible top-left with magnifying glass, Bloberto at center. Other workers are tiny icon-sized silhouettes. Shortcut toast appears OUTSIDE office floor boundary at bottom of screen.",
+  "review_number": 58,
+  "timestamp": "2026-03-09T01:00:00Z",
+  "theme": "Every pixel has a job — audit the quiet corners and make them earn their rent",
+  "visual_observations": "Desktop: office floor glows purple (crushing vibe), Bloberto crowned center-top as CVO, all five workers visible at desks, coffee corner reads 'COFFEE TRIPLE SHOT' (static text), orange gradient sky window top-right labeled tiny 'dusk', conference table ring sits empty in bottom-left, fern + cactus bottom-right corner, 'everyone is at their desk' footer text barely visible. Dashboard: 5 stat cards — ON THE CLOCK (1), ACTIVE (1 'lone wolf'), IDLE (0 'all hands on deck'), LIVE timestamp ticking, TEAM VIBE sparkline; Sofia's card shows 10% progress, '<1m' working time, QA task tag, but no ETA. Mobile (375px): desks shrink to ~40px wide, nameplates completely illegible, only 'SOFIA' label is barely readable, 'DUSK' label on window more prominent than on desktop, conference ring floats as an unlabeled ghost, vibe streak badge absent at this viewport. Across all views: the footer quote counter '1/8' is nearly invisible, Bloberto's crown is static gold regardless of vibe intensity.",
   "ideas": [
     {
       "priority": "must",
       "category": "visual",
-      "title": "Ghost Desk CSS Never Shipped — The Data Attribute Speaks to No One",
-      "description": "Office.jsx correctly computes ghostDeskTier as 'fresh'/'stale'/'abandoned' and sets data-ghost-tier on the desk div — this was #56's must #1 and the attribute is there. But a full read of Office.css shows no selector for [data-ghost-tier='stale'] or [data-ghost-tier='abandoned']. The feature is half-deployed. Fix: In Office.css add .desk--ghost[data-ghost-tier='stale'] { box-shadow: 0 0 8px rgba(245,158,11,0.35) inset; animation-duration: 3.5s; } and .desk--ghost[data-ghost-tier='abandoned'] { border-left: 2px solid #ef4444; animation-duration: 1.2s; }. For the monitor screen add an amber CSS filter on stale and a red sepia tint on abandoned. Pure CSS — zero JSX changes. WHY: The whole point of review #56's ghost tier spec was visual escalation. Someone abandoned at their desk for 5 hours and someone absent for 20 minutes look identical today. The data attribute exists. The story just needs CSS to complete it.",
+      "title": "Office Window Is Color Blind to the Vibe",
+      "description": "The OfficeWindow component in Office.jsx uses getGradient(hour) for a purely time-driven sky — the VIBE_WEATHER_LABELS object already maps vibes to weather descriptions but nothing flows into the window. Pass vibeKey as a prop to OfficeWindow and blend a vibe-specific CSS variable into the sky: on-fire tints the gradient red-orange (overlay rgba(239,68,68,0.15)), crushing adds violet shimmer (rgba(139,92,246,0.2)), slow-day desaturates with grey wash (filter: saturate(0.4)), after-hours deepens indigo. This matters because the window is the first decorative element users see upper-right — right now it tells you it's dusk, not that the team is on fire. Two props, three CSS variables, zero new components.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "must",
       "category": "feature",
-      "title": "Worker Card Back Side Has No Timestamps — History Without Time Is Just Gossip",
-      "description": "In App.jsx, WorkerCard renders .worker-card__back with up to 3 entries from workerHistory. Each entry shows: {ACTIVITY_ICONS[e.type]} {e.message}. The key uses e.timestamp but the value is never displayed. So 'deploy failed' floats without context — was it 10 minutes ago or yesterday? Fix: In the .worker-card__back-entry div, append a muted timestamp span using getRelativeTime(e.timestamp). That function is already defined in App.jsx scope — zero new dependencies. Style it as muted text matching the activity-time class used in ActivityLog. Add a separator dot between message and time. WHY: You click the ℹ️ button to understand a worker's recent history. Three floating messages with no time context are barely better than nothing. The entire feature is unlocked by passing a value already in the object.",
+      "title": "Progress Bar Tells You Where, Not When — Add the ETA",
+      "description": "In App.jsx, ProgressBar receives startedAt and progress. When progress > 5% and startedAt is valid, the remaining time is trivial math: const pct = progress / 100; const elapsed = Date.now() - new Date(startedAt); const etaMins = Math.round((elapsed / pct - elapsed) / 60000). Render a .progress-eta span beside the percentage (e.g. '~8m left') in muted text. When progress hits 100, show '✓ done'. Why it matters: Sofia sitting at 10% with '<1m elapsed' tells users nothing about whether to panic or relax. An ETA converts a progress bar from a 'where' indicator into a 'when' forecast — the single most anxious question people have watching live work.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "must",
+      "category": "visual",
+      "title": "Mobile Desks Are Braille — Give Fingers a Voice",
+      "description": "At 375px viewport, desk nameplates are 0.6rem and desk containers shrink to roughly 40px wide — completely illegible. Office.jsx's Character already detects touch via window.matchMedia('(hover: none)'). Add a two-tap behavior for mobile: first tap renders a .char-mobile-popup absolutely-positioned callout (above the character, z-index above office floor) showing worker emoji, name, role, and StatusBadge. A second tap (or tap elsewhere) navigates to the dashboard worker card via onClick. Currently, one tap skips straight to the dashboard — mobile users lose all floor context and can't identify who they're even tapping. This is a discovery and comprehension failure, not just a cosmetic issue.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "The Lone Ranger Has No Spotlight on the Floor",
+      "description": "When activeWorkers.length === 1, App.jsx renders the .workers-grid--solo layout and the solo-spotlight-msg ('🌟 Running solo today. Carrying the whole team on one pair of hands.'). But the Office floor doesn't know. The lone active worker just sits at their desk identically to any other day. Pass an isSoloChampion boolean from App into Office, then into the lone worker's Character component where it adds a .char--solo-champion class: a gold pulsing halo shadow (box-shadow: 0 0 18px rgba(251,191,36,0.5), animation: solo-glow 2s ease-in-out infinite). The floor should echo the dashboard's hero narrative — right now the two views tell completely different emotional stories about the same moment.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "should",
+      "category": "feature",
+      "title": "Task Tags Live in the Dashboard Basement — Surface Them on the Floor",
+      "description": "getTaskTags() in App.jsx parses task strings and returns typed tag objects (Bug 🔴, Ship 🟠, Design 🟣, QA 🔵, Data 🟤, Docs 🟢). These render as colorful badges in WorkerCard. On the Office floor, Character receives a tooltip prop that currently shows 'Name · Role'. Since activityEntries is already passed to Character, and the worker object has a task field, add the first matching tag's emoji+label to the tooltip: 'Sofia · QA · 🔵 QA' instead of 'Sofia · QA'. One-line change to the tooltip construction in Office.jsx. Why it matters: the floor view is the first thing visitors see — task context without having to navigate to the dashboard makes the office feel like a real working space, not just a roster.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "office-life",
+      "title": "Coffee Corner Shot Strength Should Match the Crowd",
+      "description": "The .coffee-corner label currently shows 'COFFEE TRIPLE SHOT' as a static string in the rendered JSX (Office.jsx). The coffee-corner--chatting and coffee-corner--solo states exist — but the shot strength never changes. Map crowd size to espresso intensity: 0 workers = 'DECAF' (grey), 1 worker = 'SINGLE SHOT' (warm), 2 workers = 'DOUBLE SHOT' (amber), 3+ workers = 'TRIPLE SHOT' (gold glow). Store the label computation next to the existing chatBadge logic. This turns a charming but inert decoration into a subtle real-time social metric. Users will start checking the corner to gauge team gathering momentum without reading a single stat.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
-      "priority": "should",
-      "category": "storytelling",
-      "title": "Lone Survivor on the Floor Gets No Acknowledgment",
-      "description": "The dashboard renders solo-spotlight-msg ('🌟 Running solo today. Carrying the whole team on one pair of hands.') when only 1 worker is active. The office floor renders exactly zero acknowledgment of this. Both views look at the same data and tell different stories — the floor tells none. Fix: In Office.jsx compute isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0 && nonMgr.length > 0 (same pattern as isFullSync). When true, render a .lone-survivor-label div as a sibling to the Character for that worker — vibe-keyed copy from a LONE_SURVIVOR_LABELS map: crushing → '🎯 solo run', on-fire → '🧯 one-person fireteam', in-flow → '⚡ flow state: achieved', slow-day → '🤷 who turned off the others?', after-hours → '🌙 last one standing'. Position near the desk, 0.45rem font, 0.6 opacity. WHY: The solo worker at 11pm while four desks sit dark is the most cinematic scene the office can generate. The dashboard names it. The floor — where you see the dark desks — is completely silent.",
-      "effort": "small",
-      "assigned_to": "sofia"
-    },
-    {
-      "priority": "should",
-      "category": "office-life",
-      "title": "Coffee Corner Names the Chatters — The Huddle Badge Does It, The Corner Doesn't",
-      "description": "ConferenceTable renders worker avatars when meetingWorkers.length >= 2 with a Huddle badge and CharacterAvatar stacks. The coffee-corner has an equivalent chatting state (coffee-corner--chatting class when idleWorkers.length >= 2) but only shows '☕ chatting' — no names. Fix: In Office.jsx, pass the first 2 idle workers inline to the coffee corner render area. Add a .coffee-corner__chatters div inside the chatting badge showing {w.emoji} {w.name.split(' ')[0]} for each, comma-separated, styled to match conf-meeting-badge aesthetics. Only show when idleWorkers.length >= 2. WHY: 'Maya and Carlos are at the coffee machine' is a workplace story. '☕ chatting' is a system status. The conference table earns its keep by naming participants. The coffee corner should be equally specific.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "could",
-      "category": "visual",
-      "title": "The Vibe Weather Icon Is aria-hidden With No Tooltip — A Silent Mood Ring",
-      "description": "In Office.jsx the .vibe-weather div renders VIBE_WEATHER_ICONS (⛈️/☀️/⛅/�/🌙) with aria-hidden='true' and no title attribute. It is the only element on the floor with visual content and zero metadata. Fix: remove aria-hidden, add role='img', and add title plus aria-label with vibe-contextual copy from a VIBE_WEATHER_LABELS map — crushing: '☀️ Clear skies — team at full strength', on-fire: '⛈️ Storm conditions — all hands', in-flow: '⛅ Partly cloudy — steady progress', slow-day: '🌧️ Drizzle — easy does it', after-hours: '🌙 Night sky — the stars are watching'. Two JSX attribute changes. WHY: The weather icon rewards curious users who hover the corner of the screen. Right now there is nothing to discover. The tooltip turns a decoration into an easter egg and makes the vibe legible to screen readers.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
       "priority": "could",
       "category": "delight",
-      "title": "Fern the Ficus Has a Static Name Tag — Her Title Should Tell Her Journey",
-      "description": "The office-plant--ficus div has title='Fern the office ficus' hardcoded. But plantStage (seedling/sprout/small-plant/leafy/blooming) and vibeStreak are both live in Office.jsx scope. Fix: compute ficusStageIdx = Math.min(Math.floor(vibeStreak / 5), 4) and ficusTillNext = ficusStageIdx < 4 ? (ficusStageIdx + 1) * 5 - vibeStreak : 0. Update the title prop: when not blooming → 'Fern 🌿 · stage: {plantStage} · {ficusTillNext} vibe tick(s) until she grows'; when blooming → 'Fern 🌿 · blooming · fully grown'. Update aria-label to match. Pure JSX attribute change — no new state or effects needed. WHY: The ficus is the office ambient health indicator. vibeStreak drives her growth but there is no way to know her stage or how close she is to leveling up. The tooltip turns a decoration into a living progress bar and makes the streak counter feel meaningful — 3 more ticks to grow.",
+      "title": "The Footer Quote Counter Is a Secret Menu — Give It One Wink",
+      "description": "The footer renders a quote counter like '2/8' at opacity 0.55 in tiny tabular-nums — invisible unless you're hunting for it. The footer-sparkle--twinkle animation already fires for first-time visitors via localStorage flag 'footer-sparkle-seen'. During that same first-visit window, add a .footer-hint span that appears for 4s then fades out: 'click ✦ for more'. After that, let it be secret again. Add title='Click for next quote' to the .footer-tagline wrapper. This preserves the easter-egg magic for returning users while giving new visitors one gentle nudge. The quote cycling is currently the most delightful invisible feature — it deserves a single moment of discovery.",
       "effort": "small",
-      "assigned_to": "sofia"
+      "assigned_to": "luna"
     },
     {
       "priority": "wild",
       "category": "storytelling",
-      "title": "The Dashboard Needs a Situation Report — Stats Without Narrative Are Just Numbers",
-      "description": "In App.jsx, between StatsBar and the section-header div, there is no interpretation layer. The state is 1 active / 0 idle / 0 errors / Crushing It — but the viewer assembles the meaning alone. Fix: Add a SituationReport component in App.jsx, rendered between StatsBar and the section-header. It receives activeWorkers, teamVibe, and stuckWorkers as props and selects from a scenario priority chain to produce a 1-2 sentence bulletin: isLoneSurvivor + crushing → '{name} on solo deployment. The office belongs to them today.'; multiple errors → '🚨 Multiple incidents burning. Coordinate immediately.'; isFullIdle → '🛋️ Full standby. The sprint is over for now.'; isFullSync + crushing → '🚀 All hands locked in. Peak output window open.'; stuckWorkers.length > 0 → '⚠️ {name} has been on the same task for {duration}. Worth a check-in.'; fallback → '{vibe.label}. The office is doing its thing.' Render as a .situation-card div with 0.85rem italic text and a vibe-reactive left-border using VIBE_COLORS. WHY: The stats bar gives you the sensors. The situation report gives you the meaning. Every command center has a dispatcher. The dashboard is a wall of numbers waiting for someone to translate them.",
+      "title": "Bloberto's Crown Should Chronicle Chaos — Make It Earn Its Shine",
+      "description": "In CharacterAvatar (Office.jsx), Bloberto's crown is a hardcoded yellow polygon fill='#fbbf24' regardless of actual team state. The crown sits at the highest visual point of the entire floor — it should be the first signal. Implement crown state as a computed fill and optional SVG animation: on-fire → fill='#ef4444' with <animateTransform type='rotate'> slight quiver (±2deg, 0.3s); crushing → fill='#fbbf24' with a <animate> on strokeWidth pulsing from 0 to 1 on a white stroke (sparkle effect); slow-day → fill='#78716c' (pewter, dim and defeated); after-hours → fill='#6366f1' (indigo glow matching floor border); in-flow → current gold. vibeKey is already passed to CharacterAvatar as a prop — this is pure SVG animation, no new state, no props changes. The crown is Bloberto's emotional barometer. Right now it lies.",
       "effort": "medium",
-      "assigned_to": "carlos"
+      "assigned_to": "dave"
     }
   ],
-  "hire_proposals": []
+  "hire_proposals": [],
+  "_previous_review": 57
 }

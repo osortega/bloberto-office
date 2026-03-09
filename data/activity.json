@@ -2,6 +2,12 @@
   {
     "type": "complete",
     "worker": "Sofia",
+    "message": "\ud83d\udd0d QA review #31 complete \u2014 overall score 3.4/5 (-0.1) \u2014 7 HIGH-priority bugs (all carry-overs, 5th+ strike), 18 total suggestions",
+    "timestamp": "2026-03-09T01:25:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
     "message": "\ud83d\udd0d QA review #30 complete \u2014 overall score 3.5/5 (-0.4) \u2014 4 high-priority bugs (3 carry-overs on 4th strike + 1 new), 19 total suggestions",
     "timestamp": "2026-03-09T00:52:00Z"
   },

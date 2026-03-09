@@ -1,14 +1,5 @@
 {
-  "workers": [
-    {
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA Review #31",
-      "started_at": "2026-03-09T01:15:00Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     {
       "name": "Maya",
@@ -36,5 +27,5 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "updated_at": "2026-03-09T01:15:00Z"
+  "updated_at": "2026-03-09T01:25:00Z"
 }
