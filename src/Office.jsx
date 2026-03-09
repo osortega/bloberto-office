@@ -105,6 +105,13 @@ const BLOBERTO_TITLES = {
   'after-hours': 'CISO',
 }
 
+const VIBE_WEATHER_LABELS = {
+  'crushing-it': '☀️ Clear skies — team at full strength',
+  'on-fire': '⛈️ Storm conditions — all hands',
+  'in-flow': '⛅ Partly cloudy — steady progress',
+  'slow-day': '🌧️ Drizzle — easy does it',
+  'after-hours': '🌙 Night sky — the stars are watching',
+}
 const VIBE_WEATHER_ICONS = {
   'on-fire':    '⛈️',
   'crushing':   '☀️',
@@ -1329,7 +1336,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               <rect x="9" y="0" width="18" height="11" rx="4" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1"/>
               <polygon points="23,11 23,15 19,11" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1" strokeLinejoin="round"/>
             </svg>
-            <span className="coffee-corner__chat-label">☕ chatting</span>
+            <span className="coffee-corner__chat-label">☕ {idleWorkers.length >= 2 ? idleWorkers.slice(0, 2).map(w => w.name.split(' ')[0]).join(' & ') : 'chatting'}</span>
           </div>
           <div className="coffee-corner__body">
             <div className="coffee-steam" aria-hidden="true">
@@ -1403,7 +1410,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           className={`office-plant office-plant--ficus office-plant--${plantStage}`}
           data-milestone={plantMilestone || undefined}
           style={{ left: '87%', top: '72%' }}
-          title="Fern the office ficus"
+          title={plantStage === 'blooming' ? 'Fern 🌿 · blooming · fully grown' : `Fern 🌿 · ${plantStage} · ${(Math.min(Math.floor(vibeStreak / 5), 3) + 1) * 5 - vibeStreak} vibe tick(s) until she grows`}
           aria-hidden="true"
         >
           <div className="ficus-pot" />
@@ -1431,7 +1438,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
         <div
           className={`vibe-weather vibe-weather--${vibe}`}
-          aria-hidden="true"
+          role="img"
+          title={VIBE_WEATHER_LABELS[vibe] || vibe}
+          aria-label={VIBE_WEATHER_LABELS[vibe] || vibe}
         >
           {VIBE_WEATHER_ICONS[vibe]}
         </div>

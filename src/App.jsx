@@ -330,6 +330,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
               <div key={e.timestamp + e.type + (e.worker || '')} className="worker-card__back-entry">
                 <span style={{ marginRight: '0.35rem' }}>{ACTIVITY_ICONS[e.type] ?? '🔧'}</span>
                 {e.message}
+                <span className="activity-time" style={{ marginLeft: '0.35rem', opacity: 0.6 }} title={formatFullDateTime(e.timestamp)}>{getRelativeTime(e.timestamp)}</span>
               </div>
             ))
           )}
