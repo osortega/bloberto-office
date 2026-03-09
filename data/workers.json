@@ -1,21 +1,13 @@
 {
   "workers": [
     {
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "\ud83c\udfa8",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
       "status": "working",
-      "task": "Critical bug fixes \u2014 worker.id normalization, window tint, vibeCaption cleanup, activity log count, startedAt camelCase",
-      "started_at": "2026-03-09T10:37:00Z"
-    },
-    {
-      "name": "Sofia",
-      "role": "QA & Product Analyst",
-      "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #41 \u2014 live site + codebase analysis",
-      "started_at": "2026-03-09T11:15:00Z"
+      "task": "Creative review #68 — visual + code analysis",
+      "started_at": "2026-03-09T11:30:00Z"
     }
   ],
-  "updated_at": "2026-03-09T11:15:00Z"
+  "updated_at": "2026-03-09T11:30:00Z"
 }
