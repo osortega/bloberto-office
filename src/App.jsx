@@ -264,7 +264,7 @@ const SOLO_SPOTLIGHT_MESSAGES = {
   sofia:  { 'on-fire': '🔍 Holding quality with both hands and no backup.', 'crushing': '🔍 Bugs beware — she\'s in full hunt mode, solo.', 'in-flow': '🧪 Deep in the zone, every edge case accounted for.', 'slow-day': '🔎 If there are bugs, she will find them. Alone.', default: '🔍 One set of eyes. Nothing gets past.' },
   dave:   { 'crushing': '🚀 Pipelines flying, one engineer holding it all together.', 'on-fire': '🔥 Infrastructure at max velocity. Dave\'s not slowing down.', 'after-hours': '🎧 One DevOps engineer. Infinite deployment anxiety.', default: '🚀 Solo deploy. No safety net.' },
   maya:   { 'crushing': '💜 Shipping pixels at terminal velocity, unsupervised.', 'on-fire': '🔥 One designer, infinite components, zero chill.', 'slow-day': '🎨 Quiet day. Maya\'s making every pixel count.', default: '🎨 One designer. Every pixel is hers.' },
-  luna:   { 'crushing': '✨ Big creative energy, no audience needed.', 'after-hours': '🌙 Creative review never clocks out.', default: '🌙 Dreaming alone. The ideas keep coming.' },
+  luna:   { 'crushing': '✨ Big creative energy, no audience needed.', 'after-hours': '🌙 Creative review never clocks out.', 'on-fire': '🔥 One creative in a burning building — the brief will still be beautiful.', 'in-flow': '✨ Ideas arrive faster when the office goes quiet.', 'slow-day': '🌙 Slow day. The perfect kind for the ideas that need silence.', default: '🌙 Dreaming alone. The ideas keep coming.' },
 }
 
 const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false, selectedTag = null, onTagClick = null, isDimmed = false }) {
@@ -1290,6 +1290,7 @@ export default function App() {
                     if (activityFilter === 'hires') return e.type === 'hire'
                     if (activityFilter === 'completions') return e.type === 'complete'
                     if (activityFilter === 'errors') return e.type === 'error'
+                    if (activityFilter === 'system') return e.type === 'system'
                     return true
                   }).filter(e => workerFilter !== null ? e.worker === workerFilter : true)
                   return isFiltered
@@ -1304,6 +1305,7 @@ export default function App() {
                 { key: 'hires', label: '🟢 Hires' },
                 { key: 'completions', label: '✅ Completions' },
                 { key: 'errors', label: '❌ Errors' },
+                { key: 'system', label: '⚙️ System' },
               ].map(({ key, label }) => (
                 <button
                   key={key}
@@ -1342,6 +1344,7 @@ export default function App() {
                 if (activityFilter === 'hires') return e.type === 'hire'
                 if (activityFilter === 'completions') return e.type === 'complete'
                 if (activityFilter === 'errors') return e.type === 'error'
+                if (activityFilter === 'system') return e.type === 'system'
                 return true
               }).filter(e => {
                 if (workerFilter !== null) return e.worker === workerFilter

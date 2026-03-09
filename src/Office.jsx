@@ -468,6 +468,16 @@ function AwaySign({ workerId, idleMinutes }) {
   )
 }
 
+const WORKER_IDLE_BUBBLES = {
+  carlos: ['☕', '📊', '🔍'],
+  maya: ['💜', '✏️', '🎨'],
+  dave: ['🎧', '📦', '⚡'],
+  sofia: ['🔍', '📋', '🧪'],
+  luna: ['🌙', '✨', '💭'],
+}
+const DEFAULT_IDLE_BUBBLES = ['☕', '💬', '🪟', '🧘']
+const ERROR_BUBBLE_MESSAGES = ['💀', '⚠️ help?', 'it was fine locally', '🧨', 'send help', 'undefined is not a function']
+
 const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick, isPinged = false, pingReaction = null }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
@@ -507,7 +517,6 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   }, [pingReaction])
 
   // Idle micro-bubbles — ambient thought emojis for wandering characters
-  const IDLE_BUBBLE_EMOJIS = { 1: '☕', 2: '💬', 3: '🪟', 4: '🧘' }
   useEffect(() => {
     if (variant !== 'idle') return
     const showDelay = 8000 + wanderIdx * 3000
@@ -523,7 +532,6 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   }, [variant, wanderIdx])
 
   // Error micro-bubbles — distress messages for workers in error state
-  const ERROR_BUBBLE_MESSAGES = ['💀', '⚠️ help?', 'it was fine locally', '🧨', 'send help', 'undefined is not a function']
   const WORKER_ERROR_BUBBLES = {
     carlos: ['SIGKILL', 'db is lying to me', 'logs on fire', '500'],
     maya: ['every border is wrong', 'the prototype lied', 'my components are crying'],
@@ -735,7 +743,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       </div>
       <div className="char__name">{firstName}</div>
       {variant === 'idle' && idleBubble && (
-        <div className="idle-micro-bubble">{IDLE_BUBBLE_EMOJIS[wanderIdx] || '💭'}</div>
+        <div className="idle-micro-bubble">{(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor(Date.now() / 12000) % (WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES).length]}</div>
       )}
       {errorBubble && (
         <div className="idle-micro-bubble" data-type="error">{errorBubble}</div>
