@@ -20,9 +20,8 @@
       "name": "Sofia",
       "role": "QA Engineer",
       "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #32 \u2014 full site analysis",
-      "started_at": "2026-03-09T01:45:00Z"
+      "status": "idle",
+      "task": ""
     }
   ],
   "roster": [
@@ -52,5 +51,5 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "updated_at": "2026-03-09T02:02:40Z"
+  "updated_at": "2026-03-09T02:15:24Z"
 }
