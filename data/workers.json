@@ -21,18 +21,7 @@
       "progress": 100,
       "updated_at": "2026-03-09T19:45:00Z",
       "started_at": "2026-03-09T19:15:00Z"
-    },
-    {
-      "id": "luna",
-      "name": "Luna",
-      "role": "Creative Director",
-      "emoji": "\ud83c\udf19",
-      "status": "working",
-      "task": "Creative review #72 \u2014 triaging backlog",
-      "progress": 50,
-      "updated_at": "2026-03-09T20:00:00Z",
-      "started_at": "2026-03-09T20:00:00Z"
     }
   ],
-  "updated_at": "2026-03-09T20:00:00Z"
+  "updated_at": "2026-03-09T20:05:00Z"
 }
