@@ -1,47 +1,53 @@
 {
-  "last_updated": "2026-03-08T18:05:00Z",
+  "last_updated": "2026-03-09T05:10:00Z",
   "recent_activity": [
     {
       "timestamp": "2026-03-08T18:00:00Z",
       "type": "creative-review",
       "actor": "luna",
-      "details": "Review #50 — Worker timed out. Evaluated remaining #49 ideas. All MUST/SHOULD already shipped."
+      "details": "Review #50 \u2014 Worker timed out. Evaluated remaining #49 ideas. All MUST/SHOULD already shipped."
     },
     {
       "timestamp": "2026-03-08T18:05:00Z",
       "type": "implementation",
       "actor": "bloberto",
-      "details": "🟣 Whiteboard vibe history dots — shows last 2 vibes as colored dots (COULD from #49)"
+      "details": "\ud83d\udfe3 Whiteboard vibe history dots \u2014 shows last 2 vibes as colored dots (COULD from #49)"
     },
     {
       "timestamp": "2026-03-08T17:30:00Z",
       "type": "creative-review",
       "actor": "luna",
-      "details": "Review #49 — 7 ideas, 0 hire proposals. Theme: After Hours storytelling."
+      "details": "Review #49 \u2014 7 ideas, 0 hire proposals. Theme: After Hours storytelling."
     },
     {
       "timestamp": "2026-03-08T17:32:00Z",
       "type": "implementation",
       "actor": "carlos",
-      "details": "🪟 Added visible time caption to office window (MUST)"
+      "details": "\ud83e\ude9f Added visible time caption to office window (MUST)"
     },
     {
       "timestamp": "2026-03-08T17:32:00Z",
       "type": "implementation",
       "actor": "dave",
-      "details": "🔒 Locked office door during after-hours vibe (MUST)"
+      "details": "\ud83d\udd12 Locked office door during after-hours vibe (MUST)"
     },
     {
       "timestamp": "2026-03-08T17:34:00Z",
       "type": "implementation",
       "actor": "maya",
-      "details": "🕯️ Added flickering candle to manager desk during after-hours (SHOULD)"
+      "details": "\ud83d\udd6f\ufe0f Added flickering candle to manager desk during after-hours (SHOULD)"
     },
     {
       "timestamp": "2026-03-08T17:34:00Z",
       "type": "implementation",
       "actor": "sofia",
-      "details": "💬 Bloberto speaks on page load after 3 seconds (SHOULD)"
+      "details": "\ud83d\udcac Bloberto speaks on page load after 3 seconds (SHOULD)"
+    },
+    {
+      "timestamp": "2026-03-09T05:10:00Z",
+      "type": "creative-review",
+      "actor": "luna",
+      "details": "\ud83c\udf19 Creative review #63 \u2014 theme: character voice personalization, 8 ideas (3 must, 3 should, 1 could, 1 wild)"
     }
   ]
 }
