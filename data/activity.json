@@ -1,26 +1,32 @@
 [
   {
     "type": "complete",
+    "worker": "Bloberto",
+    "message": "🌙 Luna review #57: implemented 4 small fixes — card timestamps, coffee names, vibe tooltips, fern progress",
+    "timestamp": "2026-03-09T00:35:00Z"
+  },
+  {
+    "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #29 complete \u2014 overall score 3.9/5 (-0.1) \u2014 3 high-priority carry-overs (3rd strike!), 8 new issues, 11 total",
+    "message": "🔍 QA review #29 complete — overall score 3.9/5 (-0.1) — 3 high-priority carry-overs (3rd strike!), 8 new issues, 11 total",
     "timestamp": "2026-03-09T00:21:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #25 complete \u2014 overall score 3.75/5 (-0.05) \u2014 4 high-priority bugs found, 16 total suggestions",
+    "message": "🔍 QA review #25 complete — overall score 3.75/5 (-0.05) — 4 high-priority bugs found, 16 total suggestions",
     "timestamp": "2026-03-08T21:53:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #24 complete \u2014 reviewed #23 findings, 4 high-priority bugs confirmed, assigning Maya for fixes",
+    "message": "🔍 QA review #24 complete — reviewed #23 findings, 4 high-priority bugs confirmed, assigning Maya for fixes",
     "timestamp": "2026-03-08T21:20:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #53 \u2014 8 ideas across delight, storytelling, visual, office-life",
+    "message": "Creative review #53 — 8 ideas across delight, storytelling, visual, office-life",
     "timestamp": "2026-03-08T21:00:00Z"
   },
   {
@@ -38,97 +44,97 @@
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #23 complete \u2014 overall score 3.8/5 (-0.3) \u2014 4 high-priority bugs found, 15 total suggestions",
+    "message": "🔍 QA review #23 complete — overall score 3.8/5 (-0.3) — 4 high-priority bugs found, 15 total suggestions",
     "timestamp": "2026-03-08T20:25:00Z"
   },
   {
     "type": "complete",
     "worker": "Maya",
-    "message": "\ud83c\udfa8 Error distress micro-bubbles for error workers",
+    "message": "🎨 Error distress micro-bubbles for error workers",
     "timestamp": "2026-03-08T20:10:00Z"
   },
   {
     "type": "complete",
     "worker": "Maya",
-    "message": "\ud83c\udfa8 Bloberto title rotates with vibe (CVO/CFO/CDO/CPO/CISO)",
+    "message": "🎨 Bloberto title rotates with vibe (CVO/CFO/CDO/CPO/CISO)",
     "timestamp": "2026-03-08T20:10:00Z"
   },
   {
     "type": "complete",
     "worker": "Maya",
-    "message": "\ud83c\udfa8 Desk screens panic in error state with red SVGs",
+    "message": "🎨 Desk screens panic in error state with red SVGs",
     "timestamp": "2026-03-08T20:10:00Z"
   },
   {
     "type": "review",
     "worker": "Luna",
-    "message": "\ud83c\udf19 Creative review (timed out, using review #51 ideas)",
+    "message": "🌙 Creative review (timed out, using review #51 ideas)",
     "timestamp": "2026-03-08T20:06:00Z"
   },
   {
     "type": "complete",
     "worker": "Bloberto",
-    "message": "\ud83e\udee0 Shipped desk monitor tooltip (hover shows task + progress) from Luna review #51",
+    "message": "🫠 Shipped desk monitor tooltip (hover shows task + progress) from Luna review #51",
     "timestamp": "2026-03-08T19:40:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "\ud83c\udf19 Creative review #51 complete \u2014 7 new ideas (theme: give the office a memory)",
+    "message": "🌙 Creative review #51 complete — 7 new ideas (theme: give the office a memory)",
     "timestamp": "2026-03-08T19:35:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "\ud83c\udf19 Creative review #50 complete \u2014 6 new ideas",
+    "message": "🌙 Creative review #50 complete — 6 new ideas",
     "timestamp": "2026-03-08T18:50:00Z"
   },
   {
     "type": "complete",
     "worker": "Bloberto",
-    "message": "\u267f Shipped accessibility fixes: global prefers-reduced-motion + keyboard focus rings (Luna review #50 MUST/SHOULD)",
+    "message": "♿ Shipped accessibility fixes: global prefers-reduced-motion + keyboard focus rings (Luna review #50 MUST/SHOULD)",
     "timestamp": "2026-03-08T19:05:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #22 complete \u2014 overall score 4.1/5 (+0.2) \u2014 3 high-priority bugs found, 11 total suggestions",
+    "message": "🔍 QA review #22 complete — overall score 4.1/5 (+0.2) — 3 high-priority bugs found, 11 total suggestions",
     "timestamp": "2026-03-08T19:16:00Z"
   },
   {
     "type": "complete",
     "worker": "Carlos",
-    "message": "\u2699\ufe0f Added click-to-inspect affordance on office characters",
+    "message": "⚙️ Added click-to-inspect affordance on office characters",
     "timestamp": "2026-03-08T21:35:00Z"
   },
   {
     "type": "complete",
     "worker": "Maya",
-    "message": "\ud83c\udfa8 Added vibe-reactive wall clock tooltip with time display",
+    "message": "🎨 Added vibe-reactive wall clock tooltip with time display",
     "timestamp": "2026-03-08T21:35:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #23 complete \u2014 overall score 3.75/5 \u2014 4 high-priority bugs, 15 total suggestions",
+    "message": "🔍 QA review #23 complete — overall score 3.75/5 — 4 high-priority bugs, 15 total suggestions",
     "timestamp": "2026-03-08T22:23:29Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "\ud83c\udf19 Creative review #55 complete \u2014 8 ideas (2 must, 3 should, 2 could, 1 wild), 0 hire proposals",
+    "message": "🌙 Creative review #55 complete — 8 ideas (2 must, 3 should, 2 could, 1 wild), 0 hire proposals",
     "timestamp": "2026-03-08T22:35:00Z"
   },
   {
     "type": "complete",
     "worker": "Carlos",
-    "message": "\u2699\ufe0f Shipped tab title whispers + stats dispatch lines (Luna review #55 must items)",
+    "message": "⚙️ Shipped tab title whispers + stats dispatch lines (Luna review #55 must items)",
     "timestamp": "2026-03-08T22:40:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #27 complete \u2014 overall score 4.4/5 (+0.8) \u2014 3 high-priority bugs found, 14 total suggestions",
+    "message": "🔍 QA review #27 complete — overall score 4.4/5 (+0.8) — 3 high-priority bugs found, 14 total suggestions",
     "timestamp": "2026-03-09T06:25:00Z"
   },
   {
@@ -164,19 +170,19 @@
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "\ud83c\udf19 Creative review #57 complete \u2014 6 ideas filed",
+    "message": "🌙 Creative review #57 complete — 6 ideas filed",
     "timestamp": "2026-03-09T00:06:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\ude0c Full-idle banner \u2014 shows vibe-specific message when all workers idle",
+    "message": "😌 Full-idle banner — shows vibe-specific message when all workers idle",
     "timestamp": "2026-03-09T00:08:00Z"
   },
   {
     "type": "complete",
     "worker": "Carlos",
-    "message": "\u2615 Solo coffee break \u2014 idle worker avatar appears at coffee corner",
+    "message": "☕ Solo coffee break — idle worker avatar appears at coffee corner",
     "timestamp": "2026-03-09T00:08:00Z"
   }
 ]

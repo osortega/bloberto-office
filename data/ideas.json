@@ -1,55 +1,63 @@
 {
   "creative_director": "Luna",
   "review_number": 57,
-  "timestamp": "2026-03-09T00:05:00Z",
-  "theme": "The office remembers everything but shows nothing — give it a voice for the quiet states",
-  "visual_observations": "Code review pass (Puppeteer timed out on live site). Confirmed from Office.jsx + App.jsx: ghost-tier system now shipped with fresh/stale/abandoned tiers. PING_REACTIONS map exists for all 5 workers. Sparkline legend with colored pills shipped. Vacant job card now has focus-within for touch. Aisle arrows respond to vibe via data-vibe CSS selectors. Two #56 ideas still unshipped: full-idle banner and activity log silence gaps. New observations: (1) The ghost desk tiers are computed but Office.css has no differentiated styles for stale vs abandoned — the data attribute is set but CSS doesn't use it. (2) Coffee corner has a chatting state but no visual for the solo coffee break when exactly 1 worker is idle. (3) The AwaySign component picks from 6 messages deterministically but never uses the worker's actual last task as context. (4) ErrorBubble messages are hardcoded comedy strings — no connection to the actual error. (5) The footer tagline counter shows N/9 but the denominator is wrong when bonus taglines array changes size.",
+  "timestamp": "2026-03-09T00:00:55Z",
+  "theme": "The floor and dashboard are siblings who never talk — make them tell the same story",
+  "visual_observations": "Desktop (screenshot-current.png, 1280x800): Crushing It vibe — purple border glow on office floor, Bloberto at center-top with CVO nameplate. Luna top-left (4-column SVG monitor: purple/lavender/violet/indigo bars with gold star), Carlos middle-top (blue line code SVG), Maya right-top (purple wireframe SVG), Dave left-middle (orange terminal with blinking cursor), Sofia center-middle (green bar chart SVG + pinned magnifying glass). Vacant desk bottom-right showing '📋 Vacant'. Conference table bottom-left: 6 purple chairs, 'everyone is at their desk' ambient label. Coffee corner top-right: steam animation, 'COFFEE TRIPLE SHOT' label. Window right wall: amber-purple dusk gradient. Vibe weather icon (☀️) visible near top-right but tiny and unlabeled. Aisle still has two static arrows — no vibe reaction visible. Shortcut toast inside a rounded card bottom-right. Dashboard (screenshot-dashboard.png): ON THE CLOCK: 1, ACTIVE: 1 (lone wolf), IDLE: 0 (all hands on deck), LIVE: 11:19:27 PM, TEAM VIBE: Crushing It. Sparkline has 2 barely-visible colored dots — sparkline-legend pills ARE rendered but tiny. Solo card for Sofia: QA, WORKING, 'QA review #24 — visual testing + code analysis', 10% progress, 'Working for <1m'. Solo spotlight message: '🌟 Running solo today. Carrying the whole team on one pair of hands.' Mobile (screenshot-mobile.png): Office very compressed — Sofia visible top-left with magnifying glass, Bloberto at center. Other workers are tiny icon-sized silhouettes. Shortcut toast appears OUTSIDE office floor boundary at bottom of screen.",
   "ideas": [
     {
       "priority": "must",
       "category": "visual",
-      "title": "Ghost Desk Tiers Have Data Attributes But No CSS Differentiation",
-      "description": "Office.jsx correctly computes ghostDeskTier as fresh/stale/abandoned and sets data-ghost-tier on the desk div. But Office.css has no selectors for [data-ghost-tier='stale'] or [data-ghost-tier='abandoned']. The tier computation is dead code visually. Fix: In Office.css, add .desk--ghost[data-ghost-tier='stale'] with amber-tinted monitor glow (box-shadow: 0 0 8px rgba(245,158,11,0.4)), slower opacity pulse (3s instead of 2s). Add .desk--ghost[data-ghost-tier='abandoned'] with red border-left (3px solid #ef4444), faster pulse (1.2s), and the monitor screen gets a red tint filter. WHY: The whole point of the tier system from #56 was visual escalation. Without CSS, it is a data attribute talking to nobody. This is the #1 priority because the feature is half-shipped.",
+      "title": "Ghost Desk CSS Never Shipped — The Data Attribute Speaks to No One",
+      "description": "Office.jsx correctly computes ghostDeskTier as 'fresh'/'stale'/'abandoned' and sets data-ghost-tier on the desk div — this was #56's must #1 and the attribute is there. But a full read of Office.css shows no selector for [data-ghost-tier='stale'] or [data-ghost-tier='abandoned']. The feature is half-deployed. Fix: In Office.css add .desk--ghost[data-ghost-tier='stale'] { box-shadow: 0 0 8px rgba(245,158,11,0.35) inset; animation-duration: 3.5s; } and .desk--ghost[data-ghost-tier='abandoned'] { border-left: 2px solid #ef4444; animation-duration: 1.2s; }. For the monitor screen add an amber CSS filter on stale and a red sepia tint on abandoned. Pure CSS — zero JSX changes. WHY: The whole point of review #56's ghost tier spec was visual escalation. Someone abandoned at their desk for 5 hours and someone absent for 20 minutes look identical today. The data attribute exists. The story just needs CSS to complete it.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
+      "priority": "must",
+      "category": "feature",
+      "title": "Worker Card Back Side Has No Timestamps — History Without Time Is Just Gossip",
+      "description": "In App.jsx, WorkerCard renders .worker-card__back with up to 3 entries from workerHistory. Each entry shows: {ACTIVITY_ICONS[e.type]} {e.message}. The key uses e.timestamp but the value is never displayed. So 'deploy failed' floats without context — was it 10 minutes ago or yesterday? Fix: In the .worker-card__back-entry div, append a muted timestamp span using getRelativeTime(e.timestamp). That function is already defined in App.jsx scope — zero new dependencies. Style it as muted text matching the activity-time class used in ActivityLog. Add a separator dot between message and time. WHY: You click the ℹ️ button to understand a worker's recent history. Three floating messages with no time context are barely better than nothing. The entire feature is unlocked by passing a value already in the object.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
       "priority": "should",
-      "category": "office-life",
-      "title": "Full-Idle Banner — The Breath After the Sprint",
-      "description": "Carried forward from #56 as it was not implemented. isFullSync gets a glowing banner when all workers are working. But isFullIdle (all active workers idle, zero progress) has no equivalent. The floor goes silent with no acknowledgment. Fix: In Office.jsx, compute isFullIdle = nonMgr.length > 0 && workingWorkers.length === 0 && idleWorkers.length === nonMgr.length. Render a full-idle-banner div when true, using the same conditional pattern as full-sync-banner. Text varies by vibe: crushing → 'Everyone earned their break', on-fire → 'Ceasefire', in-flow → 'The office breathes', slow-day → 'Somewhere...', after-hours → 'Nobody home'. Style as the tonal mirror of full-sync-banner: muted colors, slower pulse (3s), italicized font, 0.7 opacity. WHY: Full sync gets celebrated. Full rest deserves equal acknowledgment.",
+      "category": "storytelling",
+      "title": "Lone Survivor on the Floor Gets No Acknowledgment",
+      "description": "The dashboard renders solo-spotlight-msg ('🌟 Running solo today. Carrying the whole team on one pair of hands.') when only 1 worker is active. The office floor renders exactly zero acknowledgment of this. Both views look at the same data and tell different stories — the floor tells none. Fix: In Office.jsx compute isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0 && nonMgr.length > 0 (same pattern as isFullSync). When true, render a .lone-survivor-label div as a sibling to the Character for that worker — vibe-keyed copy from a LONE_SURVIVOR_LABELS map: crushing → '🎯 solo run', on-fire → '🧯 one-person fireteam', in-flow → '⚡ flow state: achieved', slow-day → '🤷 who turned off the others?', after-hours → '🌙 last one standing'. Position near the desk, 0.45rem font, 0.6 opacity. WHY: The solo worker at 11pm while four desks sit dark is the most cinematic scene the office can generate. The dashboard names it. The floor — where you see the dark desks — is completely silent.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Solo Coffee Break — One Idle Worker at the Coffee Corner",
-      "description": "The coffee corner has a chatting state when 2+ workers are idle (coffee-corner--chatting class). But when exactly 1 worker is idle, the coffee corner does nothing special. Fix: In Office.jsx, pass a new prop soloBreaker to the coffee corner area when idleWorkers.length === 1. Render a tiny CharacterAvatar (size=14) of that worker next to the coffee emoji with a subtle fade-in. Add a solo label like '☕ {name} refueling'. In Office.css, add .coffee-corner--solo with a gentle warm glow. WHY: The solo coffee break is its own story. One person stepping away while everyone else grinds — that quiet moment deserves to be seen.",
+      "category": "office-life",
+      "title": "Coffee Corner Names the Chatters — The Huddle Badge Does It, The Corner Doesn't",
+      "description": "ConferenceTable renders worker avatars when meetingWorkers.length >= 2 with a Huddle badge and CharacterAvatar stacks. The coffee-corner has an equivalent chatting state (coffee-corner--chatting class when idleWorkers.length >= 2) but only shows '☕ chatting' — no names. Fix: In Office.jsx, pass the first 2 idle workers inline to the coffee corner render area. Add a .coffee-corner__chatters div inside the chatting badge showing {w.emoji} {w.name.split(' ')[0]} for each, comma-separated, styled to match conf-meeting-badge aesthetics. Only show when idleWorkers.length >= 2. WHY: 'Maya and Carlos are at the coffee machine' is a workplace story. '☕ chatting' is a system status. The conference table earns its keep by naming participants. The coffee corner should be equally specific.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
-      "category": "storytelling",
-      "title": "The Whiteboard Doodle Should Rotate",
-      "description": "The wb-doodle pre element shows a single ASCII face per vibe (crushing → ╰(*°▽°*)╯, on-fire → (╯°□°)╯︵ ┻━┻, etc). It never changes within a vibe. Fix: In Office.jsx, create VIBE_DOODLES map with 3 doodles per vibe. Use a state counter that increments every 30s (or on click) and cycles through them. The transition should be a quick 200ms fade. WHY: The whiteboard is the personality center of the office. A static doodle gets stale after the first visit. Rotation keeps it alive and gives returning visitors a reason to glance at it.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "could",
-      "category": "feature",
-      "title": "Conference Table Last-Huddle Ghost Trail",
-      "description": "The lastHuddle ref already tracks who was in the last meeting and when it ended. The code renders a tiny text line showing 'Last: names · timeStr' when no meeting is active and huddle ended <30min ago. But it's plain text at 0.38rem with inline styles — nearly invisible. Fix: In Office.css, create .conf-last-huddle class with proper styling: 0.45rem, muted text color, a subtle left-border accent matching the vibe color. Show mini avatar dots (6px colored circles) for each participant instead of text names. Add a gentle fade-out animation as the 30min window closes. WHY: The huddle afterglow tells you the office was alive even when you missed it. Right now it's functionally invisible.",
+      "category": "visual",
+      "title": "The Vibe Weather Icon Is aria-hidden With No Tooltip — A Silent Mood Ring",
+      "description": "In Office.jsx the .vibe-weather div renders VIBE_WEATHER_ICONS (⛈️/☀️/⛅/�/🌙) with aria-hidden='true' and no title attribute. It is the only element on the floor with visual content and zero metadata. Fix: remove aria-hidden, add role='img', and add title plus aria-label with vibe-contextual copy from a VIBE_WEATHER_LABELS map — crushing: '☀️ Clear skies — team at full strength', on-fire: '⛈️ Storm conditions — all hands', in-flow: '⛅ Partly cloudy — steady progress', slow-day: '🌧️ Drizzle — easy does it', after-hours: '🌙 Night sky — the stars are watching'. Two JSX attribute changes. WHY: The weather icon rewards curious users who hover the corner of the screen. Right now there is nothing to discover. The tooltip turns a decoration into an easter egg and makes the vibe legible to screen readers.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
+      "priority": "could",
+      "category": "delight",
+      "title": "Fern the Ficus Has a Static Name Tag — Her Title Should Tell Her Journey",
+      "description": "The office-plant--ficus div has title='Fern the office ficus' hardcoded. But plantStage (seedling/sprout/small-plant/leafy/blooming) and vibeStreak are both live in Office.jsx scope. Fix: compute ficusStageIdx = Math.min(Math.floor(vibeStreak / 5), 4) and ficusTillNext = ficusStageIdx < 4 ? (ficusStageIdx + 1) * 5 - vibeStreak : 0. Update the title prop: when not blooming → 'Fern 🌿 · stage: {plantStage} · {ficusTillNext} vibe tick(s) until she grows'; when blooming → 'Fern 🌿 · blooming · fully grown'. Update aria-label to match. Pure JSX attribute change — no new state or effects needed. WHY: The ficus is the office ambient health indicator. vibeStreak drives her growth but there is no way to know her stage or how close she is to leveling up. The tooltip turns a decoration into a living progress bar and makes the streak counter feel meaningful — 3 more ticks to grow.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
       "priority": "wild",
       "category": "storytelling",
-      "title": "Activity Log Silence Gaps — Show the Quiet Hours",
-      "description": "Carried forward from #56. The activity log groups entries into time buckets but entries stack with no indication of time between them. Three entries in 'Earlier today' might span 2 minutes or 4 hours. Fix: In App.jsx ActivityLog component, after rendering each entry within a group, compute delta to the next entry. If delta > 30 minutes, insert a .activity-time-gap div: '··· 2h 07m ···' styled at 0.55rem muted monospace, centered. Scale the dot count proportionally (more dots = longer silence). Max 1 gap indicator per time group to avoid clutter. WHY: The hours when nothing happened are the most honest data in the dashboard. Carlos deployed. Two hours of silence. Sofia found a bug. That blank middle IS the story.",
+      "title": "The Dashboard Needs a Situation Report — Stats Without Narrative Are Just Numbers",
+      "description": "In App.jsx, between StatsBar and the section-header div, there is no interpretation layer. The state is 1 active / 0 idle / 0 errors / Crushing It — but the viewer assembles the meaning alone. Fix: Add a SituationReport component in App.jsx, rendered between StatsBar and the section-header. It receives activeWorkers, teamVibe, and stuckWorkers as props and selects from a scenario priority chain to produce a 1-2 sentence bulletin: isLoneSurvivor + crushing → '{name} on solo deployment. The office belongs to them today.'; multiple errors → '🚨 Multiple incidents burning. Coordinate immediately.'; isFullIdle → '🛋️ Full standby. The sprint is over for now.'; isFullSync + crushing → '🚀 All hands locked in. Peak output window open.'; stuckWorkers.length > 0 → '⚠️ {name} has been on the same task for {duration}. Worth a check-in.'; fallback → '{vibe.label}. The office is doing its thing.' Render as a .situation-card div with 0.85rem italic text and a vibe-reactive left-border using VIBE_COLORS. WHY: The stats bar gives you the sensors. The situation report gives you the meaning. Every command center has a dispatcher. The dashboard is a wall of numbers waiting for someone to translate them.",
       "effort": "medium",
       "assigned_to": "carlos"
     }
