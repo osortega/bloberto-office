@@ -1,189 +1,212 @@
 {
   "analyst": "Sofia",
-  "review_number": 33,
-  "timestamp": "2026-03-09T03:15:00Z",
+  "review_number": 34,
+  "timestamp": "2026-03-09T03:46:00Z",
   "screenshots": {
-    "desktop": "qa33-desktop.png (1280x800)",
-    "mobile": "qa33-mobile.png (375x812)",
-    "status": "SUCCESS — page loads cleanly, no console errors, vibe at capture: Crushing It"
+    "desktop": "qa34-desktop.png (1280x800)",
+    "mobile": "qa34-mobile.png (375x812)",
+    "status": "SUCCESS — page loads cleanly. Vibe at capture: 🔥 Crushing It. Night owl mode active (Monday, Mar 9 late night). All 5 workers at desks, VACANT slot present, MIDNIGHT window visible top-right of office floor."
   },
   "scores": {
     "visual": 4,
     "ux": 3.5,
     "responsiveness": 3.5,
     "performance": 3.5,
-    "accessibility": 3,
-    "code_quality": 2.5,
+    "accessibility": 2.5,
+    "code_quality": 2,
     "features": 4.5,
     "fun_factor": 4.5
   },
-  "overall_score": 3.6,
+  "overall_score": 3.4,
+  "score_delta": -0.2,
+  "score_note": "Accessibility dropped from 3→2.5 (new issues compounding unfixed ones). Code quality dropped from 2.5→2 (four reviews of the same five unfixed items — this is now a process failure, not just tech debt). Fun and features holding strong. The app is delightful. The codebase is getting harder to maintain.",
   "carry_over_resolved": {
-    "setTimeout_memory_leak_ambient_broadcast": "FIXED ✅ — Carlos's fix is confirmed. The ambient broadcast useEffect in Character (lines 526–561) properly clears both mountQuoteId (clearTimeout) and the 45s interval (clearInterval) in its cleanup. No dangling timers from the main loop.",
-    "office_jsx_split": "NOT FIXED ❌ [3 REVIEWS] — still exactly 1515 lines.",
-    "fragmented_media_queries": "NOT FIXED ❌ [3 REVIEWS] — Office.css has THREE separate @media (max-width: 480px) blocks (lines 1133, 2165, 2316) and ELEVEN @media (prefers-reduced-motion) blocks.",
-    "lone_survivor_label_inline_styles": "NOT FIXED ❌ [3 REVIEWS] — Office.jsx line 1419 still has a 7-property inline style object.",
-    "vibe_weather_constants_in_utils": "NOT FIXED ❌ [3 REVIEWS] — VIBE_WEATHER_LABELS and VIBE_WEATHER_ICONS are still module-level constants in Office.jsx (lines 108–121), not in utils/constants.js."
-  },
-  "maya_work_status": {
-    "ficus_streak_tooltip": "PARTIALLY DEPLOYED — The ficus renders correctly and the plantToast fires on stage up. However, there is no custom CSS tooltip component on hover; it relies solely on the native `title` attribute (Office.jsx line 1456). The ficus div is `aria-hidden='true'`, making the streak info inaccessible to screen reader and keyboard users. The streak info exists only via mouse hover on desktop.",
-    "ambient_particle_vibe_color": "APPEARS WORKING — Office-floor particles (Office.jsx line 1501) have no `data-vibe` on their container, but they correctly inherit vibe color via the parent `.office-floor[data-vibe=X]` rule. App-level particles correctly use `data-vibe={teamVibe.key}` on their container. No visual regression detected."
+    "office_jsx_split": "NOT FIXED ❌ [4 REVIEWS] — still exactly 1515 lines. This is now escalated to sprint blocker. Four consecutive reviews with zero progress.",
+    "fragmented_media_queries": "NOT FIXED ❌ [4 REVIEWS] — Office.css now has TWELVE @media blocks (11 prefers-reduced-motion + 3 max-width:480px + 1 hover:none at line 608 + 1 hover:none at 2382 + 1 max-width:600px + 1 max-width:768px). App.css has 7 prefers-reduced-motion blocks. Total: 18+ prefers-reduced-motion fragments that should be 2.",
+    "lone_survivor_label_inline_styles": "NOT FIXED ❌ [4 REVIEWS] — Office.jsx line 1419 still has a 7-property inline style object on .lone-survivor-label. This is a 10-minute fix. Four reviews of asking.",
+    "vibe_weather_constants_in_utils": "NOT FIXED ❌ [4 REVIEWS] — VIBE_WEATHER_LABELS and VIBE_WEATHER_ICONS are still module-level constants in Office.jsx (lines 108–121).",
+    "inner_setTimeout_memory_leak": "NOT FIXED ❌ [3 REVIEWS] — Office.jsx idle bubble effect (lines 489, 493) and error bubble effect (lines 504, 510) still have inner setTimeout calls not tracked or cancelled in cleanup. If a Character unmounts mid-animation, the inner timer fires setState on an unmounted component.",
+    "speech_bubble_clipped": "NOT FIXED ❌ [3 REVIEWS] — Desktop screenshot confirms it: Bloberto's speech bubble is still guillotined at the top of the office-floor. We can see '...hour?! Legends. 🏆' at the very top edge — the bubble is rendered outside the overflow:hidden boundary. Office.jsx line 1401: top={4} is too close to the container ceiling for bottom: calc(100% + 8px) to fit within the parent's overflow:hidden."
   },
   "visual_observations": {
-    "desktop": "Dark theme polished, all 5 workers at desks, Bloberto at CVO desk with 🏆 trophy. Speech bubble ('was special.') is clipped at the top — overflows above the office-floor boundary. COFFEE TRIPLE SHOT in coffee corner. Decorative plants, cactus, ficus visible. Shortcut toast showing at page load (correct, first visit). Conference table lower-left. Whiteboard shows SHIP IT with 0% avg progress.",
-    "mobile": "Layout holds. All 5 workers legible. Office floor scales acceptably. 'tap / clack / click' keystroke labels on active desks are very small but present. Header wraps cleanly. Footer visible at bottom."
+    "desktop": "Dark theme solid. All five workers rendered with correct role-colored avatars. Bloberto at CVO desk, 🏆 trophy visible (Crushing It vibe). SOFIA name label in red — she's the active/highlighted worker. Conference table (lower-left) with orbital dots animated. MIDNIGHT window visible (top-right, correct for late-night). Whiteboard shows 'SHIP IT' with avg progress bar. Ficus (orange, right side), cactus, small potted plant scattered. WallClock SVG visible at top-left of office floor wall (new). Shortcut toast present at bottom-right. Speech bubble still clipped at the top — 'hour?! Legends.' visible as a stub.",
+    "mobile": "Layout holds reasonably. All characters legible. VACANT label visible. MIDNIGHT monitor present. Conference table at bottom-left. Footer footer text readable. Office floor scales to fit 375px width. Characters are small but distinguishable. The left edge of Sofia's desk area shows her red avatar glow at the boundary of the container."
   },
   "suggestions": [
     {
-      "priority": "high",
-      "category": "Bug / Memory Leak",
-      "title": "Inner setTimeouts inside interval callbacks not cleaned up on unmount",
-      "description": "In Character component, the idle bubble effect (Office.jsx lines 486–494) and error bubble effect (lines 503–511) each call setTimeout() inside both their setInterval callback AND their initialTimeout callback. The cleanup only calls clearInterval(interval) and clearTimeout(initialTimeout) — it does NOT track or cancel the inner `setTimeout(() => setIdleBubble(false), 2200)` and `setTimeout(() => setErrorBubble(null), 2200)` calls. If a Character unmounts while one of these inner timeouts is in flight (e.g., worker goes offline mid-animation), the timer fires after unmount and attempts a setState on an unmounted component. Fix: track inner timers in a ref (e.g. innerTimerRef) and clear them in the cleanup function alongside the outer ones.",
-      "effort": "small",
-      "assign_to": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "Bug / Visual Regression",
-      "title": "Bloberto's speech bubble clipped by office-floor overflow:hidden",
-      "description": "Bloberto is placed at `top={4}%` inside `.office-floor` (Office.jsx line 1401). The `.speech-bubble` is positioned `bottom: calc(100% + 8px)` above the character. At 4% from the top of the container, the bubble does not fit and is guillotined by `overflow: hidden` on the office-floor. Visible in desktop screenshot — the bubble reads 'was special.' with the top cut off. Fixes: (a) give `.office-floor` a top padding/clip-aware margin, (b) add `overflow: visible` scoped to the manager character area, or (c) increase Bloberto's `top` prop to ~12% and adjust mgr-desk positioning accordingly.",
-      "effort": "small",
-      "assign_to": "Maya"
-    },
-    {
-      "priority": "high",
-      "category": "Code Quality / Architecture",
-      "title": "[3 REVIEWS] Office.jsx at 1515 lines — must be split",
-      "description": "Office.jsx has not been reduced in size across three consecutive reviews. At 1515 lines it contains: SVG constants (DESK_SCREEN_SVG, ~100 lines), all character SVG components (CharacterAvatar, ~370 lines), UI components (Character, AwaySign, WindowElement, ConferenceTable, WallClock, VibeShockwave — ~550 lines), local constants (BLOBERTO_TITLES, VIBE_WEATHER_*, LONE_SURVIVOR_LABELS, VACANT_ADS, PING_REACTIONS, VIBE_COLORS, VIBE_RANK, VIBE_SHOCKWAVE_COLORS), and the main Office component. Recommended split: src/components/CharacterAvatar.jsx, src/components/OfficeDecor.jsx, src/components/DeskComponents.jsx. This is a blocking technical debt item now three reviews old — escalate to sprint blocker.",
+      "priority": "critical",
+      "category": "Process / Tech Debt",
+      "title": "[4 REVIEWS] Office.jsx 1515 lines — escalating to sprint blocker",
+      "description": "Office.jsx has not shrunk by a single line across FOUR consecutive QA reviews. It contains at minimum five separable concerns: (1) SVG screen data DESK_SCREEN_SVG (~100 lines), (2) all CharacterAvatar SVG variants (~370 lines), (3) ambient UI components: WallClock, WindowElement, ConferenceTable, AwaySign, VibeShockwave (~340 lines), (4) module-level constants: BLOBERTO_TITLES, VIBE_WEATHER_*, LONE_SURVIVOR_LABELS, VACANT_ADS, PING_REACTIONS, VIBE_COLORS, VIBE_RANK, VIBE_SHOCKWAVE_COLORS, CLOCK_COMMENTS (~100 lines), (5) the main Office component (~600 lines). Proposed split: src/components/CharacterAvatar.jsx, src/components/OfficeAmbience.jsx, src/data/officeConstants.js. Assign a dedicated sprint story. No new features in Office.jsx until this is split.",
       "effort": "large",
       "assign_to": "Dave"
     },
     {
       "priority": "high",
+      "category": "Bug / Memory Leak",
+      "title": "[3 REVIEWS] Inner setTimeouts in idle/error bubble effects not cancelled on unmount",
+      "description": "Office.jsx idle effect (lines ~488–498): `setInterval(() => { setIdleBubble(true); setTimeout(() => setIdleBubble(false), 2200) }, ...)` and `setTimeout(() => { setIdleBubble(true); setTimeout(() => setIdleBubble(false), 2200) }, ...)`. The cleanup only calls clearInterval(interval) and clearTimeout(initialTimeout). The two INNER setTimeout calls — the ones that set state back to false — are never tracked or cancelled. Same pattern in the error bubble effect (lines ~503–513). If a Character unmounts while an inner timer is in flight (e.g. worker goes offline during animation), the timer fires and calls setState on an unmounted component. Fix: collect inner timer IDs in a ref array (innerTimerRefs.current.push(...)) and clear them all in the cleanup. This is a two-line fix per effect.",
+      "effort": "small",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "Bug / Visual",
+      "title": "[3 REVIEWS] Bloberto speech bubble clipped by office-floor overflow:hidden",
+      "description": "Still visible in qa34-desktop.png: speech bubble text 'hour?! Legends. 🏆' appears as a partial strip at the top of the office-floor container. Office.jsx line 1401: Bloberto is placed at top={4}%, and .speech-bubble is positioned `bottom: calc(100% + 8px)` above the character. At 4% from the top, the bubble extends above the container and is cut by Office.css line 84: `overflow: hidden` on .office-floor. Three fixes available: (a) increase Bloberto's `top` prop to ~14% and adjust mgr-desk top in CSS to match, (b) use `overflow: visible` on a wrapper scoped to the manager area, or (c) use `clip-path` instead of `overflow: hidden` on .office-floor so absolutely-positioned children can escape. Option (a) is simplest.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "Bug / Logic",
+      "title": "Tab title cycling creates leaked interval when tab becomes visible with active initial timer",
+      "description": "App.jsx lines 978–1006: the tab title effect uses `let timer`. When `handleVisibilityChange` fires with `visibilityState === 'visible'`, it executes `timer = setInterval(B, 8000)` — but only AFTER having done `clearInterval(timer)` in the hidden branch. The problem: the hidden branch clears the OLD interval and sets static title. The visible branch creates NEW interval B and assigns it to `timer`. So far so good. BUT: if the page is freshly loaded and the initial `timer = setInterval(A)` is running, and `visibilitychange` somehow fires `visible` (e.g., page restored from bfcache, focus event misfire, or OS-level tab restore), `handleVisibilityChange` creates B without clearing A first (A was never in the hidden path). `timer` is now B, cleanup clears B. A runs forever until the effect deps change again and both get GC'd. Additionally, the hidden→visible→hidden→visible rapid-fire scenario: visible branch creates B without a guard that checks if a timer is already running. Fix: at the start of the visible branch in `handleVisibilityChange`, add `clearInterval(timer)` before assigning the new interval, mirroring the hidden branch. Better still: convert to `timerRef.current` as Sofia has asked since review #33.",
+      "effort": "small",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "high",
       "category": "Code Quality / CSS",
-      "title": "[3 REVIEWS] Fragmented @media blocks — 11 prefers-reduced-motion + 3 mobile breakpoints in Office.css",
-      "description": "Office.css has three separate `@media (max-width: 480px)` blocks at lines 1133, 2165, and 2316. More critically, it has ELEVEN separate `@media (prefers-reduced-motion: reduce)` blocks scattered throughout the file (lines 2, 714, 1068, 1454, 1577, 1614, 1654, 1691, 1701, 1996, 2033). App.css has seven more prefers-reduced-motion blocks. This fragmentation makes accessibility overrides unreliable and nearly impossible to audit. Each breakpoint should have ONE consolidated block at the bottom of each file. Total: 18 prefers-reduced-motion fragments that should be 2 (one per file).",
+      "title": "[4 REVIEWS] Fragmented @media blocks — consolidate NOW",
+      "description": "Office.css: 11 `@media (prefers-reduced-motion: reduce)` blocks (lines 2, 714, 1068, 1454, 1577, 1614, 1654, 1691, 1701, 1996, 2033), 3 `@media (max-width: 480px)` blocks (lines 1133, 2165, 2316), plus new additions at 608 and 2382 for `@media (hover: none)`. App.css: 7 `@media (prefers-reduced-motion: reduce)` blocks. Total: 18 motion-preference fragments that should be one per file. This makes accessibility auditing nearly impossible — any new `animation:` or `transition:` added will almost certainly not get a corresponding reduced-motion override because no one knows which block to add it to. Tooling suggestion: add a stylelint rule `no-duplicate-at-rules` or use PostCSS groupMediaQueries to enforce consolidation.",
       "effort": "medium",
       "assign_to": "Maya"
     },
     {
       "priority": "medium",
+      "category": "Accessibility",
+      "title": "skip-link is not the first focusable element — it's buried after toast elements",
+      "description": "App.jsx line 1076: `<a href='#main-content' className='skip-link'>Skip to content</a>` is rendered AFTER `{completionToast && <div>...</div>}` and `<ShortcutToast />`. Per WCAG 2.4.1, a skip navigation link must be the first focusable element a keyboard user encounters. Currently a keyboard user tabbing through the page hits at minimum the ShortcutToast's internal focusable elements before reaching the skip link. Move the skip link to the very top of the return JSX — before ALL conditional renders, portals, and toasts. The skip link should be the literal first child of the root div.",
+      "effort": "trivial",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "Accessibility",
+      "title": "footer-tagline span is not keyboard accessible — new feature, new oversight",
+      "description": "App.jsx line 1300–1307: the footer tagline cycling span (`className='footer-tagline'`) has an `onClick` handler but NO `role='button'`, NO `tabIndex`, and NO `onKeyDown`. Keyboard users and screen reader users cannot discover or activate the tagline cycler. The `style={{ cursor: 'pointer' }}` is purely visual. A proper fix: replace `<span>` with `<button type='button' className='footer-tagline'>` — or keep span but add `role='button' tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ... } }}`. Additionally the inline `style={{ cursor: 'pointer' }}` should become a `.footer-tagline { cursor: pointer; }` CSS rule.",
+      "effort": "trivial",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "Accessibility",
+      "title": "role='radio' filter buttons have no role='radiogroup' container",
+      "description": "App.jsx line 1290: worker filter buttons use `role='radio'` and `aria-checked` but are wrapped only in a generic `<div>`. Per WAI-ARIA spec, `role='radio'` elements MUST be owned by a `role='radiogroup'` (or `role='group'`) element to form a valid widget. Without the container, assistive technologies may not announce these as a radio group, and arrow-key navigation between options won't work as expected. Fix: add `role='radiogroup'` and `aria-label='Filter by worker'` to the wrapper div. Alternatively, use real `<input type='radio'>` elements styled as buttons — which gives UA arrow-key support for free.",
+      "effort": "small",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "medium",
       "category": "Code Quality / Constants",
-      "title": "[3 REVIEWS] VIBE_WEATHER constants still in Office.jsx, not in utils",
-      "description": "VIBE_WEATHER_LABELS (lines 108–114) and VIBE_WEATHER_ICONS (lines 115–121) are defined as module-level constants in Office.jsx despite utils/constants.js existing and already exporting VIBE_WHITEBOARD. Additionally, BLOBERTO_TITLES (lines 100–106), LONE_SURVIVOR_LABELS (lines 123–129), VACANT_ADS (lines 131–137), PING_REACTIONS (lines 139–145), VIBE_COLORS (lines 344–350), VIBE_RANK (line 351), and VIBE_SHOCKWAVE_COLORS (lines 914–920) are all candidates for extraction. At minimum VIBE_WEATHER_* should move to utils/constants.js as requested since review #31.",
+      "title": "[4 REVIEWS] VIBE_WEATHER constants still in Office.jsx, not in utils",
+      "description": "VIBE_WEATHER_LABELS (lines 108–114) and VIBE_WEATHER_ICONS (lines 115–121) are still module-level constants in Office.jsx despite utils/constants.js existing. As noted in reviews #31, #32, #33, and now #34. Additionally, CLOCK_COMMENTS (a new object added inside the WallClock component, lines ~975–982) is defined inside the component function body — re-created on every render. It should be a module-level constant (or move to utils). All constants that don't depend on component state or props belong outside component functions.",
       "effort": "small",
       "assign_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "Code Quality / Inline Styles",
-      "title": "[3 REVIEWS] lone-survivor-label div still has 7-property inline style object",
-      "description": "Office.jsx line 1419: `<div className='lone-survivor-label' style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>`. This should be a CSS class `.lone-survivor-label` in Office.css with all seven properties moved there. Three reviews of asking.",
+      "title": "[4 REVIEWS] lone-survivor-label still has 7-property inline style",
+      "description": "Office.jsx line 1419: `<div className='lone-survivor-label' style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>`. All seven properties should live in a `.lone-survivor-label` CSS rule in Office.css. This was asked in reviews #31, #32, #33, and #34. It is a literally 4-minute fix.",
       "effort": "trivial",
       "assign_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "Code Quality / Inline Styles",
-      "title": "plantToast and completionToast use large inline style objects",
-      "description": "Office.jsx lines 1166–1189 (plantToast) and App.jsx lines 1052–1073 (completionToast) both use large inline style objects with ~10 CSS properties each (position, transform, background, border, borderRadius, padding, fontSize, fontWeight, zIndex, etc.). These are essentially duplicate toast styles. Create a shared `.toast-popup` CSS class in App.css and a `.toast-popup--green` / `.toast-popup--role-color` modifier. The dynamic border color can remain as an inline style or CSS variable override.",
+      "title": "New inline styles added this cycle: WallClock positioning, character cursor, footer counter",
+      "description": "Three new inline style instances were added since review #33: (1) Office.jsx line 980: WallClock SVG `style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'auto' }}` — the `.office-wall-clock` class already exists in Office.css; positioning should be defined there. (2) Office.jsx line 640: `style={{ ...style, ...(handleClick ? { cursor: 'pointer' } : {}) }}` — add `.char--clickable { cursor: pointer; }` class. (3) App.jsx line 1305: `<span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}>` for the quote counter — add `.footer-quote-counter` class. The inline style count is now 34 in Office.jsx and 25 in App.jsx and trending upward. Every new feature seems to add more.",
       "effort": "small",
       "assign_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "Accessibility",
-      "title": "Ficus streak tooltip inaccessible to keyboard and screen reader users",
-      "description": "The ficus element (Office.jsx lines 1452–1462) is `aria-hidden='true'` (intentional, it's decorative) BUT the streak information is only surfaced via `title` attribute — which is not reliably exposed by screen readers and is completely invisible to keyboard-only users who can't hover. The vibe streak is a game mechanic meaningful to sighted users. Two options: (1) Keep ficus aria-hidden, but add a visible sr-only text element nearby that announces the streak (e.g., `<span className='sr-only'>Vibe streak: {vibeStreak} — {plantStageLabel}</span>`), or (2) add a proper custom tooltip component (which is what Maya seems to be working on). The `plantToast` on stage-up is good but doesn't convey current streak state.",
-      "effort": "small",
-      "assign_to": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "Accessibility",
-      "title": "WorkerCard uses role='article' — semantically incorrect",
-      "description": "App.jsx line 261: `role='article'` is set on each WorkerCard div. The WAI-ARIA spec describes `article` as 'A section of a page that consists of a composition that forms an independent part of a document, page, or site.' Each WorkerCard is a widget, not an article. A more appropriate role would be `role='listitem'` (if the grid is a `role='list'`) or `role='group'` with `aria-labelledby` pointing to the worker name. Change WorkerCard's role to `group` and wrap the worker grid in a `role='list'` container.",
-      "effort": "small",
-      "assign_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "Accessibility",
-      "title": "Task tag spans use role='button' but are not focusable by default without tabIndex",
-      "description": "App.jsx lines 295–302: task tags conditionally get `role='button'` and `tabIndex={0}` when `onTagClick` is defined, but the `onKeyDown` handler is only wired when `onTagClick` is truthy. This is correct, but the pattern of using `<span role='button'>` instead of `<button>` means native button semantics (activation on Space/Enter via UA, implicit accessibility tree button type) are not inherited. These should be `<button type='button'>` elements styled to look like tags. Currently keyboard users CAN activate them (Enter/Space), but it requires the manual onKeyDown implementation.",
+      "title": "[2 REVIEWS] WorkerCard uses role='article' — semantically incorrect",
+      "description": "App.jsx line 261: `role='article'` on each WorkerCard div. WAI-ARIA defines 'article' as an independent document-like composition. Each WorkerCard is an interactive widget, not an article. Better: use `role='group'` with `aria-labelledby` pointing to the worker name heading. Wrap the worker grid in a `role='list'` container and use `role='listitem'` per card for the simplest correct semantics. The current `role='article'` causes screen readers to announce each card as a full document, which is disorienting.",
       "effort": "small",
       "assign_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "Bug / UX",
-      "title": "Tab title cycling creates stale timer if visibility toggles rapidly",
-      "description": "App.jsx lines 962–1008: The tab title effect uses a mutable `let timer` in the closure, and the `handleVisibilityChange` callback both clears AND recreates `timer`. If `visibilitychange` fires `visible → hidden → visible` rapidly, two separate `setInterval` calls could coexist briefly before the second `clearInterval(timer)` runs (since `timer` is reassigned, but the reference in the closure changes). The result is two simultaneous tab title cycling intervals. Fix: use `timerRef.current` (a ref) instead of `let timer` to ensure the cleanup always cancels the correct interval regardless of reassignments.",
-      "effort": "small",
+      "title": "[2 REVIEWS] stuckWorkers[0].emoji access — undefined for most workers",
+      "description": "App.jsx line 477: `stuckWorkers[0].emoji` — the `.emoji` field is only defined on workers that explicitly have it (only `luna` in DEFAULT_ROSTER has `emoji: '🌙'`). For all other workers, this renders `undefined ${name}` in the stuck worker stat card. Fall back to `getRoleEmoji(stuckWorkers[0].role)` from utils, which already exists and covers all roles via ROLE_EMOJIS.",
+      "effort": "trivial",
       "assign_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "Code Quality / Duplication",
-      "title": "VIBE_COLORS defined twice — in Office.jsx and App.css has the same hex values",
-      "description": "Office.jsx lines 344–350 defines `VIBE_COLORS` with vibe-to-hex mappings. The same hex values appear in App.css lines 1035–1039 as inline values. Additionally, ROLE_COLORS in utils/constants.js and VIBE_SHOCKWAVE_COLORS in Office.jsx (lines 914–920) have overlapping color palettes. Recommend: extract a single source of truth as CSS custom properties (e.g., `--vibe-crushing: #a78bfa`) on `:root` and reference them in both JSX (via `getComputedStyle`) and CSS. This eliminates hex duplication across 3+ locations.",
-      "effort": "medium",
+      "title": "plantToast and completionToast have near-identical 12-property inline style objects",
+      "description": "Office.jsx lines 1166–1189 (plantToast) and App.jsx lines 1052–1073 (completionToast) both render with nearly identical inline style objects: position:fixed, bottom:2rem, left:50%, transform:translateX(-50%), background:var(--surface2), borderRadius:12px, padding:0.6rem 1.2rem, fontSize:0.95rem, fontWeight:600, zIndex:9999, whiteSpace:nowrap, pointerEvents:none, animation:badge-pop. Only the `border` color differs. Create `.toast-popup` in App.css with all shared properties. Use `--toast-border-color` CSS variable for the dynamic border. This eliminates ~20 lines of inline JSX style and makes both toasts consistent.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "Accessibility",
+      "title": "[2 REVIEWS] Ficus streak tooltip inaccessible — still only title attribute",
+      "description": "Office.jsx lines 1452–1462: the ficus element remains `aria-hidden='true'` with streak info only in `title` attribute. Mouse-hover only. Add a `<span className='sr-only'>` inside the ficus (even if aria-hidden on the image parent, a sr-only sibling outside the aria-hidden element can still be read) that announces the streak state. Or better: the vibe streak counter should appear as visually hidden text adjacent to the ficus, outside the aria-hidden boundary.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "UX",
+      "title": "ShortcutToast mounts and runs timers on coarse-pointer devices it immediately hides",
+      "description": "App.jsx: ShortcutToast still mounts on touch devices, runs through 2 timers (1500ms show, 7000ms auto-dismiss), writes localStorage, then gets hidden by `@media (pointer: coarse) { .shortcut-toast { display: none !important; } }`. All this work to be hidden. Add a guard at the start of ShortcutToast: `if (window.matchMedia('(pointer: coarse)').matches) return null;` — skip the entire component on touch devices. Alternatively initialize `phase` as `'hidden'` on coarse-pointer devices to skip the timer chain.",
+      "effort": "trivial",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "Code Quality",
+      "title": "DESK_SCREEN_SVG is 98 lines of JSX at module level in Office.jsx",
+      "description": "Office.jsx lines 8–98: DESK_SCREEN_SVG is a static object containing JSX SVG elements. Logically correct (never mutates), but contributes significantly to the 1515-line file. When Office.jsx is finally split, DESK_SCREEN_SVG should move to src/data/deskScreens.jsx or be co-located with the desk component.",
+      "effort": "small",
       "assign_to": "Dave"
     },
     {
       "priority": "low",
-      "category": "UX",
-      "title": "ShortcutToast shows on every fresh session even on mobile where shortcuts don't apply",
-      "description": "App.jsx line 548-601: ShortcutToast checks `localStorage.getItem('bloberto-shortcuts-shown')` and shows keyboard shortcut hints on first visit. App.css line 1102 has `@media (pointer: coarse) { .shortcut-toast { display: none !important; } }` — this suppresses it on touch devices. BUT the toast still mounts, sets timers, and attempts to show. The phase machine goes through 'pending' → 'visible' then the CSS hides it visually, but the localStorage is still written as 'shown'. On desktop after first dismissal this is fine, but on coarse-pointer devices the toast goes through 2 timers (showTimer 1500ms, autoTimer 7000ms) purely to be hidden by CSS. Add a media query check at initialization to skip the toast entirely on touch devices.",
-      "effort": "trivial",
-      "assign_to": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "UX",
-      "title": "stuckWorkers card shows worker emoji that doesn't exist on most workers",
-      "description": "App.jsx line 477: `stuckWorkers[0].emoji` — the emoji field only exists on roster members that explicitly define it (e.g., luna in DEFAULT_ROSTER). Most workers loaded from the API or from DEFAULT_ROSTER don't have an emoji field, so this renders as `undefined ${name}`. Should fall back to `getRoleEmoji(stuckWorkers[0].role)` or use the character's avatar emoji from ROLE_EMOJIS.",
-      "effort": "trivial",
-      "assign_to": "Carlos"
-    },
-    {
-      "priority": "low",
       "category": "Visual",
-      "title": "Mobile: office-floor shortcut toast wraps awkwardly at 375px",
-      "description": "At 375px viewport width, the shortcut toast text '⌨️ Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear' is too wide and wraps in an ungainly way. App.css line 1105 has some 480px responsive styles but the toast text itself isn't shortened. Consider: abbreviate to '⌨️ 1=Office 2=Dashboard R=Refresh' or add a `max-width` with ellipsis. Note that @media (pointer: coarse) already hides this entirely (correctly), so this only affects edge cases where coarse pointer isn't detected.",
+      "title": "WallClock has charming CLOCK_COMMENTS but they're unreachable — `title` only shows on hover, never on mobile",
+      "description": "Office.jsx WallClock component (lines ~975–990): CLOCK_COMMENTS is a lovely object with per-vibe quips ('Time has no meaning during an incident.', 'You have checked this three times in the last hour.'). However, these are surfaced only via the SVG `<title>` element — which is shown as a tooltip on desktop hover only, and is invisible on mobile. On mobile you can see the clock icon but will never encounter the commentary. Low priority but: consider making the clock clickable to show a brief toast with the comment, or add it to the WallClock's aria-label. Currently a fun feature that ~50% of users never see.",
       "effort": "trivial",
       "assign_to": "Maya"
     },
     {
       "priority": "low",
       "category": "Code Quality",
-      "title": "DESK_SCREEN_SVG is 98 lines of JSX defined at module level in Office.jsx",
-      "description": "Office.jsx lines 8–98 define DESK_SCREEN_SVG as a static object containing JSX elements. Since it's static (never changes at runtime), this is fine logically, but it contributes significantly to the 1515-line file length. When Office.jsx is split (see the large split task), DESK_SCREEN_SVG should move to its own file src/data/deskScreens.jsx or be co-located with a new DeskScreen component.",
-      "effort": "small",
-      "assign_to": "Dave"
+      "title": "CLOCK_COMMENTS defined inside WallClock function — re-created every render",
+      "description": "Office.jsx: `const CLOCK_COMMENTS = { crushing: '...', ... }` is defined inside the WallClock component body (lines ~975–982). This object is re-created on every render of WallClock. Since WallClock re-renders every 60 seconds (its setInterval), it's not a hot path — but the principle of static data living outside component functions is consistent and important. Move to module scope alongside the other constants.",
+      "effort": "trivial",
+      "assign_to": "Carlos"
     },
     {
       "priority": "low",
-      "category": "Accessibility",
-      "title": "office-floor region aria-label is very verbose and redundant",
-      "description": "Office.jsx line 1192: `aria-label='Virtual office visualization showing team members at desks'` on the office-floor div. This is fine but could be simplified to `aria-label='Office floor'` since the surrounding `role='region'` and tab panel structure already provide context. The current label will cause screen readers to announce the full string on every focus, which may be annoying for power users. Also, `aria-live` regions inside this (vibeCaption, full-sync-banner, etc.) work correctly.",
+      "category": "Visual",
+      "title": "Whiteboard wb-doodle ASCII art truncates on narrow containers",
+      "description": "Office.jsx line 1237: `<pre className='wb-doodle'>` renders ASCII art like `(╯°□°)╯︵ ┻━┻` which is ~14 characters wide. At mobile scale the whiteboard element is quite small and this text may overflow or wrap awkwardly. Confirm at 375px viewport width. Add `overflow: hidden; text-overflow: clip; white-space: nowrap; font-size: clamp(0.3rem, 1.2vw, 0.5rem)` to `.wb-doodle` in Office.css if not already handled.",
       "effort": "trivial",
-      "assign_to": "Carlos"
+      "assign_to": "Maya"
     }
   ],
   "whats_good": [
-    "Carlos's ambient broadcast setTimeout fix confirmed working — cleanup in Character useEffect (lines 557–560) is solid.",
-    "No console errors whatsoever on load.",
-    "Dynamic favicon implementation is clever and works correctly.",
-    "Tab title cycling with worker status frames is a delightful detail.",
-    "Polling pause on inactivity with visual indicator (polling-paused-pill) is a genuinely useful feature.",
-    "Vibe sparkline history in the stats bar is a great visual added feature.",
-    "Worker card flip animation for activity history is smooth and well-implemented.",
-    "The character SVGs (Carlos with glasses, Maya's pink/purple hair, Dave with headphones, Sofia with magnifying glass, Luna with crescent moon) are all charming and unique.",
-    "Speech bubble overflow/hide on mouseLeave is handled cleanly with ref tracking to prevent ambient overlap.",
-    "ARIA live regions are properly placed on dynamic content (completion toasts, vibe captions, sync status).",
-    "Hash-based tab navigation syncs with browser back/forward — underrated UX detail.",
-    "The shortcut toast has proper phase state machine with gotit feedback and localStorage memory.",
-    "The ficus growth mechanic with milestone toast on stage-up is working end-to-end."
-  ]
+    "WallClock component is a new gem — per-vibe commentary in CLOCK_COMMENTS shows real craft ('Still here? So am I. I am a clock. That is fine for me.' 😭).",
+    "Footer tagline cycler with sparkle animation (✦) is a lovely easter egg — the quoteBonus mechanic with show/hide toggle and localStorage memory is delightful.",
+    "MIDNIGHT window rendering (hour < 5 → midnight sky with stars) adds ambient atmosphere for late-night viewers. Nice touch for the current review session.",
+    "Whiteboard wb-doodle ASCII art is charming and vibe-reactive: `(╯°□°)╯︵ ┻━┻` on-fire, `╰(*°▽°*)╯` crushing. Chef's kiss.",
+    "Vibe history dots on the whiteboard (wb-history-dots) — subtle but great context for where the team has been.",
+    "WallClock cleans up its setInterval correctly — simple, correct, no leaks.",
+    "Character component correctly handles keyboard Enter/Space for clickable mode (line 645: onKeyDown handler present).",
+    "onFocus/onBlur mirroring onMouseEnter/onMouseLeave on characters — keyboard users get speech bubble tooltips too.",
+    "No console errors on load. No network failures. API data hydrates cleanly.",
+    "Conference table animation dots with meetingWorkers/standupWorkers logic is a subtle UX delight.",
+    "The footer quote counter display (`2/8`) gives satisfying completionist progress feedback.",
+    "Dynamic favicon still working correctly."
+  ],
+  "process_note": "Sofia's concern, on the record: five items have now been flagged across four reviews. The inner setTimeout leak has been flagged three times. The speech bubble clip has been flagged three times. None of them are hard. Carlos and Maya: are these items in your backlog or are they falling off? If they're known and deprioritized, fine — say so and I'll stop flagging them. If they're unknown, we have a backlog hygiene problem. Either way, by review #35 I want a documented decision on each item: fix date, or explicit 'won't fix' with rationale."
 }
