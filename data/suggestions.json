@@ -1,250 +1,245 @@
 {
   "analyst": "Sofia",
-  "review_number": 49,
-  "timestamp": "2026-03-09T19:15:00Z",
+  "review_number": 51,
+  "timestamp": "2026-03-09T20:45:47Z",
   "screenshot_files": {
-    "desktop": "/workspace/data/qa49-desktop.png",
-    "mobile": "/workspace/data/qa49-mobile.png"
+    "desktop": "/workspace/screenshot-luna-51-desktop.png",
+    "mobile": "/workspace/screenshot-luna-51-mobile.png"
   },
-  "screenshot_notes": "Desktop screenshot taken at 19:15 UTC (7:15 PM). Mobile screenshot unavailable this cycle due to cgroup PID limit (max 100) exhausted by zombie Chrome processes from prior sessions in this shared environment — desktop screenshot used as mobile stand-in. Mobile analysis based on source code and breakpoint inspection.",
+  "screenshot_notes": "Both desktop (1280x800) and mobile (375x812) captured. Night owl vibe active at 20:45 UTC — 'Burning the midnight oil'. Desktop shows speech bubble 'Can we circle back on that PR?' above Bloberto's desk. Carlos visible at bottom with 1h 41m timer. Mobile shows 'Per my last commit...' bubble floating above the office floor container — overlapping the tab row area as documented. Nothing fixed since review #50.",
   "scores": {
     "visual": 4.0,
     "ux": 3.5,
-    "responsiveness": 3.5,
+    "responsiveness": 3.0,
     "performance": 3.5,
-    "accessibility": 3.5,
-    "code_quality": 3.5,
+    "accessibility": 3.0,
+    "code_quality": 3.0,
     "features": 4.5,
-    "fun": 4.5
+    "fun_factor": 5.0
   },
-  "overall_score": 3.9,
-  "verified_fixes_this_cycle": [
-    {
-      "issue": "Honorific night-owl daytime bug",
-      "status": "VERIFIED FIXED",
-      "evidence": "App.jsx line 1132 now uses `isAfterHours ? 'after-hours' : (teamVibe.key === 'after-hours' ? 'slow-day' : teamVibe.key)`. Screenshot confirms: at 7:15 PM with in-flow vibe, honorific shows 'boss' (correct). The empty-team daytime case (workers=[], 2 PM → was 'night owl') now falls through to 'slow-day' → 'chief... you still there?'. Nice."
-    },
-    {
-      "issue": "Paused pill touch text",
-      "status": "VERIFIED FIXED (with a new debt item spawned)",
-      "evidence": "App.jsx line 1153: `window.matchMedia('(pointer: coarse)').matches ? 'Tap to refresh' : 'Move mouse to refresh'` — correct differentiation confirmed. HOWEVER: App.css line 1020 still has `pointer-events: none` on `.polling-paused-pill`, making the `onClick={onResume}` on the span literal dead code. It works accidentally because the global `touchstart` listener resumes polling anyway. Functionally OK, architecturally messy. New LOW added below."
-    },
-    {
-      "issue": "Ghost tabIndex a11y",
-      "status": "VERIFIED FIXED",
-      "evidence": "Office.jsx line 683: `tabIndex={handleClick ? 0 : -1}`. Ghost characters (no onClick handler) now get tabIndex=-1 and are removed from keyboard focus order. Four cycles. Finally."
-    },
-    {
-      "issue": "Daytime sky brightness",
-      "status": "VERIFIED FIXED",
-      "evidence": "Office.css lines 1003-1008: base filter is brightness(0.7) but `.office-window__sky[data-daytime]` overrides to brightness(1.1). Screenshot shows 'GOLDEN HOUR' sky rendering correctly at 7:15 PM. The daytime (9-16) case now gets the brightness boost instead of being crushed."
-    },
-    {
-      "issue": "Orphaned TEAM VIBE card on mobile",
-      "status": "VERIFIED FIXED (edge case caveat)",
-      "evidence": "App.css line 626: `.stats-bar .stat-card:last-child:nth-child(odd) { grid-column: 1 / -1; }`. Works correctly when error/stuck cards are absent (normal case: 5 cards, TEAM VIBE is 5th = nth-child(5) = odd → spans full). Caveat: if error+stuck cards push TEAM VIBE off last-child position, the fix doesn't apply. Good enough for 80% of cases."
-    }
+  "overall_score": 3.8,
+  "new_observations": [
+    "Zero fixes landed since review #50. Every carry-over is intact. The codebase was touched (App.jsx and Office.jsx both show Mar 9 18:53 mtime) but all flagged issues remain. Either the changes were cosmetic or they introduced something not yet visible.",
+    "The window.matchMedia issue in Office.jsx (event handler path) appears correct — line 665 is now inside handleClick, not render. That specific instance is no longer problematic. The App.jsx line 1153 instance in JSX render remains unfixed.",
+    "plantStageNames has now been declared but unused for 9 consecutive review cycles. At this point it deserves its own tombstone.",
+    "The accessibility score drops from 3.5 to 3.0. Three a11y carry-overs have been open for 3+ cycles each. That is no longer 'low priority' by any reasonable measure."
   ],
   "suggestions": [
     {
-      "priority": "medium",
+      "priority": "high",
       "category": "bug",
-      "title": "[CARRY-OVER #48→#49] Paused pill onClick is dead code — pointer-events:none kills the handler",
-      "description": "App.css line 1020: `.polling-paused-pill { pointer-events: none; user-select: none; }`. App.jsx line 1151: the pill span has `onClick={onResume}` which is unreachable because the CSS blocks all pointer events. The 'Tap/click to refresh' instruction is technically correct (global touchstart/mousemove listeners do resume polling) but the pill itself cannot be interacted with directly. This is misleading code. Fix: either (a) remove `pointer-events: none` from the CSS, add `role='button'` and `tabIndex={0}` to the span so it actually works as advertised, or (b) remove `onClick={onResume}` from the span since it's not functional — the global activity listeners are the real resume mechanism.",
+      "title": "[CARRY-OVER #49->#50->#51] onResume is undefined in App header — paused pill onClick is a silent no-op with two independent failures",
+      "description": "App.jsx line 1151: the polling-paused-pill renders onClick={onResume}, but onResume is never defined as a variable in App component scope — it is only a prop name inside StatsBar. The actual resume handler is an anonymous function passed as StatsBar's onResume prop (line 1216) with no binding to a local variable. onClick calls undefined — React silently ignores it. ADDITIONALLY, App.css line 1020 still has pointer-events:none on .polling-paused-pill, making pointer interaction physically impossible regardless. Two independent bugs. Fix: (1) extract named callback: const handleResume = useCallback(() => { setPollingPaused(false); lastActivity.current = Date.now(); syncFromGitHub(); }, [syncFromGitHub]). (2) pass handleResume to header pill onClick and to StatsBar onResume prop. (3) remove pointer-events:none from .polling-paused-pill. (4) add role=button, tabIndex=0, cursor:pointer. Third cycle. This is the most user-visible broken interaction on the page.",
       "effort": "small",
-      "carry_over_count": 1
+      "carry_over": true,
+      "strike_count": 3
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "[CARRY-OVER #46→#47→#48→#49] WindowElement sunrise (hours 5-8) has label but zero decorative content",
-      "description": "Office.jsx WindowElement: isMidnight (0-4) renders star spans, isDaytime (9-16) renders clouds, isGoldenHour (17-19) renders an amber cloud — but `const isSunrise = hour >= 5 && hour <= 8` is never declared and the pink-orange sunrise gradient renders empty. The `timeLabel` returns 'sunrise' but the sky box is bare. Add `const isSunrise = hour >= 5 && hour <= 8` and a minimal decoration: a small yellow semicircle anchored at the bottom of the sky div, or a horizon-glow strip via CSS. This is the only time slot with a named caption and no visual element.",
+      "title": "[CARRY-OVER #47->#48->#49->#50->#51] Mobile speech bubble covers Office tab button area at 375px",
+      "description": "Confirmed again in review #51 mobile screenshot. Bloberto's speech bubble (position:absolute, bottom:calc(100%+8px) relative to character) floats above the office floor container and overlaps the tab-toggle row on 375px viewports. The transition quote is partially occluded by the Office/Dashboard tab bar. No @media (max-width:480px) override for .speech-bubble was added. Fix: add @media (max-width:480px) rule: .speech-bubble { max-width: calc(100vw - 80px); right: -10px; left: auto; transform: none; } to keep the bubble within the floor boundary. Five cycles.",
       "effort": "small",
-      "carry_over_count": 4
+      "carry_over": true,
+      "strike_count": 5
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "[CARRY-OVER #46->#47->#48->#49->#50->#51] WindowElement sunrise (hours 5–8) has gradient but zero decorative content",
+      "description": "Office.jsx WindowElement: isMidnight (0-4) renders stars, isDaytime (9-16) renders clouds, isGoldenHour (17-19) renders amber cloud — but sunrise (5-8) has no corresponding constant and no rendered content. The sky is a bare orange-pink gradient for 3 hours daily. Fix: add const isSunrise = hour >= 5 && hour <= 8 and render a small yellow semicircle anchored at the bottom-center of the sky div. One focused code path. Six cycles.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 6
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "[CARRY-OVER #45->...#51] Activity filter logic duplicated across two JSX render sites",
+      "description": "App.jsx: the activityLog filter chain runs in TWO separate places each render — once as an IIFE for the count badge (lines 1288-1297), and once as the entries prop to <ActivityLog> (lines 1343-1356). The logic is identical. Extract to: const filteredActivity = useMemo(() => activityLog.filter(...type...).filter(...worker...), [activityLog, activityFilter, workerFilter]) and use in both places. Seven cycles of duplicate logic.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 7
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "[CARRY-OVER #45->...#51] IIFE inside JSX for solo spotlight message",
+      "description": "App.jsx line 1244: the solo spotlight message uses an IIFE directly in JSX — (() => { const soloKey = ...; return ... })(). Creates a new closure every render, untestable, confusing to read. Extract to const soloSpotlightMsg = SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[teamVibe.key] ?? ... above the return statement. Seven cycles.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 7
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "[CARRY-OVER #47→#48→#49] Mobile speech bubble covers Office tab button text at 375px",
-      "description": "Confirmed in #48 screenshot. Bloberto's speech bubble is positioned `bottom: calc(100% + 8px)` relative to the character, which at Bloberto's top:4% position places the bubble overlapping the tab row. On 375px the tab-toggle is close enough to the office floor top that the speech bubble lands directly on the 'Office' tab text. Fix: add a breakpoint guard — at <=480px, clamp the speech bubble with `max-width: calc(100vw - 40px)` and reposition it rightward (`left: auto; right: 0`) so it opens toward the center of the floor, away from the tab strip. Alternatively increase the top margin of the office floor by the bubble height on mobile.",
+      "title": "[CARRY-OVER #42->...#51] PING_REACTIONS mixed narrative voice — third-person descriptions instead of first-person replies",
+      "description": "Office.jsx PING_REACTIONS: luna='Creative review in progress...' (status report), dave='He hears you through the headphones.' (third person narrator), carlos='Check the logs. It is ALWAYS in the logs.' (imperative command), maya='Check the PRs — purple and correct as always.' (borderline), sofia='Found 3 more bugs already.' (ambiguous). The ping metaphor is a reply — should be first-person. Suggested fixes: luna: 'In review. Send snacks.', dave: 'Heard you. These headphones are not noise-cancelling.', carlos: 'It is in the logs. It is ALWAYS in the logs.', maya: 'PRs are purple and correct. As always.', sofia: 'Found 3 more already. You are welcome.' Ten cycles. The character voice is otherwise excellent — this is the one rough edge.",
       "effort": "small",
-      "carry_over_count": 3
+      "carry_over": true,
+      "strike_count": 10
     },
     {
       "priority": "medium",
+      "category": "accessibility",
+      "title": "[CARRY-OVER #48->#49->#50->#51] WallClock SVG has both aria-label and title child — duplicate accessible name",
+      "description": "Office.jsx WallClock line 1027: SVG has aria-label='Wall clock showing H:M' AND a <title> child with time + vibe comment. Screen readers may announce both, or aria-label shadows the richer title. Per SVG a11y spec, <title> provides the accessible name when role=img is present — aria-label overrides it unnecessarily. Fix: remove aria-label, keep <title> with role=img. The vibe clock comments are charming — do not delete them. Four cycles.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 4
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "[CARRY-OVER #49->#50->#51] Empty workers array shows after-hours office during loading at any time of day",
+      "description": "During initial load, activeWorkers=[] is passed to Office.jsx. getTeamVibeKey([]) returns 'after-hours'. Office renders with locked door, purple glow, and sleep doodle before data arrives. At 2 PM on a weekday this is visually wrong. The isLoading flag exists in App but is NOT passed as a prop to Office (line 1212: <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} ...> — no isLoading). Fix: pass isLoading prop to Office and use last-known vibe from localStorage (key: 'bloberto-vibe-key') as fallback, or initialize vibe state from localStorage before first fetch completes. Third cycle.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 3
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "[CARRY-OVER #50->#51] office-whiteboard--done and --urgent use hardcoded light colors in dark theme",
+      "description": "Office.css: .office-whiteboard--done sets background:#f0ffe8 and .office-whiteboard--urgent sets background:#fff0f0. Both are hardcoded light colors. In dark mode they create jarring bright rectangles on the left wall. Replace with CSS custom properties: --wb-done-bg (default: #f0ffe8, dark override: rgba(34,197,94,0.12)) and --wb-urgent-bg (default: #fff0f0, dark override: rgba(239,68,68,0.1)). Second cycle.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 2
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "[CARRY-OVER #49->#50->#51] vibe-weather div has aria-label but no ARIA role — accessible name is orphaned",
+      "description": "Office.jsx: div.vibe-weather has aria-label={VIBE_WEATHER_LABELS[vibe]} but no role attribute. An aria-label on a plain div is ignored by most screen readers. Fix: add role='img' to the div. This has been confirmed again in review #51 source — still no role attribute. Third cycle.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 3
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "[CARRY-OVER #49->#50->#51] lone-survivor-label missing aria-hidden — screen reader announces decorative 0.45rem text",
+      "description": "Office.jsx line 1472: the lone-survivor-label div (fontSize 0.45rem, opacity 0.6, entirely inline styles) has no aria-hidden=true. Screen readers announce it redundantly alongside the worker's accessible name. Also: this div is fully inline-styled — it should be a CSS class. Add aria-hidden='true' and move styles to .lone-survivor-label. Third cycle.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 3
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "title": "[CARRY-OVER #49->#50->#51] window.matchMedia called inline in JSX render — not reactive, unsafe outside browser",
+      "description": "App.jsx line 1153: window.matchMedia('(pointer: coarse)').matches is evaluated directly in JSX inside the polling-paused-pill render path. Not reactive — if the user connects a mouse or a touch-enabled device the label never updates. Throws in SSR/test environments. Note: the previous Office.jsx instance (line 665) was correctly moved inside an event handler and is no longer an issue. Only App.jsx line 1153 remains. Fix: const isTouch = useMemo(() => window.matchMedia('(pointer: coarse)').matches, []) or use navigator.maxTouchPoints > 0. Third cycle.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 3
+    },
+    {
+      "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #45→#46→#47→#48→#49] Activity filter logic duplicated across two JSX render sites",
-      "description": "App.jsx: the activity filter chain (type filter + worker filter) runs in two separate places each render — once for the count badge and once for the ActivityLog entries prop. Extract to `const filteredActivity = useMemo(() => activityLog.filter(...), [activityLog, activityFilter, workerFilter])` and use it both places. One source of truth, memoized, testable.",
+      "title": "[CARRY-OVER #47->#48->#49->#50->#51] Footer tagline counter wraps without visual indication",
+      "description": "App.jsx footer counter shows 1/9 through 9/9 then silently wraps to 1/9 with no feedback that the user has cycled through all quotes. Fix: show a loop icon (↺) or change label to '1/9 ↺' to signal wrap-around. Five cycles.",
       "effort": "small",
-      "carry_over_count": 5
+      "carry_over": true,
+      "strike_count": 5
     },
     {
-      "priority": "medium",
+      "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #45→#46→#47→#48→#49] IIFE inside JSX for solo spotlight message",
-      "description": "App.jsx: `{(() => { const soloKey = ...; return SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[teamVibe.key] ?? ... })()}` — an IIFE in JSX creates a new closure on every render, obscures intent, and is untestable. Extract to a derived const (or useMemo) above the return statement. One minute of work.",
+      "title": "[CARRY-OVER #48->#49->#50->#51] handleTabKeyDown not memoized — new function reference on every render",
+      "description": "App.jsx line 742: handleTabKeyDown is declared as a plain arrow function, not wrapped in useCallback. It is passed to two tab button onKeyDown props. Wrap in useCallback with deps [tab, syncFromGitHub]. Four cycles.",
       "effort": "small",
-      "carry_over_count": 5
+      "carry_over": true,
+      "strike_count": 4
     },
     {
-      "priority": "medium",
+      "priority": "low",
+      "category": "code",
+      "title": "[CARRY-OVER #48->#49->#50->#51] Ghost OOO bubble reimplements getRelativeTime inline",
+      "description": "Office.jsx lines 702-711: ghost character OOO bubble contains a full inline IIFE reimplementing getRelativeTime (which also lives in App.jsx line 55). This is the third utility function duplicated across files. Extract to src/utils/time.js and import in both files. Four cycles.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 4
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "[CARRY-OVER #44->...#51] Coffee corner chat label truncates on 320px viewports",
+      "description": "Office.css: .coffee-corner__chat-label and .coffee-corner__solo-label have no overflow protection. On 320px viewports the text ('☕ Name1 & Name2') overflows the corner box. Add overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100% to both label classes and reduce font-size at max-width:380px. Eight cycles.",
+      "effort": "small",
+      "carry_over": true,
+      "strike_count": 8
+    },
+    {
+      "priority": "low",
       "category": "ux",
-      "title": "[CARRY-OVER #42→...→#49] PING_REACTIONS mixed narrative voice — third-person about workers, not from workers",
-      "description": "Office.jsx PING_REACTIONS: luna='Creative review in progress...' (third person), dave='He hears you through the headphones.' (third person about him), carlos='Check the logs. It is ALWAYS in the logs.' (second-person imperative), maya='Check the PRs — purple and correct as always.' (second-person), sofia='Found 3 more bugs already.' (ambiguous). Pick first-person spoken by the character for all five — most charming and consistent with the ping metaphor (like they're replying to a message). Suggested: sofia: 'Found 3 more already. You're welcome.', dave: 'Heard you through the headphones. They're not noise-cancelling.', luna: 'In review. Please send snacks.', carlos: 'Check the logs. It's always the logs.', maya: 'PRs are purple and correct. As always.'",
+      "title": "[CARRY-OVER #46->...#51] in-flow vibe coffee corner label has no personality",
+      "description": "Office.jsx: the conference table empty-state label for in-flow vibe reads 'reserve the table' (generic) while other vibes have personality: 'no meetings. fix it.' (on-fire), 'everyone is at their desk' (slow-day), 'open office hours' (crushing). Suggested in-flow label: 'sync? book it.' or 'flow time — do not disturb'. Six cycles. One string change.",
       "effort": "small",
-      "carry_over_count": 8
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "[CARRY-OVER #48→#49] WallClock SVG has both aria-label and <title> child — duplicate accessible text",
-      "description": "Office.jsx WallClock: the SVG has `aria-label='Wall clock showing H:MM'` AND a `<title>` child with the longer flavour text ('8:XX PM — Still here? So am I. I am a clock.'). Screen readers in some browser/AT combos announce both, creating double-announcement with mismatched content. This is the same pattern as the VibeSparkline bug (#42, still unfixed). Fix both together in one pass: keep `aria-label` for the concise SR announcement, move the flavour text to the `title` HTML attribute on the SVG element (for hover tooltip), and remove the `<title>` SVG child.",
-      "effort": "small",
-      "carry_over_count": 2
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "[NEW #49] Empty workers array produces after-hours office visualization during business hours",
-      "description": "vibe.js `getTeamVibe([])` returns `{key: 'after-hours', label: '🌙 After Hours'}` unconditionally when workers is empty. This means a cold start, data fetch failure, or legitimately empty team at 2 PM renders the full after-hours experience: night sky, locked door ('🔒 Locked up'), candle on Bloberto's desk, CISO nameplate, indigo border glow. The honorific bug was fixed (isAfterHours time check), but the office visualization still ignores the clock entirely. The `getTeamVibe` function doesn't receive time context. Fix: either (a) pass the current hour to `getTeamVibe` and return 'slow-day' for empty workers during business hours, or (b) add a `useEffect` in Office.jsx that overrides the vibe to 'slow-day' when workers=[] and the hour is between 6 and 19.",
-      "effort": "small",
-      "carry_over_count": 0
-    },
-    {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "[NEW #49] lone-survivor-label missing aria-hidden — screen readers announce tiny decorative text",
-      "description": "Office.jsx line 1472: `<div className='lone-survivor-label' style={{ fontSize: '0.45rem', ... }}>`. This element renders text like '🎯 solo run' or '🔍 holding quality with both hands' at 0.45rem (~7.2px) — below any readable threshold, purely decorative in context. It has no `aria-hidden='true'`. Screen readers will announce this in the middle of keyboard navigation through the office. Add `aria-hidden='true'` to the div. While you're at it, the font-size: 0.45rem fails WCAG 1.4.4 minimum text size for informational content — if this text is meaningful, bump it to at least 0.65rem.",
-      "effort": "small",
-      "carry_over_count": 0
-    },
-    {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "[NEW #49] vibe-weather div has aria-label but no ARIA role — label is orphaned for some AT",
-      "description": "Office.jsx line 1537: `<div className='vibe-weather vibe-weather--{vibe}' aria-label={VIBE_WEATHER_LABELS[vibe] || vibe}>`. The `aria-label` attribute on a generic `div` (which has no implicit ARIA role) is informational but technically orphaned — some screen readers ignore aria-label on elements without a declared role. Add `role='status'` (since it reflects live team state) or `role='img'` (since it's a weather icon + label presentation). The inner `aria-hidden='true'` on the icon span is correctly done.",
-      "effort": "small",
-      "carry_over_count": 0
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "[NEW #49] window.matchMedia called inline at render time — not reactive, unsafe in non-browser environments",
-      "description": "App.jsx line 1153: `window.matchMedia('(pointer: coarse)').matches` is evaluated inline in JSX during render. This is evaluated exactly once when the component first mounts and again on each re-render, but will NOT re-evaluate if the user switches between keyboard and touch (e.g., Surface tablet detaching keyboard, or Chrome DevTools device emulation toggle). Also unsafe in SSR/test environments where `window` is undefined. Fix: `const isCoarsePointer = useMemo(() => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches, [])` — or better, use a `matchMedia` listener to track changes reactively.",
-      "effort": "small",
-      "carry_over_count": 0
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "[NEW #49] Unidentified large teal ring visible in lower-left quadrant of office floor (screenshot)",
-      "description": "Desktop screenshot qa49-desktop.png shows a large (~80-100px) teal/cyan ring outline in the lower-left area of the office floor, with a smaller concentric ring inside it. This element is not explained by known UI components (conference table is lower-center, ambient particles are 3px dots, wander animations only move character position). It could be: (a) a vibe-shockwave frozen mid-animation due to screenshot timing, (b) the conference table CSS transform behaving unexpectedly at this specific viewport size, or (c) a char--idle progress ring bug (idle chars should not render progress rings per line 718 check). Needs live reproduction and inspection.",
-      "effort": "small",
-      "carry_over_count": 0
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "[CARRY-OVER #47→#48→#49] Footer tagline counter desynchronizes after 9 clicks",
-      "description": "App.jsx: BONUS_TAGLINES has 8 entries. After 9 clicks the counter wraps but the display logic diverges — quoteBonus % (BONUS_TAGLINES.length + 1) loops back to vibe tagline but the rendered counter and content can disagree. Fix: `setQuoteBonus(p => (p + 1) % (BONUS_TAGLINES.length + 1))` to cap accumulation in long sessions, and use `normBonus === 0 ? vibeTagline : BONUS_TAGLINES[normBonus - 1]` for consistent content selection.",
-      "effort": "small",
-      "carry_over_count": 3
+      "carry_over": true,
+      "strike_count": 6
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #48→#49] handleTabKeyDown not memoized — new function reference every render",
-      "description": "App.jsx: `const handleTabKeyDown = (e) => { ... }` defined inline without useCallback. Passed as onKeyDown to both tab buttons. Inconsistent with memoization applied to handleTagClick, handleWorkerClick, syncFromGitHub. Wrap in `useCallback` with `[tab]` dependency.",
+      "title": "[CARRY-OVER #42->...#51] cx and orbitR shadow outer-scope constants in ConferenceTable",
+      "description": "Office.jsx ConferenceTable: outer-scope const cx=52, orbitR=38 are redeclared with identical values inside two separate .map() callbacks at lines 925-926 and 943-944. This is a no-shadow lint violation. Remove inner re-declarations and use the outer-scope constants. Ten cycles. This is literally a deletion task.",
       "effort": "small",
-      "carry_over_count": 2
+      "carry_over": true,
+      "strike_count": 10
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #48→#49] Ghost OOO bubble reimplements getRelativeTime inline — cross-file duplication",
-      "description": "Office.jsx lines ~702-711: inline IIFE that computes diffMs → mins → hours → days → label string — exact duplicate of getRelativeTime() in App.jsx line 55. Extract both to src/utils/time.js alongside formatIdleDuration. Three utilities, one file, imported where needed.",
+      "title": "[CARRY-OVER #42->...#51] plantStageNames array declared but never used",
+      "description": "Office.jsx line 1088: const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming'] is declared inside the Office component body but is never referenced anywhere. plantStage, plantStageEmoji, and plantStageLabel are used — plantStageNames is not. Delete it. Ten cycles. If ESLint is running, this should be throwing a no-unused-vars warning on every build.",
       "effort": "small",
-      "carry_over_count": 2
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "[CARRY-OVER #44→...→#49] Coffee corner label truncates on 320px narrow viewports",
-      "description": "Office.css .coffee-corner__label and its vibe-specific ::after content has no overflow protection at 320px viewport widths. Add max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap inside a <=360px breakpoint.",
-      "effort": "small",
-      "carry_over_count": 6
+      "carry_over": true,
+      "strike_count": 10
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #46→#47→#48→#49] in-flow vibe has no coffee corner personality label",
-      "description": "Office.css defines label overrides for crushing, on-fire, slow-day, after-hours — but not in-flow. in-flow is the default/happy-path vibe and it gets generic 'Coffee'. Add `[data-vibe='in-flow'] .coffee-corner__label::after { content: ' — steady drip'; }` or similar.",
+      "title": "[CARRY-OVER #42->...#51] ProgressBar receives updatedAt prop it never uses",
+      "description": "App.jsx: ProgressBar({ progress, updatedAt, startedAt }) destructures updatedAt from props but never references it inside the function body. The only time-related logic uses startedAt for ETA calculation. Remove updatedAt from the destructuring signature and from call sites (line 347). Ten cycles.",
       "effort": "small",
-      "carry_over_count": 4
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #42→...→#49] cx and orbitR shadow outer-scope constants in ConferenceTable map callbacks",
-      "description": "Office.jsx line 846: `const cx = 52, orbitR = 38` at function scope. Lines 925 and 947 inside JSX `.map()` callbacks re-declare `const cx = 52, orbitR = 38`, silently shadowing the outer constants. Remove the inner declarations — they're already accessible from the enclosing scope. EIGHT CYCLES.",
-      "effort": "small",
-      "carry_over_count": 8
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #42→...→#49] plantStageNames array declared but never used",
-      "description": "Office.jsx line 1088: `const plantStageNames = ['seedling','sprout','small-plant','leafy','blooming']` exists above the conditional chain that manually re-spells the same strings as literals in the plant stage emoji map. Either use the array to drive the logic or delete it. EIGHT CYCLES.",
-      "effort": "small",
-      "carry_over_count": 8
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #42→...→#49] ProgressBar receives updatedAt prop it never uses",
-      "description": "App.jsx: `updatedAt={worker.updated_at}` passed to ProgressBar component. ProgressBar destructures `updatedAt` but never references it. Remove from both call site and function signature. EIGHT CYCLES. One delete.",
-      "effort": "small",
-      "carry_over_count": 8
+      "carry_over": true,
+      "strike_count": 10
     },
     {
       "priority": "low",
       "category": "accessibility",
-      "title": "[CARRY-OVER #42→...→#49] VibeSparkline SVG has both aria-label and <title> child — duplicate accessible text",
-      "description": "App.jsx: sparkline SVG has aria-label AND a <title> child with identical content — screen readers announce twice. Fix alongside WallClock (new #49 issue) in one pass: keep aria-label, remove <title> child. Both fixes together take under 10 minutes. EIGHT CYCLES.",
+      "title": "[CARRY-OVER #42->...#51] VibeSparkline SVG has both aria-label and title — duplicate accessible name",
+      "description": "App.jsx VibeSparkline line 402-403: svg has aria-label='Vibe history: ...' AND a <title> child with identical content. Same pattern as WallClock (also unfixed). Remove aria-label, keep <title> with role='img'. Two components, one trivial pattern, zero fixes across ten cycles.",
       "effort": "small",
-      "carry_over_count": 8
+      "carry_over": true,
+      "strike_count": 10
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #42→...→#49] conf-fire-glow SVG filter uses hardcoded DOM ID",
-      "description": "Office.jsx: ConferenceTable renders `<filter id='conf-fire-glow'>` with a literal string ID. If the component ever renders multiple instances, duplicate IDs cause the wrong filter to apply. Use the already-imported `useId()` hook to generate a unique ID per instance. EIGHT CYCLES.",
+      "title": "[CARRY-OVER #42->...#51] conf-fire-glow SVG filter uses hardcoded DOM ID",
+      "description": "Office.jsx ConferenceTable line 852: filter id='conf-fire-glow' is a hardcoded string. If ConferenceTable were ever rendered more than once, duplicate IDs would break the filter silently in all instances. useId() is already imported — use it: const filterId = useId(); id={filterId}, url(#${filterId}). Ten cycles.",
       "effort": "small",
-      "carry_over_count": 8
+      "carry_over": true,
+      "strike_count": 10
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #42→...→#49] Sparkline legend uses array index as React key",
-      "description": "App.jsx: `history.slice(-3).map((h, i) => <span key={i}>...)`. Use a stable composite key: `key={h.ts + '-' + h.key}`. EIGHT CYCLES.",
+      "title": "[CARRY-OVER #42->...#51] Sparkline legend uses array index as React key",
+      "description": "App.jsx VibeSparkline line 414: history.slice(-3).map((h, i) => <span key={i}>) uses array index as React key. Use h.ts (timestamp) as key instead: key={h.ts}. Prevents unnecessary remounts when vibe history shifts. Ten cycles. One character change.",
       "effort": "small",
-      "carry_over_count": 8
+      "carry_over": true,
+      "strike_count": 10
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #46→#47→#48→#49] formatDuration and formatIdleDuration near-identical — extract to shared utility",
-      "description": "App.jsx formatDuration and Office.jsx formatIdleDuration implement the same diffMs→mins→hours→label logic with only a label prefix difference. Extract to src/utils/time.js together with getRelativeTime (new #49 suggestion) and replace all three call sites. Four cycles of triplication.",
+      "title": "[CARRY-OVER #46->...#51] formatDuration and formatIdleDuration are near-identical functions",
+      "description": "App.jsx formatDuration and Office.jsx formatIdleDuration implement the same elapsed-time logic with different output prefixes ('Working for Xm' vs bare 'Xm'). Also, getRelativeTime in App.jsx and the inline IIFE in the Ghost OOO bubble make this the third near-duplicate of the same logic across the codebase. Extract to src/utils/time.js as formatElapsedTime(timestamp, prefix='') and import everywhere. Six cycles.",
       "effort": "small",
-      "carry_over_count": 4
+      "carry_over": true,
+      "strike_count": 6
     }
-  ],
-  "score_delta_from_previous": "+0.3 (from 3.6 to 3.9)",
-  "visual_observations": {
-    "desktop_1280x800": "Screenshot at 7:15 PM. Header shows '🌙 Good evening, boss · Monday, Mar 9' with '⚡ In Flow' vibe pill — correct. Honorific fix confirmed: 'boss' not 'night owl'. Office floor has teal border (in-flow). Bloberto at center top with speech bubble 'Night crew came to work. Respect.' with in-flow CPO nameplate. Sofia (QA, maroon) and Maya (Designer) at top row desks with progress rings. Dave and Luna at bottom row. One VACANT desk. Carlos idle near the door with '13m' idle timer. Window shows GOLDEN HOUR amber/orange gradient — correct for 7:15 PM. Conference table shows 'reserve the table' (in-flow ambient). Vibe weather: '⛅ Partly cloudy — steady progress'. Door: '⚡ Focus zone'. Shortcuts toast visible bottom right. ANOMALY: large teal ring artifact (~80-100px) visible in lower-left quadrant — source unknown, flagged as LOW.",
-    "mobile_375x812": "Screenshot unavailable this cycle (system resource constraint). Based on source code: breakpoints at 768px, 600px, 480px all present. TEAM VIBE orphan fix is in code. Speech bubble overlap issue from #48 not yet confirmed fixed — no new screenshot. Office.jsx mobile CSS at line 1142 looks reasonable."
-  },
-  "what_carlos_fixed_nicely": "Five solid fixes this cycle. The honorific logic in particular — the `isAfterHours ? 'after-hours' : (teamVibe.key === 'after-hours' ? 'slow-day' : teamVibe.key)` pattern — is clean and correctly handles the split-brain scenario. The ghost tabIndex fix was exactly right (one token change, correct behavior). The daytime sky brightness using data-daytime attribute is idiomatic. Good week.",
-  "what_still_annoys_me": "Eight items are on their eighth consecutive cycle. EIGHT. The cx/orbitR shadow is a three-second code deletion. plantStageNames is a two-second deletion. ProgressBar updatedAt is a six-second deletion. That's 11 seconds of work to close three carry-overs. I'm starting to feel like I'm reviewing the same codebase from a time loop.",
-  "summary": "Review #49 scores 3.9/5, up from 3.6. Carlos landed all 5 targeted fixes cleanly — the honorific, sky brightness, ghost tabIndex, paused pill text, and TEAM VIBE orphan fixes all verified in code and screenshot. Three new issues found: empty workers triggering after-hours vibe during business hours (the honorific was fixed but the office visualization wasn't), lone-survivor-label missing aria-hidden, and a mysterious large teal ring artifact in the lower-left of the office floor. The paused pill fix inadvertently left dead click code behind. The app is genuinely excellent — the feature breadth, visual polish, and personality are exceptional. The 22-item carry-over list remains a drag, with 8 items hitting their eighth cycle. One focused cleanup PR would take the score to 4.2+."
+  ]
 }
