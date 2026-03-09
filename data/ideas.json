@@ -223,5 +223,80 @@
     ],
     "hire_proposals": [],
     "_previous_review": 60
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 62,
+    "timestamp": "2026-03-09T04:30:00Z",
+    "theme": "Every transition is a confession — make the invisible state changes say something",
+    "visual_observations": "Desktop office at 4:04 AM Monday Mar 9: Bloberto centered top as CVO with a speech bubble reading 'hour?? Legends.' — the honorific correctly fires 'night owl 🌙' in the header confirming the after-hours fix from #59 landed. Sofia is the lone working character, nameplate reads 'SOFIA' in active uppercase styling, magnifying glass visible on her SVG. All other desks (Carlos, Maya, Dave, Luna) are ghosted and dim. Conference table at bottom-center shows the 'crushing' 6-chair ring layout with 'everyone is at their desk' ambient label in tiny text — chairs render as a beautiful purple ring of dots around the round table. COFFEE TRIPLE SHOT label top-right. MIDNIGHT panel (the office window time caption) visible as a dark terminal-style box. Vibe weather ☀️ icon bottom-right floats near the cactus with no label. Three decorative plants scattered: green plant at left edge, tropical plant at right-mid, cactus at right. Bottom-left has ambient particle dots. Shortcut toast visible in bottom-right as a pill. Mobile dashboard at same timestamp: stats stack into 2-column grid cleanly. ON THE CLOCK: 1, ACTIVE: 1 (lone wolf), IDLE: 0 (all hands on deck), LIVE: 04:04:38 AM, TEAM VIBE: Crushing It with sparkline showing 3 dots and a legend trail. Sofia solo-spotlight card renders full-width. The solo-spotlight caption reads the single static string about 'one pair of hands'. Keyboard shortcut bar renders fixed-bottom, still overlapping task text on Sofia's card.",
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "office-life",
+        "title": "Polling Paused Pill Sounds Like a System Error, Not an Office",
+        "description": "The pollingPaused pill in App.jsx renders '⏸ Paused · move mouse to refresh' — the single most utilitarian string in a product that otherwise breathes with vibe-aware copy everywhere. When someone is 'Crushing It' at 4AM and the app pauses after 10 minutes of inactivity, this message sounds like a DevTools warning, not a moment in Bloberto's world. Every other idle/waiting state has flavor: the WallClock says 'Still here? So am I. I am a clock. That is fine for me.' for after-hours, the empty state says 'The office is quiet... for now 🌙'. Create a `POLLING_PAUSED_COPY` constant object keyed by vibeKey with messages like: crushing → '⏸ Bloberto stepped away · nudge the mouse to resume', on-fire → '⏸ Paused mid-incident · move to rejoin', slow-day → '⏸ Nothing to see here · which tracks', after-hours → '⏸ The office dozed off · tap to wake it'. The state and aria-live are already wired — this is pure copy, zero logic.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "must",
+        "category": "feature",
+        "title": "Office Tab Is a Data Blind Spot",
+        "description": "When you are on the Office tab, there is zero indication of when data was last synced or whether you are looking at live or stale data. The Dashboard tab has the full LIVE stat card with a real-time timestamp (04:04:38 AM). The Office tab has nothing. If the network drops after you load the office floor, Bloberto could be running a 30-minute-old snapshot and you would have no way to know. The Office component already receives `isSyncing` as a prop — it even uses it to show the typing-dots above Bloberto's head during sync. Extend this: add a tiny sync status indicator anchored to the '🏢 Bloberto's HQ' sign div in Office.jsx. A green dot + 'live' or a pulsing grey dot + 'syncing…' (same styling as `.live-dot` in the stats bar, already defined in App.css). On hover, show a tooltip with the exact lastSynced timestamp. Thread `lastSynced` through the Office props alongside the existing `isSyncing`. WHY: the floor is the feature — it should be trustworthy and tell you so.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "storytelling",
+        "title": "Solo Spotlight Has One Line and One Emotion",
+        "description": "When exactly one worker is active, App.jsx renders a special `workers-grid--solo` layout with a hardcoded caption: '🌟 Running solo today. Carrying the whole team on one pair of hands.' This is sweet but it fires identically whether the worker is at 5% progress and 4AM or at 95% and nearly done. There is one message for every possible lone wolf reality. Add a `SOLO_SPOTLIGHT_MSGS` object keyed by vibeKey and progress bucket — at minimum, vary by vibe: crushing → '🔥 One person. All the velocity. Every log line earned.', on-fire → '🧯 Holding the line alone. The incident board has one name.', slow-day → '☁️ Everybody else clocked out. The office still has a heartbeat.', after-hours → '🌙 The stars are watching. So are the servers.', in-flow → '⚡ Deep work. No committee required.' These messages cost nothing and change the emotional register completely. The existing caption render is one JSX line with a hardcoded string — swap it for a lookup.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "feature",
+        "title": "System Events Are Invisible in the Activity Log",
+        "description": "In App.jsx, every vibe transition injects a system event into activityLog: `{ type: 'system', message: '🌡️ Vibe: Slow Day → Crushing It', ... }`. These are timestamp-accurate records of the team's energy arc — genuinely the most interesting events in the log. But the activity filter bar only offers All / 🟢 Hires / ✅ Completions / ❌ Errors. System events have no dedicated filter. They are buried inside 'All' and get pushed down as other events arrive. Add a '⚙️ System' option to the filter `[{ key: 'all' }, ...]` array in App.jsx. The ACTIVITY_ICONS object already maps 'system' to '⚙️'. The filter logic is one conditional: `if (activityFilter === 'system') return e.type === 'system'`. WHY: the vibe timeline is the most honest narrative of what the team experienced today — users deserve a way to read it.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "delight",
+        "title": "Error Recovery Gets No Ceremony",
+        "description": "In App.jsx, the `justShipped` detection watches for `working → idle` transitions and fires a '🎉 {name} shipped it!' completionToast with confetti. This is wonderful. But `error → working` — when a worker fixes the incident and gets back to it — fires nothing at all. This is the second most significant status transition in the product and it is completely silent. Add a `justRecovered` detection in the same activeWorkers diff useEffect: `prevMap.get(w.id)?.status === 'error' && w.status === 'working'`. Trigger a toast variant with copy like '🔧 {name} patched it up!' styled with an orange border (ROLE_COLORS['Engineer'] or simply '#f97316') to visually distinguish recovery from completion. Use the existing completionToastTimerRef pattern — no new state infrastructure needed. WHY: celebrating the recovery closes the emotional loop the error opened. Without it, the incident just silently disappears.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "The Door Has Amnesia",
+        "description": "The door event system in App.jsx (`doorEvent` state set to 'arrive'/'depart' for 1.5s/2s) is genuinely theatrical: the door icon flips to '🚪✨' with a notify dot on arrival. But once the animation fades, all record of it is gone. Nobody knows Sofia arrived 8 minutes ago or that Dave left 40 minutes ago without checking the Activity Log. Add a `doorLog` state array (max 3 entries, managed alongside the existing `doorEvent` state) that appends `{ name, type, ts }` entries from the same appeared/disappeared diffs in the activeWorkers useEffect. Render these as a tiny strip below or beside the `office-door` element in Office.jsx: faded ghost-style avatars with name and relative time ('Sofia · 8m ago ↑', 'Dave · 40m ago ↓'). Fade entries out after 30 minutes. WHY: the door is the only physical threshold in the office — it should carry memory.",
+        "effort": "medium",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "visual",
+        "title": "The Version String Is the Only Thing Not Alive",
+        "description": "The footer renders 'v1.0.0-chaos' as a hardcoded string literal on line 1306 of App.jsx. Every other footer element is dynamic: the tagline rotates by vibe and by user click, the sparkle animates on first visit, the quote counter tracks state. The version string just sits there, unchanged regardless of whether the team is on fire or running legendarily. Add a `VIBE_VERSIONS` constant: crushing → 'v2.0.0-legendary', 'on-fire' → 'v0.9.1-HOTFIX', 'in-flow' → 'v1.0.0-smooth', 'slow-day' → 'v0.0.1-maybe?', 'after-hours' → 'v1.0.0-🌙'. Swap the hardcoded string for `{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}`. WHY: the footer is the last thing you read before leaving. Let it close the story instead of breaking it.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "wild",
+        "category": "team",
+        "title": "Hire a Vibe Archaeologist",
+        "description": "The vibeHistory in localStorage grows up to 12 entries and powers the VibeSparkline. The `activityLog` captures vibe transitions as system events. But nobody has ever looked at this data and asked: what does a Bloberto Office session actually look like? We need a Vibe Archaeologist — a rotating role (not a permanent hire) that reads the raw localStorage keys from real sessions, maps vibe sequences to team outcomes (errors tend to follow slow-day more than in-flow), and writes the findings as new VIBE_QUOTES additions or BONUS_TAGLINES that reflect real team patterns. The role would audit once per quarter and submit a PR with 3–5 new quotes sourced from actual vibe data. WHY: Bloberto is a live instrument — the people who watch it have data. The creative system should feed back from that observation. Assign to Luna as first rotation.",
+        "effort": "large",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 61
   }
 ]

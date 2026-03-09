@@ -1481,11 +1481,10 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
         <div
           className={`vibe-weather vibe-weather--${vibe}`}
-          role="img"
-          title={VIBE_WEATHER_LABELS[vibe] || vibe}
           aria-label={VIBE_WEATHER_LABELS[vibe] || vibe}
         >
-          {VIBE_WEATHER_ICONS[vibe]}
+          <span className="vibe-weather__icon" aria-hidden="true">{VIBE_WEATHER_ICONS[vibe]}</span>
+          <span className="vibe-weather__label">{VIBE_WEATHER_LABELS[vibe]}</span>
         </div>
         <div className="office-plant office-plant--cactus" style={{ left: '92%', top: '30%' }}>
           <svg width="18" height="28" viewBox="0 0 18 28" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">

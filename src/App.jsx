@@ -395,7 +395,7 @@ function DeltaBadge({ delta }) {
   )
 }
 
-function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory }) {
+function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPaused, onResume }) {
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
   const idle = workers.filter((w) => w.status === 'idle').length
@@ -441,10 +441,10 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory }) {
         <span className="stat-dispatch">{getDispatch(STAT_DISPATCHES.idle, idle)}</span>
         <DeltaBadge delta={idleDelta} />
       </div>
-      <div className="stat-card sync-status">
+      <div className={`stat-card sync-status${pollingPaused ? ' sync-status--paused' : ''}`} onClick={pollingPaused ? onResume : undefined} title={pollingPaused ? 'Click to resume auto-refresh' : undefined}>
         <span className="stat-label">
-          <span className={`live-dot ${isLive ? 'live' : 'offline'}`} />
-          {isLive ? 'Live' : 'Offline'}
+          <span className={`live-dot ${pollingPaused ? 'paused' : isLive ? 'live' : 'offline'}`} />
+          {pollingPaused ? 'PAUSED' : isLive ? 'Live' : 'Offline'}
         </span>
         <span className="stat-value sync-time">{syncLabel}</span>
       </div>
@@ -1164,7 +1164,7 @@ export default function App() {
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
-            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} />
+            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={() => setPollingPaused(false)} />
 
             <div className="section-header">
               <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>

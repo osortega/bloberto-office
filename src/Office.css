@@ -1909,12 +1909,27 @@
   position: absolute;
   right: 3%;
   bottom: 26%;
-  font-size: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
   pointer-events: none;
   z-index: 1;
   opacity: 0.78;
   filter: drop-shadow(0 0 4px rgba(255,255,255,0.2));
   transition: opacity 0.6s ease;
+}
+.vibe-weather__icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.vibe-weather__label {
+  font-size: 0.7rem;
+  color: var(--text-muted, rgba(255,255,255,0.45));
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  text-align: center;
+  font-style: italic;
 }
 .vibe-weather--on-fire {
   animation: wx-urgent 1.4s ease-in-out infinite;
@@ -2343,6 +2358,12 @@
   }
   .vibe-weather {
     font-size: 0.6rem;
+  }
+  .vibe-weather__icon {
+    font-size: 0.6rem;
+  }
+  .vibe-weather__label {
+    font-size: 0.5rem;
   }
   .coffee-corner__label,
   .office-door__label {
