@@ -1,14 +1,4 @@
 {
-  "workers": [
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "status": "working",
-      "task": "Bug fixes from Luna's creative review",
-      "progress": 5,
-      "started_at": "2026-03-09T17:00:00Z"
-    }
-  ],
-  "updated_at": "2026-03-09T17:00:00Z"
+  "workers": [],
+  "updated_at": "2026-03-09T17:05:00Z"
 }
