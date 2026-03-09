@@ -136,6 +136,14 @@ const LONE_SURVIVOR_WORKER_OVERRIDES = {
   luna:   { 'after-hours': '🌙 reviews don\'t stop at midnight' },
 }
 
+const DOOR_LABELS = {
+  'crushing':    '🚀 All hands in',
+  'on-fire':     '🧯 Brace yourself',
+  'in-flow':     '⚡ Focus zone',
+  'slow-day':    '☁️ Come on in',
+  'after-hours': '🔒 Locked up',
+}
+
 const VACANT_ADS = {
   'crushing':     { title: 'Staff Wizard',          req: 'Must maintain velocity without asking what velocity means' },
   'on-fire':      { title: 'URGENT: Firefighter',   req: 'Start Monday. Like, this Monday.' },
@@ -1411,7 +1419,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         <div className={`office-door${doorEvent ? ` office-door--${doorEvent}` : ''}`} data-vibe={vibe}>
           {doorEvent === 'arrive' && <span className="office-door__notify-dot" aria-hidden="true" />}
           <span className="office-door__icon">{vibe === 'after-hours' ? '🔒' : doorEvent === 'arrive' ? '🚪✨' : '🚪'}</span>
-          <span className="office-door__label">{vibe === 'after-hours' ? 'Locked' : 'Entrance'}</span>
+          <span className="office-door__label">{DOOR_LABELS[vibe] ?? 'Entrance'}</span>
           <span className="sr-only">Exit and entrance</span>
         </div>
 
