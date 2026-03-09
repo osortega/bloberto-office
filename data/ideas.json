@@ -448,5 +448,80 @@
     ],
     "hire_proposals": [],
     "_previous_review": 63
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 65,
+    "timestamp": "2026-03-09T06:01:43Z",
+    "theme": "The Ghosts in the New Features",
+    "visual_observations": "Desktop (after-hours, empty office): Bloberto correctly titled CISO at manager desk. Door shows locked up with lock emoji - per-vibe door label working. The window rectangle top-right glows orange-to-pink sunrise gradient despite after-hours vibe - the new vibe tint overlay cannot fight the inline time-based gradient at 6am. Weather label reads Night sky correctly. Mobile: same orange window is even more jarring at 375px. Dashboard (Sofia solo, crushing vibe): Solo spotlight shows the outer generic fallback running solo today rather than sofia-specific default One set of eyes. Nothing gets past - revealing an active worker ID mismatch between live API and SOLO_SPOTLIGHT_MESSAGES map keys. Sofia card shows QA review task at 5% progress, 19m working.",
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Solo Spotlight Falls to Generic Fallback Because Live Worker ID Does Not Match Map Keys",
+        "description": "WHY: App.jsx line 1214 lookup chain is SOLO_SPOTLIGHT_MESSAGES[activeWorkers[0]?.id]?.[teamVibe.key] then ?.default then outer fallback. The live dashboard shows Sofia solo in crushing vibe displaying the outer generic fallback instead of sofia default One set of eyes. Nothing gets past (App.jsx line 248). This means activeWorkers[0].id from the live workers.json is not the string sofia. Carlos needs to audit workers.json to confirm every record has an id field matching the SOLO_SPOTLIGHT_MESSAGES keys (carlos, maya, dave, sofia, luna). Alternatively add normalization in syncFromGitHub (App.jsx line 746) to derive id from worker name lowercase if missing.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Window Vibe Tint Has Two Competing CSS Systems With Gaps and Doublings",
+        "description": "WHY: Office.css has two parallel systems for the vibe window overlay. System 1 (lines 1007-1034) uses parent selector .office-floor[data-vibe] .office-window__sky::after and covers on-fire, crushing, slow-day only. System 2 (lines 1037-1040) uses element selector .office-window__sky[data-vibe]::after and covers on-fire, crushing, after-hours, slow-day only. Results: in-flow vibe has NO tint in either system. After-hours only gets System 2 at 10% opacity rgba(67,56,202,0.1) - too faint to override the 6am sunrise orange inline gradient on the sky div. On-fire, crushing, slow-day get doubled tints from both systems firing simultaneously. The after-hours window appearing orange-coral in the screenshot is directly caused by this. Fix: consolidate to one system (parent-based), add in-flow and after-hours entries, and for after-hours use mix-blend-mode multiply with opacity 0.5+ to actually darken the time gradient.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "completeness",
+        "title": "SOLO_SPOTLIGHT_MESSAGES Has Sparse Per-Vibe Coverage - Sofia Has No Crushing Entry",
+        "description": "WHY: The per-worker per-vibe solo spotlight map at App.jsx lines 246-252 is unevenly populated. Sofia only covers on-fire and slow-day - zero entry for crushing or in-flow. Dave only covers after-hours. Maya only covers crushing. Luna only covers after-hours. The live screenshot proves the gap: Sofia solo in crushing falls to her default, not a vibe-specific line. Each worker needs coverage for their three most likely solo vibes given their role - sofia solo plus crushing means she is the only quality gate at peak velocity, an emotionally specific moment deserving its own line. Luna should draft the missing entries per worker-vibe pair and maya can add them to the map.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "polish",
+        "title": "Error Micro-Bubble Loop Fires Indefinitely With No Fatigue Model",
+        "description": "WHY: Office.jsx lines 530-546 start a setInterval at 12-second cadence that emits error micro-bubbles for the entire duration of an error state. A worker stuck in error for 20 minutes generates 100 bubble cycles. This creates alert fatigue - users stop reading undefined is not a function or REGRESSION after the fifth repetition. Add a bubblesEmittedRef counter initialized to 0, increment it each fire, and skip display if count exceeds 5 or 6. Clear the counter in the cleanup return when the variant or worker.status changes. The first few bubbles are dramatic and urgent; anything beyond that is ambient noise degrading the signal.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "data",
+        "title": "Stuck Worker Stat Card Anonymizes Identity When Count Exceeds One",
+        "description": "WHY: App.jsx lines 495-499 renders stuck worker names only when stuckWorkers.length === 1 - when there are two or more, it collapses to N workers with no names at all. The click handler at line 479-491 also always scrolls to stuckWorkers[0] regardless of count. The second stuck worker is completely invisible to the user. Fix the display to show names for up to two workers using slice(0, 2).map(w => w.name.split(' ')[0]).join(' and '). For the click handler, add a stuckScrollIdxRef that cycles through all stuck workers on each successive click so none are unreachable.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "narrative",
+        "title": "LONE_SURVIVOR_WORKER_OVERRIDES and SOLO_SPOTLIGHT_MESSAGES Are the Same Character Speaking in Two Different Voices",
+        "description": "WHY: Office.jsx lines 131-137 defines LONE_SURVIVOR_WORKER_OVERRIDES for the office view solo label, and App.jsx lines 246-252 defines SOLO_SPOTLIGHT_MESSAGES for the dashboard solo spotlight. They describe the same scenario with different phrasings for the same worker-vibe pair. Carlos on-fire in office says backend won't fall today; in dashboard says One backend between the servers and chaos. Users who toggle tabs while solo hear two different registers. Both maps are orphaned in separate files with no shared authorship. Consolidate into a single export in utils/quotes.js imported by both files. Luna should draft a unified per-worker solo voice object and maya implements the import.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "could",
+        "category": "narrative",
+        "title": "Bloberto's Speech Bubbles Disappear in 4 Seconds and Leave No Trace",
+        "description": "WHY: The bubble.quote and bubble.show state in the Character component (Office.jsx around lines 477-478) shows quotes for 3-4 seconds then fades via bubble.show false. Vibe transition quotes from VIBE_TRANSITION_QUOTES in quotes.js lines 37-58 fire exactly once per vibe change - they are the most contextually rich writing in the app and if you are on the Dashboard tab when the vibe shifts, you miss them forever. Add a lastBubbleRef that stores the most recently shown quote string. Surface it as a tooltip via data-tooltip attribute on the Bloberto character div so hovering always shows Last said: [quote] even after the bubble has faded. Zero state change, minimal render cost.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "wild",
+        "category": "animation",
+        "title": "The Ficus Grows With Ceremony But Wilts in Silence - Give the Plant a Grief State",
+        "description": "WHY: Office.jsx lines 1062-1083 triggers plantMilestone and plantToast (The office ficus leveled up!) whenever the plant grows through a streak stage. But when a streak breaks and App.jsx lines 927-929 detect prevStreakRef.current >= 3 and newStreak less than 3, the ficus silently de-stages. The eulogy toast fires in completionToast but the plant itself just quietly shrinks with no visual acknowledgment. Add an office-plant--wilting CSS keyframe (foliage drooping over 800ms with desaturated color) triggered by a new plantWilting boolean state in Office.jsx, set true on streak break and cleared after 1200ms. Mirror the existing data-milestone pulse pattern for growth. The ficus earned symmetry in its grief.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 64
   }
 ]
