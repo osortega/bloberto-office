@@ -1,245 +1,103 @@
 {
   "analyst": "Sofia",
-  "review_number": 51,
-  "timestamp": "2026-03-09T20:45:47Z",
-  "screenshot_files": {
-    "desktop": "/workspace/screenshot-luna-51-desktop.png",
-    "mobile": "/workspace/screenshot-luna-51-mobile.png"
-  },
-  "screenshot_notes": "Both desktop (1280x800) and mobile (375x812) captured. Night owl vibe active at 20:45 UTC — 'Burning the midnight oil'. Desktop shows speech bubble 'Can we circle back on that PR?' above Bloberto's desk. Carlos visible at bottom with 1h 41m timer. Mobile shows 'Per my last commit...' bubble floating above the office floor container — overlapping the tab row area as documented. Nothing fixed since review #50.",
+  "review_number": 50,
+  "timestamp": "2026-03-09T21:15:54Z",
   "scores": {
-    "visual": 4.0,
-    "ux": 3.5,
-    "responsiveness": 3.0,
-    "performance": 3.5,
-    "accessibility": 3.0,
-    "code_quality": 3.0,
-    "features": 4.5,
-    "fun_factor": 5.0
+    "visual": 4,
+    "ux": 3,
+    "responsiveness": 3,
+    "performance": 4,
+    "accessibility": 3,
+    "code_quality": 3,
+    "features": 4,
+    "fun_factor": 4
   },
-  "overall_score": 3.8,
-  "new_observations": [
-    "Zero fixes landed since review #50. Every carry-over is intact. The codebase was touched (App.jsx and Office.jsx both show Mar 9 18:53 mtime) but all flagged issues remain. Either the changes were cosmetic or they introduced something not yet visible.",
-    "The window.matchMedia issue in Office.jsx (event handler path) appears correct — line 665 is now inside handleClick, not render. That specific instance is no longer problematic. The App.jsx line 1153 instance in JSX render remains unfixed.",
-    "plantStageNames has now been declared but unused for 9 consecutive review cycles. At this point it deserves its own tombstone.",
-    "The accessibility score drops from 3.5 to 3.0. Three a11y carry-overs have been open for 3+ cycles each. That is no longer 'low priority' by any reasonable measure."
-  ],
+  "overall_score": 3.5,
+  "carlos_fixes_verification": {
+    "honorific_night_owl_daytime_bug": "VERIFIED FIXED \u2014 isAfterHours guard correctly prevents night owl during business hours. Screenshot shows night owl at 21:19 which is appropriate.",
+    "paused_pill_touch_text": "PARTIALLY FIXED \u2014 Text correctly says Tap to refresh on touch devices. BUT the pill has pointer-events:none in CSS AND onClick={onResume} references an undefined variable in App scope. Functionally works via window-level touchstart listener, but the code is broken in two simultaneous ways.",
+    "ghost_tabIndex_a11y": "VERIFIED FIXED \u2014 Ghost characters get tabIndex={-1} because handleClick is undefined for them.",
+    "daytime_sky_brightness": "VERIFIED FIXED \u2014 .office-window__sky[data-daytime] CSS rule present. Hour ranges 0-4/5-8/9-16/17-19/20-23 now fully covered.",
+    "orphaned_team_vibe_mobile": "VERIFIED FIXED \u2014 Dashboard screenshot shows all 5 stat cards rendering cleanly."
+  },
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "[CARRY-OVER #49->#50->#51] onResume is undefined in App header — paused pill onClick is a silent no-op with two independent failures",
-      "description": "App.jsx line 1151: the polling-paused-pill renders onClick={onResume}, but onResume is never defined as a variable in App component scope — it is only a prop name inside StatsBar. The actual resume handler is an anonymous function passed as StatsBar's onResume prop (line 1216) with no binding to a local variable. onClick calls undefined — React silently ignores it. ADDITIONALLY, App.css line 1020 still has pointer-events:none on .polling-paused-pill, making pointer interaction physically impossible regardless. Two independent bugs. Fix: (1) extract named callback: const handleResume = useCallback(() => { setPollingPaused(false); lastActivity.current = Date.now(); syncFromGitHub(); }, [syncFromGitHub]). (2) pass handleResume to header pill onClick and to StatsBar onResume prop. (3) remove pointer-events:none from .polling-paused-pill. (4) add role=button, tabIndex=0, cursor:pointer. Third cycle. This is the most user-visible broken interaction on the page.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 3
+      "title": "onResume is undefined in App component header \u2014 dead click handler regression",
+      "description": "App.jsx line 1151: onClick={onResume} references a variable that does not exist in App scope. onResume is only defined as an inline prop passed to StatsBar (line 1216). Worse, the CSS for .polling-paused-pill sets pointer-events:none, so the click never fires and the undefined reference is silently masked. The pill text says Tap to refresh which works ONLY because window-level touchstart/mousemove listeners exist. The pill click itself is a no-op with a broken handler hiding behind pointer-events. Fix: define a handleResume callback in App and use it in both StatsBar and the header pill, and remove pointer-events:none so the pill is actually clickable as intended.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "ux",
+      "title": "Paused pill says Tap to refresh but CSS pointer-events:none blocks the tap",
+      "description": "The .polling-paused-pill has pointer-events:none; user-select:none in App.css making it explicitly non-interactive. But it tells mobile users Tap to refresh. A user tapping the pill directly gets nothing \u2014 the tap passes through to whatever is underneath. The resume only works incidentally because any touchstart on the window triggers the listener. This is a semantic mismatch and a UX lie. Either remove pointer-events:none and wire up a real click handler, or change the copy to Touch anywhere to refresh to match actual behavior.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "[CARRY-OVER #47->#48->#49->#50->#51] Mobile speech bubble covers Office tab button area at 375px",
-      "description": "Confirmed again in review #51 mobile screenshot. Bloberto's speech bubble (position:absolute, bottom:calc(100%+8px) relative to character) floats above the office floor container and overlaps the tab-toggle row on 375px viewports. The transition quote is partially occluded by the Office/Dashboard tab bar. No @media (max-width:480px) override for .speech-bubble was added. Fix: add @media (max-width:480px) rule: .speech-bubble { max-width: calc(100vw - 80px); right: -10px; left: auto; transform: none; } to keep the bubble within the floor boundary. Five cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 5
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "[CARRY-OVER #46->#47->#48->#49->#50->#51] WindowElement sunrise (hours 5–8) has gradient but zero decorative content",
-      "description": "Office.jsx WindowElement: isMidnight (0-4) renders stars, isDaytime (9-16) renders clouds, isGoldenHour (17-19) renders amber cloud — but sunrise (5-8) has no corresponding constant and no rendered content. The sky is a bare orange-pink gradient for 3 hours daily. Fix: add const isSunrise = hour >= 5 && hour <= 8 and render a small yellow semicircle anchored at the bottom-center of the sky div. One focused code path. Six cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 6
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "[CARRY-OVER #45->...#51] Activity filter logic duplicated across two JSX render sites",
-      "description": "App.jsx: the activityLog filter chain runs in TWO separate places each render — once as an IIFE for the count badge (lines 1288-1297), and once as the entries prop to <ActivityLog> (lines 1343-1356). The logic is identical. Extract to: const filteredActivity = useMemo(() => activityLog.filter(...type...).filter(...worker...), [activityLog, activityFilter, workerFilter]) and use in both places. Seven cycles of duplicate logic.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 7
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "[CARRY-OVER #45->...#51] IIFE inside JSX for solo spotlight message",
-      "description": "App.jsx line 1244: the solo spotlight message uses an IIFE directly in JSX — (() => { const soloKey = ...; return ... })(). Creates a new closure every render, untestable, confusing to read. Extract to const soloSpotlightMsg = SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[teamVibe.key] ?? ... above the return statement. Seven cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 7
+      "category": "accessibility",
+      "title": "Activity filter buttons use role=radio but lack arrow-key navigation",
+      "description": "App.jsx lines 1311-1340: filter bars use role=radio on button elements inside role=radiogroup. A proper radio group requires arrow-key cycling between options (not just tab/click). Screen reader users will hear radio button but arrow keys do not navigate between filters. Either use actual input type=radio with styled labels, implement arrow-key handlers between filter buttons, or switch to role=button with aria-pressed which accurately describes toggle behavior.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "[CARRY-OVER #42->...#51] PING_REACTIONS mixed narrative voice — third-person descriptions instead of first-person replies",
-      "description": "Office.jsx PING_REACTIONS: luna='Creative review in progress...' (status report), dave='He hears you through the headphones.' (third person narrator), carlos='Check the logs. It is ALWAYS in the logs.' (imperative command), maya='Check the PRs — purple and correct as always.' (borderline), sofia='Found 3 more bugs already.' (ambiguous). The ping metaphor is a reply — should be first-person. Suggested fixes: luna: 'In review. Send snacks.', dave: 'Heard you. These headphones are not noise-cancelling.', carlos: 'It is in the logs. It is ALWAYS in the logs.', maya: 'PRs are purple and correct. As always.', sofia: 'Found 3 more already. You are welcome.' Ten cycles. The character voice is otherwise excellent — this is the one rough edge.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 10
+      "title": "Carlos idle card renders orphaned CURRENT TASK label with no task text",
+      "description": "Dashboard screenshot shows Carlos card with the bold CURRENT TASK header and nothing beneath it \u2014 worker.task is empty. The worker-task div renders the header unconditionally then outputs worker.task which is falsy. Results in a floating label with dead space. Guard the task section or show a No active task placeholder. The 100% progress bar on an IDLE worker with no task is also a confusing state.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "[CARRY-OVER #48->#49->#50->#51] WallClock SVG has both aria-label and title child — duplicate accessible name",
-      "description": "Office.jsx WallClock line 1027: SVG has aria-label='Wall clock showing H:M' AND a <title> child with time + vibe comment. Screen readers may announce both, or aria-label shadows the richer title. Per SVG a11y spec, <title> provides the accessible name when role=img is present — aria-label overrides it unnecessarily. Fix: remove aria-label, keep <title> with role=img. The vibe clock comments are charming — do not delete them. Four cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 4
+      "category": "visual",
+      "title": "Bloberto speech bubble clips outside office-floor container at top",
+      "description": "Desktop screenshot clearly shows the speech bubble This could have been a commit message. rendering above the office-floor boundary. The bubble is absolutely positioned relative to Character near the top of the floor. Fix: add overflow:visible to the container, or implement bubble direction flipping (show below when near top edge). Right now it looks like Bloberto is dreaming outside the building.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "[CARRY-OVER #49->#50->#51] Empty workers array shows after-hours office during loading at any time of day",
-      "description": "During initial load, activeWorkers=[] is passed to Office.jsx. getTeamVibeKey([]) returns 'after-hours'. Office renders with locked door, purple glow, and sleep doodle before data arrives. At 2 PM on a weekday this is visually wrong. The isLoading flag exists in App but is NOT passed as a prop to Office (line 1212: <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} ...> — no isLoading). Fix: pass isLoading prop to Office and use last-known vibe from localStorage (key: 'bloberto-vibe-key') as fallback, or initialize vibe state from localStorage before first fetch completes. Third cycle.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 3
+      "category": "code_quality",
+      "title": "Completion toast and plant toast use duplicated inline style objects \u2014 third time asking",
+      "description": "App.jsx lines 1098-1121 and Office.jsx lines 1218-1241 both duplicate 12+ lines of identical inline styles: position:fixed, border-radius, box-shadow, animation, z-index, padding. Extract a .toast-popup CSS class and use style only for the dynamic border-color. This has been flagged in at least 3 previous reviews. At this point it is a tradition.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "responsiveness",
+      "title": "Mobile office floor still illegible \u2014 sub-readability text and cramped layout",
+      "description": "At 375px the office floor compresses desk text to ~0.3-0.4rem. Nameplates, worker names, weather labels, and conference table text become unreadable. The office view on mobile is purely decorative. Consider: hiding sub-pixel text on mobile, making the floor horizontally scrollable with fixed min-width, or introducing a simplified character-grid view for narrow viewports.",
+      "effort": "large"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "[CARRY-OVER #50->#51] office-whiteboard--done and --urgent use hardcoded light colors in dark theme",
-      "description": "Office.css: .office-whiteboard--done sets background:#f0ffe8 and .office-whiteboard--urgent sets background:#fff0f0. Both are hardcoded light colors. In dark mode they create jarring bright rectangles on the left wall. Replace with CSS custom properties: --wb-done-bg (default: #f0ffe8, dark override: rgba(34,197,94,0.12)) and --wb-urgent-bg (default: #fff0f0, dark override: rgba(239,68,68,0.1)). Second cycle.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 2
+      "title": "Tab button text truncated on narrow mobile viewport \u2014 Office becomes Offic",
+      "description": "At 375px the Office tab label truncates to the emoji plus four letters. The tab-toggle container does not give enough room. Quick fix: use shorter labels on small screens via CSS media query, or constrain tab text to just the emoji on mobile.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "accessibility",
-      "title": "[CARRY-OVER #49->#50->#51] vibe-weather div has aria-label but no ARIA role — accessible name is orphaned",
-      "description": "Office.jsx: div.vibe-weather has aria-label={VIBE_WEATHER_LABELS[vibe]} but no role attribute. An aria-label on a plain div is ignored by most screen readers. Fix: add role='img' to the div. This has been confirmed again in review #51 source — still no role attribute. Third cycle.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 3
+      "category": "features",
+      "title": "Worker filter in activity log uses allWorkers fallback instead of canonical roster",
+      "description": "App.jsx line 1330: worker filter list uses roster.length > 0 ? roster : allWorkers. When roster is empty only currently active workers appear as filter options. Should always use the full known roster so filters are stable regardless of who is currently active.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "accessibility",
-      "title": "[CARRY-OVER #49->#50->#51] lone-survivor-label missing aria-hidden — screen reader announces decorative 0.45rem text",
-      "description": "Office.jsx line 1472: the lone-survivor-label div (fontSize 0.45rem, opacity 0.6, entirely inline styles) has no aria-hidden=true. Screen readers announce it redundantly alongside the worker's accessible name. Also: this div is fully inline-styled — it should be a CSS class. Add aria-hidden='true' and move styles to .lone-survivor-label. Third cycle.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 3
+      "category": "code_quality",
+      "title": "stuckWorkers memo uses tick counter as time-passage proxy \u2014 confusing pattern",
+      "description": "App.jsx line 440: stuckWorkers useMemo depends on [workers, tick] where tick is a counter from useTimeTick. Date.now() is called inside and tick just forces re-evaluation. This works but is misleading \u2014 the memo claims to depend on a counter when it cares about elapsed wall time. A cleaner approach: extract nowMs at render time and include it, or skip the memo since the calculation is cheap.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "performance",
-      "title": "[CARRY-OVER #49->#50->#51] window.matchMedia called inline in JSX render — not reactive, unsafe outside browser",
-      "description": "App.jsx line 1153: window.matchMedia('(pointer: coarse)').matches is evaluated directly in JSX inside the polling-paused-pill render path. Not reactive — if the user connects a mouse or a touch-enabled device the label never updates. Throws in SSR/test environments. Note: the previous Office.jsx instance (line 665) was correctly moved inside an event handler and is no longer an issue. Only App.jsx line 1153 remains. Fix: const isTouch = useMemo(() => window.matchMedia('(pointer: coarse)').matches, []) or use navigator.maxTouchPoints > 0. Third cycle.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 3
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #47->#48->#49->#50->#51] Footer tagline counter wraps without visual indication",
-      "description": "App.jsx footer counter shows 1/9 through 9/9 then silently wraps to 1/9 with no feedback that the user has cycled through all quotes. Fix: show a loop icon (↺) or change label to '1/9 ↺' to signal wrap-around. Five cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 5
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #48->#49->#50->#51] handleTabKeyDown not memoized — new function reference on every render",
-      "description": "App.jsx line 742: handleTabKeyDown is declared as a plain arrow function, not wrapped in useCallback. It is passed to two tab button onKeyDown props. Wrap in useCallback with deps [tab, syncFromGitHub]. Four cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 4
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #48->#49->#50->#51] Ghost OOO bubble reimplements getRelativeTime inline",
-      "description": "Office.jsx lines 702-711: ghost character OOO bubble contains a full inline IIFE reimplementing getRelativeTime (which also lives in App.jsx line 55). This is the third utility function duplicated across files. Extract to src/utils/time.js and import in both files. Four cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 4
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "[CARRY-OVER #44->...#51] Coffee corner chat label truncates on 320px viewports",
-      "description": "Office.css: .coffee-corner__chat-label and .coffee-corner__solo-label have no overflow protection. On 320px viewports the text ('☕ Name1 & Name2') overflows the corner box. Add overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100% to both label classes and reduce font-size at max-width:380px. Eight cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 8
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "[CARRY-OVER #46->...#51] in-flow vibe coffee corner label has no personality",
-      "description": "Office.jsx: the conference table empty-state label for in-flow vibe reads 'reserve the table' (generic) while other vibes have personality: 'no meetings. fix it.' (on-fire), 'everyone is at their desk' (slow-day), 'open office hours' (crushing). Suggested in-flow label: 'sync? book it.' or 'flow time — do not disturb'. Six cycles. One string change.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 6
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #42->...#51] cx and orbitR shadow outer-scope constants in ConferenceTable",
-      "description": "Office.jsx ConferenceTable: outer-scope const cx=52, orbitR=38 are redeclared with identical values inside two separate .map() callbacks at lines 925-926 and 943-944. This is a no-shadow lint violation. Remove inner re-declarations and use the outer-scope constants. Ten cycles. This is literally a deletion task.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 10
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #42->...#51] plantStageNames array declared but never used",
-      "description": "Office.jsx line 1088: const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming'] is declared inside the Office component body but is never referenced anywhere. plantStage, plantStageEmoji, and plantStageLabel are used — plantStageNames is not. Delete it. Ten cycles. If ESLint is running, this should be throwing a no-unused-vars warning on every build.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 10
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #42->...#51] ProgressBar receives updatedAt prop it never uses",
-      "description": "App.jsx: ProgressBar({ progress, updatedAt, startedAt }) destructures updatedAt from props but never references it inside the function body. The only time-related logic uses startedAt for ETA calculation. Remove updatedAt from the destructuring signature and from call sites (line 347). Ten cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 10
-    },
-    {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "[CARRY-OVER #42->...#51] VibeSparkline SVG has both aria-label and title — duplicate accessible name",
-      "description": "App.jsx VibeSparkline line 402-403: svg has aria-label='Vibe history: ...' AND a <title> child with identical content. Same pattern as WallClock (also unfixed). Remove aria-label, keep <title> with role='img'. Two components, one trivial pattern, zero fixes across ten cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 10
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #42->...#51] conf-fire-glow SVG filter uses hardcoded DOM ID",
-      "description": "Office.jsx ConferenceTable line 852: filter id='conf-fire-glow' is a hardcoded string. If ConferenceTable were ever rendered more than once, duplicate IDs would break the filter silently in all instances. useId() is already imported — use it: const filterId = useId(); id={filterId}, url(#${filterId}). Ten cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 10
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #42->...#51] Sparkline legend uses array index as React key",
-      "description": "App.jsx VibeSparkline line 414: history.slice(-3).map((h, i) => <span key={i}>) uses array index as React key. Use h.ts (timestamp) as key instead: key={h.ts}. Prevents unnecessary remounts when vibe history shifts. Ten cycles. One character change.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 10
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #46->...#51] formatDuration and formatIdleDuration are near-identical functions",
-      "description": "App.jsx formatDuration and Office.jsx formatIdleDuration implement the same elapsed-time logic with different output prefixes ('Working for Xm' vs bare 'Xm'). Also, getRelativeTime in App.jsx and the inline IIFE in the Ghost OOO bubble make this the third near-duplicate of the same logic across the codebase. Extract to src/utils/time.js as formatElapsedTime(timestamp, prefix='') and import everywhere. Six cycles.",
-      "effort": "small",
-      "carry_over": true,
-      "strike_count": 6
+      "category": "fun_factor",
+      "title": "Footer tagline pagination counter breaks the vibe",
+      "description": "The footer shows 1/9 inline after the rotating tagline. At low opacity it is subtle but it turns a whimsical quote into a paginator. Sprint velocity is just vibes with a spreadsheet... 1/9. The magic evaporates. Remove the counter or show it only on hover as a tooltip.",
+      "effort": "small"
     }
-  ]
+  ],
+  "summary": "Review 50 and the scoreboard says 3.5, down from 3.9. Carlos verified fixes land mostly clean: TEAM VIBE card is back where it belongs, ghost tabIndex fixed, daytime sky brightness wired up, honorific logic is time-gated correctly. Four out of five, not bad. But the paused pill fix is a two-bug pile: pointer-events:none in CSS AND onClick referencing an undefined onResume variable in App scope. The pill says Tap to refresh and tapping it does nothing \u2014 they cancel each other out and call it shipped. The carry-overs watch from the corner for the fourth straight review: inline toast styles, radio a11y, mobile cramping, speech bubble clipping. The code is charming and the product has real personality. The execution needs tighter QA before declaring a fix done."
 }
