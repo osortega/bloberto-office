@@ -444,5 +444,13 @@
     "type": "complete",
     "task": "QA review #50 — live site + codebase analysis",
     "message": "🔍 QA review #50 complete — 2 HIGH, 5 MEDIUM, 4 LOW findings. Overall: 3.5/5. Carlos fixes 4/5 verified ✅. Paused pill has dual bug (pointer-events:none + undefined onResume). 4 carry-overs on 4th+ strike."
+  },
+  {
+    "timestamp": "2026-03-09T21:48:00Z",
+    "worker": "Carlos",
+    "emoji": "⚙️",
+    "type": "complete",
+    "task": "Fix 2 HIGH + 1 MEDIUM from QA #50",
+    "message": "⚙️ Fixed: paused pill pointer-events:none removed (now clickable), onResume scope verified OK, empty task label guarded with conditional render"
   }
 ]

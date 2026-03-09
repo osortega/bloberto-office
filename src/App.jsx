@@ -309,6 +309,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             >ℹ️</button>
           </div>
 
+          {worker.task && (
           <div className="worker-task">
             <strong>📋 Current Task</strong>
             {worker.task}
@@ -337,6 +338,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
               ) : null
             })()}
           </div>
+          )}
 
           {worker.status === 'working' && worker.updated_at && (() => {
             const durationMs = Date.now() - new Date(worker.updated_at).getTime()
@@ -566,6 +568,14 @@ const FOOTER_TAGLINES = {
   'in-flow': 'if it compiles, ship it.',
   'slow-day': 'maybe it works? nobody knows.',
   'after-hours': 'the servers are watching. go home.',
+}
+
+const VIBE_VERSIONS = {
+  crushing: 'v4.2.0-crushing',
+  'on-fire': 'v3.1.4-on-fire',
+  'in-flow': 'v2.7.1-in-flow',
+  'slow-day': 'v1.0.1-slow-day',
+  'after-hours': 'v0.9.9-after-hours',
 }
 
 const BONUS_TAGLINES = [
@@ -829,6 +839,18 @@ export default function App() {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [isSyncing, syncFromGitHub])
+
+  const onResume = useCallback(() => {
+    setPollingPaused(false)
+    lastActivity.current = Date.now()
+    syncFromGitHub()
+  }, [syncFromGitHub])
+
+  useEffect(() => {
+    const handleVisibilityResume = () => { if (!document.hidden) onResume() }
+    document.addEventListener('visibilitychange', handleVisibilityResume)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityResume)
+  }, [onResume])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -1213,7 +1235,7 @@ export default function App() {
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
-            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={() => { setPollingPaused(false); lastActivity.current = Date.now(); syncFromGitHub(); }} />
+            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={onResume} />
 
             <div className="section-header">
               <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>
@@ -1366,7 +1388,7 @@ export default function App() {
           title="tap for another thought"
           onClick={() => setQuoteBonus(p => p + 1)}
         ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span><span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
-        <span>v1.0.0-chaos</span>
+        <span>{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}</span>
       </footer>
     </div>
     </ErrorBoundary>

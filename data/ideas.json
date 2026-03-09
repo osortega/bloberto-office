@@ -1346,83 +1346,91 @@
   {
     "creative_director": "Luna",
     "review_number": 73,
-    "timestamp": "2026-03-09T21:35:00Z",
-    "theme": "The accessibility gap and the features that shipped but forgot their edges",
-    "visual_observations": "Code review (Puppeteer timed out). prefers-reduced-motion exists in Office.css (line 1485-1510) but NOT in App.css \u2014 confetti, ambient particles, progress ring animation, sparkline, and vibe shockwave in App.jsx all ignore the preference. Streak eulogy toast STILL has no dismiss timer (App.jsx:955). Esc shortcut STILL only blurs without clearing filters. wanderTooltips STILL slot-keyed not character-keyed. Activity log STILL has no System filter. Luna SOLO_SPOTLIGHT_MESSAGES still missing on-fire/in-flow/slow-day entries.",
+    "timestamp": "2026-03-09T21:40:00Z",
+    "theme": "The shipped fixes revealed new edges \u2014 time to polish what landed",
+    "visual_observations": "Code review (Puppeteer timed out in container). Key findings: streak eulogy toast timer IS now set (line 958). Esc handler DOES clear filters (line 826). prefers-reduced-motion IS in App.css (5 blocks). Many previously-flagged bugs are now fixed. Focus shifts to remaining gaps: wanderTooltips still slot-keyed, activity log still lacks System filter, Luna solo spotlight still missing 3 vibes, onResume not wired to visibilitychange, VIBE_VERSIONS constant exists but footer still hardcoded.",
     "fixed_since_last_review": [
       {
-        "title": "Streak Eulogy Toast Now Uses Muted Border Color for Info Type",
+        "title": "Streak Eulogy Toast Now Has Dismiss Timer",
+        "was_flagged_in": [
+          70,
+          71,
+          72
+        ],
+        "how_fixed": "App.jsx:958 \u2014 completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3500)"
+      },
+      {
+        "title": "Esc Shortcut Now Clears All Filters",
+        "was_flagged_in": [
+          70,
+          71
+        ],
+        "how_fixed": "App.jsx:826 \u2014 setSelectedTag(null); setWorkerFilter(null); setActivityFilter('all') before blur"
+      },
+      {
+        "title": "prefers-reduced-motion Now in App.css",
+        "was_flagged_in": [
+          70
+        ],
+        "how_fixed": "App.css has 5 reduced-motion blocks covering confetti, particles, entries, and ambient elements"
+      },
+      {
+        "title": "Streak Eulogy Uses Muted Border for Info Type",
         "was_flagged_in": [
           71,
           72
         ],
-        "how_fixed": "App.jsx completionToast render now checks .type === 'info' and uses muted gray border instead of celebration purple."
+        "how_fixed": "completionToast render branches on .type === 'info' for muted styling"
       }
     ],
     "ideas": [
       {
-        "priority": "must",
-        "category": "bug",
-        "title": "Streak Eulogy Toast STILL Has No Dismiss Timer \u2014 Third Consecutive Review",
-        "description": "App.jsx line 954-956: setCompletionToast fires for streak drop but completionToastTimerRef.current is never set. The justShipped path always sets the timer. The eulogy path does not. On a slow day with no completions, the toast enters and never leaves. Flagged in reviews #70, #71, #72. Fix: add completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3500) immediately after the setCompletionToast call. ONE LINE. WHY: a toast that never dismisses is not a toast \u2014 it's a label.",
-        "effort": "small",
-        "assigned_to": "maya"
-      },
-      {
-        "priority": "must",
-        "category": "bug",
-        "title": "Esc Shortcut Still Only Blurs \u2014 Filters Stay Active Despite 'Clear' Label",
-        "description": "App.jsx line 825: Esc handler is just document.activeElement?.blur(). ShortcutToast promises 'Esc Clear'. selectedTag and workerFilter are never reset. Flagged in reviews #70, #71. Fix: add setSelectedTag(null); setWorkerFilter(null); before the blur. Update label to 'Esc Clear filters'. WHY: a shortcut that lies about its function damages trust in the entire keyboard system.",
-        "effort": "small",
-        "assigned_to": "carlos"
-      },
-      {
-        "priority": "must",
-        "category": "accessibility",
-        "title": "App.css Has Zero prefers-reduced-motion Rules \u2014 Only Office.css Is Covered",
-        "description": "Office.css lines 1485-1510 correctly handle reduced motion for office animations. But App.css has no @media (prefers-reduced-motion) block at all. This means confetti (30 animated pieces), ambient particles, progress ring transitions, sparkline SVG animations, and vibe shockwave all play at full intensity for motion-sensitive users. Fix: add @media (prefers-reduced-motion: reduce) block in App.css that sets animation-duration: 0.01ms and transition-duration: 0.01ms for *, *::before, *::after. Also gate confetti rendering in App.jsx with matchMedia check. WHY: half-implemented accessibility is worse than none \u2014 it creates false confidence that the preference is respected.",
-        "effort": "medium",
-        "assigned_to": "maya"
-      },
-      {
         "priority": "should",
         "category": "bug",
-        "title": "wanderTooltips Still Slot-Keyed Not Character-Keyed \u2014 Second Review",
-        "description": "Office.jsx lines 1472-1477: wanderTooltips keyed by position slot (1-4), not worker.id. Carlos gets 'coffee corner' only if he happens to be first idle. Flagged in review #72. Add WORKER_WANDER_TOOLTIPS keyed by worker.id with character-specific hover text. Fall back to slot-based for unknown workers. WHY: the tooltip is the one hover moment where a visitor learns who these characters are.",
+        "title": "wanderTooltips Still Slot-Keyed Not Character-Keyed",
+        "description": "Office.jsx lines 1472-1477: wanderTooltips keyed by position slot (1-4), not worker.id. Carlos gets 'coffee corner' only if he's first idle. Flagged in review #72. Add WORKER_WANDER_TOOLTIPS keyed by worker.id. WHY: the tooltip is the one hover moment where visitors learn character identity.",
         "effort": "small",
-        "assigned_to": "luna"
+        "assigned_to": "dave"
       },
       {
         "priority": "should",
         "category": "feature",
-        "title": "Activity Log System Filter \u2014 Flagged Since Review #62, Eleven Reviews Ago",
-        "description": "App.jsx activity filter bar offers All/Hires/Completions/Errors but no System option. ACTIVITY_ICONS already maps 'system' to '\u2699\ufe0f'. Vibe transition events are injected as type:'system' but buried under 'All' with no dedicated filter. Add { key: 'system', label: '\u2699\ufe0f System' } to the filter array. One conditional in the filter logic. WHY: vibe transitions are the most interesting narrative arc in the log \u2014 users deserve a way to read just that story.",
+        "title": "Activity Log System Filter \u2014 Flagged Since Review #62",
+        "description": "Activity filter bar has All/Hires/Completions/Errors but no System. ACTIVITY_ICONS maps 'system' to '\u2699\ufe0f'. Vibe transitions are type:'system' but hidden in 'All'. Add { key: 'system' } to filter array. One conditional. WHY: vibe transitions are the narrative arc \u2014 users should be able to read just that story.",
         "effort": "small",
         "assigned_to": "sofia"
       },
       {
         "priority": "should",
         "category": "storytelling",
-        "title": "Luna SOLO_SPOTLIGHT_MESSAGES Missing 3 Vibes \u2014 Falls to Generic During Crises",
-        "description": "App.jsx line 267: luna has only crushing and after-hours entries. on-fire, in-flow, slow-day all fall to 'Dreaming alone.' Unfixed since review #67. Suggested: on-fire: '\ud83d\udd25 One creative in a burning building \u2014 the brief will still be beautiful.', in-flow: '\u2728 Ideas arrive faster when the office goes quiet.', slow-day: '\ud83c\udf19 Slow day. The perfect kind for the ideas that need silence.' WHY: Luna reading 'dreaming alone' during a five-alarm incident is tonally wrong.",
+        "title": "Luna SOLO_SPOTLIGHT_MESSAGES Missing 3 Vibes",
+        "description": "App.jsx: luna has only crushing and after-hours. on-fire/in-flow/slow-day fall to generic. Suggested: on-fire: 'One creative in a burning building', in-flow: 'Ideas arrive faster when quiet', slow-day: 'The perfect kind for ideas that need silence.' WHY: 'dreaming alone' during a crisis is tonally wrong.",
         "effort": "small",
         "assigned_to": "luna"
       },
       {
         "priority": "should",
         "category": "polish",
-        "title": "onResume Callback Declared But Never Wired to Visibility Change API",
-        "description": "App.jsx declares an onResume function for tab-visibility recovery but grep shows it's defined without being connected to document.addEventListener('visibilitychange', ...). Users who switch tabs and return get no forced refresh. The polling system handles this via its own interval, but onResume was clearly intended as an immediate-refresh trigger on tab focus. Wire it: document.addEventListener('visibilitychange', () => { if (!document.hidden) onResume(); }) in the main useEffect. WHY: a tab left open for 30 minutes should catch up instantly on return, not wait up to 30s for the next poll.",
+        "title": "onResume Not Wired to Visibility Change API",
+        "description": "App.jsx has an onResume function for tab-recovery but it's not connected to document visibilitychange event. Users returning to a stale tab wait up to 30s for next poll instead of getting immediate refresh. Wire: addEventListener('visibilitychange', () => { if (!document.hidden) onResume() }). WHY: instant catch-up on tab focus is expected behavior for live dashboards.",
         "effort": "small",
         "assigned_to": "carlos"
       },
       {
         "priority": "could",
         "category": "delight",
-        "title": "VIBE_VERSIONS Exists in Code But Footer Still Renders Hardcoded v1.0.0-chaos",
-        "description": "App.jsx has a VIBE_VERSIONS constant mapping each vibe to a funny version string but the footer still renders the static string. Connect the lookup: {VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}. WHY: the footer is the last thing you see \u2014 it should close the story.",
+        "title": "VIBE_VERSIONS Exists But Footer Still Hardcoded",
+        "description": "VIBE_VERSIONS maps each vibe to a funny version string but the footer renders static v1.0.0-chaos. Connect: {VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}. WHY: the footer closes the story \u2014 let it be part of the narrative.",
         "effort": "small",
         "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "AwaySign Sticky Notes Still Generic While Nameplates Are Character-Specific",
+        "description": "Office.jsx has WORKER_AWAY_DESK_LABELS (character-specific nameplates) but AwaySign still uses shared AWAY_MESSAGES. The sticky note is more visible than the nameplate. Add WORKER_AWAY_MESSAGES keyed by worker.id with role-flavored messages. WHY: the sticky note is the soul of the idle desk.",
+        "effort": "small",
+        "assigned_to": "luna"
       }
     ],
     "hire_proposals": [],

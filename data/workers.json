@@ -5,10 +5,10 @@
       "name": "Carlos",
       "role": "Backend",
       "emoji": "⚙️",
-      "status": "working",
-      "task": "Fix 2 HIGH from QA #50 — paused pill onResume + pointer-events bug",
-      "progress": 10,
-      "updated_at": "2026-03-09T21:46:00Z",
+      "status": "idle",
+      "task": "",
+      "progress": 100,
+      "updated_at": "2026-03-09T21:48:00Z",
       "started_at": "2026-03-09T21:46:00Z"
     },
     {
@@ -23,5 +23,5 @@
       "started_at": "2026-03-09T20:15:00Z"
     }
   ],
-  "updated_at": "2026-03-09T21:46:00Z"
+  "updated_at": "2026-03-09T21:48:00Z"
 }
