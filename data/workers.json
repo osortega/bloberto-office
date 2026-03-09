@@ -4,7 +4,7 @@
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend",
-      "emoji": "⚙️",
+      "emoji": "\u2699\ufe0f",
       "status": "idle",
       "task": "",
       "progress": 100,
@@ -15,13 +15,13 @@
       "id": "sofia",
       "name": "Sofia",
       "role": "QA",
-      "emoji": "🔍",
-      "status": "idle",
-      "task": "",
-      "progress": 100,
-      "updated_at": "2026-03-09T21:45:00Z",
-      "started_at": "2026-03-09T20:15:00Z"
+      "emoji": "\ud83d\udd0d",
+      "status": "working",
+      "task": "QA review #51 \u2014 live site + codebase analysis",
+      "progress": 10,
+      "updated_at": "2026-03-09T22:15:26Z",
+      "started_at": "2026-03-09T22:15:26Z"
     }
   ],
-  "updated_at": "2026-03-09T21:48:00Z"
+  "updated_at": "2026-03-09T22:15:26Z"
 }
