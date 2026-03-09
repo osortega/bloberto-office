@@ -1,132 +1,163 @@
 {
+  "review_number": 43,
   "analyst": "Sofia",
-  "review_number": 41,
-  "timestamp": "2026-03-09T11:15:00Z",
-  "screenshot_note": "Desktop 1280x800 and mobile 375x812 captured via Chromium headless. Both verified. Sofia's lone-survivor label visually bleeds outside office-floor left edge on desktop. Speech bubble text confirmed overflowing office-floor container on mobile. Bloberto card obscures most of the office floor on narrow viewports.",
-  "scores": {
-    "visual": 7,
-    "ux": 5,
-    "responsiveness": 5,
-    "performance": 7,
-    "accessibility": 6,
-    "code_quality": 5,
-    "features": 8,
-    "fun_factor": 9
-  },
-  "overall_score": 6.5,
+  "timestamp": "2026-03-09T12:53:00Z",
+  "screenshot_note": "Desktop 1280x800 and mobile 375x812 captured via Chromium headless. Office tab and Dashboard tab both screenshotted. Mobile confirms Bloberto speech bubble still overlaps the tab navigation bar (ESCALATED, 6th review). Dashboard tab on mobile shows stats cards in 2-col grid; 'ON THE CLOCK' label wraps to two lines on mobile. Luna card shows '15%' progress bar on desktop but workers.json has no progress field — bar rendering needs investigation. CSS vibe-reactive coffee corner labels confirmed ('COFFEE TRIPLE SHOT' on crushing).",
   "carry_over_resolution": {
-    "1_resume_button_noop": "❌ STILL BROKEN — App.jsx:1211 onResume is still `() => setPollingPaused(false)`. The idle-check interval at line 719-726 runs every 15 seconds and calls `setPollingPaused(Date.now() - lastActivity.current > IDLE_TIMEOUT)`. Since lastActivity.current is never updated on Resume, the button re-pauses within 15 seconds of clicking. Fix requires `lastActivity.current = Date.now()` inside onResume. This is now broken across MULTIPLE reviews — escalating to CRITICAL.",
-    "2_pingReaction_only_bloberto": "❌ STILL BROKEN — Office.jsx line 1439 is the only Character that receives pingReaction={pingReaction}. Worker characters at desks (line 1453-1455) and idle wanderers (lines 1473-1483) do NOT receive the pingReaction prop. PING_REACTIONS has entries for luna, carlos, maya, dave, sofia, but clicking any of them only produces the pingedId pulse highlight — the speech bubble never fires. Escalating.",
-    "3_speech_bubble_mobile_overflow": "❌ STILL BROKEN — Office.css line 84: .office-floor { overflow: visible }. Confirmed visually in mobile screenshot: the 'bugs have nowhere to hide' text and Sofia's speech bubble text clip/bleed outside the office-floor container boundary. No @media override exists to constrain it. Escalating.",
-    "4_wb_task_count_wraps_mobile": "❌ STILL BROKEN — Office.jsx line 1267: wb-task-count span has inline style only (fontSize: '0.4rem'). No white-space: nowrap anywhere. No dedicated CSS class rule exists for .wb-task-count. Text '2 active · 5 total' wraps at narrow widths. Escalating.",
-    "5_useEffect_dep_missing_worker_id": "❌ STILL BROKEN — Office.jsx line 534-550: error bubble useEffect dep array is [variant, worker.status] but the closure captures worker.id (line 538: WORKER_ERROR_BUBBLES[worker.id]) and wanderIdx (line 548: wanderIdx * 1500). Stale closure risk when worker identity changes mid-render. Also affects idle bubble useEffect at line 511-523 which uses wanderIdx correctly in deps but the error one doesn't. Escalating."
+    "paused_pill_misleading": "STILL BROKEN — App.jsx line 1148: pill reads 'move mouse to refresh' but syncFromGitHub() is not called immediately. Carry-over from review 42.",
+    "activity_filter_duplicated": "STILL BROKEN — App.jsx lines 1282–1294 and 1335–1344 still duplicate the filter chain. Carry-over from review 42.",
+    "tabindex_non_interactive_chars": "STILL BROKEN — Office.jsx line 682: tabIndex={0} on all Characters unconditionally. Carry-over from review 42.",
+    "iife_solo_spotlight": "STILL BROKEN — App.jsx line 1239: IIFE still inside JSX. Carry-over from review 42.",
+    "stuckworkers_date_now_usememo": "STILL BROKEN — App.jsx lines 438–441: Date.now() captured inside useMemo with [workers] dep only. Carry-over from review 42.",
+    "pingable_aria_label": "STILL BROKEN — Office.jsx lines 1453/1481: Characters with onClick have no aria-label. Carry-over from review 42.",
+    "plant_stage_names_dead_code": "STILL BROKEN — Office.jsx line 1066: const plantStageNames still declared and never used. Carry-over from review 42.",
+    "duplicate_vibe_css_selectors": "STILL BROKEN — Office.css lines 91–95 and 97–115: single-quote and double-quote versions of identical selectors. Carry-over from review 42.",
+    "conf_table_hardcoded_filter_id": "STILL BROKEN — Office.jsx line 846: <filter id='conf-fire-glow'> is a hardcoded string. Carry-over from review 42.",
+    "activity_log_key_uses_index": "STILL BROKEN — App.jsx line 151: key includes array index i. Carry-over from review 42.",
+    "progressbar_updatedat_unused": "STILL BROKEN — App.jsx line 193: updatedAt in ProgressBar signature never used. Carry-over from review 42.",
+    "sparkline_redundant_aria": "STILL BROKEN — App.jsx lines 401–402: aria-label and <title> have identical content. Carry-over from review 42.",
+    "speech_bubble_overflow_mobile": "STILL BROKEN (6th review) — Office.css line 84: overflow: visible unchanged. Mobile screenshot confirms speech bubble still overlaps the tab navigation bar."
   },
+  "scores": {
+    "visual": 4,
+    "ux": 3,
+    "responsiveness": 2,
+    "performance": 3,
+    "accessibility": 3,
+    "code_quality": 3,
+    "features": 4,
+    "fun_factor": 5
+  },
+  "overall_score": 3.4,
+  "total_findings": 16,
   "suggestions": [
     {
-      "priority": "critical",
-      "category": "Bug",
-      "title": "[ESCALATED #4] Resume button re-pauses itself within 15s",
-      "description": "App.jsx:1211 — onResume callback only calls setPollingPaused(false) but never resets lastActivity.current. The idle-check interval at line 719-726 fires every 15 seconds and re-evaluates `Date.now() - lastActivity.current > IDLE_TIMEOUT`, which immediately re-pauses since lastActivity.current was never touched. Fix: `onResume={() => { lastActivity.current = Date.now(); setPollingPaused(false) }}`. This has been flagged in reviews 38, 39, 40, and 41 without a fix.",
-      "effort": "small"
-    },
-    {
-      "priority": "critical",
-      "category": "Bug",
-      "title": "[ESCALATED #4] pingReaction silently dropped for all non-Bloberto workers",
-      "description": "Office.jsx — handleCharClick (line 1125-1136) correctly sets pingReaction state from PING_REACTIONS[worker.id], and PING_REACTIONS has entries for all five workers. However, the pingReaction prop is only passed to the single Bloberto Character at line 1439. All desk-worker Characters (line 1447-1455) and idle Characters (line 1473-1483) are missing `pingReaction={pingedId === w.id ? PING_REACTIONS[w.id] : null}`. The state is set, the data exists, the wiring is just absent. Fix: pass the reaction through to each Character, scoped to that worker's id.",
-      "effort": "small"
+      "priority": "high",
+      "category": "bug",
+      "title": "[ESCALATED #6] Speech bubble overflows office-floor and overlaps tab bar on mobile",
+      "description": "Office.css line 84: .office-floor { overflow: visible } is unchanged for the sixth consecutive review. The mobile screenshot (375x812) confirms Bloberto's speech bubble extends above the office-floor top border and visually covers the Office/Dashboard tab buttons, making them hard to click. The bubble is positioned via bottom: calc(100% + 8px) from inside a position:absolute parent with no clip boundary. Fix options: (1) Wrap .office-floor in a .office-floor-clip container with overflow: hidden, keep the floor itself at overflow: visible so desk tooltips still pop out. (2) Port the .speech-bubble to a React portal (ReactDOM.createPortal) outside the office floor entirely, positioned relative to viewport. Option 2 is more architecturally sound but larger. Option 1 is a 3-line CSS change. This has been escalated for six reviews with zero fix. Assigning to Maya as it is a CSS containment issue.",
+      "effort": "medium",
+      "assignee": "Maya"
     },
     {
       "priority": "high",
-      "category": "Responsiveness",
-      "title": "[ESCALATED #4] Speech bubble overflows office-floor on mobile",
-      "description": "Office.css line 84: .office-floor { overflow: visible }. Confirmed in mobile screenshot — speech bubble text bleeds outside the container boundary. The .speech-bubble is positioned absolute with `bottom: calc(100% + 8px)`, which places it above its parent. When the parent is near the top of the office-floor and the floor has overflow:visible, the bubble clips out. Fix options: (1) add `overflow: hidden` to .office-floor with a conditional for the top region, or (2) set a clip-path on the character container, or (3) use a portal to render speech bubbles in a higher z-index layer outside the floor.",
-      "effort": "medium"
+      "category": "bug",
+      "title": "NEW: stuckWorkers[0].emoji renders literal 'undefined' string in stuck stat card",
+      "description": "App.jsx line 511: the stuck stat card label is built as: `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ...`. If the worker has no emoji field in workers.json (Carlos, Maya, Dave, Sofia all lack emoji in DEFAULT_ROSTER and the live JSON schema), JavaScript template literal coerces undefined to the string 'undefined', producing 'undefined Carlos · Working for 3h' in the UI. Fix: use optional chaining with a fallback: `${stuckWorkers[0].emoji ?? getRoleEmoji(stuckWorkers[0].role)} ${stuckWorkers[0].name} · ...`. getRoleEmoji is already defined at App.jsx line 159. This is a one-line fix that affects any user with a stuck non-Luna worker.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "high",
-      "category": "Responsiveness",
-      "title": "[ESCALATED #4] .wb-task-count wraps on mobile — still no white-space:nowrap",
-      "description": "Office.jsx line 1267: the wb-task-count span has only `style={{ fontSize: '0.4rem', color: 'inherit', opacity: 0.7 }}`. There is no CSS class rule for .wb-task-count and no white-space:nowrap. At narrow viewport widths the text '2 active · 5 total' wraps to two lines, breaking whiteboard layout. One-line fix: add `whiteSpace: 'nowrap'` to the inline style, or add a .wb-task-count { white-space: nowrap; } rule to Office.css.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "Code Quality",
-      "title": "[ESCALATED #4] Error bubble useEffect dep array missing worker.id and wanderIdx",
-      "description": "Office.jsx lines 534-550: the error-bubble useEffect uses `WORKER_ERROR_BUBBLES[worker.id]` (line 538) and `wanderIdx * 1500` (line 548) in its body but neither is listed in the dep array `[variant, worker.status]`. If worker.id changes (roster reload reassigns a different worker to the same Character slot) or wanderIdx changes, the closure retains stale values and shows the wrong worker's bubbles at the wrong timing. Fix: change dep array to `[variant, worker.status, worker.id, wanderIdx]`.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "Bug",
-      "title": "Always-true guard in desk monitor rendering (|| true anti-pattern)",
-      "description": "Office.jsx line 1361: `(isWorking || hasError) && (DESK_SCREEN_SVG[occ.worker.id] || true)`. The `|| true` makes the second condition always truthy, effectively making it equivalent to just `(isWorking || hasError)`. The intent was probably to render a fallback monitor even when no SVG entry exists, but the current code always renders the outer wrapper div regardless. This is misleading dead code. Remove the `|| true` and let the inner check for `DESK_SCREEN_SVG[...]` handle the fallback SVG display.",
-      "effort": "small"
+      "category": "bug",
+      "title": "NEW: ProgressBar with undefined progress renders '‍%' label and unpredictable bar width",
+      "description": "App.jsx lines 221–237: the ProgressBar component renders `{progress}%` in the progress-pct span and sets the fill width via `Math.min(progress, 100)%`. When worker.progress is not present in workers.json (e.g., Luna in the live data currently), progress is undefined. `{undefined}%` in React JSX renders '%' with no number (confirmed in desktop dashboard screenshot — Luna's card shows 'PROGRESS ... %'). `Math.min(undefined, 100)` returns NaN; 'NaN%' is invalid CSS; the browser ignores the style override and the fill may render at 0 or full-width depending on the CSS cascade. Fix: add a guard in ProgressBar — if progress is null or undefined, render nothing or a neutral empty bar: `if (progress == null || isNaN(progress)) return null`. Also guard in the WorkerCard render site: only render ProgressBar when typeof worker.progress === 'number'. The App.jsx call on line 346 passes worker.progress without checking.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "UX",
-      "title": "No feedback after Resume — user has no confirmation refresh restarted",
-      "description": "Even after the Resume button is fixed to update lastActivity.current, there is still no visual confirmation that polling resumed. The sync-status card flips from PAUSED back to Live, but there is no transient toast or animation to confirm the action. Consider a brief 'Resuming...' flash on the stat card or a short 'refresh resumed' toast notification to close the interaction loop.",
-      "effort": "small"
+      "category": "bug",
+      "title": "NEW: Keyboard arrow tab navigation does not update window.location.hash",
+      "description": "App.jsx lines 739–748: handleTabKeyDown handles ArrowLeft/ArrowRight/ArrowUp/ArrowDown to switch tabs, calling setTab() but NOT updating window.location.hash. The click handlers at lines 1184 and 1197 both call window.location.hash = tabName, and handleWorkerClick at line 752 also updates hash on navigation. The keyboard path is inconsistent — a user who uses arrow keys to switch to Dashboard will find the browser URL still shows #office, and pressing browser Back will not undo the tab switch. Fix: add window.location.hash = TABS[(currentIdx + 1) % TABS.length] inside both branches of handleTabKeyDown, matching the click handler pattern.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "Code Quality",
-      "title": "stuckWorkers useMemo uses Date.now() without declaring it as dependency",
-      "description": "App.jsx lines 438-440: `useMemo(() => workers.filter(w => ... Date.now() ... > 7_200_000), [workers])`. The Date.now() call is baked in but not a dependency, so if a worker crosses the 2-hour stuck threshold between worker array refreshes, the memo won't recompute. In practice polling every 30s limits the window, but it's a correctness issue. Fix: compute the threshold outside the memo (e.g., a useTimeTick-based value) or just run it as a plain derived value without memoization since workers.filter is cheap.",
-      "effort": "small"
+      "category": "ux",
+      "title": "[Carry-over] Paused pill says 'move mouse to refresh' but refresh takes up to 30 seconds",
+      "description": "App.jsx line 1148: the paused pill reads '⏸ Paused · move mouse to refresh'. Moving the mouse calls the touch handler which sets pollingPaused(false) but does NOT immediately call syncFromGitHub(). The next fetch only happens on the next pollTick interval (30s). A user who moves the mouse expecting immediate fresh data will wait up to 30 seconds with no visible feedback. Two fixes: (1) Change text to '⏸ Paused · move mouse to resume' (copy fix, small effort). (2) Inside the touch handler, if pollingPaused was true before the mouse move, call syncFromGitHub() immediately (functional fix, also small). The click on the paused stat card (line 1211 onResume) also only sets state — same issue there.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "Code Quality",
-      "title": "IIFE inside JSX for solo spotlight message — unnecessary per-render allocation",
-      "description": "App.jsx line 1239: `{(() => { const soloKey = ...; return SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[teamVibe.key] ?? ... })()}`. An immediately-invoked function expression inside JSX runs on every render. Since activeWorkers[0] and teamVibe.key are already in scope, this logic should be extracted to a local variable before the return statement or a useMemo, not an inline IIFE.",
-      "effort": "small"
+      "category": "performance",
+      "title": "NEW: activityEntries filter+slice in JSX defeats React.memo on WorkerCard",
+      "description": "App.jsx lines 1232, 1255, 1268: each WorkerCard receives activityEntries={activityLog.filter(e => e.worker === w.name).slice(-3)}. This creates a new array reference on every render of the parent App component. WorkerCard is wrapped in React.memo (line 269), but React.memo uses referential equality by default — a new array reference on every render means WorkerCard ALWAYS re-renders regardless of whether the data changed. The same pattern is used in all three WorkerCard render sites. Fix: compute per-worker activity slices in a useMemo keyed on [activityLog]: const activityByWorker = useMemo(() => Object.fromEntries(roster.map(r => [r.name, activityLog.filter(e => e.worker === r.name).slice(-3)])), [activityLog, roster]); then pass activityByWorker[w.name] ?? [] at each call site. This makes React.memo actually effective.",
+      "effort": "medium",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "Code Quality",
-      "title": "ActivityLogEntry key uses array index after reverse/slice — fragile reconciliation",
-      "description": "App.jsx line 151: `key={entry.timestamp + entry.worker + i}` where `i` comes from indexing into `.reverse().slice(0, 20)`. The index is volatile: adding a new entry changes every i-keyed item below it, forcing React to remount all but the first element. If entry.timestamp is unique (which it should be for activity events), just use `key={entry.timestamp + (entry.worker ?? '')}` and drop the index.",
-      "effort": "small"
+      "category": "code",
+      "title": "[Carry-over] Activity filter logic duplicated in two places",
+      "description": "App.jsx: the identical type+worker filter chain appears at lines 1282–1294 (to compute a count for the section header) and at lines 1335–1344 (to compute the entries passed to ActivityLog). Changing a filter condition requires editing both. Extract to a single useMemo: const filteredEntries = useMemo(() => activityLog.filter(typeFilter).filter(workerFilter), [activityLog, activityFilter, workerFilter]); use filteredEntries.length for the count and filteredEntries for the ActivityLog prop.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "Accessibility",
-      "title": "Pingable worker Characters lack descriptive interactive label",
-      "description": "Office.jsx — Characters with onClick handlers (desk workers line 1453, idle wanderers line 1480) are clickable but have no `aria-label` describing the action. Screen reader users see a generic element with no hint that clicking pings the worker. Add `aria-label={`Ping ${worker.name}`}` to the Character component when onClick is present, and `role='button'` with `tabIndex={0}` if it's a non-button element.",
-      "effort": "small"
+      "category": "accessibility",
+      "title": "[Carry-over] tabIndex={0} on ALL Character elements including non-interactive ghosts",
+      "description": "Office.jsx line 682: tabIndex={0} is set unconditionally on every Character div, including ghost roster members that have no onClick handler (onClick is undefined). Keyboard users tabbing through the office floor will land on 6+ ghost characters that do nothing when activated — an accessibility dead end. Fix: set tabIndex conditionally: tabIndex={handleClick ? 0 : -1}. The role={handleClick ? 'button' : undefined} check at line 681 already correctly omits the button role for non-interactive chars; tabIndex should follow the same pattern.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "NEW: IDLE_BUBBLE_EMOJIS, WORKER_ERROR_BUBBLES, ERROR_BUBBLE_MESSAGES defined inside Character component body",
+      "description": "Office.jsx lines 510, 526–533: three constant lookup objects (IDLE_BUBBLE_EMOJIS, ERROR_BUBBLE_MESSAGES, WORKER_ERROR_BUBBLES) are defined inside the Character component function body. They are re-created as new object literals on every render of every Character instance. Since there can be up to 6+ Character instances and the ambient interval fires every 8–45 seconds triggering re-renders, these allocations accumulate unnecessarily. Fix: move all three to module-level constants (outside the component, alongside the existing PING_REACTIONS, BLOBERTO_TITLES, etc.). Zero behavioral change, marginally better performance, and makes the code easier to scan.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "[Carry-over] Pingable worker Characters lack aria-label describing the ping action",
+      "description": "Office.jsx lines 1453 and 1481: Characters rendered with onClick get role='button' but no aria-label. A screen reader will read only the character's visible name ('Luna', 'Carlos', etc.) with no indication of the interactive affordance. Fix: add aria-label={'Ping ' + worker.name} (or 'Click to inspect ' + worker.name) to the Character component when onClick is provided. A one-line change at the Character call site or inside the component itself.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "low",
-      "category": "Code Quality",
-      "title": "ProgressBar 'updatedAt' prop accepted but never used",
-      "description": "App.jsx line 193: `function ProgressBar({ progress, updatedAt, startedAt })` — updatedAt is destructured but never referenced anywhere in the function body. It was likely superseded by startedAt for the ETA calculation. Remove it from the signature and from the two call sites (lines 346 and similar) to keep the interface clean.",
-      "effort": "small"
+      "category": "accessibility",
+      "title": "NEW: CSS ::after vibe labels on coffee corner are invisible to screen readers",
+      "description": "Office.css lines 1662–1667: vibe-reactive text is appended to .coffee-corner__label via CSS content, e.g., [data-vibe='crushing'] .coffee-corner__label::after { content: ' TRIPLE SHOT'; } and [data-vibe='on-fire'] .coffee-corner__label::after { content: ' STRONG. NOW.'; }. CSS-generated content via ::after pseudo-elements is typically not announced by screen readers (it is in the accessibility tree on some browsers but not consistently). The sr-only span inside the coffee corner (Office.jsx line 1427) only reads 'Coffee corner' with no vibe context. Low priority since it is decorative, but if the vibe label is informational, expose it via the sr-only span instead: e.g., <span class='sr-only'>Coffee corner — {vibe === 'crushing' ? 'triple shot' : '...'}</span>.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "low",
-      "category": "Code Quality",
-      "title": "VibeSparkline has redundant aria-label + <title> with identical content",
-      "description": "App.jsx lines 401-402: the SVG element has both `aria-label={history.map(...).join(' then ')}` and a child `<title>` with the identical string. When both are present, screen readers may announce the content twice. Remove the `aria-label` from the SVG and keep the `<title>` child, which is the SVG-native accessibility mechanism.",
-      "effort": "small"
+      "category": "bug",
+      "title": "NEW: isAfterHours (time-based, hours<5) diverges from teamVibe 'after-hours' (worker-count-based) in header",
+      "description": "App.jsx line 1056: const isAfterHours = currentHour < 5. This flags midnight–4am as 'after hours'. But getTeamVibe() returns 'after-hours' only when workers.length === 0 (vibe.js line 7). These two concepts are independent and can conflict. If it is 3am and the team has active workers, isAfterHours is true but teamVibe.key is 'crushing'. App.jsx line 1128 uses: HONORIFICS[isAfterHours ? 'after-hours' : teamVibe.key] — so at 3am with a crushing team, the greeting says 'night owl 🌙' rather than 'LEGEND 🔥'. Fix: remove the isAfterHours override in the HONORIFICS lookup and just use teamVibe.key. The greeting text already handles the after-hours case contextually. Keep isAfterHours only for the greeting prefix (line 1058) where time-of-day is the right signal.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
-      "category": "Visual",
-      "title": "Mobile: Bloberto's hover-card obscures most of the office floor",
-      "description": "Visible in the mobile screenshot — Bloberto's expanded info card (tooltip) at top-center covers roughly 40% of the office-floor vertical space on a 375px viewport. The card appears to be absolutely positioned without a mobile max-height or overflow constraint. Consider capping the card height on mobile or pinning it outside the office-floor container so workers below remain visible.",
-      "effort": "medium"
+      "category": "code",
+      "title": "[Carry-over] IIFE inside JSX for solo spotlight message",
+      "description": "App.jsx line 1239: solo spotlight message computed via an IIFE inside JSX. Extract to a pre-return variable: const soloKey = (activeWorkers[0]?.id ?? activeWorkers[0]?.name)?.toLowerCase(); const soloMsg = SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[teamVibe.key] ?? SOLO_SPOTLIGHT_MESSAGES[soloKey]?.default ?? '🌟 Running solo today...'; then use soloMsg in JSX. Carry-over from review 42.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
-      "category": "Visual",
-      "title": "Desktop: Sofia's lone-survivor label clips outside office-floor left edge",
-      "description": "Visible in the desktop screenshot — the lone-survivor label for Sofia (leftmost desk) uses `left: '50%', transform: 'translateX(-50%)'` which centers it on the character, but when the character is at the far-left desk the label's left half bleeds outside the office-floor container. The container's overflow:visible allows this. Consider adding `max-width: 90px; overflow: hidden; text-overflow: ellipsis` to the lone-survivor-label inline style, or shifting the label right for edge desks.",
-      "effort": "small"
+      "category": "code",
+      "title": "[Carry-over] stuckWorkers useMemo captures Date.now() without declaring it as dependency",
+      "description": "App.jsx lines 438–441: useMemo(() => workers.filter(w => ... Date.now() ...), [workers]). Date.now() is called at memo-evaluation time but is not a declared dependency. If a worker crosses the 2-hour threshold between worker fetches, the stuck badge won't appear until the next workers state update. The memo is cheap enough to compute as a plain derived variable outside useMemo entirely. Carry-over from review 42.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "[Carry-over] plantStageNames array declared but never used",
+      "description": "Office.jsx line 1066: const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming'] is declared and never referenced. The stage is computed via ternary chain on lines 1067–1071. Delete the array. Carry-over from review 42.",
+      "effort": "small",
+      "assignee": "Dave"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "[Carry-over] Duplicate vibe CSS selectors — single-quote and double-quote versions coexist",
+      "description": "Office.css lines 91–95 define .office-floor[data-vibe='crushing'] etc. with single-quoted attribute selectors (border-color + box-shadow only). Lines 97–115 redefine the same selectors with double-quoted values AND set --grid-line. Since single and double quotes are equivalent in CSS attribute selectors, the earlier single-quote rules for crushing/on-fire are redundant (same specificity, overridden by the later double-quote rules). Delete lines 91–95. The in-flow, slow-day, and after-hours rules also have equivalent single/double copies. Carry-over from review 42.",
+      "effort": "small",
+      "assignee": "Maya"
     }
-  ],
-  "summary": "Review #41 — all five carry-over HIGH items remain unaddressed for the fourth consecutive review. The Resume button, pingReaction wiring, speech bubble overflow, wb-task-count wrap, and useEffect dep array are fully reproducible and trivially fixable — most are one-line changes. A new always-true guard (`|| true`) was spotted in the desk rendering path. Visually the app looks genuinely polished at desktop; mobile is functional but cramped. Fun factor remains high — Bloberto's ambient quotes and the vibe-aware character expressions are genuinely charming. But charm doesn't fix a Resume button that un-resumes itself. Fix the carry-overs first. Everything else is gravy."
+  ]
 }

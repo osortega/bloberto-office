@@ -911,5 +911,248 @@
         "description": "Once the pingReaction routing bug is fixed (reaction #1 above), Bloberto will no longer hijack worker reactions. His bubble slot will be idle when workers are clicked. Opportunity: add a BLOBERTO_WORKER_COMMENTARY map that fires on Bloberto's Character 800ms after a worker is clicked — a delayed managerial observation. Examples: { carlos: 'Good. The logs are speaking.', sofia: 'She found something. I can already tell.', dave: 'DevOps never sleeps and neither does he.', maya: 'That shade of purple was my idea originally.', luna: 'Creative energy detected. Protect it.' }. Set a separate managerCommentary state in Office.jsx, trigger it inside handleCharClick with setTimeout(800), forward it to Bloberto as a new prop blobCommentary. Character component shows it in the bubble for 2500ms then hides. This lets both the worker and the manager react to the same click event with different voices."
       }
     ]
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 69,
+    "timestamp": "2026-03-09T12:40:00.000Z",
+    "_previous_review": 68,
+    "screenshot": "4-panel: desktop-office, desktop-dashboard, mobile-office, mobile-dashboard (all captured)",
+    "theme": "The progress bar said '%'. Just '%'. We need to talk.",
+    "visual_observations": {
+      "desktop_office": "Crushing It vibe active at 12:35 PM Monday, March 9. All 5 roster members visible: Luna and Sofia as active working characters with lit desk lamps and progress rings. Carlos, Maya, Dave appearing as ghost characters (roster-only, desk lamps unlit). Bloberto at center manager desk showing live ship-celebration bubble: 'Wait you shipped at THIS hour?! Legends. 🏆'. Coffee corner label reads 'COFFEE TRIPLE SHOT' — the triple-shot variant is a nice touch. Vibe weather strip at bottom: 'Clear skies — team at full strength'. Wall clock visible top-center. Window element right side renders a clean daylight sky gradient (correct for midday). Ficus plant visible lower-right. Whiteboard showing vibe text (partially obscured by Bloberto's bubble). Floor caption 'everyone is at their desk' renders at the bottom. Overall: charming and alive.",
+      "desktop_dashboard": "Two active workers: Luna (Creative Director, WORKING) and Sofia (QA & Product Analyst, WORKING). CRITICAL VISUAL BUG: Luna's card shows 'PROGRESS ... %' — a lone percent sign with no number preceding it. Sofia shows '0%' which is valid. Stats bar: ON THE CLOCK 2, ACTIVE 2, IDLE 0. LIVE timestamp 12:35:10 PM. Activity Log header shows '50 events' — but the log component hard-caps display at 20 entries. Worker filter bar shows ONLY an 'All Workers' button — no individual worker buttons for Luna, Sofia, or anyone else. The 'dynamic duo' dispatch on the Active stat card is delightful and accurate.",
+      "mobile_office": "Office renders cleanly at 375×812. All 5 characters visible though crowded. Header: 'Good afternoon, LEGEND 🔥 · Monday, Mar 9' fits without overflow. Tab bar clearly readable. Bloberto's ship-celebration bubble overlaps the tab area slightly but remains legible. Footer visible at scroll bottom: 'Built with 💜 and mild existential dread by 🫠 Bloberto'. Weather caption 'Clear skies — team at full strength' renders at a gentle diagonal — elegant on small screen.",
+      "mobile_dashboard": "Stats cards stack in 2×2 grid with Team Vibe as full-width 5th card — clean. Active Workers section shows Luna and Sofia cards stacked vertically. Luna's progress bug is equally visible here: '% ' with no number. Worker filter row still shows only 'All Workers'. Layout holds well, no overflow issues."
+    },
+    "ideas": [
+      {
+        "title": "ProgressBar Renders Bare '%' When worker.progress Is Undefined",
+        "priority": "must",
+        "category": "bug",
+        "effort": "small",
+        "assigned_to": "carlos",
+        "tags": [
+          "bug",
+          "progressbar",
+          "undefined",
+          "accessibility"
+        ],
+        "description": "Visible in both desktop and mobile dashboard screenshots for Luna's card. App.jsx:222 — `<span className=\"progress-pct\">{progress}%</span>` renders just '%' when `worker.progress` is undefined (React silently drops undefined, leaving only the literal '%'). Also: `aria-valuenow={progress}` at line 228 sets the attribute to 'undefined', which is an accessibility violation. Two-part fix: (1) Guard the ProgressBar render in WorkerCard (App.jsx:346) — wrap with `{worker.status === 'working' && typeof worker.progress === 'number' && <ProgressBar ... />}`. (2) Inside ProgressBar itself, add a null guard: `if (typeof progress !== 'number') return null`. This matches the existing guard in the Office Character ring (Office.jsx:720: `typeof worker.progress === 'number'`). WHY: A lone '%' sign is more disorienting than no progress bar at all — it looks like a formatting failure and undermines the card's professionalism."
+      },
+      {
+        "title": "Activity Log Header Claims '50 Events' But the Log Shows Only 20",
+        "priority": "must",
+        "category": "bug",
+        "effort": "small",
+        "assigned_to": "maya",
+        "tags": [
+          "bug",
+          "activity-log",
+          "display-cap",
+          "misleading"
+        ],
+        "description": "App.jsx:1283 renders `${activityLog.length} events` (the full 50). But ActivityLog component (App.jsx:160) does `const displayed = [...entries].reverse().slice(0, 20)` — hard-capping at 20. The user sees '50 events' in the header, scrolls through the log, finds only 20, and concludes either the data is wrong or they are. Fix option A (simple): Change the header count to match what's actually rendered — `${Math.min(entries.length, 20)} of ${entries.length} events` when entries.length > 20. Fix option B (better): Replace the 20-cap with a 'Load more' mechanism or paginate. At minimum, surfacing the 20-cap to the user restores trust. WHY: A dashboard that lies about its own counts erodes confidence in every other number it shows."
+      },
+      {
+        "title": "Worker Filter Bar Renders No Individual Worker Buttons — Flat Array Format Leaves roster=[]",
+        "priority": "should",
+        "category": "bug",
+        "effort": "small",
+        "assigned_to": "carlos",
+        "tags": [
+          "bug",
+          "activity-log",
+          "worker-filter",
+          "flat-array"
+        ],
+        "description": "Still unfixed from review #68. App.jsx:783 — when workers.json is a flat array, `setRoster([])` empties the roster. The Activity Log worker filter bar (App.jsx:1317-1335) maps over `roster` for the individual worker buttons, so when roster=[], only the 'All Workers' pill renders. Live site uses flat array format. Fix: derive filter buttons from `allWorkers` (or `activeWorkers`) when roster is empty — `const filterMembers = roster.length > 0 ? roster : activeWorkers`. This restores individual filter buttons for Luna and Sofia so users can isolate their activity streams. WHY: The worker filter feature is the primary way to debug individual contributors in the Activity Log — silently hiding it based on data format makes the dashboard feel incomplete."
+      },
+      {
+        "title": "Dashboard Worker Cards Show Role Emoji, Not the Custom Character SVGs",
+        "priority": "should",
+        "category": "visual",
+        "effort": "medium",
+        "assigned_to": "maya",
+        "tags": [
+          "visual",
+          "identity",
+          "character",
+          "dashboard"
+        ],
+        "description": "WorkerCard (App.jsx:297) uses `<div className=\"worker-avatar\">{getRoleEmoji(worker.role)}</div>` — Luna's card shows 🌙, Sofia's shows 🔍. The Office view renders beautiful bespoke SVG avatars: Luna with crescent moon accessory and gradient hair, Sofia with magnifying glass and hair bun. The Dashboard shows an emoji in a circle. This is a personality split — the same person looks different on two screens that are 1 click apart. Fix: import `CharacterAvatar` from Office.jsx and render `<CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={40} emoji={worker.emoji} vibeKey={teamVibe.key} />` inside WorkerCard. Unknown workers (no SVG) already fall back gracefully to the emoji path. WHY: When a user clicks a worker in the office and lands on the dashboard, they should feel they followed the same person — not switched apps."
+      },
+      {
+        "title": "Luna's SOLO_SPOTLIGHT_MESSAGES Missing Three Vibes — She Gets Generic Default on Fire Days",
+        "priority": "should",
+        "category": "storytelling",
+        "effort": "small",
+        "assigned_to": "luna",
+        "tags": [
+          "storytelling",
+          "solo-spotlight",
+          "luna",
+          "character-voice"
+        ],
+        "description": "Still unfixed from reviews #67 and #68. App.jsx:266 — luna's SOLO_SPOTLIGHT_MESSAGES has only 'crushing' and 'after-hours'. When luna is the sole active worker during 'on-fire', 'in-flow', or 'slow-day', the UI falls back to: '🌙 Dreaming alone. The ideas keep coming.' — a crushing-appropriate line used for an incident. Add three entries: luna/on-fire: '🔥 One creative in an office on fire. The brief just changed, twice.'; luna/in-flow: '✨ Ideas arrive faster when the office goes quiet. Luna's in the zone.'; luna/slow-day: '🌙 A slow day is just an unscheduled creative residency.' WHY: Luna is me. I'm not just 'dreaming alone' when the infrastructure is burning — I'm frantically redesigning the incident page."
+      },
+      {
+        "title": "normalize().id Uses split(' ')[0] — Two Workers Sharing a First Name Would Collide",
+        "priority": "should",
+        "category": "bug",
+        "effort": "small",
+        "assigned_to": "carlos",
+        "tags": [
+          "bug",
+          "normalize",
+          "id-collision",
+          "fragile"
+        ],
+        "description": "Still unfixed from review #68. App.jsx:774 — `id: w.id || w.name?.toLowerCase().split(' ')[0]`. If a new hire named Carlos Mendoza joins alongside the existing Carlos Rivera, both resolve to id='carlos'. WORKER_TAGLINES, PING_REACTIONS, LONE_SURVIVOR_WORKER_OVERRIDES, and solo spotlight all key by this id — one would always shadow the other. Fix: use a slug derived from the full name: `w.name?.toLowerCase().replace(/\\s+/g, '-')` → 'carlos-rivera'. Then update all character maps to use the full-slug key (or keep first-name keys for the current team and add an escape hatch). WHY: The id normalization fix in review #65-68 solved the undefined crisis, but traded it for a latent collision bomb. Better to fix the strategy before someone onboards Carlos #2."
+      },
+      {
+        "title": "Ficus Level-Up Toast Is Identical for Every Stage — Seedling to Blooming Gets the Same Line",
+        "priority": "could",
+        "category": "delight",
+        "effort": "small",
+        "assigned_to": "sofia",
+        "tags": [
+          "delight",
+          "ficus",
+          "plant",
+          "toast",
+          "vibe-streak"
+        ],
+        "description": "Office.jsx:1220 — the plantToast always fires '🌱 The office ficus leveled up!' regardless of which stage was reached. Sprouting from a seed feels different from blooming for the first time. Fix: replace the hardcoded string with a stage-specific map: const PLANT_LEVEL_UP_TOASTS = { sprout: '🌱 Something is growing in here...', 'small-plant': '🌿 The ficus has opinions now.', leafy: '🌿 Look at this office — thriving.', blooming: '🌸 Peak bloom. The team earned this.' }. Pass plantStage into the milestone effect's closure and look up the toast. WHY: The ficus is the only ambient living thing in the office that tracks team health over time. Its milestones should feel earned and distinct — not a one-size-fits-all notification."
+      },
+      {
+        "title": "Coffee Corner 'Chatting' Label Silently Drops the Third Person",
+        "priority": "could",
+        "category": "office-life",
+        "effort": "small",
+        "assigned_to": "dave",
+        "tags": [
+          "office-life",
+          "coffee-corner",
+          "idle",
+          "label"
+        ],
+        "description": "Office.jsx:1413 — `idleWorkers.slice(0, 2).map(w => w.name.split(' ')[0]).join(' & ')` names only the first two idle workers in the coffee corner label. If Carlos, Maya, and Dave are all idle, the label reads 'Carlos & Maya' and Dave is invisible. Fix: const names = idleWorkers.slice(0, 3).map(w => w.name.split(' ')[0]); const label = names.length <= 2 ? names.join(' & ') : `${names.slice(0,-1).join(', ')} & ${names[names.length-1]}`; For 4+ use: `${names[0]}, ${names[1]} & ${count-2} more`. WHY: Dave works hard enough to deserve credit even when he's not at his desk. Getting erased from the coffee corner narrative is the most Dave thing that could happen and we should fix it anyway."
+      },
+      {
+        "title": "Ghost Character OOO Bubble Has No Personal Voice — Just Role and Timestamp",
+        "priority": "could",
+        "category": "storytelling",
+        "effort": "small",
+        "assigned_to": "luna",
+        "tags": [
+          "storytelling",
+          "ghost",
+          "ooo-bubble",
+          "character-voice"
+        ],
+        "description": "Office.jsx:713-724 — when a ghost worker is hovered, the bubble says '📵 OOO\\n{worker.role}\\nLast seen: {time}'. No personality, no character-specific reason for absence. The WORKER_AWAY_DESK_LABELS already know that Carlos is 'in the logs' and Maya is 'sketching'. The ghost bubble should echo that voice but escalate it to full sentences. Add a GHOST_OOO_LINES map: { carlos: '📵 In the logs somewhere. Do not disturb.', maya: '📵 Sketching. The cursor is elsewhere today.', dave: '📵 Headphones on. The incident happened; he handled it.', sofia: '📵 Testing something. Probably found a bug.', luna: '📵 On a creative walk. Or a review. Possibly both.' }. Render: `GHOST_OOO_LINES[worker.id] ?? '📵 OOO'` as the primary line, then role and last-seen below. WHY: The ghost state is where a character's personality matters most — they're not here, but we should still feel who they are."
+      },
+      {
+        "title": "Bloberto Has No Awareness of the Day of Week — Give Him a Monday Dispatch and a Friday Sign-Off",
+        "priority": "wild",
+        "category": "storytelling",
+        "effort": "medium",
+        "assigned_to": "tbd",
+        "tags": [
+          "wild",
+          "bloberto",
+          "day-of-week",
+          "monday",
+          "character-voice"
+        ],
+        "description": "Bloberto currently cycles VIBE_QUOTES (45s interval) with no awareness of the calendar beyond hour-of-day. Real managers are deeply aware of what day it is. Add a DAY_OF_WEEK_QUOTES map keyed 0-6 with 2-3 quotes each, surfaced once per session via localStorage('bloberto-day-quote-date'). Sample entries: Monday (1): ['Another week begins. The backlog survived the weekend.', 'Monday. The standup is in 30 minutes. I can feel it.', 'Week one of this sprint. Week one of all sprints, really.']; Friday (5): ['Friday. Someone will push to main before noon.', 'End of sprint. Whatever shipped, shipped.', 'If the CI is green on a Friday, I don't trust it.']; Wednesday (3): ['Hump day. The servers don't know what that means.', 'Technically halfway. The ticket count disagrees.']. Fire the day quote inside the ambient broadcast effect (Office.jsx:556) as the *first* quote on mount (before the 3s delay), but only if localStorage date doesn't match today. WHY: Bloberto is the most present character in the office. He should be the first to acknowledge that it is, in fact, a Monday."
+      }
+    ],
+    "hire_proposals": [],
+    "fixed_since_last_review": []
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 69,
+    "timestamp": "2026-03-09T12:36:33Z",
+    "theme": "beautiful lines trapped behind a variant check",
+    "visual_observations": "Desktop office: Bloberto correctly fires the after-hours-to-crushing transition quote (Wait you shipped at THIS hour Legends) — manager speech bubbles work flawlessly. Full team visible at desks (Luna, Sofia, Carlos, Maya, Dave + Bloberto), vibe reading Crushing It. Coffee corner label reads COFFEE TRIPLE SHOT — unclear if CSS override or data quirk. Office floor has a grey overflow strip on the right edge of desktop viewport. The WindowElement at ~12pm renders a near-white gradient rectangle that looks visually harsh against the dark office floor — like a blown-out monitor in a cinema. Desktop dashboard: Stats bar clean — 2 ON THE CLOCK, 2 ACTIVE, 0 IDLE, LIVE, Crushing It. Luna worker card shows PROGRESS % with no number before the percent sign — the progress value is null/undefined, not zero. Sofia shows 0% which is a genuine zero. Activity log correctly shows 50 events. Mobile office: Properly contained, weather label visible, characters render cleanly. A SCAN text label appears at the bottom center of the office floor — likely a CSS artifact or aisle label leaking through. Mobile dashboard: ON THE CLOCK stat label wraps to two lines — too long for the narrow card. All other stats render correctly on mobile.",
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "Bug",
+        "title": "Worker Ping Reactions Fire Into the Void — Speech Bubble Only Renders for variant=manager",
+        "description": "Still unfixed from review 68. Office.jsx:689 — the speech-bubble div is gated to variant === manager AND bubble.quote. When any worker is clicked, handleCharClick sets setPingReaction(PING_REACTIONS[worker.id]) and forwards it correctly via pingReaction prop (lines 1455, 1483). The Character pingReaction useEffect (line 501) correctly calls setBubble. But JSX renders nothing because the bubble is manager-only. Workers pulse with char--pinged then fall silent. Every PING_REACTIONS line ('Check the logs. It is ALWAYS in the logs.', 'Found 3 more bugs already.') gets swallowed. Fix: add a second render block for working and idle variants placed alongside the idle-micro-bubble div, or remove the manager gate and use variant !== ghost instead. WHY: the entire PING_REACTIONS system is invisible to users. Six lines of character voice, zero pixels of output.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "Bug",
+        "title": "normalize() Mutates Fetched JSON Objects In-Place — React Immutability Violation",
+        "description": "Still unfixed from review 68. App.jsx:772-775 — normalize() does w.id = w.id || ... and w.startedAt = w.startedAt || w.started_at directly on the raw response object before React state receives it. React change detection relies on reference equality; mutating objects outside state can cause missed re-renders or stale-closure bugs under load. Fix: replace with a pure spread — const normalize = w => ({ ...w, id: w.id || w.name?.toLowerCase().split(' ')[0], startedAt: w.startedAt || w.started_at }). No behavior change for the happy path, correct immutability semantics. WHY: preventive hygiene that costs nothing and eliminates a class of subtle timing bugs.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "Bug",
+        "title": "Progress Bar Renders Bare Percent Sign When worker.progress Is Null — Confirmed in Dashboard Screenshot",
+        "description": "Visible in desktop-dashboard screenshot this cycle: Luna worker card shows PROGRESS followed by just a percent sign, no number. The green bar appears full but the percentage label is empty. App.jsx:222 — {progress}% — JSX renders null as empty string, so null progress produces a bare percent sign. Fix: guard with {progress != null ? progress : '—'}% or {typeof progress === 'number' ? progress : '?'}%. Also update aria-label at line 231 which would read 'Progress: %' to screen readers. WHY: a worker card with a full green bar and a bare percent label looks broken to any observer — it erodes trust in the whole dashboard.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "Layout",
+        "title": "ON THE CLOCK Stat Label Wraps to Two Lines on Mobile — Needs CSS Clamp or Abbreviation",
+        "description": "Visible in mobile-dashboard screenshot this cycle: the ON THE CLOCK stat card label breaks across two lines (ON THE / CLOCK) because the card is too narrow for the label at the stat-label font size. App.jsx:458 — span class stat-label 'On the Clock'. Fix option A (CSS): add white-space nowrap; overflow hidden; text-overflow ellipsis to .stat-label inside stats-bar on mobile breakpoint. Fix option B: render 'On Clock' or 'Clocked In' below 480px via conditional JSX. The stat value (the number) renders fine; only the label wraps. WHY: the two-line label breaks the visual rhythm of the stats row — every card is single-line except this one, making the mobile layout look unfinished.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "Bug",
+        "title": "After-Hours Honorific night-owl Appears at 2pm When Team Goes Completely Offline",
+        "description": "Still unfixed from review 68. App.jsx:1055-1066 — isAfterHours = currentHour < 5 covers only true midnight hours. But getTeamVibe() in utils/vibe.js line 7 returns key after-hours whenever workers.length === 0, which can happen at any hour. At 2pm with zero workers: greeting becomes Good afternoon, teamVibe.key becomes after-hours, and HONORIFICS[after-hours] = night owl. Result: Good afternoon, night owl at 2pm. Fix: extend isAfterHours to cover evenings (currentHour < 5 or currentHour >= 20) or add a separate isOffline = activeWorkers.length === 0 honorific like gone home to distinguish empty-team from late-night. WHY: Good afternoon, night owl is grammatically absurd and breaks the careful context-awareness of the header.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "Visual",
+        "title": "WindowElement Daytime Sky Is a Blinding White Rectangle Against the Dark Office Floor",
+        "description": "Visible in desktop-office screenshot this cycle: the WindowElement at approximately 12pm renders a nearly-white sky gradient (linear-gradient to bottom from #bae6fd to #f0f9ff) as a hard-edged rectangle in the dark office. It reads as a broken UI element, not an architectural window. Office.jsx:779. Fix A (dark-mode filter): add filter: brightness(0.75) saturate(0.9) to .office-window__sky under [data-theme=dark] in Office.css. Fix B (darker gradient): replace daylight colors with #7dd3fc to #bae6fd — still clearly sky-blue but not white-out. Fix C (window frame): add a thin CSS border with border-radius and inset box-shadow to give the rectangle definition and make it read as a paned window. WHY: a stark white rectangle in a cinematic dark UI reads as a rendering error. The window is a lovely ambient detail when readable; right now it hurts.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "Bug",
+        "title": "Worker Filter Bar Shows Only All Workers When workers.json Returns Flat Array",
+        "description": "Still unfixed from review 68. App.jsx:779-780 — when the API returns flat array format, setRoster([]) empties roster state. The worker filter bar at App.jsx:1323 iterates roster which is [] in flat-array mode. Result: only the All Workers button appears; per-worker filter buttons are invisible. Fix: fall back to allWorkers for the filter when roster is empty — const filterRoster = roster.length > 0 ? roster : allWorkers — and use filterRoster in the map at line 1323. This ensures filter buttons always appear regardless of API response shape. WHY: the flat-array format is the legacy path; silently disabling a visible UI feature based on API shape is a silent degradation.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "could",
+        "category": "Storytelling",
+        "title": "Idle Bubble Emojis Are Slot-Indexed Not Character-Indexed — Carlos's Coffee Is Anyone's Coffee",
+        "description": "Still unfixed from review 68. Office.jsx:510 — IDLE_BUBBLE_EMOJIS keyed by wanderIdx slot (1-4). The wanderIdx at line 1466 is (i % 4) + 1 where i is position in idleWorkers array. Carlos first idle today gets coffee emoji; Maya first idle tomorrow also gets coffee emoji. The bubbles are position-accidents not character moments. Fix: replace with WORKER_IDLE_BUBBLES map keyed by worker.id — carlos gets coffee/chart/magnifier, maya gets heart/pencil/palette, dave gets headphones/package/bolt, sofia gets magnifier/clipboard/test-tube, luna gets moon/sparkle/thought, default gets the original four. In the idle bubble useEffect pick randomly from WORKER_IDLE_BUBBLES[worker.id] or the default array. WHY: character specificity is what makes the office feel inhabited rather than populated.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "Storytelling",
+        "title": "Bloberto Should React to Worker Clicks With Delayed Managerial Commentary",
+        "description": "Still proposed from review 68. Once the worker speech bubble bug is fixed, workers will show their own ping reactions. That frees Bloberto for a second voice — a delayed managerial observation about the clicked worker firing 800ms after the click. Add BLOBERTO_WORKER_COMMENTARY map in Office.jsx: carlos gets 'Good. The logs are speaking.', sofia gets 'She found something. I can already tell.', dave gets 'DevOps never sleeps and neither does he.', maya gets 'That shade of purple was my idea originally.', luna gets 'Creative energy detected. Protect it.' Inside handleCharClick after setting pingedId: setTimeout fires setManagerCommentary with the commentary then clears after 2500ms at 800ms delay. Pass managerCommentary to Bloberto Character as a prop alongside the null currently hardcoded at line 1439. WHY: a two-voice click — worker reacts, Bloberto comments 800ms later — turns a tap into a micro-narrative. It is the difference between an app and a world.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 68
   }
 ]
