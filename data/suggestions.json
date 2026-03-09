@@ -1,24 +1,21 @@
 {
   "analyst": "Sofia",
-  "review_number": 32,
-  "timestamp": "2026-03-09T01:45:00Z",
-  "screenshot_status": "SUCCESS — desktop 1280x800 and mobile 375x812 captured via Puppeteer (single-process mode). Screenshots saved to /workspace/screenshot-desktop.png and /workspace/screenshot-mobile.png.",
+  "review_number": 33,
+  "timestamp": "2026-03-09T02:46:03Z",
+  "screenshot_status": "SUCCESS — desktop 1280x800 and mobile 375x812 captured via Puppeteer single-process mode after two initial failures (protocol timeout + pthread resource exhaustion on first two attempts). Both screenshots saved. Vibe at capture time: Crushing It, Monday Mar 9. All 5 workers visible on both viewports.",
   "visual_observations": {
-    "desktop": "Clean, polished dark theme. Bloberto in center top manager desk with CVO badge. Maya/Dave/Sofia top row, Maya/Carlos/Dave bottom row. Coffee corner, midnight clock, standup label, and vibe shockwave animation all rendering. Shortcuts hint visible bottom-right. No layout breaks detected at 1280px.",
-    "mobile": "Worker names (MAYA, DAVE, SOFIA) are NOW VISIBLE — the mobile fix worked. Header is single-column and readable. Office floor scales down reasonably. Tab navigation remains accessible. Stats bar not visible in 812px viewport (likely below tab area, only visible on scroll). Puppeteer shows shortcuts toast because it uses a mouse pointer — real touch devices correctly hide it via pointer: coarse media query.",
-    "regressions_vs_31": "None detected. Six high-priority bugs from #31 were fixed. Office.jsx grew by 30 lines (1,483 → 1,513). Duplicate @media (max-width: 480px) blocks increased from 2 to 3."
+    "desktop": "Dark theme intact, all 5 workers visible at desks. Bloberto at manager desk with CVO badge. REGRESSION FOUND: Bloberto's ambient speech bubble ('hour?! Legends. 🏆') is visibly CLIPPED at the top edge — only the lower two-thirds of the bubble are readable. The bubble uses `bottom: calc(100% + 8px)` which places it above the character, but Bloberto sits at top=4% inside an office-floor that has overflow:hidden, so the top of the bubble is guillotined. Ambient particles (7 pale dots) are rendering and drifting — subtle, not distracting. COFFEE TRIPLE SHOT badge in coffee corner. MIDNIGHT time caption on clock. Vibe weather ☀️ icon visible in header. Conference table lower-left, vacant job card partially visible at a desk.",
+    "mobile": "All 5 workers visible with names below avatars (mobile fix still holding). Header shows vibe pill and weather icon correctly. Office floor scales down cleanly. Shortcuts bar wraps to three lines at 375px — very tight, borderline unusable on real small devices. Ambient particles visible as faint dots. Ficus rendering in lower-right area. Conference table present. Clock time caption not visible at mobile scale, expected.",
+    "regressions_vs_32": "ONE NEW REGRESSION: Bloberto speech bubble clipped by office-floor overflow:hidden on desktop. This is a direct consequence of Bloberto being positioned at top={4} (Office.jsx line 1401) with the speech bubble extending above him — that top 4% gap is not enough headroom. Mobile shortcuts bar line-wrap is cosmetically unpleasant but functional."
   },
   "fix_verification": {
-    "inter_font": "FIXED ✅ — index.html line 8 now has <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>. After 4+ reviews this is finally done.",
-    "mobile_worker_names": "FIXED ✅ — All three @media (max-width: 480px) blocks in Office.css now set .char__name { display: block }. Dead font-size-on-hidden-element bug also cleaned up. Names visible in mobile screenshot.",
-    "stats_bar_overflow": "FIXED ✅ — App.css line 118 now uses grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)). Handles any number of conditional cards gracefully.",
-    "stuck_card_keyboard": "PARTIALLY FIXED ⚠️ — App.jsx now has tabIndex={0}, role='button', and onKeyDown for Enter/Space (lines 459-467). However, the element still has NO aria-label. Inner text reads '⚠️ Stuck' and worker info — screen readers will announce the emoji literally. Good enough for keyboard nav; aria-label still missing for clarity.",
-    "task_tag_focus_visible": "FIXED ✅ — App.css line 920 now has .task-tag:focus-visible rule. Keyboard focus is now visible on filter chips.",
-    "ping_aria_live": "FIXED ✅ — Office.jsx line 1162 now has <span className='sr-only' aria-live='polite' aria-atomic='true'>{pingReaction ?? ''}</span>. Screen readers will announce ping reactions. Dave gets credit.",
-    "settimeout_leak_ping": "NOT FIXED ❌ — Office.jsx line 1093: setTimeout(() => setPingReaction(null), 3000) is still raw, not stored in a ref, and has no cleanup. The pingTimerRef at line 1081 only cleans up pingedId, NOT pingReaction. Unmount during the 3s window = state update on dead component."
+    "settimeout_leak_ping": "PARTIALLY FIXED ⚠️ — pingReactionTimerRef was added (Office.jsx line 1082) and handleCharClick now stores the ID in it (line 1095) and clears it before setting a new one (line 1094). The vibe useEffect cleanup at line 1139 also clears it: `() => { clearTimeout(t); clearTimeout(pingReactionTimerRef.current); }`. HOWEVER: that cleanup is inside the block guarded by the isFirstVibe.current early-return (line 1129). On initial mount, the vibe effect returns early with undefined — no cleanup is registered. If the component then unmounts with vibe never having changed (e.g., data never loads), pingReactionTimerRef.current fires on a dead component. Edge case, but the original bug report covered exactly this scenario. Needs a dedicated useEffect(() => () => clearTimeout(pingReactionTimerRef.current), []) to be truly safe.",
+    "vibe_weather_labels_key": "FIXED ✅ — VIBE_WEATHER_LABELS (Office.jsx line 109) now correctly uses 'crushing' as the key, matching getTeamVibeKey() output. The vibe weather tooltip and aria-label will now properly show '☀️ Clear skies — team at full strength' instead of silently falling back to the bare vibe key string. About time.",
+    "ghost_char_focusable": "NOT FIXED ❌ — Office.jsx line 644: tabIndex={0} is still unconditional on the Character wrapper. Ghost-variant characters still render with tabIndex={0}, no role, and no aria-label. Keyboard users tab into mute, unlabeled elements that do nothing on activation.",
+    "stuck_card_aria_label": "NOT FIXED ❌ — App.jsx lines 458-481: stat-card--stuck still has no aria-label. The element has role='button' and tabIndex={0} (good from #32) but the inner text is '⚠️ Stuck' which most screen readers will announce as 'warning sign Stuck'. Worker name is inside a span with no aria labeling context."
   },
   "scores": {
-    "visual": 4,
+    "visual": 3,
     "ux": 3,
     "responsiveness": 4,
     "performance": 3,
@@ -27,112 +24,112 @@
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.5,
-  "score_notes": "Responsiveness and accessibility both bumped from #31 thanks to the six-fix sweep. Code quality stays at 2 — Office.jsx is now 1,513 lines (grew again), three fragmented 480px media query blocks, duplicate CSS still present. Performance docked for constants inside render, multiple uncleaned setTimeouts, and a 1500-line single-file component that will never be fast to parse.",
+  "overall_score": 3.4,
+  "score_notes": "Visual drops from 4 to 3 — a new regression where Bloberto's speech bubble is clipped is hard to ignore. The boss literally cannot speak. UX holds at 3 with two medium a11y carry-overs still open. Code quality stays at 2: Office.jsx grew by 2 lines to 1515, FULL_IDLE_MESSAGES/IDLE_BUBBLE_EMOJIS/ERROR_BUBBLE_MESSAGES are still allocated inside component render bodies, and the three fragmented @media 480px blocks and duplicate unquoted CSS selectors remain. The VIBE_WEATHER_LABELS fix is appreciated — that was embarrassingly overdue. Fun factor is a hard 5: COFFEE TRIPLE SHOT is inspired.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "Bug / Memory Leak",
-      "title": "[5+ REVIEWS] setPingReaction setTimeout not stored in ref — will fire on unmounted tree",
-      "description": "Office.jsx line 1093: `setTimeout(() => setPingReaction(null), 3000)` is a raw timer with no ref, no cleanup, and no cancellation. The existing pingTimerRef only tracks the 700ms pingedId timer. If Office unmounts while this 3-second timer is live, React will attempt to call setPingReaction on a dead component. Fix: add a `pingReactionTimerRef = useRef(null)` (or reuse pingTimerRef and extend its cleanup), store the timer ID, clear it at the top of handleCharClick, and clear it in a useEffect cleanup returning `() => clearTimeout(pingReactionTimerRef.current)`.",
+      "category": "Bug / Visual Regression",
+      "title": "NEW: Bloberto speech bubble clipped by office-floor overflow:hidden",
+      "description": "Office.jsx line 1401 places Bloberto at top={4} inside the office-floor which has overflow:hidden (Office.css line 84). The .speech-bubble is positioned at `bottom: calc(100% + 8px)` above the character, putting its top edge at roughly -1% of the container — it gets sliced off. In the live desktop screenshot only the lower portion of the speech bubble text is visible. Fix options: (1) Increase Bloberto's top offset from 4 to at least 12 (simple, one-character change), or (2) add a CSS exception `.char--manager .speech-bubble { bottom: auto; top: calc(100% + 8px); }` to flip the bubble below Bloberto when he's near the top edge. Option 1 is simpler but may affect layout. Option 2 is surgical and safe.",
       "effort": "trivial",
-      "assign_to": "Carlos"
+      "assign_to": "Maya"
     },
     {
-      "priority": "medium",
-      "category": "Bug / Data",
-      "title": "[2 REVIEWS] VIBE_WEATHER_LABELS uses key 'crushing-it' but vibe.js returns 'crushing'",
-      "description": "Office.jsx line 109: VIBE_WEATHER_LABELS['crushing-it'] = '☀️ Clear skies — team at full strength'. But getTeamVibeKey() in vibe.js returns 'crushing' (not 'crushing-it'). So VIBE_WEATHER_LABELS[vibe] at lines 1483-1484 always returns undefined for the most common vibe, and both the title attribute and aria-label on .vibe-weather fall back to the bare string 'crushing'. Fix is one character: change the key from 'crushing-it' to 'crushing'. This is also present in VIBE_WEATHER_ICONS at line 117 which already correctly uses 'crushing' — the inconsistency is only in VIBE_WEATHER_LABELS.",
+      "priority": "high",
+      "category": "Bug / Memory Leak",
+      "title": "[6+ REVIEWS] setPingReaction setTimeout still leaks on vibe-stable unmount",
+      "description": "Office.jsx line 1082: pingReactionTimerRef now exists and is used correctly in handleCharClick (progress!). The vibe useEffect cleanup at line 1139 clears it on vibe changes and on unmount — IF the vibe ever changed. The critical gap: on initial mount, the vibe useEffect hits the isFirstVibe.current early-return (line 1129) and registers NO cleanup function (returns undefined). If the component mounts, a user pings someone (setting pingReactionTimerRef.current), and then Office unmounts before any vibe change occurs, the 3-second timer fires on the dead component. Fix requires adding one useEffect: `useEffect(() => () => clearTimeout(pingReactionTimerRef.current), [])` directly after pingReactionTimerRef is declared. Four lines. This has been open for 6+ reviews.",
       "effort": "trivial",
       "assign_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "Accessibility",
-      "title": "Ghost (OOO) Character is focusable with no role or aria-label",
-      "description": "The Character component always renders with tabIndex={0} (Office.jsx line 644). Ghost variant characters (roster members who are OOO) are rendered without an onClick handler, so they get no role='button', no aria-label, and no tooltip (extraProps skipped for ghost variant at line 623). Result: keyboard users tab into an unlabeled interactive-looking element that does nothing meaningful. Fix: either add tabIndex={-1} when !handleClick AND variant==='ghost', or add an explicit aria-label like `{worker.name} — out of office` when variant==='ghost'. The ghost-ooo-bubble already has the right content; expose it to a11y.",
+      "title": "[3 REVIEWS] Ghost (OOO) character is focusable with no role or aria-label",
+      "description": "Office.jsx line 644: tabIndex={0} is applied unconditionally to every Character wrapper. Ghost-variant characters have no onClick handler, so they also have no role='button' and no aria-label. Keyboard users tab onto a silent, unidentifiable element. The ghost-ooo-bubble content (worker name, role, last-seen) is never surfaced to AT. Fix: when variant === 'ghost', either apply tabIndex={-1} to remove it from tab order, or add aria-label={`${worker.name} — out of office, ${worker.role}`} so it's at least identifiable. The ghost-ooo-bubble already has the right content; it just needs to be wired up to aria.",
       "effort": "small",
       "assign_to": "Dave"
     },
     {
       "priority": "medium",
       "category": "Accessibility",
-      "title": "stat-card--stuck missing aria-label — emoji read literally by screen readers",
-      "description": "App.jsx lines 452-476: the stuck card now has tabIndex={0}, role='button', and onKeyDown (good work Dave). But there's no aria-label. The inner text is '⚠️ Stuck' + worker name. Most screen readers will announce the warning emoji literally as 'warning sign' or 'exclamation'. Add aria-label={`Stuck worker: ${stuckWorkers.length === 1 ? stuckWorkers[0].name : `${stuckWorkers.length} workers stuck`}. Click to scroll to card.`} so the announcement is unambiguous.",
+      "title": "[3 REVIEWS] stat-card--stuck missing aria-label — emoji read literally",
+      "description": "App.jsx lines 458-481: the stuck worker card now has role='button' and onKeyDown (from review #31 fixes), but still no aria-label. A screen reader announces '⚠️ Stuck' — most ATs will say 'warning sign Stuck' followed by the worker info. Add aria-label={`Stuck: ${stuckWorkers.length === 1 ? `${stuckWorkers[0].name}, click to scroll to card` : `${stuckWorkers.length} workers stuck, click to scroll to first`}`}. This is a one-liner that unblocks full keyboard + screen reader accessibility for this card. It has been open for 3 reviews.",
       "effort": "trivial",
       "assign_to": "Dave"
     },
     {
       "priority": "medium",
       "category": "Bug / Layout",
-      "title": "[2 REVIEWS] char-hover-card overflows viewport on rightmost desk characters",
-      "description": "Office.css line 1209: .char-hover-card uses position: absolute; left: 50%; transform: translateX(-50%); bottom: 110%. Characters on the right side of the office (Sofia at ~left:57%) will have the hover card extend past the right edge of the office-floor container and get clipped. Fix: add a CSS custom property or use CSS @clamp / contain logic. Simplest fix: add .char--rightmost .char-hover-card { left: auto; right: 0; transform: none; } or apply data-side='right' to rightmost desk characters and add an overriding rule.",
+      "title": "[3 REVIEWS] char-hover-card overflows viewport on rightmost desk characters",
+      "description": "Office.css: .char-hover-card uses `position: absolute; left: 50%; transform: translateX(-50%); bottom: 110%`. Characters assigned to the rightmost desks (Sofia at ~57% left, Carlos at ~66%) will have their hover cards extend past the right edge of the office-floor container. The card will be clipped by overflow:hidden on the container. Fix: add `.char--rightmost .char-hover-card { left: auto; right: 0; transform: none; }` or pass a data-side='right' attribute to Characters at DESKS with left > 50%, then target `.char[data-side='right'] .char-hover-card` in CSS. Code change affects Office.jsx desk-character rendering and one CSS rule.",
       "effort": "small",
       "assign_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "Code Quality",
-      "title": "[2 REVIEWS] Duplicate .office-floor[data-vibe=...] CSS rules in Office.css",
-      "description": "Office.css lines 91-95 declare .office-floor[data-vibe='crushing'] etc. WITHOUT quotes. Lines 97-114 declare the same selectors WITH quotes, adding --grid-line custom properties. The quoted set (97-114) is the complete one; the unquoted set (91-95) is dead weight that will never match modern CSS parsers. Delete lines 91-95 entirely. Net: removes 5 duplicate declarations, eliminates specificity ambiguity, and makes it clear the custom properties are always applied.",
+      "title": "[3 REVIEWS] Duplicate unquoted .office-floor[data-vibe=...] rules in Office.css",
+      "description": "Office.css lines 91-95 declare .office-floor[data-vibe=crushing] (unquoted) with only border-color and box-shadow. Lines 97-114 redeclare the exact same selectors WITH quotes, also adding --grid-line custom properties. The unquoted set is functionally redundant and creates specificity noise. Just delete lines 91-95. The quoted rules at 97-114 are the complete, correct set. This has been flagged three reviews running.",
       "effort": "trivial",
       "assign_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "Code Quality / Performance",
-      "title": "[2 REVIEWS] Hoist component-level constants out of render body",
-      "description": "Three objects are recreated on every render:\n• IDLE_BUBBLE_EMOJIS (Office.jsx line 482) inside Character()\n• ERROR_BUBBLE_MESSAGES (line 498) inside Character()\n• FULL_IDLE_MESSAGES (line 1064) inside Office()\nThese are static — they never change. Move them to module scope, above the component function. Zero effort, eliminates unnecessary allocation on every render tick. With a 3-second polling interval and multiple character instances, this adds up.",
+      "title": "[3 REVIEWS] Hoist FULL_IDLE_MESSAGES, IDLE_BUBBLE_EMOJIS, ERROR_BUBBLE_MESSAGES out of render",
+      "description": "Three static objects are still recreated on every render: FULL_IDLE_MESSAGES inside Office() at line 1064, IDLE_BUBBLE_EMOJIS inside Character() at line 482, ERROR_BUBBLE_MESSAGES inside Character() at line 498. None of these depend on props or state. Moving them to module scope above the component functions eliminates allocations on every render cycle. With a 30s polling interval triggering re-renders and multiple Character instances, this is accumulated waste. Three cut-and-paste operations, zero logic changes.",
       "effort": "trivial",
-      "assign_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "Code Quality",
-      "title": "[5+ REVIEWS] Split Office.jsx — now at 1,513 lines and still growing",
-      "description": "Office.jsx is now 1,513 lines (grew 30 lines since review #31). CharacterAvatar, Character, AwaySign, WindowElement, ConferenceTable, VibeShockwave, WallClock, and Office are all in one file. Every PR review of this file requires scrolling through 1500 lines to find the relevant component. Suggested split: src/office/CharacterAvatar.jsx, src/office/Character.jsx, src/office/OfficeFurniture.jsx (Window, Table, Clock), src/office/Office.jsx (main orchestrator, ~300 lines). This is a dev experience debt item — not a bug, but every new bug report will be harder to fix as this grows.",
-      "effort": "medium",
       "assign_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "CSS / Maintainability",
-      "title": "Three fragmented @media (max-width: 480px) blocks in Office.css with duplicate rules",
-      "description": "Office.css now has three separate @media (max-width: 480px) blocks (lines 1133, 2160, 2311). This creates duplicate rule declarations: .office-wrap appears twice, .char__name appears twice, .wb-vibe-text appears THREE times. The block at line 2311 carries a misleading comment '/* === Mobile Office Scale Fix (Luna Review #41) === */' — Luna is a character, not a review, and we're on review 32, not 41. Merge all three blocks into one at the end of Office.css, deduplicate the rules, and delete the nonsense comment.",
+      "title": "[3 REVIEWS] Three fragmented @media (max-width: 480px) blocks with duplicate rules",
+      "description": "Office.css still has three separate @media (max-width: 480px) blocks. Duplicate rule declarations: .office-wrap appears in two, .char__name in two, .wb-vibe-text in three. One block still carries the misleading comment '/* === Mobile Office Scale Fix (Luna Review #41) === */' — Luna is a character not a reviewer, and review #41 hasn't happened yet (we're on #33). Merge all three blocks into one at the end of Office.css, deduplicate rules, delete the nonsense comment. Prevents future devs from wondering why their mobile CSS change has no effect because it's being overridden three blocks later.",
       "effort": "small",
       "assign_to": "Maya"
     },
     {
-      "priority": "low",
-      "category": "Accessibility",
-      "title": "Plant toast uses aria-live but lacks role='status'",
-      "description": "The plant milestone toast (Office.jsx line 1163) uses aria-live='polite' which is correct, but has no role='status'. Adding role='status' provides stronger semantic meaning for AT that prioritize role over aria-live. Also the toast uses inline position/transform styles — it should use a .plant-toast CSS class consistent with the rest of the codebase.",
-      "effort": "trivial",
-      "assign_to": "Dave"
+      "priority": "medium",
+      "category": "Code Quality",
+      "title": "[3 REVIEWS] Office.jsx at 1,515 lines and still growing",
+      "description": "Office.jsx grew by 2 more lines since review #32 (now 1515). CharacterAvatar, Character, AwaySign, WindowElement, ConferenceTable, VibeShockwave, WallClock, and Office are all in one file. The ambient-particles feature was added inline rather than extracted. Suggested split: src/office/CharacterAvatar.jsx, src/office/Character.jsx, src/office/OfficeFurniture.jsx (Window, Table, Clock, VibeShockwave), src/office/Office.jsx (orchestrator, ~300 lines). Every new PR on this file requires loading the entire 1500-line context to find one component. This is not getting better on its own.",
+      "effort": "medium",
+      "assign_to": "Carlos"
     },
     {
       "priority": "low",
-      "category": "Code Quality",
-      "title": "lone-survivor-label uses 7 inline styles — should be a CSS class",
-      "description": "Office.jsx line 1422: the lone-survivor-label element has style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}. That's 7 inline style properties, which can't be overridden by media queries, themes, or reduced-motion rules. Create .lone-survivor-label in Office.css and remove the style prop.",
-      "effort": "trivial",
-      "assign_to": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "Code Quality",
-      "title": "Move VIBE_WEATHER_LABELS and VIBE_WEATHER_ICONS out of Office.jsx into utils/constants.js",
-      "description": "These two lookup objects (Office.jsx lines 108-122) are pure data with no component dependencies. They belong in src/utils/constants.js alongside ROLE_EMOJIS, ROLE_COLORS, etc. This reduces Office.jsx line count and makes the vibe key mapping auditable in one place — where the VIBE_WEATHER_LABELS 'crushing-it' vs 'crushing' bug would have been easier to catch alongside getTeamVibe().",
+      "category": "Performance",
+      "title": "NEW: [...Array(7)] allocated on every render in ambient-particles",
+      "description": "Office.jsx line 1502: `{[...Array(7)].map((_, i) => ...)}` creates a new array on every render. Since the particle count and positions are static, this should either be extracted as a module-level constant `const PARTICLE_COUNT = 7` and rendered with `Array.from({length: PARTICLE_COUNT})`, or better yet, the entire particle JSX array can be memoized with useMemo (no deps) or computed once at module scope. Minor perf item but easy to fix while in the file for other changes.",
       "effort": "trivial",
       "assign_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "Accessibility",
-      "title": "Desk SVG monitor screens lack aria-label for keyboard users inspecting desks",
-      "description": "The inline SVG monitor screens in Office.jsx (DESK_SCREEN_SVG, lines 1322-1329, and the fallback SVG at line 1328) have aria-hidden='true' on the fallback but many DESK_SCREEN_SVG entries have no aria attribute at all. Workers with custom screens (Carlos, Maya, Dave etc.) have purely decorative SVGs that should be aria-hidden='true' to prevent screen reader confusion. Audit DESK_SCREEN_SVG and ensure all entries have aria-hidden='true'.",
+      "title": "Ficus plant has aria-hidden='true' but carries a meaningful title tooltip",
+      "description": "Office.jsx lines 1452-1462: the ficus div has aria-hidden='true' AND title={`Streak: ${vibeStreak} · ${plantStageLabel} ${plantStageEmoji[plantStage]}`}. The aria-hidden prevents AT from discovering the element at all, which also suppresses the title tooltip for screen reader users. The ficus streak is a meaningful data point (it reflects team health over time). Either remove aria-hidden and add a proper aria-label with the streak text, or keep aria-hidden but also expose the streak data in the stats bar or an sr-only element so it's actually discoverable.",
       "effort": "trivial",
       "assign_to": "Dave"
+    },
+    {
+      "priority": "low",
+      "category": "Code Quality",
+      "title": "lone-survivor-label still uses 7 inline styles — create a CSS class",
+      "description": "Office.jsx line 1419: the lone-survivor-label element still carries `style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}`. Seven inline style properties cannot be targeted by media queries, prefers-reduced-motion, or theme overrides. Add .lone-survivor-label to Office.css and remove the style prop. Was flagged in review #32, still not done.",
+      "effort": "trivial",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "Code Quality",
+      "title": "Move VIBE_WEATHER_LABELS and VIBE_WEATHER_ICONS to utils/constants.js",
+      "description": "These two lookup objects (Office.jsx lines 108-121) are pure static data with no component dependencies. They belong in src/utils/constants.js alongside ROLE_COLORS, VIBE_WHITEBOARD etc. Moving them would reduce Office.jsx line count by 14 lines and put all vibe-keyed data in one auditable location — which is exactly where the 'crushing-it' vs 'crushing' key mismatch would have been caught in review #31 instead of review #32. Now that the key is fixed, lock it down by co-locating it with getTeamVibeKey().",
+      "effort": "trivial",
+      "assign_to": "Carlos"
     }
   ]
 }
