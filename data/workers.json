@@ -1,4 +1,23 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-09T03:38:00Z"
+  "workers": [
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "🔍",
+      "status": "working",
+      "task": "QA review #34 — visual testing, code audit, UX analysis",
+      "progress": 5,
+      "updated_at": "2026-03-09T03:45:00Z",
+      "startedAt": "2026-03-09T03:45:00Z"
+    }
+  ],
+  "roster": [
+    { "id": "carlos", "name": "Carlos", "role": "Backend Engineer", "emoji": "⚙️" },
+    { "id": "maya", "name": "Maya", "role": "Frontend Engineer", "emoji": "🎨" },
+    { "id": "dave", "name": "Dave", "role": "DevOps Engineer", "emoji": "🚀" },
+    { "id": "sofia", "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
+    { "id": "luna", "name": "Luna", "role": "Creative Director", "emoji": "🌙" }
+  ],
+  "updated_at": "2026-03-09T03:45:00Z"
 }
