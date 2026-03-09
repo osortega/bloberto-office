@@ -7,7 +7,16 @@
       "status": "working",
       "task": "Creative review #65 — visual audit and idea generation",
       "started_at": "2026-03-09T06:00:00Z"
+    },
+    {
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "emoji": "🔍",
+      "status": "working",
+      "task": "QA review #36 — live site + codebase analysis",
+      "started_at": "2026-03-09T06:15:00Z",
+      "progress": 5
     }
   ],
-  "updated_at": "2026-03-09T06:00:00Z"
+  "updated_at": "2026-03-09T06:15:00Z"
 }
