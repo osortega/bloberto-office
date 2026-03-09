@@ -514,6 +514,8 @@
   margin-bottom: 0.1rem;
 }
 
+.worker-card__back-tagline { font-style: italic; color: var(--text-muted); font-size: 0.75rem; margin: 0.25rem 0 0.5rem; }
+
 .worker-card__back-entry {
   font-size: 0.78rem;
   color: var(--text-muted);

@@ -235,6 +235,14 @@ function formatDuration(updatedAt) {
   return rem > 0 ? `Working for ${hours}h ${rem}m` : `Working for ${hours}h`
 }
 
+const WORKER_TAGLINES = {
+  carlos: 'The logs don\'t lie.',
+  maya: 'Designs ship when they\'re ready. Sometimes sooner.',
+  dave: 'Every merged PR had a story.',
+  sofia: 'Quality or nothing.',
+  luna: 'Creative velocity is still velocity.'
+}
+
 const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false, selectedTag = null, onTagClick = null, isDimmed = false }) {
   const [isFlipped, setIsFlipped] = useState(false)
   const cardRef = useRef(null)
@@ -323,6 +331,9 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             tabIndex={isFlipped ? 0 : -1}
           >✕ Close</button>
           <div className="worker-card__back-title">{worker.name}</div>
+          {WORKER_TAGLINES[worker.id] && (
+            <div className="worker-card__back-tagline">{WORKER_TAGLINES[worker.id]}</div>
+          )}
           {workerHistory.length === 0 ? (
             <div className="worker-card__back-empty">No activity on record.</div>
           ) : (
