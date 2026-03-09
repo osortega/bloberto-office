@@ -1436,7 +1436,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
 
         {/* Bloberto — always at manager desk, always visible */}
-        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} pingReaction={pingReaction} />
+        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} pingReaction={null} />
 
         {/* Active workers at desks (working) or as ghosts (roster-only) — skip idle, they wander */}
         {DESKS.map((desk, i) => {

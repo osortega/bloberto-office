@@ -769,18 +769,18 @@ export default function App() {
 
     if (workersResult.status === 'fulfilled') {
       const data = workersResult.value
-      const normalize = w => {
-        w.id = w.id || w.name?.toLowerCase().split(' ')[0]
-        w.startedAt = w.startedAt || w.started_at
-        return w
-      }
+      const normalize = w => ({
+        ...w,
+        id: w.id || w.name?.toLowerCase().split(' ')[0],
+        startedAt: w.startedAt || w.started_at
+      })
       // Support both flat array and {workers:[], roster:[]} formats
       if (Array.isArray(data)) {
         setAllWorkers(data.map(normalize))
         setRoster([])
       } else {
         setAllWorkers((data.workers ?? []).map(normalize))
-        setRoster(data.roster ?? [])
+        setRoster((data.roster ?? []).map(normalize))
       }
       setIsLive(true)
     } else {
