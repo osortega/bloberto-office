@@ -106,7 +106,7 @@ const BLOBERTO_TITLES = {
 }
 
 const VIBE_WEATHER_LABELS = {
-  'crushing-it': '☀️ Clear skies — team at full strength',
+  'crushing': '☀️ Clear skies — team at full strength',
   'on-fire': '⛈️ Storm conditions — all hands',
   'in-flow': '⛅ Partly cloudy — steady progress',
   'slow-day': '🌧️ Drizzle — easy does it',
@@ -1079,6 +1079,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const [vibeCaption, setVibeCaption] = useState(null)
   const isFirstVibe = useRef(true)
   const pingTimerRef = useRef(null)
+  const pingReactionTimerRef = useRef(null)
   const prevVibeForNameplate = useRef(vibe)
   const nameplateRef = useRef(null)
   const lastHuddle = useRef({ names: [], endedAt: null })
@@ -1090,7 +1091,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     const reaction = PING_REACTIONS[worker.id]
     if (reaction) {
       setPingReaction(reaction)
-      setTimeout(() => setPingReaction(null), 3000)
+      clearTimeout(pingReactionTimerRef.current)
+      pingReactionTimerRef.current = setTimeout(() => setPingReaction(null), 3000)
     }
     if (onWorkerClick) onWorkerClick(worker)
   }
@@ -1134,7 +1136,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     };
     setVibeCaption(CAPTIONS[vibe] || null);
     const t = setTimeout(() => setVibeCaption(null), 2800);
-    return () => clearTimeout(t);
+    return () => { clearTimeout(t); clearTimeout(pingReactionTimerRef.current); };
   }, [vibe])
 
   // Roster members not currently active → ghost at empty desk
