@@ -373,5 +373,80 @@
     ],
     "hire_proposals": [],
     "_previous_review": 62
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 64,
+    "timestamp": "2026-03-09T05:33:12Z",
+    "theme": "The details share a wall — make them notice each other",
+    "visual_observations": "After Hours vibe is live: Bloberto sits at CISO nameplate with a 🕯️, the sky label reads '🌙 Night sky — the stars are watching', and the door shows '🔒 Locked'. The office is mostly empty — Sofia and Luna at desks, three ghosts at top row. One orange/terracotta rectangle renders oddly large at roughly 85%/55% in the office canvas (the decorative plant SVG pot is rendering without clipping containment on some zoom levels). The conference table shows 'locked up' in lowercase near the bottom — it reads like a code comment, not atmosphere. The desk nameplates for idle workers all read '↪ away' with zero identity. The solo spotlight on the Dashboard says the exact same hardcoded sentence regardless of who is alone. On mobile, the office floor is compact but readable; the vibe weather label clips at the bottom edge on 375px width.",
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "storytelling",
+        "title": "Solo Spotlight Message Doesn't Know Who's Alone",
+        "description": "In App.jsx line ~1185, the `solo-spotlight-msg` paragraph is a hardcoded string: '🌟 Running solo today. Carrying the whole team on one pair of hands.' It fires regardless of who the solo worker is, their role, their vibe, or their progress percentage. The codebase already has `WORKER_TAGLINES` (App.jsx line ~258), `LONE_SURVIVOR_WORKER_OVERRIDES` (Office.jsx line ~106), and `LONE_SURVIVOR_LABELS` keyed by vibe (Office.jsx line ~101). Compose a `SOLO_SPOTLIGHT_MESSAGES` map: `{ carlos: { 'on-fire': '📊 One backend between the servers and chaos.', 'crushing': '🧱 The whole stack is one person right now.' }, sofia: { 'on-fire': '🔍 Holding quality with both hands and no backup.', 'slow-day': '🔎 If there are bugs, she will find them. Alone.' }, dave: { 'after-hours': '🎧 One DevOps engineer. Infinite deployment anxiety.' }, maya: { 'crushing': '💜 Shipping pixels at terminal velocity, unsupervised.' }, luna: { 'after-hours': '🌙 Creative review never clocks out.' } }`. Fall back to the existing generic string for unmatched combos. The `activeWorkers[0].id` and `teamVibe.key` are both in scope at the solo spotlight render site.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "office-life",
+        "title": "Idle Desk Nameplate Says '↪ away' for Every Single Person",
+        "description": "In Office.jsx line ~1373: `<div className='desk__nameplate desk__nameplate--away'>↪ away</div>`. This renders for every idle worker sitting at their desk — Carlos, Maya, Dave, Sofia, Luna all get the same generic tag. The codebase already has `PING_REACTIONS` (Office.jsx line ~139) and `WORKER_TAGLINES` (App.jsx line ~258) establishing per-worker voice. Add a `WORKER_AWAY_DESK_LABELS` constant in Office.jsx: `{ carlos: ' logs', maya: '↪ sketching', dave: '↪ headphones', sofia: '↪ testing', luna: '↪ reviewing' }`. Replace the hardcoded string at line ~1373 with `{WORKER_AWAY_DESK_LABELS[occ.worker.id] ?? '↪ away'}`. Three words, zero effort, the desk starts knowing its person.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "storytelling",
+        "title": "Door Label Has Two States for Five Vibes",
+        "description": "In Office.jsx line ~1452, the door label renders: `{vibe === 'after-hours' ? 'Locked' : 'Entrance'}`. Five vibes, two outcomes. The door is the first and last thing the office communicates — it should speak the room's energy. Replace with a `DOOR_LABELS` map: `{ crushing: 'All hands in', 'on-fire': 'Brace yourself', 'in-flow': 'Focus zone', 'slow-day': 'Come on in', 'after-hours': 'Locked up' }` and render `{DOOR_LABELS[vibe] ?? 'Entrance'}`. The `on-fire` door should feel like a warning. The `crushing` door should feel like a rally cry. Right now every non-after-hours vibe reads 'Entrance' — which is the emotional equivalent of a blank wall.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "feature",
+        "title": "Dashboard Tab Error Badge Counts But Never Escalates",
+        "description": "In App.jsx line ~1198: `{errorCount > 0 && <span className='tab-error-badge'>{errorCount}</span>}`. The badge just displays a number. But the StatsBar already has a dramatic narrative system — `STAT_DISPATCHES.error` maps 0→'smooth sailing', 1→'minor turbulence', 2→'code red', 3→'everything is fine 🔥'. The tab badge should mirror that energy visually. Add `tab-error-badge--critical` CSS class when `errorCount >= 2` (pulse animation, brighter red), and `tab-error-badge--meltdown` at `errorCount >= 3` (frantic strobe at 0.4s interval). The number alone is data; the animation is context. The user's eye goes to the tab before the stats bar.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "The Office Window Doesn't Know What's Happening Inside",
+        "description": "In Office.jsx, `WindowElement` (~line 946) renders a time-of-day sky gradient using `new Date().getHours()` — sunrise, daylight, golden hour, dusk, midnight. Beautiful, correct, completely isolated from team state. The window is mounted two divs away from `data-vibe` on `office-floor`. Add a `vibeKey` prop to `WindowElement`. Apply a vibe-tinted CSS overlay inside `.office-window__sky`: `on-fire` → a faint red/orange wash (`rgba(239,68,68,0.12)`), `crushing` → a gold shimmer layer, `after-hours` → slightly deeper indigo, `slow-day` → a desaturated cool wash. This is a CSS `::after` pseudo-element on `.office-window__sky[data-vibe='on-fire']` — one line of CSS per vibe. The window looks outside but should feel inside.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "visual",
+        "title": "Bloberto's Desk Monitor Has No Screen Content",
+        "description": "In Office.jsx line ~1228, the `mgr-desk__monitor` renders as a styled `div` with zero inner content. Meanwhile, `DESK_SCREEN_SVG` (Office.jsx line ~10) provides rich per-worker SVG screens for all five employees — Carlos has blue code lines, Maya has a wireframe layout, Dave has a terminal cursor, Sofia has a QA bar chart, Luna has kanban columns. Bloberto — the CISO/CFO/CVO/CDO — sits in front of a blank monitor. Add a `BLOBERTO_MONITOR_SVG` object keyed by vibe: `crushing` → tiny upward bar chart in purple/gold, `on-fire` → flatline with a blinking alert indicator, `in-flow` → a smooth sine wave, `slow-day` → a single dot on a vast grid, `after-hours` → a screensaver with slow-drifting stars. Render inside `.mgr-desk__monitor` using `vibe` as the key. The boss deserves a dashboard.",
+        "effort": "medium",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "Conference Table Ambient Label Reads Like a Code Comment",
+        "description": "In Office.jsx, `ConferenceTable` (~line 864) renders the ambient label when no meeting is in progress: `vibe === 'after-hours' ? 'locked up' : vibe === 'crushing' ? 'everyone is at their desk' : vibe === 'on-fire' ? 'no meetings. fix it.' : vibe === 'in-flow' ? 'reserve the table' : 'open office hours'`. These are mostly fine, but 'locked up' reads like a commented-out variable name, not atmosphere. Rewrite: `'after-hours': '🌙 the table sleeps'`, `'slow-day': '📅 open hours — no RSVP needed'`. Also 'everyone is at their desk' for `crushing` is accurate but cold — try `'🚀 everyone's shipping, no time to sit'`. These labels are the caption for the entire social life of the office; they should feel like the narrator, not the docstring.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "The Whiteboard Doodle Has No Author — Give It a Signature",
+        "description": "In Office.jsx line ~1249, `<pre className='wb-doodle' aria-hidden='true'>` renders vibe-keyed ASCII art: `crushing` = `╰(*°▽°*)╯`, `on-fire` = `(╯°□°)╯︵ ┻━┻`, `in-flow` = `(⌐■_■)`, `slow-day` = `(._. )`, `after-hours` = `(∪.∪ )...zzz`. These are perfect. But they have no author. After the `pre`, add a tiny attribution line: a `DOODLE_AUTHORS` map `{ crushing: '— maya', 'on-fire': '— dave', 'in-flow': '— carlos', 'slow-day': '— sofia', 'after-hours': '— luna' }`. Render as `<span className='wb-doodle-author' aria-hidden='true'>{DOODLE_AUTHORS[vibe]}</span>` — styled in `Office.css` at `font-size: 0.3rem; opacity: 0.45; font-style: italic`. One line below the doodle. Now someone drew on the whiteboard. The office started having last night.",
+        "effort": "small",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 63
   }
 ]
