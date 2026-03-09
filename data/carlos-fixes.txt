@@ -1,0 +1,33 @@
+Carlos — Bug Fix Summary
+========================
+Date: 2026-03-09
+
+FIX 1 (HIGH — App.jsx): Honorific 'night owl' during daytime with empty team
+  Before: HONORIFICS[isAfterHours ? 'after-hours' : teamVibe.key]
+  After:  HONORIFICS[isAfterHours ? 'after-hours' : (teamVibe.key === 'after-hours' ? 'slow-day' : teamVibe.key)]
+  When vibe.js returns 'after-hours' (empty team) but it's not actually after-hours,
+  the key is remapped to 'slow-day' so the honorific reads "chief... you still there? 😐"
+  instead of "night owl 🌙".
+
+FIX 2 (MEDIUM — App.jsx): Paused pill shows wrong text on touch devices
+  Added onClick={onResume} to the polling-paused-pill span.
+  Text is now dynamically chosen: window.matchMedia('(pointer: coarse)').matches
+  shows 'Tap to refresh' on touch devices and 'Move mouse to refresh' on pointer devices.
+
+FIX 3 (MEDIUM — Office.jsx): Ghost characters had tabIndex=0 (focusable but non-interactive)
+  Changed tabIndex={0} → tabIndex={handleClick ? 0 : -1}
+  Ghost/non-interactive characters are now removed from the tab order.
+
+FIX 4 (MEDIUM — Office.jsx + Office.css): Daytime sky too dark (brightness 0.7)
+  Added data-daytime={isDaytime || undefined} to the .office-window__sky div
+  (isDaytime = hours 9–16).
+  Added CSS rule:
+    .office-window__sky[data-daytime] { filter: brightness(1.1) saturate(1.05); }
+  Daytime sky is now bright and vivid instead of the default dim 0.7 brightness.
+
+FIX 5 (MEDIUM — App.css): TEAM VIBE stat card orphaned as half-width on mobile
+  In the @media (max-width: 600px) block, added:
+    .stats-bar .stat-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  When the last stat card lands alone in a 2-column row it now spans full width.
+
+Build: npm run build — ✓ passed (no errors)

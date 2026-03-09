@@ -623,6 +623,7 @@
   .main { padding: 1rem; }
   .header { padding: 1rem; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .stats-bar .stat-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .workers-grid { grid-template-columns: 1fr; }
   .header-title h1 { font-size: 1.35rem; }
   .header-right { gap: 0.5rem; flex-wrap: wrap; }

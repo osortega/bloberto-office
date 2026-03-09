@@ -680,7 +680,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       onClick={handleClick}
       onKeyDown={handleClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(e) } } : undefined}
       role={handleClick ? 'button' : undefined}
-      tabIndex={0}
+      tabIndex={handleClick ? 0 : -1}
     >
       {variant === 'manager' && isSyncing && (
         <div className="bloberto-typing">
@@ -796,7 +796,7 @@ function WindowElement({ vibe }) {
   return (
     <div className="office-window" role="img" aria-label={`Office window showing ${timeLabel} sky`}>
       <span className="office-window__time-caption">{timeLabel}</span>
-      <div className="office-window__sky" style={{ background: getGradient(hour) }} data-vibe={vibe}>
+      <div className="office-window__sky" style={{ background: getGradient(hour) }} data-vibe={vibe} data-daytime={isDaytime || undefined}>
         {isMidnight && (
           <>
             <span className="office-window__star" style={{ left: '18%', top: '20%' }} aria-hidden="true" />

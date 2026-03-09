@@ -1003,6 +1003,10 @@
   filter: brightness(0.7) saturate(0.85);
 }
 
+.office-window__sky[data-daytime] {
+  filter: brightness(1.1) saturate(1.05);
+}
+
 /* Vibe tint overlays — single consolidated system */
 .office-floor[data-vibe='on-fire'] .office-window__sky::after,
 .office-floor[data-vibe='crushing'] .office-window__sky::after,
