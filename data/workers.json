@@ -4,24 +4,24 @@
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend",
-      "emoji": "\u2699\ufe0f",
+      "emoji": "⚙️",
       "status": "idle",
       "task": "",
       "progress": 100,
-      "updated_at": "2026-03-09T19:05:00Z",
+      "updated_at": "2026-03-09T21:45:00Z",
       "started_at": "2026-03-09T19:00:00Z"
     },
     {
       "id": "sofia",
       "name": "Sofia",
       "role": "QA",
-      "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #50 \u2014 live site + codebase analysis",
-      "progress": 10,
-      "updated_at": "2026-03-09T20:15:00Z",
+      "emoji": "🔍",
+      "status": "idle",
+      "task": "",
+      "progress": 100,
+      "updated_at": "2026-03-09T21:45:00Z",
       "started_at": "2026-03-09T20:15:00Z"
     }
   ],
-  "updated_at": "2026-03-09T20:15:00Z"
+  "updated_at": "2026-03-09T21:45:00Z"
 }
