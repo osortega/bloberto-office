@@ -1,13 +1,13 @@
 {
   "workers": [
     {
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "emoji": "🎨",
       "status": "working",
-      "task": "Fix ping reaction routing + normalize() immutability + worker filter bar (reviews #68-69 bugs)",
-      "started_at": "2026-03-09T13:00:00Z"
+      "task": "Fix ON THE CLOCK mobile wrap + after-hours honorific mismatch + window brightness (reviews #69 bugs)",
+      "started_at": "2026-03-09T13:05:00Z"
     }
   ],
-  "updated_at": "2026-03-09T13:00:00Z"
+  "updated_at": "2026-03-09T13:05:00Z"
 }
