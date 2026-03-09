@@ -128,6 +128,14 @@ const LONE_SURVIVOR_LABELS = {
   'after-hours':  '🌙 last one standing',
 }
 
+const LONE_SURVIVOR_WORKER_OVERRIDES = {
+  carlos: { 'on-fire': '🧯 backend won\'t fall today', 'crushing': '📊 no bottlenecks when you ARE the stack' },
+  sofia:  { 'on-fire': '🔍 holding quality with both hands', 'crushing': '✅ bugs have nowhere to hide' },
+  dave:   { 'on-fire': '🎧 incident music: selected', 'slow-day': '🎵 coding into the void' },
+  maya:   { 'crushing': '💜 shipping pixels at terminal velocity' },
+  luna:   { 'after-hours': '🌙 reviews don\'t stop at midnight' },
+}
+
 const VACANT_ADS = {
   'crushing':     { title: 'Staff Wizard',          req: 'Must maintain velocity without asking what velocity means' },
   'on-fire':      { title: 'URGENT: Firefighter',   req: 'Start Monday. Like, this Monday.' },
@@ -496,10 +504,20 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
 
   // Error micro-bubbles — distress messages for workers in error state
   const ERROR_BUBBLE_MESSAGES = ['💀', '⚠️ help?', 'it was fine locally', '🧨', 'send help', 'undefined is not a function']
+  const WORKER_ERROR_BUBBLES = {
+    carlos: ['SIGKILL', 'db is lying to me', 'logs on fire', '500'],
+    maya: ['every border is wrong', 'the prototype lied', 'my components are crying'],
+    dave: ['git blame moment', 'npm ci again?', 'the build is sentient'],
+    sofia: ['the spec never said this', 'REGRESSION', '5 new bugs found', 'who merged this'],
+    luna: ['the deck is burning', 'every color is wrong', 'the brief changed again']
+  }
   useEffect(() => {
     const isErr = variant === 'error' || worker.status === 'error'
     if (!isErr) return
-    const pick = () => ERROR_BUBBLE_MESSAGES[Math.floor(Math.random() * ERROR_BUBBLE_MESSAGES.length)]
+    const pick = () => {
+      const msgs = WORKER_ERROR_BUBBLES[worker.id] || ERROR_BUBBLE_MESSAGES
+      return msgs[Math.floor(Math.random() * msgs.length)]
+    }
     const interval = setInterval(() => {
       setErrorBubble(pick())
       setTimeout(() => setErrorBubble(null), 2200)
@@ -1416,7 +1434,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                 isPinged={pingedId === occ.worker.id}
               />
               {isLoneSurvivor && !occ.ghost && (
-                <div className='lone-survivor-label' style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>{LONE_SURVIVOR_LABELS[vibe] || '🎯 solo run'}</div>
+                <div className='lone-survivor-label' style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>{LONE_SURVIVOR_WORKER_OVERRIDES[occ.worker.id]?.[vibe] ?? LONE_SURVIVOR_LABELS[vibe] ?? '🎯 solo run'}</div>
               )}
             </div>
           )
