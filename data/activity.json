@@ -160,5 +160,17 @@
     "worker": "Luna",
     "message": "\ud83c\udf19 Creative review #57 complete \u2014 6 ideas filed",
     "timestamp": "2026-03-09T00:06:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "\ud83d\ude0c Full-idle banner \u2014 shows vibe-specific message when all workers idle",
+    "timestamp": "2026-03-09T00:08:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "\u2615 Solo coffee break \u2014 idle worker avatar appears at coffee corner",
+    "timestamp": "2026-03-09T00:08:00Z"
   }
 ]
