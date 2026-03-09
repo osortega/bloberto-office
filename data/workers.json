@@ -14,9 +14,10 @@
       "emoji": "🔍",
       "status": "working",
       "task": "QA review #42 — live site + codebase analysis",
-      "progress": 0,
-      "started_at": "2026-03-09T12:15:00Z"
+      "progress": 15,
+      "started_at": "2026-03-09T12:45:00Z",
+      "updated_at": "2026-03-09T12:45:00Z"
     }
   ],
-  "updated_at": "2026-03-09T12:15:00Z"
+  "updated_at": "2026-03-09T12:45:00Z"
 }
