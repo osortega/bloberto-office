@@ -1,117 +1,132 @@
 {
   "analyst": "Sofia",
-  "review_number": 40,
-  "timestamp": "2026-03-09T10:16:00Z",
-  "screenshot_note": "Live screenshots captured via Puppeteer — desktop 1280x800 and mobile 375x812. Both verified.",
+  "review_number": 41,
+  "timestamp": "2026-03-09T11:15:00Z",
+  "screenshot_note": "Desktop 1280x800 and mobile 375x812 captured via Chromium headless. Both verified. Sofia's lone-survivor label visually bleeds outside office-floor left edge on desktop. Speech bubble text confirmed overflowing office-floor container on mobile. Bloberto card obscures most of the office floor on narrow viewports.",
   "scores": {
-    "visual": 4,
-    "ux": 3,
-    "responsiveness": 3,
-    "performance": 3,
-    "accessibility": 3,
-    "code_quality": 2,
-    "features": 5,
-    "fun_factor": 5
+    "visual": 7,
+    "ux": 5,
+    "responsiveness": 5,
+    "performance": 7,
+    "accessibility": 6,
+    "code_quality": 5,
+    "features": 8,
+    "fun_factor": 9
   },
-  "overall_score": 3.5,
+  "overall_score": 6.5,
   "carry_over_resolution": {
-    "resume_button_noop": "NOT FIXED — onResume at App.jsx:1211 still `() => setPollingPaused(false)` with no lastActivity.current update",
-    "speech_bubble_mobile": "NOT FIXED — no change to Office.css 480px block; office-floor still overflow:visible; bubble z-index unchanged",
-    "whiteboard_task_count_wrap": "NOT FIXED — wb-task-count still has no white-space:nowrap; whiteboard still 7.5% wide at 480px",
-    "useEffect_dep_array_worker_id": "NOT FIXED — Office.jsx:550 dep array still [variant, worker.status], worker.id missing",
-    "sunrise_sky_overflow": "FIXED — .office-window now has overflow:hidden (Office.css:977); sky gradient properly clipped in screenshot"
+    "1_resume_button_noop": "❌ STILL BROKEN — App.jsx:1211 onResume is still `() => setPollingPaused(false)`. The idle-check interval at line 719-726 runs every 15 seconds and calls `setPollingPaused(Date.now() - lastActivity.current > IDLE_TIMEOUT)`. Since lastActivity.current is never updated on Resume, the button re-pauses within 15 seconds of clicking. Fix requires `lastActivity.current = Date.now()` inside onResume. This is now broken across MULTIPLE reviews — escalating to CRITICAL.",
+    "2_pingReaction_only_bloberto": "❌ STILL BROKEN — Office.jsx line 1439 is the only Character that receives pingReaction={pingReaction}. Worker characters at desks (line 1453-1455) and idle wanderers (lines 1473-1483) do NOT receive the pingReaction prop. PING_REACTIONS has entries for luna, carlos, maya, dave, sofia, but clicking any of them only produces the pingedId pulse highlight — the speech bubble never fires. Escalating.",
+    "3_speech_bubble_mobile_overflow": "❌ STILL BROKEN — Office.css line 84: .office-floor { overflow: visible }. Confirmed visually in mobile screenshot: the 'bugs have nowhere to hide' text and Sofia's speech bubble text clip/bleed outside the office-floor container boundary. No @media override exists to constrain it. Escalating.",
+    "4_wb_task_count_wraps_mobile": "❌ STILL BROKEN — Office.jsx line 1267: wb-task-count span has inline style only (fontSize: '0.4rem'). No white-space: nowrap anywhere. No dedicated CSS class rule exists for .wb-task-count. Text '2 active · 5 total' wraps at narrow widths. Escalating.",
+    "5_useEffect_dep_missing_worker_id": "❌ STILL BROKEN — Office.jsx line 534-550: error bubble useEffect dep array is [variant, worker.status] but the closure captures worker.id (line 538: WORKER_ERROR_BUBBLES[worker.id]) and wanderIdx (line 548: wanderIdx * 1500). Stale closure risk when worker identity changes mid-render. Also affects idle bubble useEffect at line 511-523 which uses wanderIdx correctly in deps but the error one doesn't. Escalating."
   },
   "suggestions": [
     {
-      "priority": "high",
-      "category": "bug",
-      "title": "[CARRY-OVER #39] Resume button is still a functional no-op",
-      "description": "App.jsx:1211 — `onResume={() => setPollingPaused(false)}` does not touch `lastActivity.current`. The 15s idle checker at line 721 evaluates `Date.now() - lastActivity.current > IDLE_TIMEOUT` and will re-set `pollingPaused = true` within 15 seconds of resuming. On desktop a mouse-move to the button incidentally fires the mousemove listener which does update lastActivity, but keyboard-only users and touch users tapping without prior movement will see the pause banner return silently. Fix: `onResume={() => { lastActivity.current = Date.now(); setPollingPaused(false) }}`.",
+      "priority": "critical",
+      "category": "Bug",
+      "title": "[ESCALATED #4] Resume button re-pauses itself within 15s",
+      "description": "App.jsx:1211 — onResume callback only calls setPollingPaused(false) but never resets lastActivity.current. The idle-check interval at line 719-726 fires every 15 seconds and re-evaluates `Date.now() - lastActivity.current > IDLE_TIMEOUT`, which immediately re-pauses since lastActivity.current was never touched. Fix: `onResume={() => { lastActivity.current = Date.now(); setPollingPaused(false) }}`. This has been flagged in reviews 38, 39, 40, and 41 without a fix.",
+      "effort": "small"
+    },
+    {
+      "priority": "critical",
+      "category": "Bug",
+      "title": "[ESCALATED #4] pingReaction silently dropped for all non-Bloberto workers",
+      "description": "Office.jsx — handleCharClick (line 1125-1136) correctly sets pingReaction state from PING_REACTIONS[worker.id], and PING_REACTIONS has entries for all five workers. However, the pingReaction prop is only passed to the single Bloberto Character at line 1439. All desk-worker Characters (line 1447-1455) and idle Characters (line 1473-1483) are missing `pingReaction={pingedId === w.id ? PING_REACTIONS[w.id] : null}`. The state is set, the data exists, the wiring is just absent. Fix: pass the reaction through to each Character, scoped to that worker's id.",
       "effort": "small"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "[NEW] pingReaction is wired only to Bloberto — all other workers' reactions are silently dropped",
-      "description": "Office.jsx:1129-1134 — `handleCharClick` calls `setPingReaction(reaction)` for any worker with a PING_REACTIONS entry (luna, carlos, maya, dave, sofia all have entries). But `pingReaction` is only passed as a prop to the Bloberto Character at line 1439. Desk workers (lines 1447-1455) and idle workers (lines 1473-1483) never receive `pingReaction`. Clicking Carlos or Dave sets state, fires a 3s timer, and then nothing happens visually. Fix: replace the single `pingReaction` state with a per-worker map, or derive it: `pingReaction={pingedId === occ.worker.id ? PING_REACTIONS[occ.worker.id] : null}` and remove the separate state entirely.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "[CARRY-OVER #37/#38/#39] Bloberto speech bubble still overflows office-floor on mobile",
-      "description": "Office.css — `.office-floor` still has `overflow: visible` (line 84). The `.speech-bubble` is `position: absolute; bottom: calc(100% + 8px); z-index: 30`. Bloberto sits at `top: 4%` of the office floor. When Bloberto's manager bubble is visible it renders above the character, which places it above the office-floor top edge and can overlap the tab bar above it. No fix was applied in the 480px media block. Add `overflow: hidden` to `.office-floor` at the 480px breakpoint, or clamp speech-bubble `bottom` to `min(calc(100% + 8px), 90%)` relative to the container.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "[CARRY-OVER #38/#39] Whiteboard wb-task-count still wraps character-by-character on mobile",
-      "description": "Office.css:1162-1163 — `.office-whiteboard` is clamped to 7.5% width at 480px (~28px on a 375px screen). The `wb-task-count` span ('2 active · 5 total') has no `white-space: nowrap` override, so each word or character wraps independently, producing the stacked-text disaster from prior reviews. No fix applied. Add `.wb-task-count { white-space: nowrap; overflow: hidden; text-overflow: clip; }` inside the 480px media block, or just `display: none` since the whiteboard is illegible at that size anyway.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "[CARRY-OVER #38/#39] Character useEffect dep array still missing worker.id (and wanderIdx)",
-      "description": "Office.jsx:550 — the error-bubble interval effect has dep array `[variant, worker.status]` but closes over `worker.id` (line 538: `WORKER_ERROR_BUBBLES[worker.id]`) and `wanderIdx` (line 548: `2000 + wanderIdx * 1500`). If a Character slot is reused for a different worker or a wanderIdx changes, the stale closure selects the wrong error messages and fires at the wrong initial offset. Add both to the dep array: `[variant, worker.status, worker.id, wanderIdx]`.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "[NEW] pingTimerRef and pingReactionTimerRef have no unmount cleanup",
-      "description": "Office.jsx:1119-1133 — both `pingTimerRef` and `pingReactionTimerRef` are set inside `handleCharClick` (a plain function, not inside a useEffect). There is no cleanup effect that cancels them on unmount. If the Office component unmounts while either timer is pending, the callbacks fire and call `setPingedId(null)` / `setPingReaction(null)` on a dead component, which in React 18 produces a no-op but still runs the timeout closure and leaks memory. Add: `useEffect(() => () => { clearTimeout(pingTimerRef.current); clearTimeout(pingReactionTimerRef.current) }, [])`.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "[CARRY-OVER #39] Arrow-key tab navigation doesn't update URL hash",
-      "description": "App.jsx:739-748 — `handleTabKeyDown` calls `setTab(TABS[...])` on ArrowLeft/Right/Up/Down but never calls `window.location.hash = TABS[newIdx]`. Click handlers (lines 1184, 1197) and keyboard shortcut handlers (lines 820-821) all do update the hash. This means: arrow-key tab switches break hash-based tab restore on reload, and break the hashchange listener at line 674-675. Fix: add `window.location.hash = TABS[(currentIdx + 1) % TABS.length]` (and -1 variant) inside the key handler.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "[CARRY-OVER #39] Footer BONUS_TAGLINES[0] is permanently skipped",
-      "description": "App.jsx:1359 — `onClick` does `setQuoteBonus(prev => prev + 1)` and `setShowBonus(prev => !prev)` simultaneously. On first click: quoteBonus becomes 1, showBonus becomes true. The tagline displayed is `BONUS_TAGLINES[1 % 8]` = index 1. Index 0 ('technically it deploys if you squint') is never shown. Fix: either start quoteBonus at -1 and increment to 0 on first click, or display `BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]`.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "[CARRY-OVER #39] Activity log filtered 4× per render with no memoization",
-      "description": "App.jsx:1283-1292 — an inline IIFE filters `activityLog` twice (type filter then worker filter) to build the count string. App.jsx:1336-1340 — the `ActivityLog` component prop does the identical two-pass filter again. Neither is memoized. Every state change (60s timer tick, cursor move, any polling update) re-runs all four filter passes over the full log. Wrap both in `useMemo([activityLog, activityFilter, workerFilter])`. This is particularly wasteful because `activityLog` can grow unbounded in a long session.",
+      "category": "Responsiveness",
+      "title": "[ESCALATED #4] Speech bubble overflows office-floor on mobile",
+      "description": "Office.css line 84: .office-floor { overflow: visible }. Confirmed in mobile screenshot — speech bubble text bleeds outside the container boundary. The .speech-bubble is positioned absolute with `bottom: calc(100% + 8px)`, which places it above its parent. When the parent is near the top of the office-floor and the floor has overflow:visible, the bubble clips out. Fix options: (1) add `overflow: hidden` to .office-floor with a conditional for the top region, or (2) set a clip-path on the character container, or (3) use a portal to render speech bubbles in a higher z-index layer outside the floor.",
       "effort": "medium"
     },
     {
-      "priority": "medium",
-      "category": "performance",
-      "title": "[CARRY-OVER #39] 19 simultaneously animating ambient particles when Office tab is active",
-      "description": "App.jsx:1071 renders a 12-particle `.ambient-particles` layer unconditionally at the app root (always active regardless of which tab is shown). Office.jsx:1538 renders a separate 7-particle layer inside `.office-floor`. When on the Office tab both are active = 19 `@keyframes dust-drift` animations running. Gate the App-level layer: `{tab === 'dashboard' && <div className='ambient-particles' ...>}`, since the Office has its own.",
+      "priority": "high",
+      "category": "Responsiveness",
+      "title": "[ESCALATED #4] .wb-task-count wraps on mobile — still no white-space:nowrap",
+      "description": "Office.jsx line 1267: the wb-task-count span has only `style={{ fontSize: '0.4rem', color: 'inherit', opacity: 0.7 }}`. There is no CSS class rule for .wb-task-count and no white-space:nowrap. At narrow viewport widths the text '2 active · 5 total' wraps to two lines, breaking whiteboard layout. One-line fix: add `whiteSpace: 'nowrap'` to the inline style, or add a .wb-task-count { white-space: nowrap; } rule to Office.css.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "Code Quality",
+      "title": "[ESCALATED #4] Error bubble useEffect dep array missing worker.id and wanderIdx",
+      "description": "Office.jsx lines 534-550: the error-bubble useEffect uses `WORKER_ERROR_BUBBLES[worker.id]` (line 538) and `wanderIdx * 1500` (line 548) in its body but neither is listed in the dep array `[variant, worker.status]`. If worker.id changes (roster reload reassigns a different worker to the same Character slot) or wanderIdx changes, the closure retains stale values and shows the wrong worker's bubbles at the wrong timing. Fix: change dep array to `[variant, worker.status, worker.id, wanderIdx]`.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "Bug",
+      "title": "Always-true guard in desk monitor rendering (|| true anti-pattern)",
+      "description": "Office.jsx line 1361: `(isWorking || hasError) && (DESK_SCREEN_SVG[occ.worker.id] || true)`. The `|| true` makes the second condition always truthy, effectively making it equivalent to just `(isWorking || hasError)`. The intent was probably to render a fallback monitor even when no SVG entry exists, but the current code always renders the outer wrapper div regardless. This is misleading dead code. Remove the `|| true` and let the inner check for `DESK_SCREEN_SVG[...]` handle the fallback SVG display.",
       "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "[CARRY-OVER #38/#39] radiogroup arrow-key navigation missing (WAI-ARIA violation)",
-      "description": "App.jsx:1296-1329 — both activity filter bars use `role='radiogroup'` / `role='radio'` but implement no arrow-key navigation. Per WAI-ARIA authoring practices, all radio buttons in a group are a single tab stop; arrow keys move focus within the group. Currently each button is its own tab stop. Set `tabIndex={activityFilter === key ? 0 : -1}` on each radio and add `onKeyDown` on the group to handle ArrowLeft/Right.",
-      "effort": "medium"
+      "category": "UX",
+      "title": "No feedback after Resume — user has no confirmation refresh restarted",
+      "description": "Even after the Resume button is fixed to update lastActivity.current, there is still no visual confirmation that polling resumed. The sync-status card flips from PAUSED back to Live, but there is no transient toast or animation to confirm the action. Consider a brief 'Resuming...' flash on the stat card or a short 'refresh resumed' toast notification to close the interaction loop.",
+      "effort": "small"
     },
     {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #39] sparkleUnseen state setter is never captured — twinkle animates forever",
-      "description": "App.jsx:697 — `const [sparkleUnseen] = useState(...)` destructures only the value, discarding the setter. `sparkleUnseen` is always whatever it was on mount (likely `true` on first visit). The useEffect at line 733-735 writes to localStorage but never calls the setter, so the twinkle class is applied on every render for the entire session. Either destructure the setter and call it, or replace the state with a `useRef` that you read synchronously.",
+      "priority": "medium",
+      "category": "Code Quality",
+      "title": "stuckWorkers useMemo uses Date.now() without declaring it as dependency",
+      "description": "App.jsx lines 438-440: `useMemo(() => workers.filter(w => ... Date.now() ... > 7_200_000), [workers])`. The Date.now() call is baked in but not a dependency, so if a worker crosses the 2-hour stuck threshold between worker array refreshes, the memo won't recompute. In practice polling every 30s limits the window, but it's a correctness issue. Fix: compute the threshold outside the memo (e.g., a useTimeTick-based value) or just run it as a plain derived value without memoization since workers.filter is cheap.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality",
+      "title": "IIFE inside JSX for solo spotlight message — unnecessary per-render allocation",
+      "description": "App.jsx line 1239: `{(() => { const soloKey = ...; return SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[teamVibe.key] ?? ... })()}`. An immediately-invoked function expression inside JSX runs on every render. Since activeWorkers[0] and teamVibe.key are already in scope, this logic should be extracted to a local variable before the return statement or a useMemo, not an inline IIFE.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality",
+      "title": "ActivityLogEntry key uses array index after reverse/slice — fragile reconciliation",
+      "description": "App.jsx line 151: `key={entry.timestamp + entry.worker + i}` where `i` comes from indexing into `.reverse().slice(0, 20)`. The index is volatile: adding a new entry changes every i-keyed item below it, forcing React to remount all but the first element. If entry.timestamp is unique (which it should be for activity events), just use `key={entry.timestamp + (entry.worker ?? '')}` and drop the index.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Accessibility",
+      "title": "Pingable worker Characters lack descriptive interactive label",
+      "description": "Office.jsx — Characters with onClick handlers (desk workers line 1453, idle wanderers line 1480) are clickable but have no `aria-label` describing the action. Screen reader users see a generic element with no hint that clicking pings the worker. Add `aria-label={`Ping ${worker.name}`}` to the Character component when onClick is present, and `role='button'` with `tabIndex={0}` if it's a non-button element.",
       "effort": "small"
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #38/#39] ConferenceTable inner map callbacks redeclare outer-scope cx and orbitR",
-      "description": "Office.jsx:840 declares `const cx = 52, orbitR = 38` (among others) in the ConferenceTable body. Lines 919 and 937 re-declare `const cx = 52, orbitR = 38` inside `meetingWorkers.map()` and `standupWorkers.map()` callbacks, shadowing the outer values with identical ones. Dead code. ESLint no-shadow would catch this. Remove the inner declarations.",
+      "category": "Code Quality",
+      "title": "ProgressBar 'updatedAt' prop accepted but never used",
+      "description": "App.jsx line 193: `function ProgressBar({ progress, updatedAt, startedAt })` — updatedAt is destructured but never referenced anywhere in the function body. It was likely superseded by startedAt for the ETA calculation. Remove it from the signature and from the two call sites (lines 346 and similar) to keep the interface clean.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "Code Quality",
+      "title": "VibeSparkline has redundant aria-label + <title> with identical content",
+      "description": "App.jsx lines 401-402: the SVG element has both `aria-label={history.map(...).join(' then ')}` and a child `<title>` with the identical string. When both are present, screen readers may announce the content twice. Remove the `aria-label` from the SVG and keep the `<title>` child, which is the SVG-native accessibility mechanism.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "Visual",
+      "title": "Mobile: Bloberto's hover-card obscures most of the office floor",
+      "description": "Visible in the mobile screenshot — Bloberto's expanded info card (tooltip) at top-center covers roughly 40% of the office-floor vertical space on a 375px viewport. The card appears to be absolutely positioned without a mobile max-height or overflow constraint. Consider capping the card height on mobile or pinning it outside the office-floor container so workers below remain visible.",
+      "effort": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "Visual",
+      "title": "Desktop: Sofia's lone-survivor label clips outside office-floor left edge",
+      "description": "Visible in the desktop screenshot — the lone-survivor label for Sofia (leftmost desk) uses `left: '50%', transform: 'translateX(-50%)'` which centers it on the character, but when the character is at the far-left desk the label's left half bleeds outside the office-floor container. The container's overflow:visible allows this. Consider adding `max-width: 90px; overflow: hidden; text-overflow: ellipsis` to the lone-survivor-label inline style, or shifting the label right for edge desks.",
       "effort": "small"
     }
-  ]
+  ],
+  "summary": "Review #41 — all five carry-over HIGH items remain unaddressed for the fourth consecutive review. The Resume button, pingReaction wiring, speech bubble overflow, wb-task-count wrap, and useEffect dep array are fully reproducible and trivially fixable — most are one-line changes. A new always-true guard (`|| true`) was spotted in the desk rendering path. Visually the app looks genuinely polished at desktop; mobile is functional but cramped. Fun factor remains high — Bloberto's ambient quotes and the vibe-aware character expressions are genuinely charming. But charm doesn't fix a Resume button that un-resumes itself. Fix the carry-overs first. Everything else is gravy."
 }

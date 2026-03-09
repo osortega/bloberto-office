@@ -673,5 +673,243 @@
     ],
     "hire_proposals": [],
     "_previous_review": 66
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 68,
+    "timestamp": "2026-03-09T11:31:21.673Z",
+    "screenshot": "unavailable (network timeout) — code-review mode",
+    "summary": "The big win this cycle: .id normalization is finally in. App.jsx:772 normalize() now sets w.id = w.id || w.name?.toLowerCase().split(' ')[0], unblocking WORKER_TAGLINES, PING_REACTIONS, SOLO_SPOTLIGHT_MESSAGES, LONE_SURVIVOR_WORKER_OVERRIDES, and justShipped confetti all at once. Crushing sky is purple not green. Activity log header count is correct. vibeCaption and pingReaction fully decoupled. All 20 VIBE_TRANSITION_QUOTES pairs present. Six major bugs closed in one cycle. But normalization exposed a new routing bug: reactions now resolve correctly but pingReaction state only forwards to Bloberto's Character — so clicking Carlos makes Bloberto say his line. Also: normalize() mutates objects in-place. Roster path skips normalization entirely. Worker filter bar still empty on flat-array format.",
+    "fixed_since_last_review": [
+      {
+        "title": "Worker .id Normalization — normalize() Now Assigns .id from .name",
+        "was_flagged_in": [
+          65,
+          66,
+          67
+        ],
+        "how_fixed": "App.jsx:772-775 — normalize() sets w.id = w.id || w.name?.toLowerCase().split(' ')[0] before calling setAllWorkers(). Unblocks WORKER_TAGLINES, PING_REACTIONS, LONE_SURVIVOR_WORKER_OVERRIDES, and justShipped confetti for all five core team members."
+      },
+      {
+        "title": "Activity Log Header Count Now Shows Filtered vs Total",
+        "was_flagged_in": [
+          60,
+          66,
+          67
+        ],
+        "how_fixed": "App.jsx:1283-1292 — header now renders 'X of Y events (filtered)' when activityFilter !== 'all' or workerFilter !== null."
+      },
+      {
+        "title": "Crushing Window Sky Overlay Is Now Purple, Not Green",
+        "was_flagged_in": [
+          65,
+          66,
+          67
+        ],
+        "how_fixed": "Office.css:1029 — consolidated ::after system uses rgba(167,139,250,0.14) gradient for crushing. Green leak gone."
+      },
+      {
+        "title": "vibeCaption Cleanup No Longer Cancels Ping Reactions",
+        "was_flagged_in": [
+          66,
+          67
+        ],
+        "how_fixed": "Office.jsx:1115-1177 — vibeCaption and pingReaction are now fully independent state variables with separate timer refs."
+      },
+      {
+        "title": "VIBE_TRANSITION_QUOTES Now Has All 20 Pairs",
+        "was_flagged_in": [
+          66
+        ],
+        "how_fixed": "utils/quotes.js:37-56 — all 20 vibe-to-vibe transition pairs present and accounted for."
+      },
+      {
+        "title": "ProgressBar startedAt Now Receives Correct Value via normalize()",
+        "was_flagged_in": [
+          67
+        ],
+        "how_fixed": "App.jsx:774 — normalize() sets w.startedAt = w.startedAt || w.started_at before the worker hits the component tree."
+      }
+    ],
+    "ideas": [
+      {
+        "title": "pingReaction Appears on Bloberto Instead of the Clicked Worker",
+        "priority": "must",
+        "effort": "small",
+        "assignee": "carlos",
+        "framework": "Delight & Polish",
+        "tags": [
+          "bug",
+          "normalization-aftermath",
+          "character"
+        ],
+        "description": "The normalization fix made PING_REACTIONS[worker.id] resolve correctly — 'Check the logs. It is ALWAYS in the logs.' for carlos, etc. But in Office.jsx the pingReaction state is only forwarded to Bloberto's Character (line 1439). Working Characters (lines 1448-1462) and idle Characters (lines 1474-1486) receive no pingReaction prop. So clicking Carlos correctly finds his reaction then puts it in Bloberto's speech bubble. Bug was invisible before normalization because the reaction was always undefined. Fix: pass pingReaction={pingedId === occ.worker.id ? pingReaction : null} to each working Character and similarly to idle Characters. Bloberto should receive null (he has no PING_REACTIONS entry). One-line change per Character render call."
+      },
+      {
+        "title": "normalize() Mutates Input Objects In-Place — React Immutability Violation",
+        "priority": "must",
+        "effort": "small",
+        "assignee": "carlos",
+        "framework": "New Features",
+        "tags": [
+          "bug",
+          "react",
+          "immutability",
+          "normalize"
+        ],
+        "description": "App.jsx:772-776 — normalize() does w.id = w.id || ... and w.startedAt = w.startedAt || w.started_at directly on the fetched JSON object. This mutates the raw response in-place before React state receives it. React uses reference equality for change detection; mutating source objects can cause missed re-renders or stale closures in edge cases. Fix: replace with a pure function — return { ...w, id: w.id || w.name?.toLowerCase().split(' ')[0], startedAt: w.startedAt || w.started_at }. One-line change, no behavior change for happy path, correct immutability semantics."
+      },
+      {
+        "title": "setRoster() Skips normalize() — Roster Entries Lack .id and .startedAt Normalization",
+        "priority": "should",
+        "effort": "small",
+        "assignee": "carlos",
+        "framework": "New Features",
+        "tags": [
+          "bug",
+          "roster",
+          "normalize"
+        ],
+        "description": "App.jsx:783 — setRoster(data.roster ?? []) passes roster entries to state without normalize(). If a live workers.json omits .id from roster entries, ghostRoster matching in Office.jsx:1182 fails silently (!activeIds.has(w.id) always true) and every roster member ghosts even when they are working. Fix: setRoster((data.roster ?? []).map(normalize)). Already-normalized entries are unaffected since the w.id = w.id || ... is a no-op when id exists."
+      },
+      {
+        "title": "completionToast.text Ternary Is Dead Code — .text Field Is Never Set",
+        "priority": "should",
+        "effort": "small",
+        "assignee": "dave",
+        "framework": "Delight & Polish",
+        "tags": [
+          "bug",
+          "dead-code",
+          "toast"
+        ],
+        "description": "App.jsx:1116 — {completionToast.text ? completionToast.text : 'shipped it!'} — the completionToast object is always set as { name: worker.name, color } (App.jsx:~928) with no text field. The .text branch is dead code. Either remove the ternary entirely and keep the default, or document and implement a use case where text is set (e.g., custom ship messages per worker from workers.json). If no custom text use case exists, clean it to just the emoji string."
+      },
+      {
+        "title": "After-Hours Vibe at Non-Midnight Hours Mismatches Greeting and Honorific",
+        "priority": "should",
+        "effort": "small",
+        "assignee": "maya",
+        "framework": "Office Life",
+        "tags": [
+          "bug",
+          "honorific",
+          "vibe",
+          "time-awareness"
+        ],
+        "description": "App.jsx:1055-1066 — isAfterHours = currentHour < 5 covers only midnight-5am. But getTeamVibe() in utils/vibe.js:7 returns after-hours whenever workers.length === 0, which can happen at 2pm or 6pm. At 6pm with no workers: greeting = 'Good evening', teamVibe.key = 'after-hours', honorific = HONORIFICS['after-hours'] = 'night owl'. The page reads 'Good evening, night owl' — grammatically weird but tolerable. The real gap: at 2pm with zero workers, greeting = 'Good afternoon' and honorific = 'night owl'. Fix: give after-hours honorific two flavors — if currentHour >= 18 || currentHour < 5 use 'night owl', else use 'gone home' or 'offline'. Alternatively extend isAfterHours to cover evening: currentHour < 5 || currentHour >= 18."
+      },
+      {
+        "title": "Worker Filter Bar Shows Only All Workers When workers.json Returns Flat Array",
+        "priority": "should",
+        "effort": "medium",
+        "assignee": "sofia",
+        "framework": "New Features",
+        "tags": [
+          "bug",
+          "filter-bar",
+          "flat-array",
+          "roster"
+        ],
+        "description": "Still unfixed from review 66. App.jsx:783 — when workers.json is a flat array, setRoster([]) is called. Worker filter buttons (App.jsx:1323-1333) render from roster.map(...). With an empty roster, only the All Workers button appears and the filter is useless. Fix: when roster is empty, derive filter buttons from unique worker names seen in activityLog. Computed as: const filterCandidates = roster.length > 0 ? roster : [...new Map(activityLog.filter(e => e.worker).map(e => [e.worker, { name: e.worker }])).values()]. Use filterCandidates in place of roster for the filter button render. This gives the filter real data even without a roster response."
+      },
+      {
+        "title": "normalize() id Strategy Is split(' ')[0] — Fragile for Same-First-Name Workers",
+        "priority": "should",
+        "effort": "small",
+        "assignee": "luna",
+        "framework": "Team Growth",
+        "tags": [
+          "bug",
+          "normalize",
+          "id-strategy",
+          "naming"
+        ],
+        "description": "App.jsx:773 — w.name?.toLowerCase().split(' ')[0] generates id from only the first word. Works for current team (carlos, maya, dave, sofia, luna). Breaks for: (a) two workers sharing a first name — 'Carlos Mendez' and 'Carlos Rivera' both get id 'carlos', causing lookup collisions across all character maps; (b) prefixes — 'Dr. Smith' becomes 'dr.'; (c) initials — 'J. Chen' becomes 'j.'. Better strategy: w.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') — gives 'carlos-mendez', 'carlos-rivera', unique and slug-safe. Then the five character maps (PING_REACTIONS, WORKER_TAGLINES, SOLO_SPOTLIGHT_MESSAGES, LONE_SURVIVOR_WORKER_OVERRIDES, WORKER_ERROR_BUBBLES) need their keys updated to match. Luna owns this because she maintains the character Bible."
+      },
+      {
+        "title": "Stuck Worker Stat Card Anonymizes Identity When Count Exceeds One",
+        "priority": "should",
+        "effort": "small",
+        "assignee": "maya",
+        "framework": "Office Life",
+        "tags": [
+          "bug",
+          "stat-card",
+          "stuck-workers"
+        ],
+        "description": "Still unfixed from review 65. App.jsx:497-502 — when stuckWorkers.length > 1, the stat card shows only '${stuckWorkers.length} workers'. No names, no roles, no way to identify who is blocked. Fix for count 2: show both names — '${w0.name.split(' ')[0]} & ${w1.name.split(' ')[0]}'. For count 3+: show first plus overflow — '${w0.name.split(' ')[0]} +${stuckWorkers.length - 1} more'. Also: the click handler (App.jsx:~504) only scrolls to the first stuck worker's card. Should scroll to the first, then offer a tooltip or cycle through all stuck workers on subsequent clicks."
+      },
+      {
+        "title": "Error Micro-Bubble Loop Has No Fatigue Model — Worker Screams at Uniform Intensity Forever",
+        "priority": "could",
+        "effort": "medium",
+        "assignee": "dave",
+        "framework": "Storytelling",
+        "tags": [
+          "polish",
+          "error-bubble",
+          "fatigue",
+          "animation"
+        ],
+        "description": "Still unfixed from review 65. Office.jsx:541-553 — the error micro-bubble setInterval fires every 12 seconds indefinitely. A worker in error for 2 hours fires 600 bubbles at equal urgency. Real engineers lose steam. Add a fatigue model: useRef fireCount tracks calls; first 4 fires use WORKER_ERROR_BUBBLES (full panic), next 4 alternate with subdued messages ('...', 'still here', 'please send help'), after that slow to 30s intervals with only passive messages ('😶', '🤐'). Implement with recursive setTimeout instead of setInterval so the interval duration can change. Reset fireCount when variant or worker.status changes back from error."
+      },
+      {
+        "title": "SOLO_SPOTLIGHT_MESSAGES Is Still Incomplete — Most Workers Missing 2-3 Vibe Entries",
+        "priority": "could",
+        "effort": "small",
+        "assignee": "luna",
+        "framework": "Storytelling",
+        "tags": [
+          "polish",
+          "solo-spotlight",
+          "character-voice"
+        ],
+        "description": "Still partially unfixed from review 65. App.jsx:261-269 — coverage gaps: carlos missing in-flow/slow-day/after-hours, dave missing in-flow/slow-day, maya missing in-flow/after-hours, luna missing on-fire/in-flow/slow-day. All fall back to default. Add the 10 missing entries. Suggestions: carlos/in-flow: '⚙️ Backend humming. He barely notices anyone left.'; carlos/slow-day: '📋 Low traffic. He is reading the logs from two weeks ago.'; dave/in-flow: '🚀 Pipelines clear. Dave is optimizing things no one asked for.'; dave/slow-day: '🎧 Quiet infra day. He is listening to something called ambient code noise.'; maya/in-flow: '✏️ Nobody is here to critique the design. Dangerous.'; maya/after-hours: '🎨 Just her, the mockup, and the infinite scroll of inspiration.'; luna/on-fire: '🔥 Creative brief on fire. Deadlines do that to everything.'; luna/in-flow: '✨ Ideas arrive faster when the office goes quiet.'; luna/slow-day: '🌙 Slow day. The perfect kind for the ideas that need silence.'"
+      },
+      {
+        "title": "Idle Micro-Bubble Emojis Are Slot-Based Not Character-Based — Same Seat, Different Person, Same Emoji",
+        "priority": "could",
+        "effort": "small",
+        "assignee": "luna",
+        "framework": "Storytelling",
+        "tags": [
+          "polish",
+          "idle-bubble",
+          "character-voice"
+        ],
+        "description": "Office.jsx:514 — IDLE_BUBBLE_EMOJIS is keyed by wanderIdx slot (1-4). Carlos always gets coffee if he is first idle; if someone else occupies that slot they also get coffee. The bubbles are position-accidents not character moments. Fix: replace IDLE_BUBBLE_EMOJIS with a WORKER_IDLE_BUBBLES map keyed by worker.id: { carlos: ['☕', '📊', '🔍'], maya: ['💜', '✏️', '🎨'], dave: ['🎧', '📦', '⚡'], sofia: ['🔍', '📋', '🧪'], luna: ['🌙', '✨', '💭'], default: ['☕', '💬', '🪟', '🧘'] }. In the Character idle bubble useEffect, pick randomly from WORKER_IDLE_BUBBLES[worker.id] || WORKER_IDLE_BUBBLES.default. Now Carlos's breaks always feel like Carlos."
+      },
+      {
+        "title": "The Ficus Still Has No Grief State When vibeStreak Drops Back to Seedling",
+        "priority": "could",
+        "effort": "medium",
+        "assignee": "maya",
+        "framework": "Delight & Polish",
+        "tags": [
+          "wild",
+          "ficus",
+          "plant",
+          "vibe-streak",
+          "animation"
+        ],
+        "description": "Still unfixed from review 65. Office.jsx:1066-1082 — when vibeStreak drops and plantStage reverts to seedling, the ficus silently regresses with no animation. All that growth, no ceremony for the loss. Fix: in the plant milestone useEffect, detect stage decrease and set a new plantWilting state for 1800ms. In Office.css, add: .office-plant--ficus[data-wilting] .ficus-foliage { transform: rotate(12deg) scale(0.85); opacity: 0.45; transition: all 0.9s ease; } and .office-plant--ficus[data-wilting] .ficus-stem { filter: brightness(0.7); }. Also update the tooltip for seedling stage from current generic text to 'Ficus.js is having a moment... (streak: 1)'. Maya owns the animation work."
+      },
+      {
+        "title": "Give Bloberto Manager Commentary When Workers Are Clicked — Independent of Their Personal Reaction",
+        "priority": "wild",
+        "effort": "small",
+        "assignee": "luna",
+        "framework": "Storytelling",
+        "tags": [
+          "wild",
+          "bloberto",
+          "ping-reaction",
+          "manager-commentary",
+          "character-voice"
+        ],
+        "description": "Once the pingReaction routing bug is fixed (reaction #1 above), Bloberto will no longer hijack worker reactions. His bubble slot will be idle when workers are clicked. Opportunity: add a BLOBERTO_WORKER_COMMENTARY map that fires on Bloberto's Character 800ms after a worker is clicked — a delayed managerial observation. Examples: { carlos: 'Good. The logs are speaking.', sofia: 'She found something. I can already tell.', dave: 'DevOps never sleeps and neither does he.', maya: 'That shade of purple was my idea originally.', luna: 'Creative energy detected. Protect it.' }. Set a separate managerCommentary state in Office.jsx, trigger it inside handleCharClick with setTimeout(800), forward it to Bloberto as a new prop blobCommentary. Character component shows it in the bubble for 2500ms then hides. This lets both the worker and the manager react to the same click event with different voices."
+      }
+    ]
   }
 ]
