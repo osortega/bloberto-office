@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-09T15:02:00Z"
+  "workers": [
+    {
+      "name": "Sofia",
+      "role": "qa",
+      "emoji": "🔍",
+      "status": "working",
+      "task": "QA review #45 — live site + codebase analysis",
+      "started_at": "2026-03-09T15:15:00Z"
+    }
+  ],
+  "updated_at": "2026-03-09T15:15:00Z"
 }
