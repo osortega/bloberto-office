@@ -1154,5 +1154,96 @@
     ],
     "hire_proposals": [],
     "_previous_review": 68
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 70,
+    "timestamp": "2026-03-09T14:05:00Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Puppeteer timed out in this environment; review based on full code audit of App.jsx, Office.jsx, Office.css, App.css, and utils/.",
+    "visual_observations": [
+      "Code review confirms the streak eulogy toast has no dismiss timer — it can freeze on screen indefinitely.",
+      "The Esc shortcut is labeled 'Clear' in ShortcutToast but the handler only blurs — no filter state is cleared.",
+      "TASK_TAG_DEFS regex patterns cover Bug/Ship/Design/QA/Data/Docs but have no Meeting or Planning category.",
+      "AwaySign AWAY_MESSAGES (sticky-note layer) are generic strings while WORKER_AWAY_DESK_LABELS (nameplate layer) are character-specific — two systems coexist with different levels of personality.",
+      "Footer quote counter shows '1/9' on first load even when no bonus has been unlocked — the vibe-keyed tagline is silently counted as entry #1.",
+      "vibeCaption overlay has no cooldown — threshold-boundary vibe oscillations spam the overlay on every cycle.",
+      "DESKS is hardcoded to 6 slots; any workers.json entry beyond 6 is silently clipped with no visual fallback.",
+      "No prefers-reduced-motion handling found anywhere in App.jsx or Office.jsx — confetti, ambient particles, character animations, and sparklines all play at full intensity."
+    ],
+    "fixed_since_last_review": [
+      "Worker ping reactions now render on the clicked worker — the variant !== 'manager' guard is in place at Office.jsx:694-698.",
+      "normalize() no longer mutates in-place — the spread operator creates a new object at App.jsx:772-776.",
+      "Worker filter bar now falls back to allWorkers when roster is empty — (roster.length > 0 ? roster : allWorkers) at App.jsx:1323.",
+      "Progress bar undefined guard added — typeof progress === 'number' ? progress : '—' at App.jsx:222 (though '—%' still renders the bare percent sign)."
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "Bug",
+        "title": "Streak Eulogy Toast Has No Clear Timer — It Sticks on Screen Indefinitely",
+        "description": "App.jsx line 951-953: when vibeStreak drops below 3, setCompletionToast({ text: '💀 RIP the streak...', type: 'info' }) is called. But completionToastTimerRef.current is NEVER set in this code path. The justShipped block (line 924-933) always sets completionToastTimerRef, but the streak eulogy fires from a separate useEffect with no corresponding timer. Result: the toast renders and never removes itself unless a justShipped event happens to overwrite it. On a slow day with no task completions, the eulogy toast could persist for the entire session. Fix: after the setCompletionToast({ text, type }) call, add completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3500). WHY: a toast with no exit is a UI anchor — it stops being a notification and becomes a permanent element, exactly the opposite of what transient feedback should do.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "Bug",
+        "title": "Esc Shortcut Is Labeled 'Clear' But Only Blurs — Tag Filter and Worker Filter Stay Active",
+        "description": "App.jsx line 822: the Esc handler calls document.activeElement?.blur() and nothing else. ShortcutToast line 634 advertises '⌨️ Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear'. Users who read 'Esc Clear' and then press Esc while a task tag or worker filter is active will see no change — both selectedTag and workerFilter remain set. The label is a promise the code does not keep. Fix: in the Esc handler, add setSelectedTag(null) and setWorkerFilter(null) before the blur call. Update the ShortcutToast label to match: 'Esc Clear filters'. WHY: keyboard shortcut labels are implicit contracts. Breaking that contract trains users not to trust the shortcut system and not to explore what other shortcuts might do.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "Accessibility",
+        "title": "prefers-reduced-motion Is Completely Ignored — Every Animation Plays at Full Intensity",
+        "description": "A search of App.jsx, Office.jsx, App.css, and Office.css finds zero instances of prefers-reduced-motion or matchMedia('(prefers-reduced-motion'). This means confetti (30 animated pieces), ambient particles (12 in App, 7 in Office), character bob/wander keyframe animations, progress ring transition, sparkline SVG, vibe shockwave, and the bloberto-typing dots all play at full intensity regardless of the user's system motion preference. For users with vestibular disorders, this is a real accessibility failure. Fix in two parts: (1) add a CSS block @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } } in index.css; (2) in App.jsx, gate confetti rendering with a window.matchMedia('(prefers-reduced-motion: reduce)').matches check — don't render the confetti-layer divs at all when true. WHY: the office should feel alive for people who want it; it should not be physically uncomfortable for people who don't.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "Delight & Polish",
+        "title": "TASK_TAG_DEFS Has No Meeting or Planning Pattern — A Whole Class of Work Is Invisible",
+        "description": "App.jsx lines 164-171: TASK_TAG_DEFS covers Bug, Ship, Design, QA, Data, and Docs. But tasks like 'roadmap review', 'planning sprint 42', 'scheduling standup ceremony', 'discuss requirements with client', 'quarterly kickoff prep' match zero patterns and render no tags. Planning and meeting work is a substantial portion of team activity — especially for Bloberto (Manager) and Luna (Creative Director) — and it's entirely invisible to the tag filter system. Fix: add { pattern: /plan|roadmap|sprint|kickoff|standup|meeting|agenda|discuss|ceremony|sync/i, label: 'Plan', emoji: '🟡', className: 'task-tag--plan' } to TASK_TAG_DEFS. Add .task-tag--plan { background: rgba(234,179,8,0.15); color: #ca8a04; } in App.css. WHY: the tag system exists to give the dashboard instant semantic context; if a whole category of work is invisible, the context is systematically incomplete.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "Storytelling",
+        "title": "AwaySign Sticky-Note Uses Generic Messages While the Nameplate Has Character-Specific Labels — Two Layers, Two Personalities",
+        "description": "Office.jsx has two parallel systems for idle desks: WORKER_AWAY_DESK_LABELS (line 147-153) keyed by worker.id — carlos gets '↪ in the logs', maya gets '↪ sketching' — and the AwaySign component (line 437-468) with a generic AWAY_MESSAGES array ['☕ Coffee run', '🧠 Deep think', '📞 On a call', '🚶 Taking a lap', '🥪 Lunch', '🎧 Headphones in']. The sticky-note on the desk is the more visible element — it's animated, larger, and color-coded by idle duration — but it says the same generic things for every worker. Fix: add WORKER_AWAY_MESSAGES in Office.jsx: { carlos: ['☕ In the logs', '🧪 Tracing a bug', '📖 Reading docs', '🔌 Debugging'], maya: ['🎨 Sketching', '🖌️ Wireframing', '💜 Mood-boarding', '✏️ Reviewing comps'], dave: ['🎧 Headphones in', '⚙️ Pipeline watch', '📦 Infra thinking', '🚀 Deploy planning'], sofia: ['🔍 Exploring', '🧪 Test design', '📋 Case writing', '🔎 Bug hunting'], luna: ['🌙 Daydreaming', '✨ Spec drafting', '💡 Ideas percolating', '📐 Visual thinking'], default: AWAY_MESSAGES }. In AwaySign, pick from WORKER_AWAY_MESSAGES[workerId] or default. WHY: the sticky-note is the soul of the idle desk — it should know who left it.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "could",
+        "category": "Delight & Polish",
+        "title": "Footer Quote Counter Opens at '1/9' When Zero Bonus Quotes Have Been Unlocked",
+        "description": "App.jsx line 1360: the counter formula is (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 / BONUS_TAGLINES.length + 1. BONUS_TAGLINES has 8 entries, so the denominator is 9. On first load quoteBonus = 0, so the counter shows '1/9'. But at this point showBonus is false and the footer is displaying the FOOTER_TAGLINES vibe-keyed quote — not a bonus. The counter says '1 of 9 seen' when the user hasn't tapped the sparkle yet. First tap flips showBonus to true AND increments quoteBonus to 1, showing '2/9' for what is actually the first bonus seen. Off-by-one in the counter misleads users about discovery progress. Fix: when showBonus is false, show no counter (or '0/8'). When showBonus is true, show quoteBonus/BONUS_TAGLINES.length — just the bonus count. WHY: discovery counters are only delightful when they're accurate; a wrong counter teaches users to distrust the UI.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "Office Life",
+        "title": "vibeCaption Overlay Has No Cooldown — Threshold Oscillation Spams the Caption on Every Poll Cycle",
+        "description": "Office.jsx lines 1171-1183: setVibeCaption fires on any vibe change and clears after 2800ms. The vibe is recalculated from getTeamVibe(workers) on every poll (every 30s). If the team sits on the boundary between 'in-flow' (40-70% working) and 'slow-day' (below 40%), a single worker toggling between working and idle every poll cycle will produce a caption every 30 seconds — '⚡ In the zone' then '☁️ Easy does it' then '⚡ In the zone' in rapid alternating succession. The caption becomes noise rather than signal. Fix: add a lastCaptionVibeRef = useRef(null) in Office. Only fire setVibeCaption if the new vibe is different from lastCaptionVibeRef.current AND it has been at least 90 seconds since the last caption. WHY: a notification that fires too often stops being noticed; one that fires at the right moment stops the room.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "wild",
+        "category": "New Features",
+        "title": "DESKS Silently Clips Any Worker Beyond Six — Give the Office an Overflow Zone",
+        "description": "Office.jsx constants.js DESKS array has exactly 6 entries. The deskOccupants useMemo at line 1190-1203 maps workers to desk slots in order — once all 6 are filled, any additional workers (7th, 8th, etc.) are silently skipped. They appear nowhere in the office view: no desk, no character, no ghost. If workers.json ever gains a 6th or 7th team member, they simply vanish from the Office tab with no indication. Fix in two layers: (1) short-term: any workers beyond 6 should appear in a 'Remote Row' — a new CSS zone below the main desks with a '📡 Remote' label, rendered using the same desk/character components but with a softer visual treatment. (2) long-term: make DESKS dynamically extensible by computing rows from Math.ceil(workers.length / 3) and distributing desk positions proportionally. WHY: the office should grow with the team. Silently hiding people is exactly the opposite of what a visibility tool should do — it's worse than an empty state because it suggests presence while delivering absence.",
+        "effort": "large",
+        "assigned_to": "tbd"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 69
   }
 ]
