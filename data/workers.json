@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-09T15:45:00Z"
+  "workers": [
+    {
+      "name": "Carlos",
+      "role": "backend",
+      "emoji": "⚙️",
+      "status": "working",
+      "task": "Fix 4 HIGH + 1 MEDIUM bugs from Sofia QA #45",
+      "started_at": "2026-03-09T15:46:00Z"
+    }
+  ],
+  "updated_at": "2026-03-09T15:46:00Z"
 }
