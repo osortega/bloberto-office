@@ -298,5 +298,80 @@
     ],
     "hire_proposals": [],
     "_previous_review": 61
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 63,
+    "timestamp": "2026-03-09T05:01:00Z",
+    "theme": "Your characters have faces — now give them handwriting",
+    "visual_observations": "Puppeteer timed out; thorough code review conducted instead. The codebase has invested enormous effort in individual character identity: each team member has a bespoke hand-drawn SVG portrait (Carlos with thick-rimmed glasses, Dave with headphone band, Sofia with magnifying glass, Maya with bicolor pink/purple hair, Luna with crescent moon accessory) and a unique desk screen SVG (Carlos: blue editor lines; Maya: purple wireframe boxes; Dave: orange blinking terminal cursor; Sofia: green bar charts; Luna: indigo Kanban columns with gold star). PING_REACTIONS in Office.jsx nails each voice precisely. But the moment a character goes idle, they lose all individuality: AWAY_MESSAGES ('Coffee run', 'Headphones in') are shared across everyone and indexed by wander slot position, not by who the person is. IDLE_BUBBLE_EMOJIS is keyed by wanderIdx (1-4), not worker.id. ERROR_BUBBLE_MESSAGES fires identically for all five characters regardless of role -- Carlos the backend engineer and Maya the designer both panic with frontend-flavored errors. LONE_SURVIVOR_LABELS are purely vibe-keyed. VACANT_ADS are vibe-keyed but role-agnostic. The card flip back face has no character voice at all -- just timestamped log entries under a name label. The entire characterization architecture lives in the SVG portrait layer; the behavioral and text layer below it reverts to generic chorus. The desk screens -- the most quietly expressive feature in the office scene -- are completely static and decorative.",
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "team",
+        "title": "Away Notes Should Know Whose Desk They Are On",
+        "description": "In Office.jsx, the AwaySign component derives its message from AWAY_MESSAGES indexed by (seed + Math.floor(idleMinutes / 10)) mod length -- a shared array of 6 generic strings shared by every worker. Sofia the QA analyst and Dave the backend dev leave identical notes. Replace with a WORKER_AWAY_MESSAGES object keyed by worker.id, falling back to the generic array: carlos -> ['In the logs again', 'Blame attribution in progress', 'Something smells wrong'], maya -> ['Redlining this', 'Making it purple', 'Grid theory break'], dave -> ['Full send in cans', 'Compiling the vibe', 'Cleaning up the diff'], sofia -> ['Found something', 'Writing the spec', 'Lunch (spotted 2 bugs)'], luna -> ['Horizon scanning', 'Staring at this layout', 'Revising the deck']. The AwaySign component already has the workerId prop threading through -- swap AWAY_MESSAGES for a per-worker lookup. WHY: the away note is the most readable character moment in the idle state. It should sound like them, not like a shared office template.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "team",
+        "title": "Error Panics Should Match the Panic-er's Job",
+        "description": "In Office.jsx, ERROR_BUBBLE_MESSAGES fires for all workers in error state: ['it was fine locally', 'undefined is not a function', 'send help']. Every message is frontend JS developer flavored. When Sofia (QA) panics she says 'undefined is not a function'. When Luna (Creative Director) panics she says 'it was fine locally.' These are wrong by role. Replace the shared array with a WORKER_ERROR_BUBBLES map keyed by worker.id: carlos -> ['SIGKILL', 'db is lying to me', 'logs on fire', '500'], maya -> ['every border is wrong', 'the prototype lied', 'my components are crying'], dave -> ['git blame moment', 'npm ci again?', 'the build is sentient'], sofia -> ['the spec never said this', 'REGRESSION', '5 new bugs found', 'who merged this'], luna -> ['the deck is burning', 'every color is wrong', 'the brief changed again']. Fall back to ERROR_BUBBLE_MESSAGES for workers without a mapping. WHY: panic reveals character -- a QA engineer and a backend dev do not have the same flavor of crisis.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "must",
+        "category": "storytelling",
+        "title": "The Card Back Is a Ledger With No Author",
+        "description": "In App.jsx, WorkerCard's back face renders the worker name then immediately maps over workerHistory as plain log entries. There is no character voice anywhere on the back. The back should open with a character-specific tagline: a styled .worker-card__back-tagline element drawn from a WORKER_TAGLINES map keyed by worker.id. Examples: carlos -> 'The logs don’t lie.', maya -> 'Designs ship when they’re ready. Sometimes sooner.', dave -> 'Every merged PR had a story.', sofia -> 'Quality or nothing.', luna -> 'Creative velocity is still velocity.' Render it as a small italic/muted line between .worker-card__back-title and the history entries in the WorkerCard back div. WHY: you flip the card to learn something about the person -- you should hear them before you read the receipts.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "office-life",
+        "title": "Idle Micro-Bubbles Know the Seat, Not the Person",
+        "description": "In Office.jsx, IDLE_BUBBLE_EMOJIS is { 1: '☕', 2: '💬', 3: '🪟', 4: '🧘' }, indexed by wanderIdx -- the character's wander animation slot (1-4), which is assigned by position order each render, not by identity. Carlos might be wanderIdx=2 one session and wanderIdx=3 the next. Replace with WORKER_IDLE_BUBBLES keyed by worker.id: carlos -> ['📊', '☕', '🐛'], maya -> ['🎨', '💜', '✏️'], dave -> ['🎧', '🎵', '🎤'], sofia -> ['🔍', '📋', '✅'], luna -> ['🌙', '✦', '📔']. Cycle using (Math.floor(Date.now() / 12000)) mod workerBubbles.length. In the Character component, swap IDLE_BUBBLE_EMOJIS[wanderIdx] for the worker-specific lookup. WHY: thought bubbles are windows into someone's inner monologue -- they should not be accidentally assigned by which slot the character happened to land in this poll cycle.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "The Desk Screen Is a Silent Character -- Let It React",
+        "description": "In Office.jsx, DESK_SCREEN_SVG has meticulously crafted per-worker screens: Carlos's blue editor lines, Maya's purple wireframe boxes, Dave's orange blinking terminal cursor, Sofia's green bar charts. These are beautiful and they never change -- a worker can be tagged Bug with error status and their screen still shows steady blue progress lines. The key is determined by worker.id or worker.id + '_error'. Extend this to task-aware lookup: build the screen key as worker.id + '_' + dominant task tag, falling back progressively to worker.id + '_error' then worker.id. At minimum add a sofia_qa variant (pulsing test pass/fail columns) and a maya_design variant (denser wireframe grid with more boxes). The DESK_SCREEN_SVG object already has error variants per worker -- the same pattern applies to task-state variants. WHY: the desk screen is the only element in the office that shows WHAT someone is working on spatially. Right now it just shows who they are. Let it show both.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "storytelling",
+        "title": "The Lone Survivor Reads the Vibe, Not the Person",
+        "description": "In Office.jsx, LONE_SURVIVOR_LABELS maps vibeKey to a label: 'on-fire' -> '🧯 one-person fireteam', 'crushing' -> '🎯 solo run'. This fires when isLoneSurvivor is true. Sofia holding the line during on-fire and Carlos holding the line during on-fire read identically. Sofia is QA -- she is catching regressions. Carlos is Backend -- he is keeping the db alive. Create LONE_SURVIVOR_WORKER_OVERRIDES keyed by worker.id with vibeKey sub-keys: carlos -> { 'on-fire': '🧯 backend won’t fall today', 'crushing': '📊 no bottlenecks when you ARE the stack' }, sofia -> { 'on-fire': '🔍 holding quality with both hands', 'crushing': '✅ bugs have nowhere to hide' }, dave -> { 'on-fire': '🎧 incident music: selected', 'slow-day': '🎵 coding into the void' }, maya -> { 'crushing': '💜 shipping pixels at terminal velocity' }, luna -> { 'after-hours': '🌙 reviews don’t stop at midnight' }. Fall back to LONE_SURVIVOR_LABELS[vibe] if no override exists. WHY: the lone survivor moment is the most cinematic frame in the product -- it should name the person, not just the vibe.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "delight",
+        "title": "deep-work Has No Human Announcement",
+        "description": "In Office.jsx, the char--deep-work CSS class fires when a worker has been actively working for 45+ minutes. This triggers a CSS animation change but there is no textual signal -- the Character component data-tooltip shows the same generic tooltip as any other working character. Add a DEEP_WORK_LABELS map keyed by worker.id: carlos -> 'deep in the stack', maya -> 'in the design zone', dave -> 'headphones: noise canceling', sofia -> 'thorough mode: activated', luna -> 'creative deep dive'. When variant === 'working' and updated_at is 45+ minutes ago, use this label in the tooltip: firstName + ' · ' + DEEP_WORK_LABELS[worker.id] + ' · ' + formatDuration(worker.updated_at). Consider also a tiny inline indicator alongside the typing-dots so deep work is visible without hover. WHY: 45 minutes of uninterrupted focus is a meaningful signal that should announce itself with each worker's own flavor rather than a generic CSS class that only designers ever notice.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "wild",
+        "category": "team",
+        "title": "Consolidate Five Voice Systems Into One Character Bible",
+        "description": "Character voice is currently fragmented across at least five independent constants in two files: PING_REACTIONS (Office.jsx), AWAY_MESSAGES (Office.jsx), IDLE_BUBBLE_EMOJIS (Office.jsx), ERROR_BUBBLE_MESSAGES (Office.jsx), and the proposed additions from this review. Each was built independently and speaks in a different register. The result is a patchwork personality instead of a coherent internal voice for each worker. Proposal: create src/utils/characterVoice.js with a single CHARACTER_VOICE object keyed by worker.id with sub-keys for each context: { carlos: { idle: [...], error: [...], ping: '...', deepWork: '...', awayNotes: [...], cardTagline: '...' } }. Migrate all existing per-worker voice constants to import from this file. No rendering logic changes -- just one authoritative source of truth. Start with carlos and sofia as the first two entries as proof of concept. WHY: every future feature that wants to add character personality currently has to invent a new standalone constant in a new place. A character bible means the voice is an asset you can extend, not a side effect you have to find.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 62
   }
 ]
