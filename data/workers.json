@@ -1,13 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️",
-      "status": "working",
-      "task": "Late-night greeting fix + dispatch label navigation",
-      "started_at": "2026-03-09T03:36:00Z"
-    }
-  ],
-  "updated_at": "2026-03-09T03:36:00Z"
+  "workers": [],
+  "updated_at": "2026-03-09T03:38:00Z"
 }
