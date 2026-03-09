@@ -1,13 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Luna",
-      "role": "Creative Director",
-      "emoji": "🌙",
-      "status": "working",
-      "task": "Creative review #59 — visual audit & ideation",
-      "started_at": "2026-03-09T01:30:00Z"
-    }
-  ],
-  "updated_at": "2026-03-09T01:30:00Z"
+  "workers": [],
+  "updated_at": "2026-03-09T01:42:00Z"
 }
