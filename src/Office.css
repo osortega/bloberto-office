@@ -1166,6 +1166,11 @@
     font-size: 0.48rem;
     letter-spacing: 0.06em;
   }
+  .office-wall-clock {
+    top: 6px !important;
+    right: 8px !important;
+    transform: scale(0.75);
+  }
 }
 
 /* ---- Typing Dots ---- */

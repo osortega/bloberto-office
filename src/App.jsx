@@ -618,6 +618,7 @@ export default function App() {
   const [isSyncing, setIsSyncing] = useState(false)
   const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
   const [vibeStreak, setVibeStreak] = useState(1)
+  const prevStreakRef = useRef(0)
   const [tab, setTab] = useState(() => {
     const h = window.location.hash.slice(1)
     return h === 'dashboard' || h === 'office' ? h : 'office'
@@ -902,6 +903,12 @@ export default function App() {
     localStorage.setItem('bloberto-vibe-key', teamVibe.key)
     localStorage.setItem('bloberto-vibe-streak', String(newStreak))
     setVibeStreak(newStreak)
+
+    // Streak eulogy
+    if (prevStreakRef.current >= 3 && newStreak < 3) {
+      setCompletionToast({ text: '💀 RIP the streak — it was beautiful while it lasted', type: 'info' })
+    }
+    prevStreakRef.current = newStreak
 
     // Confetti burst when vibe rank increases
     const vibeRanking = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }
