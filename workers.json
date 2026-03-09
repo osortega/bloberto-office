@@ -1,13 +1,13 @@
 {
   "workers": [
     {
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
       "status": "working",
-      "task": "Fix worker.id normalization + startedAt camelCase + activity log header count (review #67 bugs)",
-      "started_at": "2026-03-09T08:10:00Z"
+      "task": "Creative review #69 — 30-minute site evaluation and ideation",
+      "started_at": "2026-03-09T12:30:00Z"
     }
   ],
-  "updated_at": "2026-03-09T08:10:00Z"
+  "updated_at": "2026-03-09T12:30:00Z"
 }
