@@ -1,17 +1,5 @@
 {
-  "workers": [
-    {
-      "id": "sofia-qa-30",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "🔍",
-      "status": "working",
-      "task": "QA review #30 — analyzing live site + source code",
-      "progress": 10,
-      "updated_at": "2026-03-09T00:45:00Z",
-      "startedAt": "2026-03-09T00:45:00Z"
-    }
-  ],
+  "workers": [],
   "roster": [
     { "name": "Maya", "role": "Frontend Dev", "emoji": "🎨" },
     { "name": "Carlos", "role": "Backend Dev", "emoji": "⚙️" },
@@ -19,5 +7,5 @@
     { "name": "Sofia", "role": "QA Engineer", "emoji": "🔍" },
     { "name": "Luna", "role": "Creative Director", "emoji": "🌙" }
   ],
-  "updated_at": "2026-03-09T00:45:00Z"
+  "updated_at": "2026-03-09T00:52:00Z"
 }
