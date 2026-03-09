@@ -1,21 +1,13 @@
 {
   "workers": [
     {
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
       "status": "working",
-      "task": "3 small MUST fixes: greeting time, shortcut bar mobile, polling indicator",
-      "started_at": "2026-03-09T04:36:00Z"
-    },
-    {
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨",
-      "status": "working",
-      "task": "Surface VIBE_WEATHER_LABELS in Office UI",
-      "started_at": "2026-03-09T04:36:00Z"
+      "task": "Creative review #63",
+      "started_at": "2026-03-09T05:00:00Z"
     }
   ],
-  "updated_at": "2026-03-09T04:36:00Z"
+  "updated_at": "2026-03-09T05:00:00Z"
 }
