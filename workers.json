@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-09T01:42:00Z"
+  "workers": [
+    {
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "⚙️",
+      "status": "working",
+      "task": "Conference table standup trigger + whiteboard task count",
+      "started_at": "2026-03-09T01:44:00Z"
+    }
+  ],
+  "updated_at": "2026-03-09T01:44:00Z"
 }
