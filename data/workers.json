@@ -3,11 +3,19 @@
     {
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙",
+      "emoji": "\ud83c\udf19",
       "status": "working",
-      "task": "Creative review #68 — visual + code analysis",
+      "task": "Creative review #68 \u2014 visual + code analysis",
       "started_at": "2026-03-09T11:30:00Z"
+    },
+    {
+      "name": "Sofia",
+      "role": "QA & Product Analyst",
+      "emoji": "\ud83d\udd0d",
+      "status": "working",
+      "task": "QA review #41 triage \u2014 escalating 2 CRITICAL + 4 HIGH items",
+      "started_at": "2026-03-09T11:45:00Z"
     }
   ],
-  "updated_at": "2026-03-09T11:30:00Z"
+  "updated_at": "2026-03-09T11:45:00Z"
 }
