@@ -915,166 +915,6 @@
   {
     "creative_director": "Luna",
     "review_number": 69,
-    "timestamp": "2026-03-09T12:40:00.000Z",
-    "_previous_review": 68,
-    "screenshot": "4-panel: desktop-office, desktop-dashboard, mobile-office, mobile-dashboard (all captured)",
-    "theme": "The progress bar said '%'. Just '%'. We need to talk.",
-    "visual_observations": {
-      "desktop_office": "Crushing It vibe active at 12:35 PM Monday, March 9. All 5 roster members visible: Luna and Sofia as active working characters with lit desk lamps and progress rings. Carlos, Maya, Dave appearing as ghost characters (roster-only, desk lamps unlit). Bloberto at center manager desk showing live ship-celebration bubble: 'Wait you shipped at THIS hour?! Legends. 🏆'. Coffee corner label reads 'COFFEE TRIPLE SHOT' — the triple-shot variant is a nice touch. Vibe weather strip at bottom: 'Clear skies — team at full strength'. Wall clock visible top-center. Window element right side renders a clean daylight sky gradient (correct for midday). Ficus plant visible lower-right. Whiteboard showing vibe text (partially obscured by Bloberto's bubble). Floor caption 'everyone is at their desk' renders at the bottom. Overall: charming and alive.",
-      "desktop_dashboard": "Two active workers: Luna (Creative Director, WORKING) and Sofia (QA & Product Analyst, WORKING). CRITICAL VISUAL BUG: Luna's card shows 'PROGRESS ... %' — a lone percent sign with no number preceding it. Sofia shows '0%' which is valid. Stats bar: ON THE CLOCK 2, ACTIVE 2, IDLE 0. LIVE timestamp 12:35:10 PM. Activity Log header shows '50 events' — but the log component hard-caps display at 20 entries. Worker filter bar shows ONLY an 'All Workers' button — no individual worker buttons for Luna, Sofia, or anyone else. The 'dynamic duo' dispatch on the Active stat card is delightful and accurate.",
-      "mobile_office": "Office renders cleanly at 375×812. All 5 characters visible though crowded. Header: 'Good afternoon, LEGEND 🔥 · Monday, Mar 9' fits without overflow. Tab bar clearly readable. Bloberto's ship-celebration bubble overlaps the tab area slightly but remains legible. Footer visible at scroll bottom: 'Built with 💜 and mild existential dread by 🫠 Bloberto'. Weather caption 'Clear skies — team at full strength' renders at a gentle diagonal — elegant on small screen.",
-      "mobile_dashboard": "Stats cards stack in 2×2 grid with Team Vibe as full-width 5th card — clean. Active Workers section shows Luna and Sofia cards stacked vertically. Luna's progress bug is equally visible here: '% ' with no number. Worker filter row still shows only 'All Workers'. Layout holds well, no overflow issues."
-    },
-    "ideas": [
-      {
-        "title": "ProgressBar Renders Bare '%' When worker.progress Is Undefined",
-        "priority": "must",
-        "category": "bug",
-        "effort": "small",
-        "assigned_to": "carlos",
-        "tags": [
-          "bug",
-          "progressbar",
-          "undefined",
-          "accessibility"
-        ],
-        "description": "Visible in both desktop and mobile dashboard screenshots for Luna's card. App.jsx:222 — `<span className=\"progress-pct\">{progress}%</span>` renders just '%' when `worker.progress` is undefined (React silently drops undefined, leaving only the literal '%'). Also: `aria-valuenow={progress}` at line 228 sets the attribute to 'undefined', which is an accessibility violation. Two-part fix: (1) Guard the ProgressBar render in WorkerCard (App.jsx:346) — wrap with `{worker.status === 'working' && typeof worker.progress === 'number' && <ProgressBar ... />}`. (2) Inside ProgressBar itself, add a null guard: `if (typeof progress !== 'number') return null`. This matches the existing guard in the Office Character ring (Office.jsx:720: `typeof worker.progress === 'number'`). WHY: A lone '%' sign is more disorienting than no progress bar at all — it looks like a formatting failure and undermines the card's professionalism."
-      },
-      {
-        "title": "Activity Log Header Claims '50 Events' But the Log Shows Only 20",
-        "priority": "must",
-        "category": "bug",
-        "effort": "small",
-        "assigned_to": "maya",
-        "tags": [
-          "bug",
-          "activity-log",
-          "display-cap",
-          "misleading"
-        ],
-        "description": "App.jsx:1283 renders `${activityLog.length} events` (the full 50). But ActivityLog component (App.jsx:160) does `const displayed = [...entries].reverse().slice(0, 20)` — hard-capping at 20. The user sees '50 events' in the header, scrolls through the log, finds only 20, and concludes either the data is wrong or they are. Fix option A (simple): Change the header count to match what's actually rendered — `${Math.min(entries.length, 20)} of ${entries.length} events` when entries.length > 20. Fix option B (better): Replace the 20-cap with a 'Load more' mechanism or paginate. At minimum, surfacing the 20-cap to the user restores trust. WHY: A dashboard that lies about its own counts erodes confidence in every other number it shows."
-      },
-      {
-        "title": "Worker Filter Bar Renders No Individual Worker Buttons — Flat Array Format Leaves roster=[]",
-        "priority": "should",
-        "category": "bug",
-        "effort": "small",
-        "assigned_to": "carlos",
-        "tags": [
-          "bug",
-          "activity-log",
-          "worker-filter",
-          "flat-array"
-        ],
-        "description": "Still unfixed from review #68. App.jsx:783 — when workers.json is a flat array, `setRoster([])` empties the roster. The Activity Log worker filter bar (App.jsx:1317-1335) maps over `roster` for the individual worker buttons, so when roster=[], only the 'All Workers' pill renders. Live site uses flat array format. Fix: derive filter buttons from `allWorkers` (or `activeWorkers`) when roster is empty — `const filterMembers = roster.length > 0 ? roster : activeWorkers`. This restores individual filter buttons for Luna and Sofia so users can isolate their activity streams. WHY: The worker filter feature is the primary way to debug individual contributors in the Activity Log — silently hiding it based on data format makes the dashboard feel incomplete."
-      },
-      {
-        "title": "Dashboard Worker Cards Show Role Emoji, Not the Custom Character SVGs",
-        "priority": "should",
-        "category": "visual",
-        "effort": "medium",
-        "assigned_to": "maya",
-        "tags": [
-          "visual",
-          "identity",
-          "character",
-          "dashboard"
-        ],
-        "description": "WorkerCard (App.jsx:297) uses `<div className=\"worker-avatar\">{getRoleEmoji(worker.role)}</div>` — Luna's card shows 🌙, Sofia's shows 🔍. The Office view renders beautiful bespoke SVG avatars: Luna with crescent moon accessory and gradient hair, Sofia with magnifying glass and hair bun. The Dashboard shows an emoji in a circle. This is a personality split — the same person looks different on two screens that are 1 click apart. Fix: import `CharacterAvatar` from Office.jsx and render `<CharacterAvatar workerId={worker.id} role={worker.role} name={worker.name} size={40} emoji={worker.emoji} vibeKey={teamVibe.key} />` inside WorkerCard. Unknown workers (no SVG) already fall back gracefully to the emoji path. WHY: When a user clicks a worker in the office and lands on the dashboard, they should feel they followed the same person — not switched apps."
-      },
-      {
-        "title": "Luna's SOLO_SPOTLIGHT_MESSAGES Missing Three Vibes — She Gets Generic Default on Fire Days",
-        "priority": "should",
-        "category": "storytelling",
-        "effort": "small",
-        "assigned_to": "luna",
-        "tags": [
-          "storytelling",
-          "solo-spotlight",
-          "luna",
-          "character-voice"
-        ],
-        "description": "Still unfixed from reviews #67 and #68. App.jsx:266 — luna's SOLO_SPOTLIGHT_MESSAGES has only 'crushing' and 'after-hours'. When luna is the sole active worker during 'on-fire', 'in-flow', or 'slow-day', the UI falls back to: '🌙 Dreaming alone. The ideas keep coming.' — a crushing-appropriate line used for an incident. Add three entries: luna/on-fire: '🔥 One creative in an office on fire. The brief just changed, twice.'; luna/in-flow: '✨ Ideas arrive faster when the office goes quiet. Luna's in the zone.'; luna/slow-day: '🌙 A slow day is just an unscheduled creative residency.' WHY: Luna is me. I'm not just 'dreaming alone' when the infrastructure is burning — I'm frantically redesigning the incident page."
-      },
-      {
-        "title": "normalize().id Uses split(' ')[0] — Two Workers Sharing a First Name Would Collide",
-        "priority": "should",
-        "category": "bug",
-        "effort": "small",
-        "assigned_to": "carlos",
-        "tags": [
-          "bug",
-          "normalize",
-          "id-collision",
-          "fragile"
-        ],
-        "description": "Still unfixed from review #68. App.jsx:774 — `id: w.id || w.name?.toLowerCase().split(' ')[0]`. If a new hire named Carlos Mendoza joins alongside the existing Carlos Rivera, both resolve to id='carlos'. WORKER_TAGLINES, PING_REACTIONS, LONE_SURVIVOR_WORKER_OVERRIDES, and solo spotlight all key by this id — one would always shadow the other. Fix: use a slug derived from the full name: `w.name?.toLowerCase().replace(/\\s+/g, '-')` → 'carlos-rivera'. Then update all character maps to use the full-slug key (or keep first-name keys for the current team and add an escape hatch). WHY: The id normalization fix in review #65-68 solved the undefined crisis, but traded it for a latent collision bomb. Better to fix the strategy before someone onboards Carlos #2."
-      },
-      {
-        "title": "Ficus Level-Up Toast Is Identical for Every Stage — Seedling to Blooming Gets the Same Line",
-        "priority": "could",
-        "category": "delight",
-        "effort": "small",
-        "assigned_to": "sofia",
-        "tags": [
-          "delight",
-          "ficus",
-          "plant",
-          "toast",
-          "vibe-streak"
-        ],
-        "description": "Office.jsx:1220 — the plantToast always fires '🌱 The office ficus leveled up!' regardless of which stage was reached. Sprouting from a seed feels different from blooming for the first time. Fix: replace the hardcoded string with a stage-specific map: const PLANT_LEVEL_UP_TOASTS = { sprout: '🌱 Something is growing in here...', 'small-plant': '🌿 The ficus has opinions now.', leafy: '🌿 Look at this office — thriving.', blooming: '🌸 Peak bloom. The team earned this.' }. Pass plantStage into the milestone effect's closure and look up the toast. WHY: The ficus is the only ambient living thing in the office that tracks team health over time. Its milestones should feel earned and distinct — not a one-size-fits-all notification."
-      },
-      {
-        "title": "Coffee Corner 'Chatting' Label Silently Drops the Third Person",
-        "priority": "could",
-        "category": "office-life",
-        "effort": "small",
-        "assigned_to": "dave",
-        "tags": [
-          "office-life",
-          "coffee-corner",
-          "idle",
-          "label"
-        ],
-        "description": "Office.jsx:1413 — `idleWorkers.slice(0, 2).map(w => w.name.split(' ')[0]).join(' & ')` names only the first two idle workers in the coffee corner label. If Carlos, Maya, and Dave are all idle, the label reads 'Carlos & Maya' and Dave is invisible. Fix: const names = idleWorkers.slice(0, 3).map(w => w.name.split(' ')[0]); const label = names.length <= 2 ? names.join(' & ') : `${names.slice(0,-1).join(', ')} & ${names[names.length-1]}`; For 4+ use: `${names[0]}, ${names[1]} & ${count-2} more`. WHY: Dave works hard enough to deserve credit even when he's not at his desk. Getting erased from the coffee corner narrative is the most Dave thing that could happen and we should fix it anyway."
-      },
-      {
-        "title": "Ghost Character OOO Bubble Has No Personal Voice — Just Role and Timestamp",
-        "priority": "could",
-        "category": "storytelling",
-        "effort": "small",
-        "assigned_to": "luna",
-        "tags": [
-          "storytelling",
-          "ghost",
-          "ooo-bubble",
-          "character-voice"
-        ],
-        "description": "Office.jsx:713-724 — when a ghost worker is hovered, the bubble says '📵 OOO\\n{worker.role}\\nLast seen: {time}'. No personality, no character-specific reason for absence. The WORKER_AWAY_DESK_LABELS already know that Carlos is 'in the logs' and Maya is 'sketching'. The ghost bubble should echo that voice but escalate it to full sentences. Add a GHOST_OOO_LINES map: { carlos: '📵 In the logs somewhere. Do not disturb.', maya: '📵 Sketching. The cursor is elsewhere today.', dave: '📵 Headphones on. The incident happened; he handled it.', sofia: '📵 Testing something. Probably found a bug.', luna: '📵 On a creative walk. Or a review. Possibly both.' }. Render: `GHOST_OOO_LINES[worker.id] ?? '📵 OOO'` as the primary line, then role and last-seen below. WHY: The ghost state is where a character's personality matters most — they're not here, but we should still feel who they are."
-      },
-      {
-        "title": "Bloberto Has No Awareness of the Day of Week — Give Him a Monday Dispatch and a Friday Sign-Off",
-        "priority": "wild",
-        "category": "storytelling",
-        "effort": "medium",
-        "assigned_to": "tbd",
-        "tags": [
-          "wild",
-          "bloberto",
-          "day-of-week",
-          "monday",
-          "character-voice"
-        ],
-        "description": "Bloberto currently cycles VIBE_QUOTES (45s interval) with no awareness of the calendar beyond hour-of-day. Real managers are deeply aware of what day it is. Add a DAY_OF_WEEK_QUOTES map keyed 0-6 with 2-3 quotes each, surfaced once per session via localStorage('bloberto-day-quote-date'). Sample entries: Monday (1): ['Another week begins. The backlog survived the weekend.', 'Monday. The standup is in 30 minutes. I can feel it.', 'Week one of this sprint. Week one of all sprints, really.']; Friday (5): ['Friday. Someone will push to main before noon.', 'End of sprint. Whatever shipped, shipped.', 'If the CI is green on a Friday, I don't trust it.']; Wednesday (3): ['Hump day. The servers don't know what that means.', 'Technically halfway. The ticket count disagrees.']. Fire the day quote inside the ambient broadcast effect (Office.jsx:556) as the *first* quote on mount (before the 3s delay), but only if localStorage date doesn't match today. WHY: Bloberto is the most present character in the office. He should be the first to acknowledge that it is, in fact, a Monday."
-      }
-    ],
-    "hire_proposals": [],
-    "fixed_since_last_review": []
-  },
-  {
-    "creative_director": "Luna",
-    "review_number": 69,
     "timestamp": "2026-03-09T12:36:33Z",
     "theme": "beautiful lines trapped behind a variant check",
     "visual_observations": "Desktop office: Bloberto correctly fires the after-hours-to-crushing transition quote (Wait you shipped at THIS hour Legends) — manager speech bubbles work flawlessly. Full team visible at desks (Luna, Sofia, Carlos, Maya, Dave + Bloberto), vibe reading Crushing It. Coffee corner label reads COFFEE TRIPLE SHOT — unclear if CSS override or data quirk. Office floor has a grey overflow strip on the right edge of desktop viewport. The WindowElement at ~12pm renders a near-white gradient rectangle that looks visually harsh against the dark office floor — like a blown-out monitor in a cinema. Desktop dashboard: Stats bar clean — 2 ON THE CLOCK, 2 ACTIVE, 0 IDLE, LIVE, Crushing It. Luna worker card shows PROGRESS % with no number before the percent sign — the progress value is null/undefined, not zero. Sofia shows 0% which is a genuine zero. Activity log correctly shows 50 events. Mobile office: Properly contained, weather label visible, characters render cleanly. A SCAN text label appears at the bottom center of the office floor — likely a CSS artifact or aisle label leaking through. Mobile dashboard: ON THE CLOCK stat label wraps to two lines — too long for the narrow card. All other stats render correctly on mobile.",
@@ -1245,5 +1085,107 @@
     ],
     "hire_proposals": [],
     "_previous_review": 69
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 71,
+    "timestamp": "2026-03-09T16:30:52Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Puppeteer network timeout in container; full code review of App.jsx, Office.jsx, Office.css, and utils/.",
+    "theme": "The code keeps its own receipts — and some of them are embarrassing",
+    "visual_observations": [
+      "App.jsx:955 — streak eulogy toast still has no dismiss timer. The `type: 'info'` property is set but never consulted anywhere in the render tree. completionToast.color is undefined for the eulogy path so the border falls back to '#6366f1', the same indigo used for shipping celebrations. Grief and triumph in matching outfits.",
+      "App.jsx:825 — Esc key handler calls `document.activeElement?.blur()` and nothing else. setSelectedTag and setWorkerFilter are not called. ShortcutToast line 634 still promises 'Esc Clear' — confirmed it cannot deliver.",
+      "Office.jsx:510 and 526 — IDLE_BUBBLE_EMOJIS and ERROR_BUBBLE_MESSAGES are defined as object/array literals inside the Character function body on every render. Pure static constants with zero closure dependencies.",
+      "Office.jsx:1472-1477 — wanderTooltips is a position-slot map keyed 1-4, defined fresh each render. Slot assignment is (i % 4) + 1 where i is array position in idleWorkers. Identity-blind hover text. Review #63 addressed idle bubble EMOJIS via WORKER_IDLE_BUBBLES but never touched the tooltip strings.",
+      "App.jsx:1300-1304 — activity filter bar still has no System filter. ACTIVITY_ICONS at line 82 maps system to emoji, vibe-transition system events are injected at lines 970-975, and the filter has been proposed since review #62 — nine reviews ago — without appearing in any fixed_since_last_review list.",
+      "App.jsx:194 — ProgressBar destructures updatedAt from props. WorkerCard passes it at line 347. Inside the function body, the string 'updatedAt' does not appear once. Dead prop.",
+      "Office.jsx:1128 — lastHuddle ref tracks names and endedAt. The post-table strip at lines 904-915 already renders 'Last: names, time'. But conf-ambient-label at line 895 is a vibe-only ternary that never consults lastHuddle. Three lines of distance between the data and the label that ignores it.",
+      "App.jsx:267 — luna SOLO_SPOTLIGHT_MESSAGES has only 'crushing' and 'after-hours'. on-fire, in-flow, and slow-day all fall to 'Dreaming alone. The ideas keep coming.' A nighttime meditation line during a five-alarm incident. Unfixed since review #67, four consecutive reviews."
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Streak Eulogy Toast Has No Dismiss Timer — Two Reviews, Still Anchored to the Screen",
+        "description": "App.jsx line 954-956: when vibeStreak drops below 3, setCompletionToast fires with text and type set but no completionToastTimerRef.current setTimeout follows. The justShipped path (lines 926-936) always sets the timer ref. The eulogy path, added later, does not. On a slow day with no task completions, the toast enters and never leaves. Flagged in review #70 as MUST; unfixed. Fix: immediately after line 955, add completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3500). One line. WHY: a toast that never dismisses stops being a notification and becomes a UI fixture. An uncleared grief message is stranger than no grief at all.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Esc Shortcut Promises Clear and Delivers Blur — Contract Still Broken",
+        "description": "App.jsx line 825: the complete Esc handler is document.activeElement?.blur(). ShortcutToast advertises 'Esc Clear'. When a user presses Esc with a task tag or worker filter active, both filters stay set, dimmed cards stay dimmed, and the user is given no feedback. Flagged in review #70 as MUST; unfixed. Fix: add setSelectedTag(null) and setWorkerFilter(null) before the blur call, and update the ShortcutToast label to 'Esc Clear filters'. WHY: a keyboard shortcut that names its action and performs a different one damages trust in every other shortcut. Users who discover this gap will mentally mark the shortcut system unreliable.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Streak Eulogy Uses Purple Celebration Border — type: info Is a Promise the Render Never Keeps",
+        "description": "App.jsx line 1106 on completionToast render: border is completionToast.color || '#6366f1'. The eulogy path sets no .color, so border defaults to #6366f1 — the same indigo as every shipping celebration. The type: 'info' field is set at line 955 but never referenced anywhere in the render tree. Result: the 'RIP the streak' message renders identically to a ship toast. Fix: in the completionToast div style block, branch on completionToast.type === 'info' to use var(--text-muted, #6b7280) as border and rgba(107,114,128,0.15) for the shadow. One ternary per style property. WHY: emotional register requires visual register. Grief should look like grief, not like a deployment success. The infrastructure to distinguish them is already wired into the data — just not into the presentation.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "performance",
+        "title": "IDLE_BUBBLE_EMOJIS and ERROR_BUBBLE_MESSAGES Are Redeclared Inside Character on Every Render",
+        "description": "Office.jsx line 510: IDLE_BUBBLE_EMOJIS is declared as a const object literal inside the Character memo function body. Office.jsx line 526: ERROR_BUBBLE_MESSAGES is a const array literal, also inside Character. Both are pure static constants with zero closure dependencies — neither references props, state, or any external variable. Up to 6 Character instances render on each poll cycle, each allocating fresh versions of both. Fix: hoist both to module scope above the Character declaration. This is also the prerequisite step for the WORKER_IDLE_BUBBLES and WORKER_ERROR_BUBBLES refactors proposed in reviews #63, #68, and #69, which require a module-scope map to replace them. WHY: constants inside a component function signal render-cycle relevance to future maintainers when there is none. Misleading architecture at a small but continuous performance cost.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "storytelling",
+        "title": "wanderTooltips Are Position-Slot Keyed — Every Poll Assigns the Wrong Character the Wrong Story",
+        "description": "Office.jsx lines 1472-1477: wanderTooltips is an object keyed 1-4 by slot position, not by worker identity. Slot assignment at line 1471 is (i % 4) + 1 where i is the index in idleWorkers that poll cycle. If Carlos is the first idle worker today, hovering him shows 'Heading to the coffee corner'. If Maya is first idle tomorrow, she gets the same coffee label. If Carlos becomes second idle, he stares out the window instead. Review #63 addressed idle bubble EMOJIS via a WORKER_IDLE_BUBBLES map, but the tooltip prop passed to Character (line 1485) was never updated — it still comes from wanderTooltips[wIdx]. Fix: add WORKER_WANDER_TOOLTIPS keyed by worker.id: carlos gets 'Probably chasing down that weird log entry', maya gets 'Sketching something in her head', dave gets 'Headphones on — he can hear you, he just will not answer', sofia gets 'Found something. She always finds something.', luna gets 'Horizon-scanning. Leave her to it.' Fall back to wanderTooltips[wIdx] for unknown workers. WHY: the hover tooltip is the one moment a visitor understands who these people actually are. An anonymous position-assigned string is set dressing; a character-specific one is a personality.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "feature",
+        "title": "Activity Log System Filter — Nine Reviews Without It",
+        "description": "App.jsx lines 1300-1304: the activity filter array is [{key:'all'},{key:'hires'},{key:'completions'},{key:'errors'}]. ACTIVITY_ICONS at line 82 already maps 'system' to the gear emoji. Every vibe transition writes a system event to activityLog at lines 970-975. These events are the most narrative-rich entries in the log — the literal story arc of the team's day — and the only way to read them is to wade through 50 mixed entries in the All filter. Add {key: 'system', label: 'System'} with the gear emoji to the filter array. Add the branch if (activityFilter === 'system') return e.type === 'system' to the filter chains at lines 1339 and 1287. First proposed in review #62. Never appeared in any fixed_since_last_review list in reviews #63 through #70. WHY: vibe transitions are first-class events in this system. The minimal respect we can pay them is a dedicated filter row.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "ProgressBar Accepts updatedAt Prop It Never References — Dead Parameter in Plain Sight",
+        "description": "App.jsx line 194: function ProgressBar({ progress, updatedAt, startedAt }) — updatedAt is destructured. WorkerCard passes it at line 347: updatedAt={worker.updated_at}. Inside ProgressBar lines 215-238, the identifier updatedAt does not appear once. The component uses startedAt for ETA; updatedAt presumably was intended for a last-updated indicator but was never implemented. Fix A (conservative): remove updatedAt from the destructure signature. Fix B (additive): render a subtle 'Updated Xm ago' subtitle below the bar using formatIdleDuration(updatedAt), visible only when updatedAt is set and progress is not 100. Option B converts a dead prop into a useful one by completing the original intent — a small hint of progress staleness for workers whose percentage hasn't moved in a while. WHY: a function parameter that is passed, accepted, and silently ignored is a broken contract in the signature. Future developers who see updatedAt in props will assume it does something.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "Conference Table Ambient Label Forgets Meetings Happened — lastHuddle Sits Three Lines Away",
+        "description": "Office.jsx line 1128: lastHuddle useRef tracks names and endedAt of the most recent meeting. The post-table strip at lines 904-915 already surfaces 'Last: Maya, Carlos, 7m ago' when a meeting ended within 30 minutes. But the conf-ambient-label at line 895 is a pure vibe ternary that never consults lastHuddle. When a meeting wraps and workers return to desks, the label instantly reverts to 'reserve the table' or 'everyone is at their desk' with zero acknowledgment. Fix: before the vibe ternary, check if lastHuddle.current.endedAt is non-null and within 5 minutes of now. If so, render a post-meeting label: 'Just wrapped with {names}' using the first names from lastHuddle.current.names.slice(0,2). The fallback to the vibe label happens naturally after the 5-minute window closes. The data and the render are already neighbors; the label just needs to look sideways. WHY: a conference table that acknowledges its most recent meeting is more alive than one that instantly forgets. The office already has the memory.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "could",
+        "category": "character-voice",
+        "title": "Luna Defaults to Dreaming Alone During Incidents — Four Reviews, Three Missing Vibes",
+        "description": "App.jsx line 267: luna in SOLO_SPOTLIGHT_MESSAGES has only 'crushing' and 'after-hours'. on-fire, in-flow, and slow-day fall to default: 'Dreaming alone. The ideas keep coming.' — a nighttime meditation line that fires equally during a five-alarm incident, a deep focus session, and a slow Tuesday. Flagged in reviews #67, #68, #69, #70 without resolution. Proposed entries: on-fire: 'One creative in a burning office. The brief will still be beautiful.'; in-flow: 'Ideas arrive faster when the distractions leave. Luna is deep in it.'; slow-day: 'Slow day. Exactly the kind she needs to rethink everything.' WHY: the default line was written for after-hours and it shows in every other context. Luna is the Creative Director — three sentences, one per missing vibe, would put this to rest.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "The Footer Version String Should Be the Last Joke in the Room",
+        "description": "App.jsx line 1364: the version string is the hardcoded literal v1.0.0-chaos. Every other footer element is dynamic — tagline rotates by vibe, sparkle animates on first visit, quote counter tracks discovery, date is live. The version string is the one footer element that has no awareness of the room it is in. Fix: add VIBE_VERSIONS constant: { crushing: 'v2.0.0-legendary', 'on-fire': 'v0.9.1-HOTFIX-DO-NOT-DEPLOY', 'in-flow': 'v1.0.0-smooth', 'slow-day': 'v0.0.1-maybe', 'after-hours': 'v1.0.0-moon' }. Replace the hardcoded span with VIBE_VERSIONS[teamVibe.key] and fall back to 'v1.0.0-chaos' when no key matches. teamVibe.key is already in scope in the App return. WHY: the version string is the last thing a visitor reads before leaving. It should close the story instead of breaking it. A version string that knows the vibe is the kind of detail that makes people screenshot the footer.",
+        "effort": "small",
+        "assigned_to": "dave"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 70
   }
 ]

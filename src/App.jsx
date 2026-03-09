@@ -638,6 +638,8 @@ function ShortcutToast() {
   )
 }
 
+const HONORIFICS = { crushing: 'LEGEND 🔥', 'on-fire': 'captain 🚨', 'in-flow': 'boss', 'slow-day': 'chief... you still there? 😐', 'after-hours': 'night owl 🌙' }
+
 export default function App() {
   useTimeTick(60_000) // keep relative timestamps fresh
   const [allWorkers, setAllWorkers] = useState([])
@@ -695,7 +697,6 @@ export default function App() {
   const focusedWorkerTimerRef = useRef(null)
   const [selectedTag, setSelectedTag] = useState(null)
   const [quoteBonus, setQuoteBonus] = useState(0)
-  const [showBonus, setShowBonus] = useState(false)
   const [sparkleUnseen] = useState(() => !localStorage.getItem('footer-sparkle-seen'))
 
   const handleTagClick = useCallback((tag) => {
@@ -1068,8 +1069,6 @@ export default function App() {
       ? '🌤️ Good afternoon'
       : '🌙 Good evening'
 
-  const HONORIFICS = { crushing: 'LEGEND 🔥', 'on-fire': 'captain 🚨', 'in-flow': 'boss', 'slow-day': 'chief... you still there? 😐', 'after-hours': 'night owl 🌙' }
-
   return (
     <ErrorBoundary>
     <div className="app">
@@ -1213,7 +1212,7 @@ export default function App() {
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
-            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={() => { setPollingPaused(false); lastActivity.current = Date.now(); }} />
+            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={() => { setPollingPaused(false); lastActivity.current = Date.now(); syncFromGitHub(); }} />
 
             <div className="section-header">
               <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>
@@ -1364,8 +1363,8 @@ export default function App() {
           className="footer-tagline"
           style={{ cursor: 'pointer' }}
           title="tap for another thought"
-          onClick={() => { setShowBonus(prev => !prev); setQuoteBonus(prev => prev + 1) }}
-        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{showBonus ? BONUS_TAGLINES[quoteBonus % BONUS_TAGLINES.length] : (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.')}&rdquo;</span><span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
+          onClick={() => setQuoteBonus(p => p + 1)}
+        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span><span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
         <span>v1.0.0-chaos</span>
       </footer>
     </div>

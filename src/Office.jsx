@@ -532,13 +532,6 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   }, [variant, wanderIdx])
 
   // Error micro-bubbles — distress messages for workers in error state
-  const WORKER_ERROR_BUBBLES = {
-    carlos: ['SIGKILL', 'db is lying to me', 'logs on fire', '500'],
-    maya: ['every border is wrong', 'the prototype lied', 'my components are crying'],
-    dave: ['git blame moment', 'npm ci again?', 'the build is sentient'],
-    sofia: ['the spec never said this', 'REGRESSION', '5 new bugs found', 'who merged this'],
-    luna: ['the deck is burning', 'every color is wrong', 'the brief changed again']
-  }
   useEffect(() => {
     const isErr = variant === 'error' || worker.status === 'error'
     if (!isErr) return
@@ -1063,6 +1056,22 @@ function WallClock({ vibeKey }) {
   )
 }
 
+const FULL_IDLE_MESSAGES = {
+  crushing: 'Everyone earned their break',
+  'on-fire': 'Ceasefire',
+  'in-flow': 'The office breathes',
+  'slow-day': 'Somewhere...',
+  'after-hours': 'Nobody home',
+}
+
+const WORKER_ERROR_BUBBLES = {
+  carlos: ['SIGKILL', 'db is lying to me', 'logs on fire', '500'],
+  maya: ['every border is wrong', 'the prototype lied', 'my components are crying'],
+  dave: ['git blame moment', 'npm ci again?', 'the build is sentient'],
+  sofia: ['the spec never said this', 'REGRESSION', '5 new bugs found', 'who merged this'],
+  luna: ['the deck is burning', 'every color is wrong', 'the brief changed again']
+}
+
 export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0, doorEvent = null }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
@@ -1111,14 +1120,6 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const isFullSync     = nonMgr.length > 0 && idleWorkers.length === 0 && workingWorkers.length === nonMgr.length
   const isFullIdle     = nonMgr.length > 0 && workingWorkers.length === 0 && idleWorkers.length === nonMgr.length
   const isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0
-
-  const FULL_IDLE_MESSAGES = {
-    crushing: 'Everyone earned their break',
-    'on-fire': 'Ceasefire',
-    'in-flow': 'The office breathes',
-    'slow-day': 'Somewhere...',
-    'after-hours': 'Nobody home',
-  }
 
   const avgProgress = Math.round(
     workingWorkers.reduce((s, w) => s + (w.progress || 0), 0) / Math.max(workingWorkers.length, 1)
