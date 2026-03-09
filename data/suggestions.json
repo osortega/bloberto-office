@@ -1,170 +1,174 @@
 {
   "analyst": "Sofia",
-  "review_number": 36,
-  "timestamp": "2026-03-09T06:27:00.000Z",
+  "review_number": 37,
+  "timestamp": "2026-03-09T07:15:00Z",
   "scores": {
-    "visual": 5,
+    "visual": 4,
     "ux": 3,
-    "responsiveness": 3,
+    "responsiveness": 4,
     "performance": 4,
-    "accessibility": 3,
+    "accessibility": 2,
     "code_quality": 3,
     "features": 5,
     "fun_factor": 5
   },
-  "overall_score": 3.9,
+  "overall_score": 3.8,
+  "screenshot_context": "Desktop 1280x800: Bloberto HQ, vibe '🔥 Crushing It', Sofia as sole active worker in error state ('bugs have nowhere to hide' speech bubble, desk__nameplate--error in red), Carlos/Maya/Dave/Luna as ghost roster members at dark desks, one vacant desk with job card (hidden until hover — correct). Office window ambient visible at right edge with orange sunrise gradient; time-caption 'SUNRISE' clipped by overflow:hidden to read 'UNRISE'. Bloberto title 'CVO'. COFFEE TRIPLE SHOT corner intact. Shortcut toast visible bottom-right. Mobile 375x812: Tab labels '🏢 Office' and '📊 Dashboard' BOTH FULLY VISIBLE — tab clipping regression from #36 is FIXED. Office grid compressed but functional. Footer visible below the fold. Polling paused pill not present (idle state). Puppeteer a11y audit: 0 images without alt, 0 unlabeled buttons — BUT role=radio audit returned 0 because Dashboard panel is not rendered when Office tab is active (conditional rendering conceals the bug from automated audits).",
+  "fixed_since_last_review": [
+    "Mobile tab label '🏢 Office' was clipped to '🏢 Offic' at 375px — now fully visible (Puppeteer confirmed: right=118px, windowWidth=375px, clipped=false). Dashboard tab also renders fully at right=259px."
+  ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Office floor overflows at 1280px desktop viewport",
-      "description": "At 1280×800, the right edge of the office floor is visually clipped — gray overflow shadow bleeds outside the floor container and decorative elements (VACANT desk ad, orange couch prop, plants) are partially outside the viewport. The floor's `max-width: 900px` plus `.main` padding and the `office-wrap` padding adds up to overflow. Fix: reduce floor `max-width` to `860px`, or add `overflow: hidden` to `.office-wrap`, or tighten the horizontal padding on `.main` at this breakpoint. Also audit right-side absolute-positioned children in Office.jsx to ensure they stay within bounds.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "high",
-      "category": "ux",
-      "title": "Dashboard tab nearly inaccessible on mobile (375px)",
-      "description": "On a 375px viewport, the '📊 Dashboard' tab button is partially cut off — roughly half the label is invisible. The `.tab-toggle` container has no `overflow-x: auto` and no text truncation strategy for small screens. Users on iPhone SE and similar devices may not realize there's a second tab at all. Fix: add `overflow-x: auto; scrollbar-width: none;` to `.tab-toggle`, or reduce tab padding at ≤480px via a media query (e.g., `padding: 7px 12px; font-size: 0.78rem`). Also consider making tab labels shorter on mobile: 'Office' / 'Dashboard' could compress to icons + short labels.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "high",
-      "category": "code",
-      "title": "App.jsx is a 1350-line god component — extract custom hooks",
-      "description": "App.jsx contains fetching, polling, worker diffing, confetti logic, vibe streak tracking, favicon updates, tab title cycling, toast management, keyboard shortcuts, and the full render tree — all in a single function component. This makes the file extremely hard to test, maintain, or onboard new contributors to. Recommended extractions: `useWorkerSync(pollIntervalActive, pollIntervalHidden)` → returns workers, activityLog, fetchError, isSyncing, syncNow; `useVibeTracking(teamVibeKey)` → returns vibeStreak, vibeHistory, confettiActive; `useTabTitle(activeWorkers, teamVibe)` → side effect only; `useDynamicFavicon(activeWorkers, fetchError)` → side effect only. Office.jsx at 1552 lines has the same problem — Character and CharacterAvatar alone could be a separate file.",
-      "effort": "large",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
       "title": "role='radio' on <button> elements is invalid ARIA",
-      "description": "The activity log filter bar and worker filter bar use `role='radio'` on `<button>` elements with a parent `role='radiogroup'`. The ARIA spec prohibits `role='radio'` on `<button>` — it is only valid on `<input type='radio'>` or a generic container. Screen readers like VoiceOver and NVDA will behave unpredictably: some may announce these as 'radio button' but ignore the `aria-checked` state entirely. Fix option A: Replace with actual `<input type='radio'>` elements styled as buttons. Fix option B: Remove `role='radio'` and `aria-checked`, change parent to `role='toolbar'` or `role='group'`, and communicate selection state via `aria-pressed` on each button. Option B is less markup change.",
+      "description": "Still unfixed. App.jsx lines 1289, 1300, 1310: filter bar buttons carry `role='radio'` inside `role='radiogroup'` parents. ARIA spec prohibits role='radio' on interactive elements. Puppeteer returned radioRoleCount=0 only because the Dashboard panel uses conditional rendering (`tab === 'office' ? ... : ...`) and the Office tab is default — the broken markup is hidden from automated audits at page load. Switch to a real Dashboard tab to verify: role='radio' on <button> is still live in production. Fix A: Replace with <input type='radio'> styled as buttons. Fix B: remove role='radio' + aria-checked, change parent to role='group', add aria-pressed to each button. Six line change.",
       "effort": "small",
-      "assignee": "Sofia"
+      "carry_over_count": 1
+    },
+    {
+      "priority": "high",
+      "category": "accessibility",
+      "title": "Ghost characters are focusable (tabIndex=0) but have no keyboard interaction",
+      "description": "Still unfixed. Office.jsx line 682: Character always renders tabIndex={0} regardless of variant. Ghost roster characters have no onClick and no role='button' — yet they consume a tab stop. A keyboard user tabbing through the office floor lands on five dead focusable ghosts. Fix: set tabIndex={-1} on ghost characters, or add a keyboard handler that reveals the ghost's OOO bubble on Enter/Space. Either way, remove the wasted tab stop.",
+      "effort": "small",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "completionToast state uses two incompatible shapes — silent 'undefined shipped it!' risk",
+      "description": "Still unfixed. App.jsx line 1111: `completionToast.text ? completionToast.text : '🎉 ${completionToast.name} shipped it!'` — two different call sites set the toast with different shapes ({ name, color } vs { text, type: 'info' }). If shapes diverge or a future change sets the wrong path, the toast renders '🎉 undefined shipped it!' with no console error. Fix: normalize to { message: string, color?: string } and update both call sites.",
+      "effort": "small",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Plant toast and completion toast render at identical screen coordinates",
+      "description": "Still unfixed. Both Office.jsx plantToast (lines 1207-1219) and App.jsx completionToast (lines 1093-1105) use `position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); zIndex: 9999`. When a worker ships at the same time the ficus levels up, the toasts completely overlap. Fix: stagger vertically (plantToast at bottom: 5.5rem) or queue them through a shared toast manager.",
+      "effort": "small",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "'After Hours' vibe is unreachable when any worker is active",
+      "description": "Still unfixed. utils/vibe.js: getTeamVibe() only returns 'after-hours' when workers.length === 0. At 2am with Sofia solo-grinding, the vibe is '🔥 Crushing It' and the honorific correctly shows 'night owl 🌙' (App.jsx line 1123 uses isAfterHours override), but the vibe KEY stays 'crushing' — meaning Bloberto's title is 'CVO', the weather label is wrong, and VACANT_ADS shows 'Staff Wizard' instead of 'Night Watch'. The greeting and the vibe system are out of sync. Fix: in getTeamVibe(), return 'after-hours' when hour >= 22 || hour < 6, regardless of worker count.",
+      "effort": "small",
+      "carry_over_count": 1
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "useTimeTick re-renders entire App every 60 seconds",
-      "description": "`useTimeTick(60_000)` is called at the top of `App` and calls `setTick` every 60 seconds, which triggers a full re-render of the entire component tree including the office floor, stats bar, all worker cards, and activity log — even when no data has changed. The intent is just to refresh relative timestamps like '5m ago'. Fix: Move `useTimeTick` into `ActivityLogEntry` and `WorkerCard` components only, so only those leaf nodes re-render on tick. Alternatively, use a context or a dedicated timestamp refresh event so the tick is scoped. This saves potentially dozens of wasted re-renders per hour.",
+      "title": "useTimeTick at App root re-renders entire tree every 60 seconds",
+      "description": "Still unfixed. App.jsx line 640: useTimeTick(60_000) triggers full re-render of office floor, all desks, all characters, StatsBar, all WorkerCards, and ActivityLog every minute — even when zero data changed. The sole purpose is keeping '5m ago' timestamps fresh. Fix: remove call from App root, move into ActivityLogEntry and WorkerCard leaf components only. Both are already memo-wrapped.",
       "effort": "medium",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "completionToast state has a polymorphic shape — runtime type hazard",
-      "description": "The `completionToast` state is used in two incompatible shapes: `{ name: string, color: string }` when a worker ships a task, and `{ text: string, type: 'info' }` when the vibe streak dies. The render uses `completionToast.text ? completionToast.text : '🎉 ${completionToast.name} shipped it!'` to distinguish them, which will silently render '🎉 undefined shipped it!' if the wrong shape is set. Normalize to a single shape: `{ message: string, color?: string }`. Update both call sites to set `message` directly.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "No stale-data fallback — offline load shows empty state",
-      "description": "If a user loads the app with no network connection (or GitHub raw CDN is unreachable), `isLoading` stays true briefly then resolves to an empty workers array with a fetch error banner. The user sees an empty office and no worker cards — there is no cached fallback. Fix: After every successful fetch, persist the workers and activity arrays to `localStorage` (e.g., `bloberto-workers-cache` and `bloberto-activity-cache`). On load, hydrate state from cache before the first fetch resolves, and display a 'Showing last known data' banner if the fetch fails. Workers are small JSON so storage cost is negligible.",
-      "effort": "medium",
-      "assignee": "Carlos"
+      "carry_over_count": 1
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Tab keyboard switch does not manage focus to new panel",
-      "description": "When the user presses '1' or '2' to switch tabs via keyboard shortcuts, focus stays on whatever element was last active (often a button deep in the previous panel). The ARIA authoring guide for tabpanels recommends moving focus to the panel or its first focusable child after a keyboard-triggered tab switch. Currently there is no `focus()` call after `setTab()` in the keyboard handler. Fix: after `setTab('dashboard')`, call `document.getElementById('tabpanel-dashboard')?.focus()` (ensuring the panel has `tabIndex={-1}`). This also applies to the arrow-key navigation in `handleTabKeyDown`.",
+      "title": "Keyboard tab-switch does not move focus to the new panel",
+      "description": "Still unfixed. App.jsx handleTabKeyDown (lines 739-749): pressing ArrowRight/ArrowLeft switches the active tab but does not call focus() on the new panel. Puppeteer confirmed tabpanel elements have tabIndex=null. The ARIA tabpanel pattern requires focus to move to the panel container or its first focusable child on keyboard-triggered switch. Fix: give each tabpanel tabIndex={-1} and add `document.getElementById('tabpanel-dashboard')?.focus()` after setTab('dashboard') in the handler.",
       "effort": "small",
-      "assignee": "Sofia"
+      "carry_over_count": 1
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Activity log shows blank when filter has no matches — needs empty state",
-      "description": "When filtering the activity log by 'Errors' (or any type/worker combo) with no matching entries, the log renders an empty `<div class='activity-log'>` with no message. The existing `activity-empty` style ('No activity yet…') is only shown when `displayed.length === 0` before filtering — it is never reached when a filter yields zero results because the filter happens at the call site, not inside `ActivityLog`. Fix: pass the active filter label into `ActivityLog` and render a contextual empty state like '🎉 No errors in the last 20 events' or '😶 No activity from Maya recently' when the filtered list is empty.",
+      "title": "Activity log filter shows blank area when filter yields zero results",
+      "description": "Still unfixed. App.jsx ActivityLog component line 145: the 'No activity yet…' guard fires only when the passed entries array is empty. The external filter state (activityFilter, activityWorkerFilter) reduces entries to zero when no matching events exist, and ActivityLog renders a silent blank div rather than a contextual message. Fix: detect displayed.length === 0 after reversing and render 'No errors logged recently' or '😶 Nothing here for this worker' based on the active filter.",
       "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "App-level constants scattered — move VIBE_COLORS, STAT_DISPATCHES etc. to constants.js",
-      "description": "Several constant objects are defined at the top of App.jsx that logically belong in `utils/constants.js`: `VIBE_COLORS`, `VIBE_RANK`, `STAT_DISPATCHES`, `FOOTER_TAGLINES`, `BONUS_TAGLINES`, `HONORIFICS`, `WORKER_TAGLINES`, `SOLO_SPOTLIGHT_MESSAGES`. Having them in App.jsx bloats the component file and makes them unreachable for unit testing without importing the entire React component tree. Move them to `constants.js` (or a new `utils/copy.js` for the text-heavy ones). This is a pure refactor with no behavior change.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "carry_over_count": 1
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Worker cards in Dashboard have no visible 'flip to history' affordance on mobile",
-      "description": "The ℹ️ button on each WorkerCard triggers a CSS 3D flip to reveal activity history. On desktop, the button is clearly visible. On mobile, the card is smaller and the button is 22×22px — very close to the status badge, making it easy to miss or accidentally tap. There is also no visual hint that the card is flippable (no 'flip' icon, no tooltip on mobile). Fix: add a subtle 'History' text label next  on mobile, or increase the tap target to 44×44px minimum (WCAG 2.5.5). Also add `title='Tap for activity history'` on the button.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "Character component defines ERROR_BUBBLE_MESSAGES and WORKER_ERROR_BUBBLES inside the render function body",
-      "description": "Inside `Character`, `ERROR_BUBBLE_MESSAGES` and `WORKER_ERROR_BUBBLES` arrays/objects are declared inside `useEffect` callback scope, meaning new array references are created on every render. While the values are constant, they're not eligible for hoisting by the JS engine because they're declared inside a closure. Move both to module scope (top of Office.jsx, outside any component) so they're created once at module load time. Same applies to `IDLE_BUBBLE_EMOJIS`.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Light mode office floor grid is nearly invisible",
-      "description": "In `[data-theme='light']`, the floor grid uses `--grid-line: rgba(0,0,0,0.05)` — this is so faint that the grid character of the office floor essentially disappears in light mode, making it look like a plain light rectangle instead of a grid office. The dark mode uses `rgba(255,255,255,0.04)` which is comparable but the floor is very dark so the grid reads. Fix: increase light mode grid opacity to `rgba(0,0,0,0.09)` or `rgba(100,100,180,0.08)` for a subtle blue-tinted grid that matches the office aesthetic.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Footer quote pagination counter '1/9' has no label and is cryptically small",
-      "description": "The footer renders a tiny `1/9`-style counter next to the rotating tagline quote, at `font-size: 0.7em` with `opacity: 0.55`. Users don't know what this number means — is it a version? a step? a rating? Fix: add a `title='Quote 1 of 9 — click ✦ to cycle'` tooltip on the counter span, or replace the bare `1/9` with `Quote 1/9` at slightly higher opacity. Also consider making the ✦ sparkle icon visually larger and adding a `cursor: pointer` hint text on hover.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "Office tab has no worker presence indicator — must switch tabs to check",
-      "description": "The Dashboard tab correctly shows an error badge count (red pill with number) when workers are in error state. But the Office tab has zero status indicators — if you're on the Dashboard tab, you have no idea if the office view has something interesting happening (new arrival, door event, worker just errored). Add a small presence dot or count indicator to the Office tab: a green dot when everyone is working, amber when someone is idle, red when someone is in error. This mirrors how the tab error badge works for Dashboard.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Vibe sparkline hover legend only shows on hover — inaccessible on touch devices",
-      "description": "The `.sparkline-legend` in the Team Vibe stat card is hidden by default and only revealed on `.stat-card:hover`. Touch users (mobile, tablet) cannot hover, so they never see the legend showing which vibe each colored dot represents. The SVG `<title>` elements provide screen-reader text but nothing visual on mobile. Fix: always render the legend (remove the hover-only display rule) but keep it small and subtle. The pills are tiny (`0.55rem`) so they won't add much visual weight.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "Inline styles in completionToast and section headers bypass the theme system",
-      "description": "The `completionToast` element in App.jsx uses a long `style={{...}}` object with hardcoded values for `position`, `background`, `border`, `borderRadius`, `padding`, `fontSize`, `fontWeight`, `color`, `boxShadow`, `zIndex`, `whiteSpace`, `pointerEvents`, and `animation`. Section header subtitles also use inline `style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}`. These are hard to override in a theme, hard to find when debugging, and add noise to JSX. Extract to CSS classes: `.completion-toast` and `.section-subtitle`. This is cosmetic but improves maintainability.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "Add task search / filter-by-text to the Dashboard worker grid",
-      "description": "As the team grows (data could have 10+ workers), there's no way to search worker cards by name or task text. The tag filter (Bug/Ship/Design/QA/Data/Docs) is great but only works on tasks that match the defined regex patterns. A simple text input above the workers grid that filters cards by worker name or task string would cover the gap. Keep it minimal: a small `<input placeholder='Search workers…'>` that dims non-matching cards using the existing `worker-card--dimmed` class.",
+      "title": "No stale-data fallback — offline page load shows empty office",
+      "description": "Still unfixed. localStorage usage in App.jsx is limited to theme, vibe streak, shortcut visibility, and vibe history. Worker and activity arrays are never cached. Offline load = empty office with error banner. Fix: after each successful fetch, write workers and activity to localStorage (bloberto-workers-cache, bloberto-activity-cache). On load, hydrate state from cache before first fetch and show a 'Showing cached data' badge if the live fetch fails.",
       "effort": "medium",
-      "assignee": "Carlos"
+      "carry_over_count": 1
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "App.jsx is a 1350-line god component — extract at minimum 4 custom hooks",
+      "description": "Still unfixed. App.jsx line count unchanged at 1350. It owns: data fetching, polling, worker cinematic entry/exit diffing, vibe streak + confetti, favicon updates, tab title cycling, toast management, keyboard shortcuts, activity filtering, tag filtering, AND the full render tree. Office.jsx is 1552 lines. Extract at minimum: useWorkerSync(), useVibeTracking(vibeKey), useDynamicFavicon(workers, fetchError), useTabTitle(workers, vibe). Primary blocker for testability.",
+      "effort": "large",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Worker card flip button (ℹ️) tap target too small and unlabeled on mobile",
+      "description": "Still unfixed. App.css .worker-card__info-btn (line 533): padding: 0.15rem 0.4rem with font-size: 0.85rem. Rendered tap target is well below WCAG 2.5.5's 44×44px minimum. No min-width/min-height on mobile. Fix: add min-width: 44px; min-height: 44px on .worker-card__info-btn at ≤640px breakpoint, and add a visible 'History' text label next to the icon on mobile.",
+      "effort": "small",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Office window time-caption 'SUNRISE' clipped to 'UNRISE' by overflow:hidden",
+      "description": "NEW in #37. Office.css .office-window is 7% wide with overflow:hidden. The .office-window__time-caption uses white-space:nowrap and font-size:0.38rem centered via left:50%; transform:translateX(-50%). At 7% of floor width (roughly 26–62px depending on viewport), the word 'sunrise' (7 chars) overflows both sides and the leading 'S' is cropped by overflow:hidden, rendering 'UNRISE' in the bottom of the window on both desktop and mobile screenshots. Fix: either reduce the caption to an emoji (🌅) or truncate-ellipsis with overflow:hidden + text-overflow:ellipsis on the caption itself rather than relying on the parent clip.",
+      "effort": "small",
+      "carry_over_count": 0
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Light mode office floor grid disappears — opacity 0.05 is too faint",
+      "description": "Still unfixed (cannot verify in screenshot — dark mode was active). Office.css sets --grid-line: rgba(0,0,0,0.05) in [data-theme='light']. At this opacity the grid lines are visually invisible on the light background. Fix: increase to rgba(0,0,0,0.09) or add a tint like rgba(80,80,200,0.07) to maintain the cool-blue palette.",
+      "effort": "small",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "EmptyState renders 🌙 emoji twice in three lines of JSX",
+      "description": "Still unfixed. App.jsx lines 522–525: <span class='empty-emoji'>🌙</span> followed immediately by 'The office is quiet... for now 🌙'. Same emoji appears twice in the same tiny component. When the Dashboard has no active workers, this is the only content visible — looks like a copy-paste artifact. Fix: remove the trailing 🌙 or replace it with 😴 or 🛌.",
+      "effort": "small",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "Vibe sparkline legend is hover-only — invisible on touch devices",
+      "description": "Still unfixed. App.css line 1144: .sparkline-legend only appears via .stat-card:hover. Touch users never see the legend for the colored vibe history dots. Fix: render the legend at opacity:0.7 always and increase to 1 on hover. The pills are tiny — the always-visible version adds negligible height.",
+      "effort": "small",
+      "carry_over_count": 1
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "Polling-paused banner overlaps header controls on small screens",
-      "description": "The `.polling-paused-pill` renders inline inside `.header-right` with `flex-wrap: wrap`. On viewports below ~500px, this pill wraps to a new line and sits awkwardly inside the sticky header, pushing content down and occasionally obscuring the tab bar. The text 'Paused · move mouse to refresh' is also not meaningful on touch devices (no mouse). Fix: hide this pill on `(pointer: coarse)` devices (same pattern as shortcut-toast), or reword to 'Tap to refresh' and use a fixed bottom banner instead of injecting it into the header.",
+      "title": "Polling-paused pill shows 'move mouse to refresh' on touch devices",
+      "description": "Still unfixed. App.css line 1012: .polling-paused-pill has no @media (pointer: coarse) rule. The text 'Paused · move mouse to refresh' is meaningless on mobile — there is no mouse. The shortcut-toast correctly uses @media (pointer: coarse) { display: none } at line 1116 but this fix was never applied to the pill. Fix: add @media (pointer: coarse) { .polling-paused-pill { display: none; } }.",
       "effort": "small",
-      "assignee": "Maya"
+      "carry_over_count": 1
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Office tab has no status indicator while user is on Dashboard tab",
+      "description": "Still unfixed. App.jsx lines 1171–1193: the Office tab button renders only '🏢 Office' with no status badge. The Dashboard tab receives the error count badge (tab-error-badge) at line 1196. If a worker enters error state while the user is on Dashboard, there is no visual cue to switch to Office. Fix: mirror the Dashboard badge logic — add a colored dot to the Office tab: green when all working, amber when any idle, red when any in error.",
+      "effort": "small",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "ERROR_BUBBLE_MESSAGES and WORKER_ERROR_BUBBLES declared inside component body",
+      "description": "Still unfixed. Office.jsx lines 510, 526–537: IDLE_BUBBLE_EMOJIS, ERROR_BUBBLE_MESSAGES, and WORKER_ERROR_BUBBLES are declared inside the Character component function body (not inside a useEffect, but at the top level of the component). A new array and a new object are allocated on every render of every Character. Move all three to module scope — they have zero dependency on props or state.",
+      "effort": "small",
+      "carry_over_count": 1
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Footer quote counter '1/9' has no label — reads like a version number",
+      "description": "Still unfixed. The footer shows a counter like '1/9' at font-size:0.7em; opacity:0.55 next to the tagline. Without context it reads as a version identifier. The ✦ sparkle has no aria-label. Fix: add title='Quote 1 of 9 — click ✦ to cycle' to the counter span and aria-label='Cycle tagline quotes' to the ✦ trigger.",
+      "effort": "small",
+      "carry_over_count": 1
     }
   ]
 }
