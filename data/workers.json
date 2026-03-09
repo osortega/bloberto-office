@@ -7,15 +7,7 @@
       "status": "working",
       "task": "Critical bug fixes — worker.id normalization, window tint, vibeCaption cleanup, activity log count, startedAt camelCase",
       "started_at": "2026-03-09T10:37:00Z"
-    },
-    {
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "emoji": "🔍",
-      "status": "working",
-      "task": "QA review #39 — live site + codebase analysis",
-      "started_at": "2026-03-09T10:15:00Z"
     }
   ],
-  "updated_at": "2026-03-09T10:37:00Z"
+  "updated_at": "2026-03-09T10:45:00Z"
 }

@@ -1,135 +1,117 @@
 {
   "analyst": "Sofia",
-  "review_number": 39,
-  "timestamp": "2026-03-09T09:15:00Z",
+  "review_number": 40,
+  "timestamp": "2026-03-09T10:16:00Z",
+  "screenshot_note": "Live screenshots captured via Puppeteer — desktop 1280x800 and mobile 375x812. Both verified.",
   "scores": {
-    "visual": 3.5,
-    "ux": 3.5,
-    "responsiveness": 3.5,
-    "performance": 5,
-    "accessibility": 3.5,
-    "code_quality": 3.5,
-    "features": 4.5,
+    "visual": 4,
+    "ux": 3,
+    "responsiveness": 3,
+    "performance": 3,
+    "accessibility": 3,
+    "code_quality": 2,
+    "features": 5,
     "fun_factor": 5
   },
-  "overall_score": 4.1,
-  "delta_from_last": "+0.1 (was 4.0 in review #38)",
+  "overall_score": 3.5,
+  "carry_over_resolution": {
+    "resume_button_noop": "NOT FIXED — onResume at App.jsx:1211 still `() => setPollingPaused(false)` with no lastActivity.current update",
+    "speech_bubble_mobile": "NOT FIXED — no change to Office.css 480px block; office-floor still overflow:visible; bubble z-index unchanged",
+    "whiteboard_task_count_wrap": "NOT FIXED — wb-task-count still has no white-space:nowrap; whiteboard still 7.5% wide at 480px",
+    "useEffect_dep_array_worker_id": "NOT FIXED — Office.jsx:550 dep array still [variant, worker.status], worker.id missing",
+    "sunrise_sky_overflow": "FIXED — .office-window now has overflow:hidden (Office.css:977); sky gradient properly clipped in screenshot"
+  },
   "suggestions": [
     {
       "priority": "high",
-      "category": "ux",
-      "title": "[CARRY-OVER #37/#38] Bloberto speech bubble obliterates the Office tab on mobile",
-      "description": "Still happening. Screenshot confirms it — the ambient speech bubble ('Velocity like this doesn't just happen…') physically covers the '🏢 Offic' tab label on mobile (375px), leaving it partially visible and unclickable. Root cause: `.office-floor` has `overflow: visible` (intentional for the bubble to escape upward), and the bubble's `z-index: 30` is uncontested by the tab-toggle which has no explicit z-index or stacking context. Fix: give `.tab-toggle` a stacking context — add `position: relative; z-index: 50` — so it's guaranteed above any escaping office content. Alternatively add `max-height` clamping to the speech bubble so it cannot grow above the office floor's top edge. On desktop the bubble sits in the gap between tabs and floor without overlap, so this is a mobile-only regression.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "visual",
-      "title": "[CARRY-OVER #38] Whiteboard label is 'WH ITE BO AR D' — still broken on mobile",
-      "description": "Screenshot confirms it. The `.office-whiteboard::before` pseudo-element sets `content: 'WHITEBOARD'` with `letter-spacing: 0.15em` but no `white-space: nowrap`. Inside the narrow flexbox container (5.5% of 900px ≈ 50px), the word wraps character-by-character, producing the vertical stack. On desktop it's barely readable; on mobile (7.5% width at 375px) it renders as 'WH / ITE / BO / AR / D'. Fix: add `white-space: nowrap; overflow: hidden; text-overflow: clip;` to `.office-whiteboard::before`, or reduce `letter-spacing` to 0. The actual vibe text already has `white-space: nowrap` on `.wb-vibe-text` — the pseudo-element just needs the same treatment. Two-line fix.",
-      "effort": "small",
-      "assignee": "Maya"
+      "category": "bug",
+      "title": "[CARRY-OVER #39] Resume button is still a functional no-op",
+      "description": "App.jsx:1211 — `onResume={() => setPollingPaused(false)}` does not touch `lastActivity.current`. The 15s idle checker at line 721 evaluates `Date.now() - lastActivity.current > IDLE_TIMEOUT` and will re-set `pollingPaused = true` within 15 seconds of resuming. On desktop a mouse-move to the button incidentally fires the mousemove listener which does update lastActivity, but keyboard-only users and touch users tapping without prior movement will see the pause banner return silently. Fix: `onResume={() => { lastActivity.current = Date.now(); setPollingPaused(false) }}`.",
+      "effort": "small"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Character `useEffect` dep array missing `worker.id` — wrong error bubbles possible",
-      "description": "In Office.jsx, the error bubble effect (line 534–550) references `WORKER_ERROR_BUBBLES[worker.id]` inside the callback but declares `}, [variant, worker.status])` as its dependency array. If `worker.id` changes while `variant` and `worker.status` stay the same (e.g. a desk slot is reassigned to a different worker with the same 'error' status), the effect does NOT re-run. The previous worker's error messages ('SIGKILL', 'db is lying to me') would keep firing for the new character. Fix: add `worker.id` to the dependency array: `}, [variant, worker.status, worker.id])`. Same applies to `WORKER_AWAY_DESK_LABELS` usage pattern elsewhere.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "title": "[NEW] pingReaction is wired only to Bloberto — all other workers' reactions are silently dropped",
+      "description": "Office.jsx:1129-1134 — `handleCharClick` calls `setPingReaction(reaction)` for any worker with a PING_REACTIONS entry (luna, carlos, maya, dave, sofia all have entries). But `pingReaction` is only passed as a prop to the Bloberto Character at line 1439. Desk workers (lines 1447-1455) and idle workers (lines 1473-1483) never receive `pingReaction`. Clicking Carlos or Dave sets state, fires a 3s timer, and then nothing happens visually. Fix: replace the single `pingReaction` state with a per-worker map, or derive it: `pingReaction={pingedId === occ.worker.id ? PING_REACTIONS[occ.worker.id] : null}` and remove the separate state entirely.",
+      "effort": "small"
     },
     {
-      "priority": "medium",
-      "category": "visual",
-      "title": "[CARRY-OVER #38] Sunrise/gradient rectangle clips at right office edge",
-      "description": "Still visible in both screenshots — the orange-to-pink gradient rectangle (the time-of-day window) is labeled 'UNRIS' on mobile and 'UNRISE' on desktop because the right ~20% overflows the office-floor boundary. The `office-floor` has `overflow: visible`, so it bleeds into the page chrome. The `WindowElement` component needs either a tighter `right`/`width` CSS constraint, or the parent `.office-floor` needs `overflow: hidden` on its x-axis. Since `overflow: visible` is needed for the speech bubble escaping upward, consider `overflow: hidden clip` (x=hidden, y=visible) using the `overflow-x: hidden; overflow-y: visible` pattern. This would fix both the sunrise bleed AND leave the vertical speech bubble path open — though note this also clips the whiteboard pseudo.",
-      "effort": "small",
-      "assignee": "Maya"
+      "priority": "high",
+      "category": "bug",
+      "title": "[CARRY-OVER #37/#38/#39] Bloberto speech bubble still overflows office-floor on mobile",
+      "description": "Office.css — `.office-floor` still has `overflow: visible` (line 84). The `.speech-bubble` is `position: absolute; bottom: calc(100% + 8px); z-index: 30`. Bloberto sits at `top: 4%` of the office floor. When Bloberto's manager bubble is visible it renders above the character, which places it above the office-floor top edge and can overlap the tab bar above it. No fix was applied in the 480px media block. Add `overflow: hidden` to `.office-floor` at the 480px breakpoint, or clamp speech-bubble `bottom` to `min(calc(100% + 8px), 90%)` relative to the container.",
+      "effort": "small"
     },
     {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Office character divs lack semantic role — focusable but unspeakable",
-      "description": "The `Character` component (Office.jsx line 673–761) always renders with `tabIndex={0}` but only sets `role='button'` when `handleClick` is defined. Bloberto (manager) and ghost characters are keyboard-focusable with no role, meaning screen readers announce them as generic unlabeled divs. Bloberto responds to focus by showing a quote bubble but offers no keyboard-triggerable action and no role. Ghosts show a bubble on focus but are also role-less. Fix: add `role='img'` + `aria-label` for non-interactive characters (Bloberto, ghosts), and `role='button'` + `aria-label` for clickable ones. Alternatively, set `tabIndex={-1}` for Bloberto since he has no keyboard-activatable function.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "priority": "high",
+      "category": "bug",
+      "title": "[CARRY-OVER #38/#39] Whiteboard wb-task-count still wraps character-by-character on mobile",
+      "description": "Office.css:1162-1163 — `.office-whiteboard` is clamped to 7.5% width at 480px (~28px on a 375px screen). The `wb-task-count` span ('2 active · 5 total') has no `white-space: nowrap` override, so each word or character wraps independently, producing the stacked-text disaster from prior reviews. No fix applied. Add `.wb-task-count { white-space: nowrap; overflow: hidden; text-overflow: clip; }` inside the 480px media block, or just `display: none` since the whiteboard is illegible at that size anyway.",
+      "effort": "small"
     },
     {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "[CARRY-OVER #38] radiogroup arrow-key navigation still missing (WAI-ARIA violation)",
-      "description": "The two `.activity-filter-bar` groups use `role='radiogroup'` and now correctly set `aria-checked` (✅ fixed this cycle). But WAI-ARIA still requires ArrowLeft/ArrowRight keyboard navigation within each group. Currently Tab is the only way to move between radio options, which violates the radiogroup interaction model. The tab switcher already implements `handleTabKeyDown` with arrow key support — extract that pattern into a reusable `handleRadioGroupKeyDown(options, current, setter)` helper and apply to both filter bars. This is a copy-paste job.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "priority": "high",
+      "category": "bug",
+      "title": "[CARRY-OVER #38/#39] Character useEffect dep array still missing worker.id (and wanderIdx)",
+      "description": "Office.jsx:550 — the error-bubble interval effect has dep array `[variant, worker.status]` but closes over `worker.id` (line 538: `WORKER_ERROR_BUBBLES[worker.id]`) and `wanderIdx` (line 548: `2000 + wanderIdx * 1500`). If a Character slot is reused for a different worker or a wanderIdx changes, the stale closure selects the wrong error messages and fires at the wrong initial offset. Add both to the dep array: `[variant, worker.status, worker.id, wanderIdx]`.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Footer quote counter desynchronizes from tagline after 8 clicks",
-      "description": "App.jsx line 1360: the counter displays `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` as the numerator, making it cycle 1→9 over 9 steps. But the actual tagline uses `quoteBonus % BONUS_TAGLINES.length` (8 items), cycling 0→7. After 8 clicks the counter shows 9/9 but the tagline has already looped back to index 0. On click 9 the counter resets to 1 but the tagline is at index 1. They're permanently out of sync after the first loop. Fix: use the same modulo for both: `const taglineIdx = quoteBonus % BONUS_TAGLINES.length` for display and the counter should be `taglineIdx + 1` / `BONUS_TAGLINES.length`. Remove the `+1` in the denominator.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "title": "[NEW] pingTimerRef and pingReactionTimerRef have no unmount cleanup",
+      "description": "Office.jsx:1119-1133 — both `pingTimerRef` and `pingReactionTimerRef` are set inside `handleCharClick` (a plain function, not inside a useEffect). There is no cleanup effect that cancels them on unmount. If the Office component unmounts while either timer is pending, the callbacks fire and call `setPingedId(null)` / `setPingReaction(null)` on a dead component, which in React 18 produces a no-op but still runs the timeout closure and leaks memory. Add: `useEffect(() => () => { clearTimeout(pingTimerRef.current); clearTimeout(pingReactionTimerRef.current) }, [])`.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "[CARRY-OVER #39] Arrow-key tab navigation doesn't update URL hash",
+      "description": "App.jsx:739-748 — `handleTabKeyDown` calls `setTab(TABS[...])` on ArrowLeft/Right/Up/Down but never calls `window.location.hash = TABS[newIdx]`. Click handlers (lines 1184, 1197) and keyboard shortcut handlers (lines 820-821) all do update the hash. This means: arrow-key tab switches break hash-based tab restore on reload, and break the hashchange listener at line 674-675. Fix: add `window.location.hash = TABS[(currentIdx + 1) % TABS.length]` (and -1 variant) inside the key handler.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "[CARRY-OVER #39] Footer BONUS_TAGLINES[0] is permanently skipped",
+      "description": "App.jsx:1359 — `onClick` does `setQuoteBonus(prev => prev + 1)` and `setShowBonus(prev => !prev)` simultaneously. On first click: quoteBonus becomes 1, showBonus becomes true. The tagline displayed is `BONUS_TAGLINES[1 % 8]` = index 1. Index 0 ('technically it deploys if you squint') is never shown. Fix: either start quoteBonus at -1 and increment to 0 on first click, or display `BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]`.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "Activity log filtered three separate times per render — still no memoization",
-      "description": "The filtered activity log is computed three independent times on every render: (1) lines 1284–1290 for the event count label in the section header; (2) lines 1336–1344 when passing `entries` to `<ActivityLog>`; (3) inside `ActivityLog` itself as `[...entries].reverse().slice(0, 20)`. All three share the same `activityFilter` and `workerFilter` inputs. Wrap with `useMemo([activityLog, activityFilter, workerFilter])` and compute once. The count and the list should use the same memoized array. The inner `[...entries].reverse()` also creates a new array on every render — move the reverse+slice into the same useMemo call upstream.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "title": "[CARRY-OVER #39] Activity log filtered 4× per render with no memoization",
+      "description": "App.jsx:1283-1292 — an inline IIFE filters `activityLog` twice (type filter then worker filter) to build the count string. App.jsx:1336-1340 — the `ActivityLog` component prop does the identical two-pass filter again. Neither is memoized. Every state change (60s timer tick, cursor move, any polling update) re-runs all four filter passes over the full log. Wrap both in `useMemo([activityLog, activityFilter, workerFilter])`. This is particularly wasteful because `activityLog` can grow unbounded in a long session.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "[CARRY-OVER #38] Desk screen SVGs hardcoded dark backgrounds break light mode",
-      "description": "All `DESK_SCREEN_SVG` definitions in Office.jsx use `fill='#05050f'` (near-black) for the screen background. In light mode (`data-theme='light'`), these render as opaque black rectangles with no visible content, breaking visual coherence. The error-state SVGs use `fill='#1a0000'` — equally broken in light mode. Fix: replace hardcoded fills with a CSS variable: `fill='var(--desk-screen-bg, #05050f)'` and add `[data-theme='light'] { --desk-screen-bg: #e2e8f0; }` to the light mode block in Office.css. The SVG stroke colors (blue, purple, orange) are fine on light — only the background rect needs updating.",
-      "effort": "medium",
-      "assignee": "Maya"
+      "category": "performance",
+      "title": "[CARRY-OVER #39] 19 simultaneously animating ambient particles when Office tab is active",
+      "description": "App.jsx:1071 renders a 12-particle `.ambient-particles` layer unconditionally at the app root (always active regardless of which tab is shown). Office.jsx:1538 renders a separate 7-particle layer inside `.office-floor`. When on the Office tab both are active = 19 `@keyframes dust-drift` animations running. Gate the App-level layer: `{tab === 'dashboard' && <div className='ambient-particles' ...>}`, since the Office has its own.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "ConferenceTable shadows outer `cx` and `orbitR` inside map callbacks",
-      "description": "Office.jsx lines 919 and 939 both declare `const cx = 52, orbitR = 38` inside the `meetingWorkers.map()` and `standupWorkers.map()` callbacks — directly shadowing the outer `const cx = 52, cy = 52, tableR = 28, chairR = 6, orbitR = 38` declared at line 840. Currently harmless because the values are identical, but it's a trap: if the outer layout values ever change, the seated character positions won't update. The inner declarations also shadow `cy` (which is 52, same as cx — accidentally correct). Remove the inner `const cx = 52, orbitR = 38` declarations and use the outer scope variables directly.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "category": "ux",
+      "title": "[CARRY-OVER #38/#39] radiogroup arrow-key navigation missing (WAI-ARIA violation)",
+      "description": "App.jsx:1296-1329 — both activity filter bars use `role='radiogroup'` / `role='radio'` but implement no arrow-key navigation. Per WAI-ARIA authoring practices, all radio buttons in a group are a single tab stop; arrow keys move focus within the group. Currently each button is its own tab stop. Set `tabIndex={activityFilter === key ? 0 : -1}` on each radio and add `onKeyDown` on the group to handle ArrowLeft/Right.",
+      "effort": "medium"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #38] Unstable list keys in ActivityLog — index suffix still present",
-      "description": "App.jsx line 151: `key={entry.timestamp + entry.worker + i}`. The `+ i` index suffix still defeats the composite key uniqueness. If entries prepend (which they do — new entries are unshifted at line 967: `[{ ...newEvent }, ...prev]`), every existing key shifts by +1, forcing React to re-render all log entries instead of only appending. Remove `+ i` — the `timestamp + worker` composite should be unique enough. If duplicate timestamps are a genuine concern, add a `seq` or `id` field at the data source level.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "title": "[CARRY-OVER #39] sparkleUnseen state setter is never captured — twinkle animates forever",
+      "description": "App.jsx:697 — `const [sparkleUnseen] = useState(...)` destructures only the value, discarding the setter. `sparkleUnseen` is always whatever it was on mount (likely `true` on first visit). The useEffect at line 733-735 writes to localStorage but never calls the setter, so the twinkle class is applied on every render for the entire session. Either destructure the setter and call it, or replace the state with a `useRef` that you read synchronously.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "[CARRY-OVER #38] Direct `document.querySelector` calls — replace with refs",
-      "description": "Three calls remain in App.jsx: line 468 (`.workers-grid` scroll-into-view in StatsBar), line 496 (data-worker-name scroll in stuck-worker card onClick), line 504 (same in onKeyDown). These are fragile — class rename silently breaks the scroll. The stuck-worker selector interpolates `name` from worker data into a CSS attribute selector string, which could fail if names contain special characters. Replace with `useRef()` attached to `.workers-grid` and pass a `workerRef` map to StatsBar via context or props.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER #38] z-index magic numbers scattered across four files",
-      "description": "z-index values found: 9999 × 3 (skip-link, confetti-layer, both toast divs inline), 200 (shortcut-toast), 150 (ghost-ooo-bubble), 100 (Office.css line 838), 60, 50, 30 (speech-bubble), 20, 12, 10, 5, 3, 2, 1. No defined scale anywhere. The speech bubble's z-index: 30 is what allows it to bleed above the office floor and overlap the tab-toggle (which has no z-index at all). Defining a scale in `:root` — `--z-tooltip: 30`, `--z-nav: 50`, `--z-toast: 100`, `--z-overlay: 9999` — would directly expose that the tab nav needs at minimum `--z-nav` to stay above floating office content.",
-      "effort": "small",
-      "assignee": "Maya"
+      "title": "[CARRY-OVER #38/#39] ConferenceTable inner map callbacks redeclare outer-scope cx and orbitR",
+      "description": "Office.jsx:840 declares `const cx = 52, orbitR = 38` (among others) in the ConferenceTable body. Lines 919 and 937 re-declare `const cx = 52, orbitR = 38` inside `meetingWorkers.map()` and `standupWorkers.map()` callbacks, shadowing the outer values with identical ones. Dead code. ESLint no-shadow would catch this. Remove the inner declarations.",
+      "effort": "small"
     }
-  ],
-  "fixed_since_last": [
-    "✅ [HIGH CARRY-OVER #37/#38] aria-checked on role=radio filter buttons — FINALLY FIXED. Lines 1308, 1319, 1329 all correctly set aria-checked={...}. Two review cycles to land a one-line fix, but it's done. Screen readers can now announce the selected filter state."
-  ],
-  "regression_notes": "No regressions detected. The aria-checked fix is the only notable change this cycle. Both HIGH visual carry-overs (tooltip overlap, whiteboard text) remain unchanged — the CSS for both has not been modified. The sunrise clipping (medium) also unchanged. Overall the codebase is stable but these three visual bugs are becoming embarrassing for a product that's otherwise quite polished.",
-  "kudos": [
-    "aria-checked is fixed — took two reviews but it shipped. That's one less WAI-ARIA violation.",
-    "The error bubble system for workers is genuinely delightful. 'undefined is not a function' appearing above Sofia's head during an error state is peak product personality.",
-    "Conference table meeting detection + standup mode is a clever feature — idle workers auto-gathering at the table is a great ambient storytelling device.",
-    "Ping reaction system (click a character, Bloberto responds with a worker-specific one-liner) is excellent mobile UX for a touch-first interaction that desktop users discover as a bonus.",
-    "prefers-reduced-motion coverage in Office.css is thorough — lists 20+ animated elements. Most teams skip this entirely.",
-    "The ficus plant growing with vibe streak is still one of the best gamification hooks I've seen in a monitoring tool."
   ]
 }
