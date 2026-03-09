@@ -1,13 +1,13 @@
 {
   "workers": [
     {
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
       "status": "working",
-      "task": "Ficus streak tooltip + ambient particle vibe color fix",
-      "started_at": "2026-03-09T01:48:00Z"
+      "task": "Creative review #60",
+      "started_at": "2026-03-09T04:00:00Z"
     }
   ],
-  "updated_at": "2026-03-09T01:48:00Z"
+  "updated_at": "2026-03-09T04:00:00Z"
 }
