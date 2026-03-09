@@ -120,6 +120,14 @@ const VIBE_WEATHER_ICONS = {
   'after-hours':'🌙',
 }
 
+const LONE_SURVIVOR_LABELS = {
+  'crushing':     '🎯 solo run',
+  'on-fire':      '🧯 one-person fireteam',
+  'in-flow':      '⚡ flow state: achieved',
+  'slow-day':     '🤷 who turned off the others?',
+  'after-hours':  '🌙 last one standing',
+}
+
 const VACANT_ADS = {
   'crushing':     { title: 'Staff Wizard',          req: 'Must maintain velocity without asking what velocity means' },
   'on-fire':      { title: 'URGENT: Firefighter',   req: 'Start Monday. Like, this Monday.' },
@@ -770,7 +778,7 @@ function WindowElement() {
 // Chair positions around the table (angle in degrees, radius from center)
 const CHAIR_ANGLES = [0, 60, 120, 180, 240, 300]
 
-function ConferenceTable({ vibeKey, meetingWorkers = [], lastHuddle }) {
+function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], lastHuddle }) {
   const vibe = vibeKey || 'in-flow'
 
   // How many chairs are visible per vibe
@@ -794,7 +802,7 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], lastHuddle }) {
   const cx = 52, cy = 52, tableR = 28, chairR = 6, orbitR = 38
 
   return (
-    <div className="conference-table" data-meeting={meetingWorkers.length >= 2 || undefined} aria-label="Conference table" role="img" style={{ position: 'relative' }}>
+    <div className="conference-table" data-meeting={(meetingWorkers.length >= 2 || standupWorkers.length > 0) || undefined} aria-label="Conference table" role="img" style={{ position: 'relative' }}>
       <svg width="104" height="104" viewBox="0 0 104 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: tableOpacity }}>
         <defs>
           <filter id="conf-fire-glow" x="-40%" y="-40%" width="180%" height="180%">
@@ -864,10 +872,28 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], lastHuddle }) {
         )
       })()}
 
-      {meetingWorkers.length >= 2 && (
+      {meetingWorkers.length >= 2 && standupWorkers.length === 0 && (
         <>
           <div className="conf-meeting-badge">Huddle</div>
           {meetingWorkers.map((w, i) => {
+            const angle = CHAIR_ANGLES[i];
+            const rad = (angle * Math.PI) / 180;
+            const cx = 52, orbitR = 38;
+            const x = cx + orbitR * Math.sin(rad);
+            const y = cx - orbitR * Math.cos(rad);
+            return (
+              <div key={w.id} className="char--seated" style={{ left: x + 'px', top: y + 'px' }}>
+                <CharacterAvatar workerId={w.id} role={w.role} name={w.name} size={16} emoji={w.emoji} />
+              </div>
+            );
+          })}
+        </>
+      )}
+
+      {standupWorkers.length > 0 && (
+        <>
+          <div className="conf-meeting-badge">STANDUP</div>
+          {standupWorkers.map((w, i) => {
             const angle = CHAIR_ANGLES[i];
             const rad = (angle * Math.PI) / 180;
             const cx = 52, orbitR = 38;
@@ -1022,9 +1048,12 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const workingIds     = new Set(workingWorkers.map(w => w.id))
   const idleWorkers    = nonMgr.filter(w => w.status === 'idle' && !workingIds.has(w.id))
   const meetingWorkers = idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : []
+  const standupActive  = workingWorkers.length >= 3 && (vibe === 'crushing' || vibe === 'in-flow')
+  const standupWorkers = standupActive ? workingWorkers.slice(0, 4) : []
   const hasAnyError    = nonMgr.some(w => w.status === 'error')
   const isFullSync     = nonMgr.length > 0 && idleWorkers.length === 0 && workingWorkers.length === nonMgr.length
   const isFullIdle     = nonMgr.length > 0 && workingWorkers.length === 0 && idleWorkers.length === nonMgr.length
+  const isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0
 
   const FULL_IDLE_MESSAGES = {
     crushing: 'Everyone earned their break',
@@ -1124,6 +1153,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
   return (
     <div className="office-wrap">
+      <span className="sr-only" aria-live="polite" aria-atomic="true">{pingReaction ?? ''}</span>
       {plantToast && (
         <div
           aria-live="polite"
@@ -1188,6 +1218,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               <span className="wb-progress-label">avg task progress</span>
             </>
           )}
+          <span className="wb-task-count" style={{ fontSize: '0.4rem', color: 'inherit', opacity: 0.7 }}>
+            {workingWorkers.length} active · {nonMgr.length} total
+          </span>
           <div className="wb-history-dots" aria-hidden="true">
             {vibeHistoryRef.current.slice(0, -1).map((v, i) => (
               <span key={i} className="wb-history-dot" data-vibe={v} />
@@ -1311,7 +1344,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         })}
 
         {/* Conference table — lower center */}
-        <ConferenceTable vibeKey={vibe} meetingWorkers={meetingWorkers} lastHuddle={lastHuddle} />
+        <ConferenceTable vibeKey={vibe} meetingWorkers={meetingWorkers} standupWorkers={standupWorkers} lastHuddle={lastHuddle} />
 
         {vibeCaption && <div className="vibe-caption" aria-live="polite">{vibeCaption}</div>}
 
@@ -1364,18 +1397,20 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           const occ = deskOccupants[desk.id]
           if (!occ || occ.idle) return null
           return (
-            <Character
-              key={occ.worker.id}
-              worker={occ.worker}
-              left={desk.left + 7}
-              top={desk.top - 4}
-              variant={occ.ghost ? 'ghost' : 'working'}
-              delay={i * 0.12}
-              tooltip={occ.ghost ? occ.worker.role : occ.worker.task}
-              activityEntries={occ.ghost ? activityEntries : []}
-              onClick={!occ.ghost && onWorkerClick ? handleCharClick : undefined}
-              isPinged={pingedId === occ.worker.id}
-            />
+            <div key={occ.worker.id} style={{ position: 'absolute', left: `${desk.left + 7}%`, top: `${desk.top - 4}%` }}>
+              <Character
+                worker={occ.worker}
+                variant={occ.ghost ? 'ghost' : 'working'}
+                delay={i * 0.12}
+                tooltip={occ.ghost ? occ.worker.role : occ.worker.task}
+                activityEntries={occ.ghost ? activityEntries : []}
+                onClick={!occ.ghost && onWorkerClick ? handleCharClick : undefined}
+                isPinged={pingedId === occ.worker.id}
+              />
+              {isLoneSurvivor && !occ.ghost && (
+                <div className='lone-survivor-label' style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>{LONE_SURVIVOR_LABELS[vibe] || '🎯 solo run'}</div>
+              )}
+            </div>
           )
         })}
 
