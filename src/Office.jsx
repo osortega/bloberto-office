@@ -1017,6 +1017,15 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const meetingWorkers = idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : []
   const hasAnyError    = nonMgr.some(w => w.status === 'error')
   const isFullSync     = nonMgr.length > 0 && idleWorkers.length === 0 && workingWorkers.length === nonMgr.length
+  const isFullIdle     = nonMgr.length > 0 && workingWorkers.length === 0 && idleWorkers.length === nonMgr.length
+
+  const FULL_IDLE_MESSAGES = {
+    crushing: 'Everyone earned their break',
+    'on-fire': 'Ceasefire',
+    'in-flow': 'The office breathes',
+    'slow-day': 'Somewhere...',
+    'after-hours': 'Nobody home',
+  }
 
   const avgProgress = Math.round(
     workingWorkers.reduce((s, w) => s + (w.progress || 0), 0) / Math.max(workingWorkers.length, 1)
@@ -1142,6 +1151,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         <VibeShockwave vibeKey={vibe} />
         <div className="office-sign">🏢 Bloberto&apos;s HQ</div>
         {isFullSync && <div className="full-sync-banner" aria-label="Full team sync" aria-live="polite">⚡ Full sync</div>}
+        {isFullIdle && <div className="full-idle-banner" aria-label="Full team idle" aria-live="polite">😌 {FULL_IDLE_MESSAGES[vibe] ?? 'The office breathes'}</div>}
 
         {/* Wall clock — top wall, between sign and manager area */}
         <WallClock vibeKey={vibe} />
@@ -1305,7 +1315,13 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
 
         {/* Coffee corner — top right */}
-        <div className={`coffee-corner${idleWorkers.length >= 2 ? ' coffee-corner--chatting' : ''}`} data-vibe={vibe}>
+        <div className={`coffee-corner${idleWorkers.length >= 2 ? ' coffee-corner--chatting' : ''}${idleWorkers.length === 1 ? ' coffee-corner--solo' : ''}`} data-vibe={vibe}>
+          {idleWorkers.length === 1 && (
+            <div className="coffee-corner__solo-badge">
+              <CharacterAvatar workerId={idleWorkers[0].id} role={idleWorkers[0].role} name={idleWorkers[0].name} size={14} emoji={idleWorkers[0].emoji} />
+              <span className="coffee-corner__solo-label">☕ {idleWorkers[0].name.split(' ')[0]} refueling</span>
+            </div>
+          )}
           <div className="coffee-corner__chat-badge" aria-hidden="true">
             <svg className="coffee-corner__bubbles" width="28" height="18" viewBox="0 0 28 18" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="0" y="2" width="18" height="11" rx="4" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1"/>
