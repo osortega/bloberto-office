@@ -1,5 +1,22 @@
 {
-  "workers": [],
+  "workers": [
+    {
+      "name": "Maya",
+      "role": "Frontend Dev",
+      "emoji": "\ud83c\udfa8",
+      "status": "working",
+      "task": "Fix mobile worker names + stats bar overflow",
+      "started_at": "2026-03-09T01:26:00Z"
+    },
+    {
+      "name": "Dave",
+      "role": "DevOps",
+      "emoji": "\ud83d\udd27",
+      "status": "working",
+      "task": "Fix Inter font, stuck card a11y, task tag focus, ping aria-live",
+      "started_at": "2026-03-09T01:26:00Z"
+    }
+  ],
   "roster": [
     {
       "name": "Maya",
@@ -27,5 +44,5 @@
       "emoji": "\ud83c\udf19"
     }
   ],
-  "updated_at": "2026-03-09T01:25:00Z"
+  "updated_at": "2026-03-09T01:26:00Z"
 }
