@@ -81,7 +81,7 @@
   background-size: 44px 44px;
   border: 2px solid var(--border);
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow:
     0 8px 40px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -102,6 +102,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  border-radius: inherit;
   background: linear-gradient(0deg, rgba(249,115,22,0.06) 0%, transparent 40%);
   animation: heat-shimmer 3s ease-in-out infinite;
 }
@@ -611,6 +612,7 @@
     font-size: 0.5rem;
     opacity: 0.5;
   }
+  .char-hover-card { pointer-events: auto; }
 }
 
 /* ── Vacant desk job-posting hover card ── */
@@ -1138,13 +1140,14 @@
 
 @media (max-width: 480px) {
   .office-floor {
-    min-height: 0;
+    min-height: 65vh;
     max-height: none;
     height: calc(100vw * 0.75);
+    border-radius: 8px;
   }
   .office-wrap {
     margin-bottom: 1rem;
-    padding: 0.25rem;
+    padding: 0.3rem;
   }
   .char__avatar {
     width: 24px;
@@ -1169,13 +1172,39 @@
     display: none;
   }
   .wb-vibe-text {
-    font-size: 0.48rem;
+    font-size: 0.55rem;
     letter-spacing: 0.06em;
   }
   .office-wall-clock {
     top: 6px !important;
     right: 8px !important;
     transform: scale(0.75);
+  }
+  .idle-duration {
+    font-size: 0.26rem;
+  }
+  .desk__nameplate {
+    font-size: 0.38rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+  .desk-lamp {
+    transform: scale(0.8);
+  }
+  .office-sign {
+    font-size: 0.4rem;
+  }
+  .vibe-weather {
+    font-size: 0.6rem;
+  }
+  .vibe-weather__icon {
+    font-size: 0.6rem;
+  }
+  .vibe-weather__label {
+    font-size: 0.5rem;
+  }
+  .coffee-corner__label,
+  .office-door__label {
+    font-size: 0.25rem;
   }
 }
 
@@ -1261,6 +1290,7 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  border-radius: inherit;
   animation: dust-drift 20s ease-in-out infinite;
   /* px offsets converted from percentages (900px wide × 675px tall floor) */
   box-shadow:
@@ -1957,7 +1987,7 @@
 }
 
 /* ── Ambient Dust Motes ── */
-.ambient-particles { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+.ambient-particles { position: absolute; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; border-radius: inherit; }
 .ambient-particle {
   position: absolute;
   width: 3px; height: 3px;
@@ -2183,13 +2213,6 @@
   50% { opacity: 0.45; }
 }
 
-@media (max-width: 480px) {
-  .wb-vibe-text {
-    font-size: 0.48rem;
-    letter-spacing: 0.06em;
-  }
-}
-
 /* Vibe Caption */
 .vibe-caption {
   position: absolute;
@@ -2259,6 +2282,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  border-radius: inherit;
   background-image:
     radial-gradient(circle 1.5px at 7% 14%, rgba(255,255,255,0.55) 1px, transparent 1px),
     radial-gradient(circle 1px at 19% 38%, rgba(255,255,255,0.4) 1px, transparent 1px),
@@ -2404,10 +2428,6 @@
   background: rgba(60, 0, 0, 0.75);
   border-color: rgba(239, 68, 68, 0.5);
   color: #fca5a5;
-}
-
-@media (hover: none) {
-  .char-hover-card { pointer-events: auto; }
 }
 
 .conf-ambient-label {

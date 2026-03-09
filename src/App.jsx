@@ -4,6 +4,21 @@ import Office from './Office.jsx'
 import { getTeamVibe } from './utils/vibe.js'
 import { ROLE_EMOJIS, STATUS_LABELS, STATUS_EMOJIS, ROLE_COLORS } from './utils/constants.js'
 
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false } }
+  static getDerivedStateFromError() { return { hasError: true } }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontSize: '1.1rem', color: '#f87171' }}>
+          Something went wrong — refresh the page
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 const GITHUB_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json'
 const ACTIVITY_API_URL =
@@ -25,14 +40,14 @@ function getDispatch(map, value) {
 
 
 
-async function fetchWorkersFromGitHub() {
-  const res = await fetch(GITHUB_API_URL + '?t=' + Date.now())
+async function fetchWorkersFromGitHub(signal) {
+  const res = await fetch(GITHUB_API_URL + '?t=' + Date.now(), { signal })
   if (!res.ok) throw new Error(`Fetch error ${res.status}`)
   return res.json()
 }
 
-async function fetchActivityFromGitHub() {
-  const res = await fetch(ACTIVITY_API_URL + '?t=' + Date.now())
+async function fetchActivityFromGitHub(signal) {
+  const res = await fetch(ACTIVITY_API_URL + '?t=' + Date.now(), { signal })
   if (!res.ok) throw new Error(`Fetch error ${res.status}`)
   return res.json()
 }
@@ -743,12 +758,14 @@ export default function App() {
     }, 3000)
   }, [])
 
-  const syncFromGitHub = useCallback(async () => {
+  const syncFromGitHub = useCallback(async (signal) => {
     setIsSyncing(true)
     const [workersResult, activityResult] = await Promise.allSettled([
-      fetchWorkersFromGitHub(),
-      fetchActivityFromGitHub(),
+      fetchWorkersFromGitHub(signal),
+      fetchActivityFromGitHub(signal),
     ])
+
+    if (signal?.aborted) return
 
     if (workersResult.status === 'fulfilled') {
       const data = workersResult.value
@@ -805,7 +822,8 @@ export default function App() {
   }, [isSyncing, syncFromGitHub])
 
   useEffect(() => {
-    syncFromGitHub()
+    const controller = new AbortController()
+    syncFromGitHub(controller.signal)
     const getInterval = () =>
       document.visibilityState === 'hidden' ? POLL_INTERVAL_HIDDEN : POLL_INTERVAL_ACTIVE
 
@@ -823,6 +841,7 @@ export default function App() {
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
+      controller.abort()
       clearInterval(timer)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
@@ -1042,6 +1061,7 @@ export default function App() {
   const HONORIFICS = { crushing: 'LEGEND 🔥', 'on-fire': 'captain 🚨', 'in-flow': 'boss', 'slow-day': 'chief... you still there? 😐', 'after-hours': 'night owl 🌙' }
 
   return (
+    <ErrorBoundary>
     <div className="app">
       <div className="ambient-particles" data-vibe={teamVibe.key} aria-hidden="true">
         {Array.from({ length: 12 }, (_, i) => (
@@ -1075,20 +1095,20 @@ export default function App() {
             left: '50%',
             transform: 'translateX(-50%)',
             background: 'var(--surface2)',
-            border: `2px solid ${completionToast.color}`,
+            border: `2px solid ${completionToast.color || '#6366f1'}`,
             borderRadius: '12px',
             padding: '0.6rem 1.2rem',
             fontSize: '0.95rem',
             fontWeight: 600,
             color: 'var(--text)',
-            boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 12px ${completionToast.color}55`,
+            boxShadow: `0 4px 20px rgba(0,0,0,0.4), 0 0 12px ${(completionToast.color || '#6366f1')}55`,
             zIndex: 9999,
             whiteSpace: 'nowrap',
             pointerEvents: 'none',
             animation: 'badge-pop 0.3s cubic-bezier(0.34,1.56,0.64,1) both',
           }}
         >
-          🎉 {completionToast.name} shipped it!
+          {completionToast.text ? completionToast.text : `🎉 ${completionToast.name} shipped it!`}
         </div>
       )}
       <ShortcutToast />
@@ -1325,5 +1345,6 @@ export default function App() {
         <span>v1.0.0-chaos</span>
       </footer>
     </div>
+    </ErrorBoundary>
   )
 }

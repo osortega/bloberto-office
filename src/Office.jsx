@@ -486,11 +486,15 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   const isHoveringRef = useRef(false) // prevents ambient overlap with hover
   const prevVibeRef = useRef(null)
   const prevProgressRef = useRef(worker.progress)
+  const idleInnerTimeoutRef = useRef(null)   // inner setTimeout inside idle interval
+  const errorInnerTimeoutRef = useRef(null)  // inner setTimeout inside error interval
 
   // Cleanup both timer and interval on unmount
   useEffect(() => () => {
     if (timerRef.current)  clearTimeout(timerRef.current)
     if (ambientRef.current) clearInterval(ambientRef.current)
+    if (idleInnerTimeoutRef.current) clearTimeout(idleInnerTimeoutRef.current)
+    if (errorInnerTimeoutRef.current) clearTimeout(errorInnerTimeoutRef.current)
   }, [])
 
   // Ping reaction — show Bloberto's worker-specific one-liner
@@ -509,13 +513,13 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
     const showDelay = 8000 + wanderIdx * 3000
     const interval = setInterval(() => {
       setIdleBubble(true)
-      setTimeout(() => setIdleBubble(false), 2200)
+      idleInnerTimeoutRef.current = setTimeout(() => setIdleBubble(false), 2200)
     }, showDelay + 2200)
     const initialTimeout = setTimeout(() => {
       setIdleBubble(true)
-      setTimeout(() => setIdleBubble(false), 2200)
+      idleInnerTimeoutRef.current = setTimeout(() => setIdleBubble(false), 2200)
     }, showDelay)
-    return () => { clearInterval(interval); clearTimeout(initialTimeout) }
+    return () => { clearInterval(interval); clearTimeout(initialTimeout); clearTimeout(idleInnerTimeoutRef.current) }
   }, [variant, wanderIdx])
 
   // Error micro-bubbles — distress messages for workers in error state
@@ -536,13 +540,13 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
     }
     const interval = setInterval(() => {
       setErrorBubble(pick())
-      setTimeout(() => setErrorBubble(null), 2200)
+      errorInnerTimeoutRef.current = setTimeout(() => setErrorBubble(null), 2200)
     }, 12000)
     const initialTimeout = setTimeout(() => {
       setErrorBubble(pick())
-      setTimeout(() => setErrorBubble(null), 2200)
+      errorInnerTimeoutRef.current = setTimeout(() => setErrorBubble(null), 2200)
     }, 2000 + wanderIdx * 1500)
-    return () => { clearInterval(interval); clearTimeout(initialTimeout) }
+    return () => { clearInterval(interval); clearTimeout(initialTimeout); clearTimeout(errorInnerTimeoutRef.current) }
   }, [variant, worker.status])
 
   // Progress ring 100% burst
