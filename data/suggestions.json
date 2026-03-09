@@ -1,131 +1,155 @@
 {
   "analyst": "Sofia",
-  "review_number": 27,
-  "timestamp": "2026-03-08T23:15:53Z",
+  "review_number": 28,
+  "timestamp": "2026-03-08T23:45:49Z",
+  "screenshot_note": "Puppeteer/Chromium could not launch in this environment due to thread resource limits (pthread_create: Resource temporarily unavailable). Code analysis performed against /workspace/src/ source files. Visual reference cross-checked against qa26 and qa27 screenshot artifacts on disk.",
   "scores": {
     "visual": 5,
     "ux": 4,
-    "responsiveness": 4,
+    "responsiveness": 3,
     "performance": 4,
-    "accessibility": 4,
-    "code_quality": 4,
+    "accessibility": 3,
+    "code_quality": 3,
     "features": 5,
     "fun_factor": 5
   },
-  "overall_score": 4.4,
+  "overall_score": 4.0,
+  "regression_summary": {
+    "from_review_27_high_fixed": 0,
+    "from_review_27_high_open": 3,
+    "from_review_27_medium_fixed": 0,
+    "from_review_27_medium_open": 4,
+    "from_review_27_low_fixed": 1,
+    "from_review_27_low_open": 5,
+    "new_issues_this_review": 4
+  },
+  "fixed_since_last_review": [
+    {
+      "title": "Vibe Sparkline Has No Legend or Context",
+      "resolution": "A hover legend showing the last 3 vibe-state pills was added via .sparkline-legend and .sparkline-legend__pill. The underlying sparkline already had per-circle <title> tags. Partially complete — see new issue about touch-device inaccessibility."
+    }
+  ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Stats Bar Grid Overflows Beyond 5 Columns",
-      "description": "The stats bar uses `grid-template-columns: repeat(5, 1fr)` but dynamically adds error and stuck worker cards beyond those 5 slots. When both an error card AND a stuck card appear simultaneously, you get 7 cells in a 5-col grid \u2014 the overflow wraps to a second row, creating an uneven orphaned row. Switch to `repeat(auto-fill, minmax(160px, 1fr))` or explicitly reserve space for the optional cards.",
+      "title": "Stats Bar 5-Column Fixed Grid Still Not Fixed (Regression Carry #27)",
+      "description": "App.css line 118 still reads `grid-template-columns: repeat(5, 1fr)`. The StatsBar renders 5 base cards plus up to 2 optional cards (error count, stuck workers), totalling 7 cells in a 5-column grid. The overflow silently wraps to an orphaned second row. This was the top-priority bug from review #27 and has received zero code changes. Fix: change to `grid-template-columns: repeat(auto-fill, minmax(160px, 1fr))`. One line. Zero risk.",
       "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "ux",
-      "title": "Office Floor Is Unusable on Mobile",
-      "description": "On 375px mobile, worker names and desk labels in the Office view are rendered at 0.32\u20130.38rem \u2014 effectively sub-pixel and unreadable. Characters overlap or stack awkwardly. The isometric floor layout is a desktop-first experience and needs either: (a) a minimum character/label scale enforced via CSS clamp(), (b) a simplified 2-column grid list view as a mobile fallback, or (c) a pinch-to-zoom container. This is the single biggest UX gap on mobile.",
-      "effort": "large",
       "assigned_to": "Maya"
     },
     {
       "priority": "high",
-      "category": "visual",
-      "title": "Inter Font Never Loaded \u2014 Silently Falls Back",
-      "description": "index.css declares `font-family: 'Inter', 'Segoe UI', system-ui` but there is no @import or <link> tag loading Inter from Google Fonts or any self-hosted source. Users without Inter pre-installed (most non-macOS users) silently render in Segoe UI or the system font, breaking typographic consistency. Fix with a preconnect + preload Google Fonts link in index.html, or bundle Inter via npm (fontsource-inter).",
+      "category": "bug",
+      "title": "Inter Font Still Not Loaded — Carry #27",
+      "description": "index.html still has no Google Fonts <link> or @import for Inter. The root in index.css declares `font-family: 'Inter', 'Segoe UI', system-ui` but Inter is never fetched. Windows users silently render in Segoe UI, Linux in whatever `sans-serif` resolves to. Thirteen reviews have passed since this was first flagged. Add one preconnect + stylesheet link to Google Fonts, or `npm install @fontsource/inter` and import it in main.jsx. Takes 5 minutes. Do it.",
       "effort": "small",
       "assigned_to": "Dave"
     },
     {
-      "priority": "medium",
-      "category": "code",
-      "title": "App.jsx and Office.jsx Are Too Large to Maintain",
-      "description": "App.jsx is 1,273 lines and Office.jsx is 1,417 lines. App.jsx alone contains StatsBar, ActivityLog, WorkerCard, ProgressBar, DeltaBadge, VibeSparkline, ShortcutToast, LoadingSkeleton, EmptyState, and the main App component. Extract each logical component into its own file under src/components/. This is not cosmetic \u2014 it directly impacts debuggability, test coverage, and future onboarding speed.",
+      "priority": "high",
+      "category": "ux",
+      "title": "Mobile Office Floor: Names Gone, Workers Anonymous at 480px",
+      "description": "Office.css now applies `.char__name { display: none }` at 480px (≤480px breakpoint), which hides worker names entirely instead of the sub-pixel 0.32rem text flagged in review #27. This is arguably worse — the fix traded illegibility for invisibility. At 375px mobile, workers are now completely anonymous blobs. Between 481px and 600px, names still render at 0.44rem (~7px). Neither state is acceptable. Required: either a mobile-specific list/grid view that replaces the isometric layout at ≤640px, or a tap-to-reveal tooltip with worker name/status. The isometric floor is a desktop-first visualization; pretending otherwise isn't design, it's avoidance.",
       "effort": "large",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "NEW: Fetch-Warn Retry Button Missing isSyncing Guard",
+      "description": "The `fetchWarn` banner's Retry button (rendered when one of the two parallel fetches fails) calls `syncFromGitHub` with no `disabled` prop and no `isSyncing` check. Compare with the `sync-now-btn` in the header which correctly disables when `isSyncing` is true. A user seeing 'Some data may be stale' who clicks Retry rapidly can fire multiple concurrent fetches — each calling `Promise.allSettled([fetchWorkersFromGitHub(), fetchActivityFromGitHub()])` simultaneously, causing race conditions on `setAllWorkers`, `setRoster`, and `setActivityLog`. Fix: add `disabled={isSyncing}` to the Retry button in the warn banner (and the error banner, same issue).",
+      "effort": "small",
       "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "completionToast Rendered with Inline Styles \u2014 Breaks Light Mode",
-      "description": "The worker completion toast (\ud83c\udf89 X shipped it!) uses hardcoded inline styles (`background: 'var(--surface2)'`, `color: 'var(--text)'`, `boxShadow` with hardcoded rgba values). While CSS variables work in inline styles, the border and glow color are passed as a raw hex prop making the component impossible to theme or override. Move to a `.completion-toast` CSS class with a CSS custom property for the accent color, consistent with every other notification element.",
+      "title": "NEW: Footer Quote Counter Modulo Logic Is Broken",
+      "description": "The footer quote counter shows `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 / (BONUS_TAGLINES.length + 1)`, e.g. '1/9 … 9/9' cycling every 9 clicks. But `showBonus` TOGGLES on every click — alternating between the vibe tagline and bonus taglines every 2 clicks, not every 9. The counter resets to '1/9' at click 9 while `showBonus` is true and the user sees a bonus tagline, making the counter completely misaligned with visible content. It also shows '9/9' when the vibe tagline is displayed (showBonus=false), which is wrong. Simplest fix: track a separate `quoteIndex` for bonus and show `${quoteIndex + 1}/${BONUS_TAGLINES.length}` only when `showBonus` is true, or remove the counter entirely.",
       "effort": "small",
-      "assigned_to": "Maya"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Escape Key Does Not Clear Active Tag Filter",
-      "description": "Keyboard shortcut: Escape currently only calls `document.activeElement?.blur()`. When a task tag filter is active (selectedTag is set), pressing Escape should also clear it \u2014 this is the expected behavior in any filter UI. A user using keyboard-only navigation has no way to clear the filter without clicking or using mouse. Add `setSelectedTag(null)` to the Escape handler in the global keydown effect.",
+      "title": "Escape Key Still Does Not Clear Active Tag Filter — Carry #27",
+      "description": "The global keydown handler at App.jsx line 765 still reads `else if (e.key === 'Escape') document.activeElement?.blur()`. When `selectedTag` is set, pressing Escape should also call `setSelectedTag(null)`. This is standard filter-UI keyboard behavior (see: Notion, Linear, GitHub Issues). A keyboard-only user has no way to clear the tag filter without a mouse click. One-line fix: `else if (e.key === 'Escape') { document.activeElement?.blur(); setSelectedTag(null); }`. This was marked medium-priority in review #27 and has had zero changes.",
       "effort": "small",
       "assigned_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "completionToast Still Fully Inline-Styled — Carry #27",
+      "description": "The '🎉 X shipped it!' toast is still rendered with a dozen inline style properties: `background`, `border` (hardcoded hex color), `borderRadius`, `padding`, `fontSize`, `fontWeight`, `color`, `boxShadow` (hardcoded rgba), `zIndex`, `whiteSpace`, `pointerEvents`, and `animation`. Every other notification element in this app uses CSS classes. Create a `.completion-toast` class and a `--toast-accent` CSS custom property. Pass only `style={{ '--toast-accent': completionToast.color }}` as the inline override. This has been open since review #27.",
+      "effort": "small",
+      "assigned_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "No aria-live Announcement When Data Syncs",
-      "description": "When the polling sync completes, worker counts and statuses update silently for screen readers. Add a visually-hidden `aria-live='polite'` region (sr-only) that announces something like 'Dashboard updated, 3 workers active' after each successful sync. The isSyncing state and lastSynced timestamp are already tracked \u2014 just pipe the summary string into the live region. Low effort, high accessibility win.",
+      "title": "No aria-live Announcement When Data Syncs — Carry #27",
+      "description": "The `isSyncing` and `lastSynced` state are both tracked. The sync status card in StatsBar updates visually when data arrives. But there is still no `aria-live='polite'` region announcing the outcome to screen readers. Add a visually-hidden `<span aria-live='polite' aria-atomic='true' className='sr-only'>` that renders `'Dashboard updated, ${activeWorkers.length} workers'` after each successful sync (triggered by the `lastSynced` state changing). The polling-paused pill now uses aria-live, showing the team knows the pattern — apply it to sync completion.",
       "effort": "small",
       "assigned_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Activity Log Worker Filter Excludes Non-Roster Workers",
-      "description": "The worker filter pill bar below the activity log only renders buttons for workers in the `roster` array from workers.json. Workers who appear in activity.json events but are NOT in the roster (e.g. temporary workers, removed workers, or Bloberto himself for system events) cannot be filtered. Either derive filter options from the union of roster + unique worker names seen in activityLog, or add a fallback showing all workers mentioned in the log.",
+      "title": "Activity Log Worker Filter Shows Roster Workers Only — Carry #27",
+      "description": "The new worker filter pill bar (a welcome addition this cycle!) still derives its options from `roster.map(member => ...)`, which only includes workers listed in data/workers.json's `roster` array. System events by 'Bloberto', events by decommissioned workers, or workers present only in activity.json are silently unfiltered. Fix: derive filter options from `Array.from(new Set(activityLog.map(e => e.worker).filter(Boolean)))` and merge with roster, deduplicating by name. This ensures every worker name that actually appears in the log gets a filter pill.",
       "effort": "small",
       "assigned_to": "Carlos"
     },
     {
-      "priority": "low",
+      "priority": "medium",
       "category": "code",
-      "title": "Dead CSS Block at Bottom of App.css",
-      "description": "A block labeled `/* === Mobile Header Fix (Luna Review #41) === */` at the very end of App.css targets `.tab-content`, `.header-subtitle`, and `.tab-toggle` \u2014 none of which exist as class names in the JSX. These are ghost selectors from an old design iteration that were never cleaned up. Remove the dead block (~14 lines). Also check Office.css for similar orphaned selectors from past refactors.",
+      "title": "App.jsx and Office.jsx Grew Again — Carry #27",
+      "description": "App.jsx grew from 1,273 to 1,285 lines (+12). Office.jsx grew from 1,417 to 1,447 lines (+30). The new solo-spotlight layout, fetchWarn banner, polling-paused pill, and worker filter pills were all added inline rather than extracted. This is the third consecutive review flagging this. Each new feature added to these monoliths increases cognitive overhead and collision risk. Concrete next step: extract `StatsBar`, `ActivityLog`, `ActivityLogEntry`, `WorkerCard`, `VibeSparkline`, `ShortcutToast`, and `LoadingSkeleton` from App.jsx into `src/components/`. These are already discrete, named functions — the extraction is mechanical.",
+      "effort": "large",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "NEW: Sparkline Legend Is Hover-Only — Invisible on Touch Devices",
+      "description": "The new `.sparkline-legend` element (added this cycle to address review #27's 'no context' issue) is controlled by `.stat-card:hover .sparkline-legend { display: flex }`. On touch devices there is no hover state, so the legend is permanently hidden — the fix is inaccessible on the platform (mobile) where accessibility help is most needed. Fix: add `@media (hover: none) { .sparkline-legend { display: flex; } }` in App.css to always show the legend on touch devices. The SVG `aria-label` text is adequate for screen readers but sighted touch users still can't see the legend.",
       "effort": "small",
-      "assigned_to": "Dave"
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "NEW: polling-paused-pill Uses Conditional aria-live (Unreliable)",
+      "description": "The `polling-paused-pill` span uses `aria-live='polite'` but the element is conditionally rendered (`{pollingPaused && <span aria-live='polite'>...`). An `aria-live` region must be present in the DOM before its content changes to reliably announce to screen readers — elements that are added to the DOM with content already set will not announce in all screen reader/browser combinations. Fix: always render the span but toggle its content: `<span aria-live='polite' aria-atomic='true' className='sr-only'>{pollingPaused ? '⏸ Auto-refresh paused. Move mouse to resume.' : ''}</span>`. The visible pill can remain conditional.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "getTaskTags() Called Twice Per Worker Per Render",
-      "description": "In the workers grid, `getTaskTags(w.task)` is called both inside WorkerCard (for rendering tags) and at the call site as `!getTaskTags(w.task).some(...)` to compute the `isDimmed` prop. This doubles the regex matching work per worker. Either memoize tags inside WorkerCard with useMemo, compute isDimmed inside WorkerCard using already-computed tags, or pass the tags array as a prop instead of the raw task string.",
+      "title": "getTaskTags() Still Called Twice Per Worker Per Render — Carry #27",
+      "description": "At every render of the workers grid, `getTaskTags(w.task)` is called once at the render site to compute `isDimmed` and once again inside WorkerCard to render the tag pills. With 6 workers and a selectedTag active, that is 12 regex evaluations per render cycle (6 patterns × 2 calls × 6 workers = 72 pattern tests). Compute tags once and pass as a prop: `const tags = getTaskTags(w.task)` at the call site, then `isDimmed={selectedTag !== null && !tags.some(t => t.label === selectedTag)}` and `tags={tags}` prop on WorkerCard. WorkerCard already receives the tags indirectly — this is pure redundancy.",
       "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Conference Table 'Last Huddle' Text Is Sub-Pixel",
-      "description": "The 'Last huddle' timestamp below the conference table is rendered at `font-size: 0.38rem` \u2014 at 16px base that is approximately 6px, smaller than most screens can render crisply. It is effectively invisible. Either bump it to a minimum of 0.65rem and style it as a proper soft label, or remove the feature entirely. Invisible UI is worse than no UI.",
-      "effort": "small",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Vibe Sparkline Has No Legend or Context",
-      "description": "The vibe sparkline in the Team Vibe stat card is charming but completely opaque to new users. The y-axis represents vibe rank (after-hours \u2192 crushing), the x-axis is time, and dot colors map to vibe states \u2014 but none of this is documented. Add a tooltip on hover for the SVG element explaining the axes, or add aria-description text. The existing `<title>` tags on individual circles are good but the overall chart needs context.",
-      "effort": "small",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "Add Worker Name Search to Dashboard Grid",
-      "description": "As the roster grows, a text search input above the workers grid would help. A simple uncontrolled input filtering `activeWorkers` by `worker.name.toLowerCase().includes(query)` would cover 90% of the use case with minimal code. Consider placing it in the section header next to 'Active Workers (N)'.",
-      "effort": "medium",
       "assigned_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Version String Still Shows v1.0.0-chaos",
-      "description": "The footer version is unchanged through at least 27 reviews. Given the substantial feature additions (vibe history, sparklines, custom SVG characters, stuck worker beacon, activity log filters, hash routing, etc.), consider adopting date-based versioning or at least bumping to v2.0.0-chaos to communicate the scale of changes. It's a cosmetic issue but it signals 'nothing has changed' to returning users.",
+      "title": "Dead CSS Block 'Mobile Header Fix (Luna Review #41)' Still Present — Carry #27",
+      "description": "App.css lines 1099–1117: the `/* === Mobile Header Fix (Luna Review #41) === */` block is still there. It targets `.tab-content` (no JSX match), `.header-subtitle` (no JSX match), and `.tab-toggle margin: 0.3rem 0` (duplicates existing .tab-toggle rules). The `.header h1` and `.header-subtitle` rules are dead selectors from a removed design. Additionally, the Office.css `@media (max-width: 480px)` block at line 2250 contains `.bloberto-character__name { display: none }` which is a ghost selector — the actual class is `.char__name`. Audit and purge dead selectors.",
+      "effort": "small",
+      "assigned_to": "Dave"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Version String Still v1.0.0-chaos — Carry #27",
+      "description": "The footer still shows `v1.0.0-chaos` through 28 reviews, including additions of: vibe sparklines, isometric office floor, worker confetti, activity log with type + worker filters, solo spotlight layout, polling pause detection, hash-based routing, and custom SVG character avatars. This communicates stasis to returning users and makes it impossible to reason about 'what changed'. At minimum bump to `v2.0.0-chaos`. Ideally adopt a date-based scheme: `v2026.03-chaos`. It's one string.",
       "effort": "small",
       "assigned_to": "Dave"
     }
   ],
-  "summary": "Review #27 \u2014 major leap forward from the previous 3.6. The codebase has matured significantly: intelligent polling (visibility-aware + idle-pause), a genuinely delightful vibe streak system with sparkline history, click-to-focus cross-tab worker navigation, task tag filtering with dimming, stuck worker beacon, per-worker completion confetti, and rich custom SVG character avatars that include error-state PANIC screens. The Office view is a legitimate showpiece \u2014 conference table vibe behavior, time-of-day sky gradients, away signs, ghost/OOO workers, and Bloberto's ambient speech bubbles are all cohesive and polished. Accessibility has meaningfully improved (skip link, full ARIA tablist pattern, reduced-motion throughout, coarse-pointer detection). Three issues need fixing before this hits prime time: the stats bar grid silently breaks with 7+ cards, the office view is genuinely unusable on mobile at 375px, and Inter font is declared but never loaded. Code health is the main ongoing debt \u2014 App.jsx at 1273 lines and Office.jsx at 1417 lines are becoming a liability. Fun factor is off the charts. This is the best version yet."
+  "summary": "Review #28 — a net regression from #27's 4.4 down to 4.0, and honestly, that's being charitable. Three high-priority issues from last review sit completely untouched: the stats bar 5-column overflow, the missing Inter font, and mobile office unusability (which got 'fixed' by deleting worker names entirely at 480px — congratulations, the names are no longer illegible because they no longer exist). Zero of review #27's medium-priority issues were resolved. The files actually grew. Two new bugs arrived: the fetch-warn Retry button can fire concurrent fetches because it's missing `disabled={isSyncing}`, and the footer quote counter has a modulo logic mismatch that makes it display wrong positions relative to what's shown. On the positive side: the new worker filter pills in the activity log are genuinely useful (roster-only data source notwithstanding), the solo-spotlight layout for single workers is a lovely polish moment, and the fetchWarn partial-failure banner shows thoughtful resilience engineering. The sparkline legend from last review's suggestion was implemented, but it's hover-only with no touch fallback, which is the QA equivalent of fixing a leaky roof by putting a bucket under it. The fun factor and visual design remain elite — this codebase has taste in abundance. What it needs is a dedicated 'fix the backlog' sprint before adding more features. At current trajectory, review #29 will be measuring 1,300-line App.jsx additions against a list of 15 unresolved issues. Ship it? Yes. Proud of it? Ask again after the sprint."
 }

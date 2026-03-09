@@ -1,63 +1,55 @@
 {
   "creative_director": "Luna",
-  "review_number": 56,
-  "timestamp": "2026-03-08T23:01:00Z",
-  "theme": "Every silent element is a missed joke — make the office earn its rent",
-  "visual_observations": "Desktop (qa26, 1280x800): Vibe Crushing It — purple border glow, Bloberto center-top with CVO nameplate. Five workers at desks: Luna top-left (4-column colorful monitor), Carlos (wrench icon), Maya (palette icon), Dave (wrench), Sofia (magnifying glass + hover card open + trophy in crushing vibe). Vacant desk bottom-right. Conference table lower-left: circular purple chairs, everyone is at their desk ambient label. Coffee corner top-right: COFFEE TRIPLE SHOT with steam. Window right-wall: tall DUSK purple-amber gradient. Cactus top-right, two plants + Fern lower floor. Aisle: two static ▸ ◂ arrows in floor center — zero animation, zero personality. Shortcut toast inside card. Mobile (375x812): identical vibe, workers compressed, shortcut toast still OUTSIDE the card boundary (the #55 must-fix is not yet shipped). Dashboard tab: 1 active worker (Sofia), stats sparkline shows 2 barely-visible dots on a faint white polyline with no legend, Running solo today. Carrying the whole team on one pair of hands. message.",
+  "review_number": 57,
+  "timestamp": "2026-03-09T00:05:00Z",
+  "theme": "The office remembers everything but shows nothing — give it a voice for the quiet states",
+  "visual_observations": "Code review pass (Puppeteer timed out on live site). Confirmed from Office.jsx + App.jsx: ghost-tier system now shipped with fresh/stale/abandoned tiers. PING_REACTIONS map exists for all 5 workers. Sparkline legend with colored pills shipped. Vacant job card now has focus-within for touch. Aisle arrows respond to vibe via data-vibe CSS selectors. Two #56 ideas still unshipped: full-idle banner and activity log silence gaps. New observations: (1) The ghost desk tiers are computed but Office.css has no differentiated styles for stale vs abandoned — the data attribute is set but CSS doesn't use it. (2) Coffee corner has a chatting state but no visual for the solo coffee break when exactly 1 worker is idle. (3) The AwaySign component picks from 6 messages deterministically but never uses the worker's actual last task as context. (4) ErrorBubble messages are hardcoded comedy strings — no connection to the actual error. (5) The footer tagline counter shows N/9 but the denominator is wrong when bonus taglines array changes size.",
   "ideas": [
     {
       "priority": "must",
       "category": "visual",
-      "title": "Ghost Desk Time Tiers Need Visual Escalation",
-      "description": "The code computes exact elapsed time for ghost desks (working + updated_at > 15min) and stores it as ghostDeskTitle — but that string lives ONLY in a title tooltip. Every ghost desk looks identical at 20 minutes and at 5 hours; desk--ghost has no tier differentiation in CSS. Fix: in Office.jsx, derive a tier from the same elapsed-time computation already in place and add data-ghost-tier to the desk div: fresh (15-60min), stale (1-3h), abandoned (3h+). In Office.css: stale gets amber monitor tint and slower opacity pulse; abandoned gets a red border bleed and faster angrier pulse animation. WHY: A task that has not updated in 5 hours is not the same story as a 20-minute lull. The floor is lying by treating them identically. Time urgency is the one thing this dashboard should never hide.",
+      "title": "Ghost Desk Tiers Have Data Attributes But No CSS Differentiation",
+      "description": "Office.jsx correctly computes ghostDeskTier as fresh/stale/abandoned and sets data-ghost-tier on the desk div. But Office.css has no selectors for [data-ghost-tier='stale'] or [data-ghost-tier='abandoned']. The tier computation is dead code visually. Fix: In Office.css, add .desk--ghost[data-ghost-tier='stale'] with amber-tinted monitor glow (box-shadow: 0 0 8px rgba(245,158,11,0.4)), slower opacity pulse (3s instead of 2s). Add .desk--ghost[data-ghost-tier='abandoned'] with red border-left (3px solid #ef4444), faster pulse (1.2s), and the monitor screen gets a red tint filter. WHY: The whole point of the tier system from #56 was visual escalation. Without CSS, it is a data attribute talking to nobody. This is the #1 priority because the feature is half-shipped.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
-      "priority": "must",
+      "priority": "should",
       "category": "office-life",
-      "title": "Vacant Desk Job Card Is Touch-Inaccessible",
-      "description": "The .vacant-job-card with vibe-specific hiring jokes like Staff Wizard: Must maintain velocity without asking what velocity means is revealed only via CSS :hover. On touch devices there is no hover so the card is permanently invisible on mobile. Pure CSS fix: add .desk--vacant:focus-within .vacant-job-card to the existing hover selector. The vacant desk already has tabIndex=0 so tap-then-focus works on touch with zero JSX changes. Also add a mobile-only CSS pseudo-element on .desk__nameplate--vacant hinting the desk is interactive. WHY: The vibe-specific job postings are the sharpest writing on the floor. On mobile the vacant desk is a grey rectangle with nothing. The joke is locked behind a gesture that does not exist on half of all devices.",
+      "title": "Full-Idle Banner — The Breath After the Sprint",
+      "description": "Carried forward from #56 as it was not implemented. isFullSync gets a glowing banner when all workers are working. But isFullIdle (all active workers idle, zero progress) has no equivalent. The floor goes silent with no acknowledgment. Fix: In Office.jsx, compute isFullIdle = nonMgr.length > 0 && workingWorkers.length === 0 && idleWorkers.length === nonMgr.length. Render a full-idle-banner div when true, using the same conditional pattern as full-sync-banner. Text varies by vibe: crushing → 'Everyone earned their break', on-fire → 'Ceasefire', in-flow → 'The office breathes', slow-day → 'Somewhere...', after-hours → 'Nobody home'. Style as the tonal mirror of full-sync-banner: muted colors, slower pulse (3s), italicized font, 0.7 opacity. WHY: Full sync gets celebrated. Full rest deserves equal acknowledgment.",
       "effort": "small",
-      "assigned_to": "dave"
+      "assigned_to": "sofia"
     },
     {
       "priority": "should",
-      "category": "storytelling",
-      "title": "Bloberto Goes Silent When You Click a Worker",
-      "description": "When handleCharClick fires in Office.jsx, pingedId gets set and the character flashes. Bloberto does nothing. Fix: when pingedId changes to a non-null worker id, trigger the manager Character speech bubble with a worker-specific one-liner. Add a PING_REACTIONS map keyed by worker id: luna gets creative review in progress, maya gets check the PRs purple and correct as always, carlos gets it is in the logs it is ALWAYS in the logs, dave gets he hears you through the headphones, sofia gets found 3 more bugs already. Reuse the existing bubble system by lifting the ping trigger into Office and forwarding it to the manager Character via a ref or a new onPing prop. WHY: Clicking a worker currently feels like a UI action. Bloberto reacting turns it into an office interaction and the surveillance-dashboard joke writes itself.",
+      "category": "delight",
+      "title": "Solo Coffee Break — One Idle Worker at the Coffee Corner",
+      "description": "The coffee corner has a chatting state when 2+ workers are idle (coffee-corner--chatting class). But when exactly 1 worker is idle, the coffee corner does nothing special. Fix: In Office.jsx, pass a new prop soloBreaker to the coffee corner area when idleWorkers.length === 1. Render a tiny CharacterAvatar (size=14) of that worker next to the coffee emoji with a subtle fade-in. Add a solo label like '☕ {name} refueling'. In Office.css, add .coffee-corner--solo with a gentle warm glow. WHY: The solo coffee break is its own story. One person stepping away while everyone else grinds — that quiet moment deserves to be seen.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
-      "priority": "should",
-      "category": "feature",
-      "title": "The Vibe Sparkline Is Beautiful and Completely Unreadable",
-      "description": "In the dashboard Team Vibe stat card, the sparkline is 64x14px colored dots on a faint white polyline. The qa26 screenshot shows 2 barely-visible dots. Each circle already has a title child with timestamp and vibe key but those only surface in narrow browser implementations. The SVG aria-label says only Vibe history with zero content. Fix: update VibeSparkline aria-label to the full sequence — Vibe history: Crushing It → On Fire → Crushing It. Add a title element as first SVG child with the same string. Then add a sibling .sparkline-legend div visible on .stat-card:hover showing the last 3 vibes as inline colored text pills using VIBE_COLORS. Pure render-time data, zero overhead. WHY: The sparkline is the most data-dense element in the dashboard and it is completely silent. People are watching those dots and guessing. Give it a voice.",
+      "priority": "could",
+      "category": "storytelling",
+      "title": "The Whiteboard Doodle Should Rotate",
+      "description": "The wb-doodle pre element shows a single ASCII face per vibe (crushing → ╰(*°▽°*)╯, on-fire → (╯°□°)╯︵ ┻━┻, etc). It never changes within a vibe. Fix: In Office.jsx, create VIBE_DOODLES map with 3 doodles per vibe. Use a state counter that increments every 30s (or on click) and cycles through them. The transition should be a quick 200ms fade. WHY: The whiteboard is the personality center of the office. A static doodle gets stale after the first visit. Rotation keeps it alive and gives returning visitors a reason to glance at it.",
       "effort": "small",
-      "assigned_to": "sofia"
+      "assigned_to": "dave"
     },
     {
       "priority": "could",
-      "category": "visual",
-      "title": "The Aisle Arrows Are the Only Dead Element in the Office",
-      "description": "office-aisle renders two aria-hidden spans with the arrow characters. Static text. No animation, no vibe reaction, no color. Every other floor element reacts to vibe: the clock tooltip changes, the window gradient shifts, the whiteboard rewrites itself, the door icon switches, the conference table gains and loses chairs. The aisle is the one element that has checked out. Fix: add data-vibe={vibe} to the .office-aisle div (one attribute). Then in Office.css: on-fire makes both arrows red and same-direction pulsing fast; crushing makes them teal and faster; slow-day desaturates and slows animation to 4s; after-hours fades one arrow to opacity 0.1 since nobody is leaving; in-flow gives a gentle teal pulse at 2s. WHY: The aisle is the path workers walk. It should breathe with the office. A dead element in a living world breaks the illusion.",
+      "category": "feature",
+      "title": "Conference Table Last-Huddle Ghost Trail",
+      "description": "The lastHuddle ref already tracks who was in the last meeting and when it ended. The code renders a tiny text line showing 'Last: names · timeStr' when no meeting is active and huddle ended <30min ago. But it's plain text at 0.38rem with inline styles — nearly invisible. Fix: In Office.css, create .conf-last-huddle class with proper styling: 0.45rem, muted text color, a subtle left-border accent matching the vibe color. Show mini avatar dots (6px colored circles) for each participant instead of text names. Add a gentle fade-out animation as the 30min window closes. WHY: The huddle afterglow tells you the office was alive even when you missed it. Right now it's functionally invisible.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
-      "priority": "could",
-      "category": "office-life",
-      "title": "The Full-Idle State Gets No Banner",
-      "description": "isFullSync triggers a glowing Full sync banner on the floor when all workers are in working state — confirmed in the mobile screenshot. But isFullIdle — all active workers idle, zero progress happening — has no equivalent. The floor goes quiet with no acknowledgment. Fix: compute isFullIdle = nonMgr.length > 0 && workingWorkers.length === 0 in Office.jsx. Render a full-idle-banner when true using the same conditional pattern as full-sync-banner: Everyone on break for most vibes, Somewhere... for slow-day, Nobody home for after-hours. Style as the tonal mirror of full-sync-banner — muted colors, slower pulse, italicized. WHY: Full sync gets celebrated with a glowing banner. The full rest deserves equal acknowledgment. It is the breath after the sprint — not an absence of state but a state of its own that the floor should name.",
-      "effort": "small",
-      "assigned_to": "sofia"
-    },
-    {
       "priority": "wild",
       "category": "storytelling",
-      "title": "The Activity Log Hides the Silence Between Events",
-      "description": "The log groups entries into time buckets — clean and well-implemented. But within a group, entries stack with no indication of time between them. Three entries in Earlier today might span 2 minutes or 4 hours. That gap — the quiet hours when nothing was logged — is invisible. Fix: in the ActivityLog component, after rendering each entry, compute the delta to the next entry in the same group. If delta > 30 minutes, insert an activity-time-gap div between them showing the silence as scaled dot leaders: a short gap renders as 34m in dots, a multi-hour gap renders as 2h 07m with more surrounding dots. Style at 0.55rem muted monospace, centered. Max 1 gap indicator per time group. WHY: The log currently reads like a list. With silence markers it reads like a timeline with chapters. Carlos completed a deploy. Two hours of silence. Sofia hit an error. That blank middle IS the story. The hours when nothing happened are the most honest data in the dashboard.",
+      "title": "Activity Log Silence Gaps — Show the Quiet Hours",
+      "description": "Carried forward from #56. The activity log groups entries into time buckets but entries stack with no indication of time between them. Three entries in 'Earlier today' might span 2 minutes or 4 hours. Fix: In App.jsx ActivityLog component, after rendering each entry within a group, compute delta to the next entry. If delta > 30 minutes, insert a .activity-time-gap div: '··· 2h 07m ···' styled at 0.55rem muted monospace, centered. Scale the dot count proportionally (more dots = longer silence). Max 1 gap indicator per time group to avoid clutter. WHY: The hours when nothing happened are the most honest data in the dashboard. Carlos deployed. Two hours of silence. Sofia found a bug. That blank middle IS the story.",
       "effort": "medium",
       "assigned_to": "carlos"
     }

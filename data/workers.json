@@ -1,16 +1,4 @@
 {
-  "workers": [
-    {
-      "id": "luna",
-      "name": "Luna",
-      "role": "Creative Director",
-      "emoji": "🌙",
-      "status": "working",
-      "task": "30-minute creative review — evaluating office dashboard for new ideas",
-      "progress": 10,
-      "updated_at": "2026-03-09T00:00:00Z",
-      "startedAt": "2026-03-09T00:00:00Z"
-    }
-  ],
-  "updated_at": "2026-03-09T00:00:00Z"
+  "workers": [],
+  "updated_at": "2026-03-09T00:06:00Z"
 }
