@@ -1145,7 +1145,8 @@
     height: 24px;
   }
   .char__name {
-    display: none;
+    display: block;
+    font-size: 0.45rem;
   }
   .coffee-corner__emoji {
     font-size: 1rem;
@@ -1936,7 +1937,7 @@
   width: 3px; height: 3px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
-  animation: ambient-drift linear infinite;
+  animation: ambient-drift calc(20s + var(--i, 0) * 4s) linear infinite;
 }
 @keyframes ambient-drift {
   0% { transform: translate(0, 0); opacity: 0.08; }
@@ -2292,6 +2293,20 @@
 .desk--ghost[data-ghost-tier='abandoned'] .desk-monitor-screen { filter: brightness(0.5) sepia(0.3) hue-rotate(-30deg); }
 @keyframes abandoned-pulse { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 8px 2px rgba(239,68,68,0.25); } }
 
+.desk--ghost[data-ghost-tier='stale'] {
+  box-shadow: 0 0 8px rgba(245,158,11,0.35) inset;
+}
+.desk--ghost[data-ghost-tier='stale'] .desk__monitor-screen {
+  filter: sepia(0.3) saturate(0.7);
+}
+.desk--ghost[data-ghost-tier='abandoned'] {
+  border-left: 2px solid #ef4444;
+  box-shadow: 0 0 12px rgba(239,68,68,0.25) inset;
+}
+.desk--ghost[data-ghost-tier='abandoned'] .desk__monitor-screen {
+  filter: sepia(0.5) saturate(0.4) brightness(0.8);
+}
+
 /* === Mobile Office Scale Fix (Luna Review #41) === */
 @media (max-width: 480px) {
   .office-wrap {
@@ -2302,7 +2317,8 @@
     min-height: 65vh;
   }
   .char__name {
-    font-size: 0.32rem;
+    display: block;
+    font-size: 0.45rem;
   }
   .idle-duration {
     font-size: 0.26rem;
@@ -2377,4 +2393,14 @@
 @keyframes label-arrive {
   from { opacity: 0; transform: translateX(-50%) translateY(4px); }
   to   { opacity: 0.45; transform: translateX(-50%) translateY(0); }
+}
+
+.lone-survivor-label {
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  animation: lone-pulse 3s ease-in-out infinite;
+}
+@keyframes lone-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.9; }
 }

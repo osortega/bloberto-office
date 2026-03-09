@@ -330,7 +330,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
               <div key={e.timestamp + e.type + (e.worker || '')} className="worker-card__back-entry">
                 <span style={{ marginRight: '0.35rem' }}>{ACTIVITY_ICONS[e.type] ?? '🔧'}</span>
                 {e.message}
-                <span className="activity-time" style={{ marginLeft: '0.35rem', opacity: 0.6 }} title={formatFullDateTime(e.timestamp)}>{getRelativeTime(e.timestamp)}</span>
+                <span className='worker-card__back-time' style={{ opacity: 0.5, fontSize: '0.7rem', marginLeft: '0.35rem' }}>· {getRelativeTime(e.timestamp)}</span>
               </div>
             ))
           )}
@@ -427,7 +427,12 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory }) {
       <div className="stat-card active">
         <span className="stat-label">⚡ Active</span>
         <span className="stat-value">{active}</span>
-        <span className="stat-dispatch">{getDispatch(STAT_DISPATCHES.active, active)}</span>
+        <span
+          className="stat-dispatch"
+          style={{ cursor: 'pointer' }}
+          title="Scroll to workers"
+          onClick={() => document.querySelector('.workers-grid')?.scrollIntoView({ behavior: 'smooth' })}
+        >{getDispatch(STAT_DISPATCHES.active, active)}</span>
         <DeltaBadge delta={activeDelta} />
       </div>
       <div className="stat-card idle">
@@ -455,6 +460,15 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory }) {
           onClick={() => {
             const name = stuckWorkers[0].name
             document.querySelector(`[data-worker-name="${name}"]`)?.scrollIntoView({ behavior: 'smooth' })
+          }}
+          tabIndex={0}
+          role="button"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              const name = stuckWorkers[0].name
+              document.querySelector(`[data-worker-name="${name}"]`)?.scrollIntoView({ behavior: 'smooth' })
+            }
           }}
         >
           <span className="stat-label">⚠️ Stuck</span>
@@ -989,8 +1003,11 @@ export default function App() {
   const errorCount = activeWorkers.filter(w => w.status === 'error').length
 
   const currentHour = new Date().getHours()
+  const isAfterHours = currentHour < 5
   const greeting =
-    currentHour < 12
+    isAfterHours
+      ? (currentHour % 2 === 0 ? '🌃 Burning the midnight oil' : '🦉 Still at it')
+      : currentHour < 12
       ? '☕ Good morning'
       : currentHour < 18
       ? '🌤️ Good afternoon'
@@ -1057,7 +1074,7 @@ export default function App() {
         </div>
         <div className="header-right">
           <div className="header-badge">
-            {greeting}, <span key={teamVibe.key} className="honorific">{HONORIFICS[teamVibe.key] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
+            {greeting}, <span key={teamVibe.key} className="honorific">{HONORIFICS[isAfterHours ? 'after-hours' : teamVibe.key] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
             {new Date().toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'short',

@@ -1026,7 +1026,13 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   )
 
   const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming']
-  const plantStage = plantStageNames[Math.min(Math.floor(vibeStreak / 5), 4)]
+  const plantStage = vibeStreak <= 1 ? 'seedling'
+    : vibeStreak <= 3 ? 'sprout'
+    : vibeStreak <= 5 ? 'small-plant'
+    : vibeStreak <= 8 ? 'leafy'
+    : 'blooming'
+  const plantStageEmoji = { seedling: '🌱', sprout: '🌱', 'small-plant': '🌿', leafy: '🌿', blooming: '🌸' }
+  const plantStageLabel = plantStage.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ')
 
   // Ficus milestone burst
   const prevPlantStageRef = useRef(plantStage)
@@ -1445,7 +1451,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           className={`office-plant office-plant--ficus office-plant--${plantStage}`}
           data-milestone={plantMilestone || undefined}
           style={{ left: '87%', top: '72%' }}
-          title={plantStage === 'blooming' ? 'Fern 🌿 · blooming · fully grown' : `Fern 🌿 · ${plantStage} · ${(Math.min(Math.floor(vibeStreak / 5), 3) + 1) * 5 - vibeStreak} vibe tick(s) until she grows`}
+          title={`Streak: ${vibeStreak} · ${plantStageLabel} ${plantStageEmoji[plantStage]}`}
           aria-hidden="true"
         >
           <div className="ficus-pot" />
@@ -1493,9 +1499,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         <div className="ambient-particles" aria-hidden="true">
           {[...Array(7)].map((_, i) => (
             <span key={i} className="ambient-particle" style={{
+              '--i': i,
               left: `${10 + i * 12}%`,
               top: `${20 + (i * 17) % 60}%`,
-              animationDuration: `${20 + i * 4}s`,
               animationDelay: `${i * 3}s`
             }} />
           ))}

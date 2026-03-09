@@ -115,7 +115,7 @@
 /* ---- Stats Bar ---- */
 .stats-bar {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
   border-radius: var(--radius);
@@ -914,6 +914,11 @@
 
 .tab-toggle button:focus-visible {
   outline: 2px solid var(--accent, #a78bfa);
+  outline-offset: 2px;
+}
+
+.task-tag:focus-visible {
+  outline: 2px solid var(--accent, #a855f7);
   outline-offset: 2px;
 }
 

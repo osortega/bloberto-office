@@ -1,73 +1,73 @@
 {
   "creative_director": "Luna",
   "review_number": 59,
-  "timestamp": "2026-03-09T01:30:00Z",
-  "theme": "Make the silent things speak — conference table, whiteboard, and ficus deserve runtime stories",
-  "visual_observations": "Review performed via code analysis (container timed out during Puppeteer). Office floor has conference table always empty, ficus growth stages defined but streak counter invisible to users, whiteboard shows vibe text but no task count or worker names, aisle markers are static decorations, ambient particles identical across all vibes despite CSS hooks existing.",
+  "timestamp": "2026-03-09T01:31:07Z",
+  "theme": "Silence has receipts — give every empty thing its data story",
+  "visual_observations": "Desktop Office: 6 desks total in 2 rows of 3, only Maya (top-row-left) and Dave (top-row-center) desks glow active with lit outlines; bottom row (Carlos, Dave-2, Sofia) is dim and ghosted. Bloberto centered top as CVO with 'crushing' face. 'COFFEE TRIPLE SHOT' corner top-right is static at 2-person capacity — over-caffeinated for the crowd. 'MIDNIGHT' time widget right-side is a tiny dark box. Conference ring bottom-left still floats unlabeled and empty. 'everyone is at their desk' footer text visible bottom-center. Desktop Dashboard: Stats bar shows ON THE CLOCK 2, ACTIVE 2 'dynamic duo', IDLE 0 'all hands on deck', LIVE 01:34:48 AM, TEAM VIBE Crushing It with a 2-dot sparkline. Both Maya and Dave have Bug task tags and near-full progress bars. NO mention of Carlos, Sofia, or Luna anywhere in the dashboard — they've been fully erased. Header reads '☕ Good morning, LEGEND 🔥' at 1:34 AM which is factually wrong. Activity log filter shows per-worker tabs (Maya, Carlos, Dave, Sofia, Luna) but the log itself is below the fold. Mobile: Office view compressed but functional — Bloberto, Maya, Dave labeled; lower-row workers visible but small; 'TEAM LOCKED IN' vibe caption banner at bottom (transient toast caught mid-display); footer text just legible.",
   "ideas": [
     {
       "priority": "must",
-      "category": "storytelling",
-      "title": "Conference Table Should Host Standup When 3+ Workers Active",
-      "description": "The conference-table element in Office.jsx renders an empty SVG ring with a conf-meeting-badge that only appears via data-meeting attribute — but nothing ever sets it. When activeWorkers.length >= 3 and the vibe is 'crushing' or 'in-flow', set data-meeting on the conference table and render tiny seated Character avatars (.char--seated, already styled at 16px) around the ring. This transforms dead real estate into a visual narrative: 'the team is so in sync they're huddling.' The CSS already exists (.conf-meeting-badge, .char--seated) — it's just never triggered.",
+      "category": "visual",
+      "title": "1:34 AM Is Not Good Morning",
+      "description": "In App.jsx around line 1001, the greeting ternary has three brackets: `currentHour < 12` → '☕ Good morning', `< 18` → '🌤️ Good afternoon', else → '🌙 Good evening'. At 1:34 AM (hour=1), `< 12` fires and the header cheerfully says 'Good morning' next to a 🔥 Crushing It vibe badge. It's a 3AM coding session — this is tone-deaf. Prepend one condition: `currentHour < 5` → '🦉 Still at it' (or '🌃 Burning the midnight oil'). The HONORIFICS map already has `'after-hours': 'night owl 🌙'` — the greeting and honorific should agree. One line of code fixes a jarring contradiction that any visitor at midnight will notice immediately.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "must",
       "category": "feature",
-      "title": "Whiteboard Should Show Active Task Count Not Just Vibe",
-      "description": "The .office-whiteboard currently renders wb-vibe-text (the vibe label) and a progress bar. But it never shows HOW MANY tasks are in flight. Add a wb-task-count line above the progress bar: '3 tasks · 2 active' in 0.4rem text. The whiteboard is the team's shared information radiator — in a real office it would show sprint progress. The data is already computed in App.jsx (workers array with status field). Pass taskSummary={active: N, total: N} as a prop to Office, then to the Whiteboard sub-component.",
+      "title": "The Dashboard Has No Memory of Absent Workers",
+      "description": "The Dashboard shows 'Active Workers (2)' with zero trace of Carlos, Sofia, or Luna. The floor correctly renders them as ghost desks using `ghostRoster` (computed by diffing `DEFAULT_ROSTER` against active worker IDs in Office.jsx). The Dashboard needs to mirror this. Below the active workers grid, add a collapsible 'Off the Clock (3)' section: minimal cards showing each ghost worker's emoji, name, role, and last-seen timestamp from the most recent activity log entry. The data is all present — `DEFAULT_ROSTER` in constants.js + `activityEntries` filtered by name. Without this section, the dashboard implies the team has 2 people. With it, users understand the bench, see who might return, and the empty floor makes emotional sense.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "feature",
+      "title": "Dispatch Labels That Know They're Navigation",
+      "description": "The 'dynamic duo' text in the ACTIVE stat card (StatsBar in App.jsx) is dead text. The 'Stuck' stat card already has a model: `onClick` calls `document.querySelector('[data-worker-name=\\\"...\\\"]')?.scrollIntoView()`. Apply the same pattern to the ACTIVE card's dispatch label area — clicking 'dynamic duo' (or 'lone wolf' or 'skeleton crew') should scroll to and briefly focus-ring the `.workers-grid` section. Add `cursor: pointer` and `title='Jump to workers'` on the dispatch span. This makes the stats bar interactive rather than decorative, creating a natural flow from summary → detail that currently doesn't exist.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Ficus Streak Counter — Show the Growth Number",
-      "description": "The office-plant--ficus has 5 growth stages (seedling→blooming) driven by vibeStreak, with milestone burst animations already coded. But users have no idea what the number IS or what triggers growth. Add a tiny tooltip on hover showing 'Streak: 4 🌱' (or whatever stage name). The .office-plant already has pointer-events: auto and cursor: default — it's waiting for interaction. Users who discover the ficus growth mechanic will check it obsessively, creating a retention loop around vibe streaks.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Ambient Particles Should Match Vibe Color — CSS Hooks Exist But Are Disconnected",
-      "description": "App.css defines vibe-specific particle colors: [data-vibe='crushing'] .ambient-particle { background: #4ade80 }, [data-vibe='on-fire'] { background: #f87171 }, etc. But Office.css also defines .ambient-particle with background: rgba(255,255,255,0.12) which likely overrides due to specificity. Check that the data-vibe attribute on the ambient-particles container (or a parent) propagates correctly. If particles are always white, the vibe-reactive colors are dead code. This is a bug-fix disguised as polish — the work was already done, it just doesn't render.",
-      "effort": "small",
-      "assigned_to": "maya"
+      "category": "storytelling",
+      "title": "Ghost Desks Need to Speak Their Last Task",
+      "description": "In Office.jsx, `deskOccupants` marks ghost workers with `{ ghost: true }`. These desks render as quiet, desaturated characters. But each ghost worker has a data trail: their last `task` string and last activity timestamp exist in `activityEntries` (already passed as a prop to Office). Render a tiny Post-it SVG absolutely-positioned over the ghost desk (top-right corner of the desk cell, ~22×18px, yellow fill, slight rotation) showing the task truncated to 18 chars. On hover, expand to a popover with full task + relative time ('Sofia · spec coverage · 3h ago'). This transforms every empty desk from a hole in the floor to a frozen moment. The office becomes an archaeology site — you can feel the day that was.",
+      "effort": "medium",
+      "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "office-life",
-      "title": "Door Should Show Recent Arrivals/Departures as Mini-Log",
-      "description": "The office-door has arrive/depart swing animations and a notify-dot, but no persistent indication of WHO just arrived or left. Add a small .door-recent-log absolutely positioned beside the door showing the last 1-2 events: '🌙 Luna arrived 3m ago'. The activity feed has this data (hire/complete events with timestamps). This turns the door from a passive decoration into a real-time narrative element — like the lobby board in a coworking space.",
-      "effort": "medium",
+      "title": "WallClock Is AWOL on Mobile",
+      "description": "The `<WallClock vibeKey={vibe} />` component renders at an absolute position inside `.office-floor` that gets clipped on 375px viewports. Looking at the mobile screenshot, the clock is completely absent — the most atmospheric real-time element in the office just vanishes. In Office.css, add a mobile media query that repositions `.wall-clock` to `top: 6px; right: 8px; transform: scale(0.75)` at `max-width: 480px`. The clock is already vibe-reactive (it renders custom face copy for on-fire: 'Time has no meaning during an incident') — that storytelling is being lost on every mobile visit.",
+      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "Desk Hover Should Show Worker's Current File (From Task String)",
-      "description": "Worker tasks often contain filenames like 'Fix responsive layout in Office.css'. The char-hover-card shows name, role, task, and time — but could parse and highlight the filename from the task string with a mono-font code badge. Regex: /\\b[\\w-]+\\.(jsx?|tsx?|css|json|md)\\b/. This makes the hover card feel like peeking over someone's shoulder at their screen — a delightful detail that costs one regex.",
+      "title": "Vibe Streak Needs a Eulogy",
+      "description": "The streak badge system (vibeStreak >= 3 shows 👑, >= 5 shows 🔥, >= 10 shows 🏆) celebrates streaks beautifully on the way up. But when a streak breaks (vibeStreak was > 3 and resets to 0), nothing happens — the badge just disappears silently. Add a `prevStreakRef` (useRef) that tracks the previous streak value. When it drops from > 3 to ≤ 1, fire a `streakEulogy` toast (same pattern as `completionToast` in App.jsx): '💀 RIP the streak — it was beautiful while it lasted' for 3.5s. Use a muted border-color (var(--text-muted)) to differentiate grief from celebration. The streak eulogy makes users care about maintaining the streak precisely because its loss is acknowledged.",
       "effort": "small",
       "assigned_to": "dave"
     },
     {
       "priority": "could",
-      "category": "feature",
-      "title": "Keyboard Shortcut '?' Should Open a Help Overlay",
-      "description": "The shortcut-toast component exists and shows keyboard hints, but there's no comprehensive help panel. Pressing '?' should toggle a modal listing all shortcuts (1-5 for worker focus, T for tab toggle, etc.) and a mini legend of vibe states. Many dashboards have this (GitHub, Gmail). The toast infrastructure is already there — extend it to a full overlay. This lowers the learning curve for first-time visitors.",
-      "effort": "medium",
-      "assigned_to": "carlos"
+      "category": "visual",
+      "title": "Vibe Sparkline First-Run Is a 2-Dot Shrug",
+      "description": "The TEAM VIBE stat card's VibeSparkline shows only 2 connected dots on first visit because `VIBE_HISTORY_KEY` in localStorage is empty and history is being built live (max 12 entries). A 2-dot sparkline looks like a broken chart, not a feature. When `vibeHistory.length < 3`, replace the SVG with a gentle skeleton: an animated shimmer line (CSS `@keyframes shimmer`) with text 'Building vibe history…' in `var(--text-muted)` at 0.7rem. Once history has 3+ entries, switch to the real sparkline. This prevents the first-visit impression that the chart is broken, and makes the sparkline feel like it was earned once it appears.",
+      "effort": "small",
+      "assigned_to": "sofia"
     },
     {
       "priority": "wild",
       "category": "storytelling",
-      "title": "End-of-Day Timelapse — Compress 24h of Office Life into 30s",
-      "description": "Store the last 24h of vibe snapshots (already in sparkline data) and worker state changes. Add a 'Replay' button in the dashboard that animates through the day: sky changes, workers arriving/leaving, vibe transitions, ficus growing. Like a security camera timelapse but charming. This would be the single most shareable feature — people would screen-record and post it. Large effort but massive delight payoff.",
-      "effort": "large",
-      "assigned_to": "tbd"
+      "title": "The Conference Table Should Be a War Room",
+      "description": "The conference table (`<ConferenceTable>` in Office.jsx) already has `data-meeting` and a fire-glow SVG filter activated when `meetingWorkers.length >= 2` wander to it during idle. But this is passive — the table has no identity of its own. Map it to the most recent team-wide event in `activityEntries`: when the last entry is a `complete` type, render a tiny confetti SVG burst on the table surface (3-4 colored dots using the completing worker's `ROLE_COLORS`); when it's an `error` type, render a red warning diamond; when it's `hire`, render a 🎉 badge. Add a `title` attribute to the `.conference-table` div showing 'Last team event: {message} · {relativeTime}'. The table goes from ambient decoration to a ticker tape of team history — a physical activity feed that doesn't require navigating away from the floor.",
+      "effort": "medium",
+      "assigned_to": "dave"
     }
   ],
   "hire_proposals": [],
