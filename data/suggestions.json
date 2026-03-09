@@ -1,174 +1,130 @@
 {
   "analyst": "Sofia",
-  "review_number": 37,
-  "timestamp": "2026-03-09T07:15:00Z",
+  "review_number": 38,
+  "timestamp": "2026-03-09T08:45:00Z",
   "scores": {
-    "visual": 4,
-    "ux": 3,
-    "responsiveness": 4,
-    "performance": 4,
-    "accessibility": 2,
-    "code_quality": 3,
-    "features": 5,
-    "fun_factor": 5
+    "visual": 4.2,
+    "ux": 3.5,
+    "responsiveness": 3.0,
+    "performance": 3.8,
+    "accessibility": 3.2,
+    "code_quality": 3.5,
+    "features": 4.0,
+    "fun_factor": 4.5
   },
-  "overall_score": 3.8,
-  "screenshot_context": "Desktop 1280x800: Bloberto HQ, vibe '🔥 Crushing It', Sofia as sole active worker in error state ('bugs have nowhere to hide' speech bubble, desk__nameplate--error in red), Carlos/Maya/Dave/Luna as ghost roster members at dark desks, one vacant desk with job card (hidden until hover — correct). Office window ambient visible at right edge with orange sunrise gradient; time-caption 'SUNRISE' clipped by overflow:hidden to read 'UNRISE'. Bloberto title 'CVO'. COFFEE TRIPLE SHOT corner intact. Shortcut toast visible bottom-right. Mobile 375x812: Tab labels '🏢 Office' and '📊 Dashboard' BOTH FULLY VISIBLE — tab clipping regression from #36 is FIXED. Office grid compressed but functional. Footer visible below the fold. Polling paused pill not present (idle state). Puppeteer a11y audit: 0 images without alt, 0 unlabeled buttons — BUT role=radio audit returned 0 because Dashboard panel is not rendered when Office tab is active (conditional rendering conceals the bug from automated audits).",
-  "fixed_since_last_review": [
-    "Mobile tab label '🏢 Office' was clipped to '🏢 Offic' at 375px — now fully visible (Puppeteer confirmed: right=118px, windowWidth=375px, clipped=false). Dashboard tab also renders fully at right=259px."
-  ],
+  "overall_score": 3.7,
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "role='radio' on <button> elements is invalid ARIA",
-      "description": "Still unfixed. App.jsx lines 1289, 1300, 1310: filter bar buttons carry `role='radio'` inside `role='radiogroup'` parents. ARIA spec prohibits role='radio' on interactive elements. Puppeteer returned radioRoleCount=0 only because the Dashboard panel uses conditional rendering (`tab === 'office' ? ... : ...`) and the Office tab is default — the broken markup is hidden from automated audits at page load. Switch to a real Dashboard tab to verify: role='radio' on <button> is still live in production. Fix A: Replace with <input type='radio'> styled as buttons. Fix B: remove role='radio' + aria-checked, change parent to role='group', add aria-pressed to each button. Six line change.",
+      "category": "ux",
+      "title": "Bloberto speech bubble overlaps Office/Dashboard tabs on mobile",
+      "description": "On mobile (375px), Bloberto's speech bubble covers the Office tab, making it impossible to tap. The bubble z-index is higher than the tab bar. Either move the speech bubble below the tabs, reduce its width on mobile, or add a dismiss-on-tap behavior. This is the worst mobile UX issue right now.",
       "effort": "small",
-      "carry_over_count": 1
+      "assignee": "Maya"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "Ghost characters are focusable (tabIndex=0) but have no keyboard interaction",
-      "description": "Still unfixed. Office.jsx line 682: Character always renders tabIndex={0} regardless of variant. Ghost roster characters have no onClick and no role='button' — yet they consume a tab stop. A keyboard user tabbing through the office floor lands on five dead focusable ghosts. Fix: set tabIndex={-1} on ghost characters, or add a keyboard handler that reveals the ghost's OOO bubble on Enter/Space. Either way, remove the wasted tab stop.",
+      "title": "Whiteboard text is unreadable on mobile — vertical letter stacking",
+      "description": "The whiteboard on mobile shows letters stacked vertically (W/H/I/T/E/B/O/A/R/D) because the container is too narrow. The actual vibe text inside is also clipped. This has been flagged in multiple prior reviews. Either hide the whiteboard on small screens or rotate it 90° with a transform. Carry-over from reviews #35-37.",
       "effort": "small",
-      "carry_over_count": 1
+      "assignee": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "visual",
+      "title": "Sofia's name label is RED and shouting compared to other workers",
+      "description": "In the desktop screenshot, Sofia's desk label shows 'SOFIA' in bright red/uppercase while Carlos and Maya have normal gray labels. This is because her QA role color (#f43f5e) is applied to the active worker label. It looks like an error state, not a 'working' state. The name color for active workers should be consistent — use the status color (green for working), not the role color.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "completionToast state uses two incompatible shapes — silent 'undefined shipped it!' risk",
-      "description": "Still unfixed. App.jsx line 1111: `completionToast.text ? completionToast.text : '🎉 ${completionToast.name} shipped it!'` — two different call sites set the toast with different shapes ({ name, color } vs { text, type: 'info' }). If shapes diverge or a future change sets the wrong path, the toast renders '🎉 undefined shipped it!' with no console error. Fix: normalize to { message: string, color?: string } and update both call sites.",
-      "effort": "small",
-      "carry_over_count": 1
+      "category": "responsiveness",
+      "title": "Mobile layout: desk grid doesn't reflow — desks overlap and clip",
+      "description": "The office uses absolute positioning (DESKS array with left/top percentages). On mobile, desks overlap each other because the percentages don't account for the narrower viewport. Dave and Luna's desks are cramped. Consider a CSS grid or flexbox layout for mobile that stacks desks vertically or in a 2-column layout.",
+      "effort": "large",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "Plant toast and completion toast render at identical screen coordinates",
-      "description": "Still unfixed. Both Office.jsx plantToast (lines 1207-1219) and App.jsx completionToast (lines 1093-1105) use `position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); zIndex: 9999`. When a worker ships at the same time the ficus levels up, the toasts completely overlap. Fix: stagger vertically (plantToast at bottom: 5.5rem) or queue them through a shared toast manager.",
-      "effort": "small",
-      "carry_over_count": 1
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "'After Hours' vibe is unreachable when any worker is active",
-      "description": "Still unfixed. utils/vibe.js: getTeamVibe() only returns 'after-hours' when workers.length === 0. At 2am with Sofia solo-grinding, the vibe is '🔥 Crushing It' and the honorific correctly shows 'night owl 🌙' (App.jsx line 1123 uses isAfterHours override), but the vibe KEY stays 'crushing' — meaning Bloberto's title is 'CVO', the weather label is wrong, and VACANT_ADS shows 'Staff Wizard' instead of 'Night Watch'. The greeting and the vibe system are out of sync. Fix: in getTeamVibe(), return 'after-hours' when hour >= 22 || hour < 6, regardless of worker count.",
-      "effort": "small",
-      "carry_over_count": 1
+      "category": "code",
+      "title": "App.jsx (1366 lines) and Office.jsx (1552 lines) need splitting",
+      "description": "Both files are massive. WorkerCard, StatsBar, ActivityLog, and Dashboard are all self-contained components inside App.jsx that could be extracted. Office.jsx has CharacterAvatar, Desk components, and all the SVG definitions that could be in separate files. This is a carry-over but it's getting worse with each feature addition.",
+      "effort": "large",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "useTimeTick at App root re-renders entire tree every 60 seconds",
-      "description": "Still unfixed. App.jsx line 640: useTimeTick(60_000) triggers full re-render of office floor, all desks, all characters, StatsBar, all WorkerCards, and ActivityLog every minute — even when zero data changed. The sole purpose is keeping '5m ago' timestamps fresh. Fix: remove call from App root, move into ActivityLogEntry and WorkerCard leaf components only. Both are already memo-wrapped.",
+      "title": "All desk screen SVGs are defined inline as constants — should be lazy or memoized per vibe",
+      "description": "DESK_SCREEN_SVG object at the top of Office.jsx contains 15 SVG definitions (5 normal + 5 error + partial). These are created on every module load. They include animated elements that run continuously. Consider wrapping error-state SVGs in a lazy loader so they only mount when a worker is in error state.",
       "effort": "medium",
-      "carry_over_count": 1
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "No loading state or skeleton when dashboard data is being fetched",
+      "description": "When switching to Dashboard tab, if data hasn't loaded yet, the user sees either nothing or a flash. App.jsx fetches from GitHub raw URLs with cache-busting. There should be a skeleton/shimmer state while waiting for the first fetch to resolve.",
+      "effort": "medium",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Keyboard tab-switch does not move focus to the new panel",
-      "description": "Still unfixed. App.jsx handleTabKeyDown (lines 739-749): pressing ArrowRight/ArrowLeft switches the active tab but does not call focus() on the new panel. Puppeteer confirmed tabpanel elements have tabIndex=null. The ARIA tabpanel pattern requires focus to move to the panel container or its first focusable child on keyboard-triggered switch. Fix: give each tabpanel tabIndex={-1} and add `document.getElementById('tabpanel-dashboard')?.focus()` after setTab('dashboard') in the handler.",
+      "title": "Tab buttons use role assumptions without proper ARIA tab pattern",
+      "description": "The Office/Dashboard tabs should use role='tablist' on the container and role='tab' + aria-selected on each button. This was flagged in prior reviews as a role='radio' issue. The fix is straightforward: tablist/tab/tabpanel ARIA pattern. Carry-over.",
       "effort": "small",
-      "carry_over_count": 1
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "Activity log filter shows blank area when filter yields zero results",
-      "description": "Still unfixed. App.jsx ActivityLog component line 145: the 'No activity yet…' guard fires only when the passed entries array is empty. The external filter state (activityFilter, activityWorkerFilter) reduces entries to zero when no matching events exist, and ActivityLog renders a silent blank div rather than a contextual message. Fix: detect displayed.length === 0 after reversing and render 'No errors logged recently' or '😶 Nothing here for this worker' based on the active filter.",
-      "effort": "small",
-      "carry_over_count": 1
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "No stale-data fallback — offline page load shows empty office",
-      "description": "Still unfixed. localStorage usage in App.jsx is limited to theme, vibe streak, shortcut visibility, and vibe history. Worker and activity arrays are never cached. Offline load = empty office with error banner. Fix: after each successful fetch, write workers and activity to localStorage (bloberto-workers-cache, bloberto-activity-cache). On load, hydrate state from cache before first fetch and show a 'Showing cached data' badge if the live fetch fails.",
-      "effort": "medium",
-      "carry_over_count": 1
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "App.jsx is a 1350-line god component — extract at minimum 4 custom hooks",
-      "description": "Still unfixed. App.jsx line count unchanged at 1350. It owns: data fetching, polling, worker cinematic entry/exit diffing, vibe streak + confetti, favicon updates, tab title cycling, toast management, keyboard shortcuts, activity filtering, tag filtering, AND the full render tree. Office.jsx is 1552 lines. Extract at minimum: useWorkerSync(), useVibeTracking(vibeKey), useDynamicFavicon(workers, fetchError), useTabTitle(workers, vibe). Primary blocker for testability.",
-      "effort": "large",
-      "carry_over_count": 1
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Worker card flip button (ℹ️) tap target too small and unlabeled on mobile",
-      "description": "Still unfixed. App.css .worker-card__info-btn (line 533): padding: 0.15rem 0.4rem with font-size: 0.85rem. Rendered tap target is well below WCAG 2.5.5's 44×44px minimum. No min-width/min-height on mobile. Fix: add min-width: 44px; min-height: 44px on .worker-card__info-btn at ≤640px breakpoint, and add a visible 'History' text label next to the icon on mobile.",
-      "effort": "small",
-      "carry_over_count": 1
-    },
-    {
-      "priority": "low",
       "category": "visual",
-      "title": "Office window time-caption 'SUNRISE' clipped to 'UNRISE' by overflow:hidden",
-      "description": "NEW in #37. Office.css .office-window is 7% wide with overflow:hidden. The .office-window__time-caption uses white-space:nowrap and font-size:0.38rem centered via left:50%; transform:translateX(-50%). At 7% of floor width (roughly 26–62px depending on viewport), the word 'sunrise' (7 chars) overflows both sides and the leading 'S' is cropped by overflow:hidden, rendering 'UNRISE' in the bottom of the window on both desktop and mobile screenshots. Fix: either reduce the caption to an emoji (🌅) or truncate-ellipsis with overflow:hidden + text-overflow:ellipsis on the caption itself rather than relying on the parent clip.",
+      "title": "Coffee cup and plant decorations clip against right edge on tablet widths",
+      "description": "At ~768px width, the coffee cup ('COFFEE TRIPLE SHOT') and the gradient rectangle (sunrise panel?) extend past the office border. The office container has overflow:hidden but the elements are positioned with percentage-based right offsets that don't scale well at intermediate widths.",
       "effort": "small",
-      "carry_over_count": 0
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Light mode office floor grid disappears — opacity 0.05 is too faint",
-      "description": "Still unfixed (cannot verify in screenshot — dark mode was active). Office.css sets --grid-line: rgba(0,0,0,0.05) in [data-theme='light']. At this opacity the grid lines are visually invisible on the light background. Fix: increase to rgba(0,0,0,0.09) or add a tint like rgba(80,80,200,0.07) to maintain the cool-blue palette.",
-      "effort": "small",
-      "carry_over_count": 1
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "EmptyState renders 🌙 emoji twice in three lines of JSX",
-      "description": "Still unfixed. App.jsx lines 522–525: <span class='empty-emoji'>🌙</span> followed immediately by 'The office is quiet... for now 🌙'. Same emoji appears twice in the same tiny component. When the Dashboard has no active workers, this is the only content visible — looks like a copy-paste artifact. Fix: remove the trailing 🌙 or replace it with 😴 or 🛌.",
-      "effort": "small",
-      "carry_over_count": 1
-    },
-    {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "Vibe sparkline legend is hover-only — invisible on touch devices",
-      "description": "Still unfixed. App.css line 1144: .sparkline-legend only appears via .stat-card:hover. Touch users never see the legend for the colored vibe history dots. Fix: render the legend at opacity:0.7 always and increase to 1 on hover. The pills are tiny — the always-visible version adds negligible height.",
-      "effort": "small",
-      "carry_over_count": 1
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Polling-paused pill shows 'move mouse to refresh' on touch devices",
-      "description": "Still unfixed. App.css line 1012: .polling-paused-pill has no @media (pointer: coarse) rule. The text 'Paused · move mouse to refresh' is meaningless on mobile — there is no mouse. The shortcut-toast correctly uses @media (pointer: coarse) { display: none } at line 1116 but this fix was never applied to the pill. Fix: add @media (pointer: coarse) { .polling-paused-pill { display: none; } }.",
-      "effort": "small",
-      "carry_over_count": 1
+      "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "Office tab has no status indicator while user is on Dashboard tab",
-      "description": "Still unfixed. App.jsx lines 1171–1193: the Office tab button renders only '🏢 Office' with no status badge. The Dashboard tab receives the error count badge (tab-error-badge) at line 1196. If a worker enters error state while the user is on Dashboard, there is no visual cue to switch to Office. Fix: mirror the Dashboard badge logic — add a colored dot to the Office tab: green when all working, amber when any idle, red when any in error.",
+      "title": "Add a quick stats summary to the Office tab header",
+      "description": "The office view shows characters at desks but no quick summary of how many are working/idle/error without switching to Dashboard. A small pill badge next to the 'Office' tab showing '4 working' or similar would add context without cluttering the view.",
       "effort": "small",
-      "carry_over_count": 1
+      "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "ERROR_BUBBLE_MESSAGES and WORKER_ERROR_BUBBLES declared inside component body",
-      "description": "Still unfixed. Office.jsx lines 510, 526–537: IDLE_BUBBLE_EMOJIS, ERROR_BUBBLE_MESSAGES, and WORKER_ERROR_BUBBLES are declared inside the Character component function body (not inside a useEffect, but at the top level of the component). A new array and a new object are allocated on every render of every Character. Move all three to module scope — they have zero dependency on props or state.",
-      "effort": "small",
-      "carry_over_count": 1
+      "title": "VIBE constants are scattered across 4 files — centralize in vibe.js",
+      "description": "VIBE_WEATHER_LABELS, VIBE_WEATHER_ICONS, DOOR_LABELS, LONE_SURVIVOR_LABELS are in Office.jsx. VIBE_WHITEBOARD is in constants.js. VIBE_QUOTES are in quotes.js. getTeamVibe is in vibe.js. All vibe-related constants should live in one place for consistency.",
+      "effort": "medium",
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
-      "category": "ux",
-      "title": "Footer quote counter '1/9' has no label — reads like a version number",
-      "description": "Still unfixed. The footer shows a counter like '1/9' at font-size:0.7em; opacity:0.55 next to the tagline. Without context it reads as a version identifier. The ✦ sparkle has no aria-label. Fix: add title='Quote 1 of 9 — click ✦ to cycle' to the counter span and aria-label='Cycle tagline quotes' to the ✦ trigger.",
+      "category": "accessibility",
+      "title": "CharacterAvatar fallback emoji SVG text not hidden from screen readers",
+      "description": "When CharacterAvatar renders the generic emoji fallback (Office.jsx), the SVG contains a <text> element that screen readers will announce in addition to the aria-label. Add aria-hidden='true' to the inner text element. Carry-over from #37.",
       "effort": "small",
-      "carry_over_count": 1
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Light mode is half-baked — either finish it or remove the toggle",
+      "description": "The sun/moon toggle exists but light mode produces washed-out office floor and low-contrast elements. Only 6 CSS selectors handle light mode in Office.css. Either add comprehensive light theme variables or hide the toggle and commit to dark-only. Carry-over.",
+      "effort": "large",
+      "assignee": "Maya"
     }
+  ],
+  "regression_notes": "Score stable at 3.7 (vs 3.75 in #37). The mobile whiteboard and ARIA tab issues remain unfixed across 4+ reviews — these need to be prioritized or explicitly deferred. Sofia's red name label is a new visual regression likely introduced when role colors were applied to active worker labels. The desktop experience remains strong. Mobile is where the pain is.",
+  "kudos": [
+    "Bloberto's vibe-reactive face animations are genuinely delightful — the 'crushing' sparkle eyes are chef's kiss",
+    "The weather metaphor for team vibe (Clear skies, Storm conditions) is creative and immediately readable",
+    "Keyboard shortcuts (1/2/R/Esc) are a nice power-user touch",
+    "The dynamic speech bubbles with vibe-specific humor give real personality",
+    "Coffee tracker and office plants add warmth without cluttering"
   ]
 }
