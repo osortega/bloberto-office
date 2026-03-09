@@ -1,6 +1,14 @@
 {
   "workers": [
     {
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "emoji": "🎨",
+      "status": "working",
+      "task": "Critical bug fixes — worker.id normalization, window tint, vibeCaption cleanup, activity log count, startedAt camelCase",
+      "started_at": "2026-03-09T10:37:00Z"
+    },
+    {
       "name": "Sofia",
       "role": "QA Engineer",
       "emoji": "🔍",
@@ -9,5 +17,5 @@
       "started_at": "2026-03-09T10:15:00Z"
     }
   ],
-  "updated_at": "2026-03-09T10:36:00Z"
+  "updated_at": "2026-03-09T10:37:00Z"
 }
