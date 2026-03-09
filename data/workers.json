@@ -1,21 +1,13 @@
 {
   "workers": [
     {
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "⚙️",
       "status": "working",
-      "task": "Ficus streak tooltip + ambient particle vibe color fix",
-      "started_at": "2026-03-09T01:48:00Z"
-    },
-    {
-      "name": "Luna",
-      "role": "Creative Director",
-      "emoji": "🌙",
-      "status": "working",
-      "task": "Creative review cycle #60",
-      "started_at": "2026-03-09T03:30:00Z"
+      "task": "Late-night greeting fix + dispatch label navigation",
+      "started_at": "2026-03-09T03:36:00Z"
     }
   ],
-  "updated_at": "2026-03-09T03:30:00Z"
+  "updated_at": "2026-03-09T03:36:00Z"
 }
