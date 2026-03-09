@@ -83,16 +83,17 @@ const ACTIVITY_ICONS = {
 
 /** Bumps every 60s so relative timestamps stay fresh */
 function useTimeTick(intervalMs = 60_000) {
-  const [, setTick] = useState(0)
+  const [tick, setTick] = useState(0)
   useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), intervalMs)
     return () => clearInterval(id)
   }, [intervalMs])
+  return tick
 }
 
 function ActivityLogEntry({ entry, roster }) {
   const workerData = roster?.find(r => r.name === entry.worker)
-  const workerEmoji = workerData?.emoji ?? (entry.worker ? '🤖' : null)
+  const workerEmoji = workerData?.emoji ?? ROLE_EMOJIS[workerData?.role] ?? (entry.worker ? '🤖' : null)
   return (
     <div className={`activity-entry activity-entry--${entry.type}`}>
       {workerEmoji && <span className="activity-worker-emoji">{workerEmoji}</span>}
@@ -228,11 +229,11 @@ function ProgressBar({ progress, updatedAt, startedAt }) {
         aria-valuenow={typeof progress === 'number' ? progress : 0}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={`Progress: ${progress}%`}
+        aria-label={`Progress: ${typeof progress === 'number' ? progress : 0}%`}
       >
         <div
           className={`progress-bar-fill${progress >= 100 ? ' progress-bar-fill--overflow' : ''} ${flashClass}`}
-          style={{ width: `${Math.min(progress, 100)}%` }}
+          style={{ width: `${Math.min(typeof progress === 'number' ? progress : 0, 100)}%` }}
         />
       </div>
     </div>
@@ -430,6 +431,7 @@ function DeltaBadge({ delta }) {
 }
 
 function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPaused, onResume }) {
+  const tick = useTimeTick(60_000)
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
   const idle = workers.filter((w) => w.status === 'idle').length
@@ -437,7 +439,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
 
   const stuckWorkers = useMemo(
     () => workers.filter((w) => w.status === 'working' && (Date.now() - new Date(w.updated_at).getTime()) > 7_200_000),
-    [workers]
+    [workers, tick]
   )
 
   const prevCountsRef = useRef({})
@@ -508,7 +510,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
           <span className="stat-label">⚠️ Stuck</span>
           <span className="stat-value">
             {stuckWorkers.length === 1
-              ? `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].updated_at || stuckWorkers[0].startedAt || stuckWorkers[0].started_at)}`
+              ? `${stuckWorkers[0].emoji ?? ROLE_EMOJIS[stuckWorkers[0].role] ?? '🤖'} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].updated_at || stuckWorkers[0].startedAt || stuckWorkers[0].started_at)}`
               : `${stuckWorkers.length} workers`}
           </span>
         </div>
@@ -772,7 +774,8 @@ export default function App() {
       const normalize = w => ({
         ...w,
         id: w.id || w.name?.toLowerCase().split(' ')[0],
-        startedAt: w.startedAt || w.started_at
+        startedAt: w.startedAt || w.started_at,
+        progress: typeof w.progress === 'number' ? w.progress : 0
       })
       // Support both flat array and {workers:[], roster:[]} formats
       if (Array.isArray(data)) {
@@ -1328,7 +1331,7 @@ export default function App() {
                   onClick={() => setWorkerFilter(workerFilter === member.name ? null : member.name)}
                   aria-checked={workerFilter === member.name}
                 >
-                  {member.emoji ?? '🤖'} {member.name}
+                  {member.emoji ?? ROLE_EMOJIS[member.role] ?? '🤖'} {member.name}
                 </button>
               ))}
             </div>
