@@ -713,9 +713,6 @@
   width: 12px;
   height: 14px;
 }
-@media (prefers-reduced-motion: reduce) {
-  .desk-away-sign { animation: none; opacity: 1; }
-}
 .char__name {
   font-size: 0.58rem;
   color: var(--text-muted);
@@ -1005,9 +1002,11 @@
   transition: background 3s ease;
 }
 
-/* Vibe tint overlays */
+/* Vibe tint overlays — single consolidated system */
 .office-floor[data-vibe='on-fire'] .office-window__sky::after,
 .office-floor[data-vibe='crushing'] .office-window__sky::after,
+.office-floor[data-vibe='in-flow'] .office-window__sky::after,
+.office-floor[data-vibe='after-hours'] .office-window__sky::after,
 .office-floor[data-vibe='slow-day'] .office-window__sky::after {
   content: '';
   position: absolute;
@@ -1031,15 +1030,18 @@
   background: linear-gradient(180deg, rgba(34,197,94,0.14) 0%, transparent 70%);
 }
 
+.office-floor[data-vibe='in-flow'] .office-window__sky::after {
+  background: linear-gradient(180deg, rgba(59,130,246,0.15) 0%, rgba(99,102,241,0.08) 100%);
+}
+
+.office-floor[data-vibe='after-hours'] .office-window__sky::after {
+  background: rgba(49,46,129,0.55);
+  mix-blend-mode: multiply;
+}
+
 .office-floor[data-vibe='slow-day'] .office-window__sky::after {
   background: rgba(156,163,175,0.22);
 }
-
-/* Per-element vibe tint overlays (data-vibe on sky itself) */
-.office-window__sky[data-vibe='on-fire']::after { content: ''; position: absolute; inset: 0; background: rgba(239,68,68,0.12); pointer-events: none; }
-.office-window__sky[data-vibe='crushing']::after { content: ''; position: absolute; inset: 0; background: rgba(234,179,8,0.08); pointer-events: none; }
-.office-window__sky[data-vibe='after-hours']::after { content: ''; position: absolute; inset: 0; background: rgba(67,56,202,0.1); pointer-events: none; }
-.office-window__sky[data-vibe='slow-day']::after { content: ''; position: absolute; inset: 0; background: rgba(148,163,184,0.1); pointer-events: none; }
 
 .office-window__star {
   position: absolute;
@@ -1071,12 +1073,6 @@
 @keyframes cloud-drift {
   from { left: -20%; }
   to   { left: 115%; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  @keyframes star-twinkle { from {} to {} }
-  @keyframes cloud-drift  { from {} to {} }
-  .window-cloud { animation: none; }
 }
 
 @media (max-width: 600px) {
@@ -1534,6 +1530,22 @@
 
   /* sos-morse reduced for a11y */
   .desk--error .desk__monitor { animation: none; }
+
+  /* Window animations */
+  @keyframes star-twinkle { from {} to {} }
+  @keyframes cloud-drift  { from {} to {} }
+  .window-cloud { animation: none; }
+
+  /* Away sign, desk states, coffee & misc */
+  .desk-away-sign { animation: none; opacity: 1; }
+  .desk--error { animation: none; border: 2px solid #f87171; }
+  .desk--active { animation: none; }
+  .desk--ghost .desk-character { animation: none; }
+  .char--coffee-break { animation: none; left: 92%; top: 8%; }
+  .coffee-corner--visited::after { animation: none; opacity: 0.5; }
+  .coffee-steam span { animation: none; opacity: 0.3; }
+  .progress-ring--complete .progress-ring__fill { animation: none; }
+  .vibe-shockwave { animation: none; display: none; }
 }
 
 /* ── Error desk SOS morse flash (Luna #7) ── */
@@ -1610,7 +1622,6 @@
 /* Error desk glow */
 .desk--error { animation: desk-error-glow 2s ease-in-out infinite; }
 @keyframes desk-error-glow { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 10px 3px rgba(248,113,113,0.55); } }
-@media (prefers-reduced-motion: reduce) { .desk--error { animation: none; border: 2px solid #f87171; } }
 
 /* ── Coffee Break — char walks toward coffee corner ── */
 .char--coffee-break {
@@ -1645,11 +1656,6 @@
   0%   { opacity: 0;   transform: translateX(-50%) translateY(0)    scaleX(1);   }
   30%  { opacity: 0.8; transform: translateX(-50%) translateY(-4px)  scaleX(1.3); }
   100% { opacity: 0;   transform: translateX(-50%) translateY(-18px) scaleX(0.7); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .char--coffee-break { animation: none; left: 92%; top: 8%; }
-  .coffee-corner--visited::after { animation: none; opacity: 0.5; }
 }
 
 /* Coffee corner vibe reactions */
@@ -1687,9 +1693,6 @@
   50%  { stroke-width: 5; filter: drop-shadow(0 0 4px #22c55e); }
   100% { stroke-width: 2.5; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .progress-ring--complete .progress-ring__fill { animation: none; }
-}
 
 /* ── Progress Ring 100% Burst ── */
 .char[data-complete]::after {
@@ -1724,18 +1727,10 @@
   border-radius: 8px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .desk--active { animation: none; }
-}
-
 /* ── Ghost Desk — workers idle >15 min ── */
 .desk--ghost .desk-character {
   opacity: 0.25;
   animation: ghost-float 4s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .desk--ghost .desk-character { animation: none; }
 }
 
 /* ── Fern the Office Ficus — vibeStreak growth stages ── */
@@ -2044,10 +2039,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .vibe-shockwave { animation: none; display: none; }
-}
-
 /* ── Coffee Machine Steam ── */
 .coffee-steam {
   position: absolute;
@@ -2080,10 +2071,6 @@
 [data-vibe='crushing'] .coffee-steam { --steam-dur: 1.1s; }
 [data-vibe='slow-day'] .coffee-steam { --steam-dur: 3.5s; }
 [data-vibe='after-hours'] .coffee-steam span { animation-play-state: paused; }
-
-@media (prefers-reduced-motion: reduce) {
-  .coffee-steam span { animation: none; opacity: 0.3; }
-}
 .desk-keystrokes span {
   position: absolute;
   font-size: 7px;
@@ -2355,50 +2342,6 @@
 }
 .desk--ghost[data-ghost-tier='abandoned'] .desk__monitor-screen {
   filter: sepia(0.5) saturate(0.4) brightness(0.8);
-}
-
-/* === Mobile Office Scale Fix (Luna Review #41) === */
-@media (max-width: 480px) {
-  .office-wrap {
-    padding: 0.3rem;
-  }
-  .office-floor {
-    border-radius: 8px;
-    min-height: 65vh;
-  }
-  .char__name {
-    display: block;
-    font-size: 0.45rem;
-  }
-  .idle-duration {
-    font-size: 0.26rem;
-  }
-  .wb-vibe-text {
-    font-size: 0.55rem;
-  }
-  .desk__nameplate {
-    font-size: 0.38rem;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-  }
-  .desk-lamp {
-    transform: scale(0.8);
-  }
-  .office-sign {
-    font-size: 0.4rem;
-  }
-  .vibe-weather {
-    font-size: 0.6rem;
-  }
-  .vibe-weather__icon {
-    font-size: 0.6rem;
-  }
-  .vibe-weather__label {
-    font-size: 0.5rem;
-  }
-  .coffee-corner__label,
-  .office-door__label {
-    font-size: 0.25rem;
-  }
 }
 
 /* === Idle Micro-Bubbles (Luna Review #41) === */

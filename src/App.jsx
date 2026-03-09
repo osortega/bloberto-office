@@ -260,10 +260,10 @@ const WORKER_TAGLINES = {
 
 const SOLO_SPOTLIGHT_MESSAGES = {
   carlos: { 'on-fire': '📊 One backend between the servers and chaos.', 'crushing': '🧱 The whole stack is one person right now.', default: '⚙️ Solo shift. The logs are his only company.' },
-  sofia:  { 'on-fire': '🔍 Holding quality with both hands and no backup.', 'slow-day': '🔎 If there are bugs, she will find them. Alone.', default: '🔍 One set of eyes. Nothing gets past.' },
-  dave:   { 'after-hours': '🎧 One DevOps engineer. Infinite deployment anxiety.', default: '🚀 Solo deploy. No safety net.' },
-  maya:   { 'crushing': '💜 Shipping pixels at terminal velocity, unsupervised.', default: '🎨 One designer. Every pixel is hers.' },
-  luna:   { 'after-hours': '🌙 Creative review never clocks out.', default: '🌙 Dreaming alone. The ideas keep coming.' },
+  sofia:  { 'on-fire': '🔍 Holding quality with both hands and no backup.', 'crushing': '🔍 Bugs beware — she\'s in full hunt mode, solo.', 'in-flow': '🧪 Deep in the zone, every edge case accounted for.', 'slow-day': '🔎 If there are bugs, she will find them. Alone.', default: '🔍 One set of eyes. Nothing gets past.' },
+  dave:   { 'crushing': '🚀 Pipelines flying, one engineer holding it all together.', 'on-fire': '🔥 Infrastructure at max velocity. Dave\'s not slowing down.', 'after-hours': '🎧 One DevOps engineer. Infinite deployment anxiety.', default: '🚀 Solo deploy. No safety net.' },
+  maya:   { 'crushing': '💜 Shipping pixels at terminal velocity, unsupervised.', 'on-fire': '🔥 One designer, infinite components, zero chill.', 'slow-day': '🎨 Quiet day. Maya\'s making every pixel count.', default: '🎨 One designer. Every pixel is hers.' },
+  luna:   { 'crushing': '✨ Big creative energy, no audience needed.', 'after-hours': '🌙 Creative review never clocks out.', default: '🌙 Dreaming alone. The ideas keep coming.' },
 }
 
 const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false, selectedTag = null, onTagClick = null, isDimmed = false }) {
@@ -1231,7 +1231,7 @@ export default function App() {
                     isDimmed={selectedTag !== null && !getTaskTags(activeWorkers[0].task).some(t => t.label === selectedTag)}
                   />
                 </div>
-                <p className="solo-spotlight-msg">{SOLO_SPOTLIGHT_MESSAGES[activeWorkers[0]?.id]?.[teamVibe.key] ?? SOLO_SPOTLIGHT_MESSAGES[activeWorkers[0]?.id]?.default ?? '🌟 Running solo today...'}</p>
+                <p className="solo-spotlight-msg">{(() => { const soloKey = (activeWorkers[0]?.id ?? activeWorkers[0]?.name)?.toLowerCase(); return SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[teamVibe.key] ?? SOLO_SPOTLIGHT_MESSAGES[soloKey]?.default ?? '🌟 Running solo today...' })()} </p>
               </div>
             ) : (
               <div className="workers-grid">

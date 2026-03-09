@@ -523,5 +523,80 @@
     ],
     "hire_proposals": [],
     "_previous_review": 64
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 66,
+    "timestamp": "2026-03-09T06:31:09Z",
+    "theme": "Timers, Tints, and the Trust Tax — the interface silently lies and nobody catches it",
+    "visual_observations": "Puppeteer screenshot timed out (30s). Conducted full code review of Office.jsx (1552 lines), App.jsx (1350 lines), Office.css, and all utils. The two must-priority bugs from review #65 remain unfixed. On the window: Office.css still has both System 1 (parent-selector ::after, lines 1006-1033) and System 2 (element-selector ::after, lines 1036-1039). Critically: System 1 applies a green overlay (rgba 34,197,94,0.14) to the crushing vibe window, making peak-productivity sky feel like a deployment success screen. Solo spotlight at App.jsx line 1234 still reads SOLO_SPOTLIGHT_MESSAGES with raw .id. New finds: Office.jsx line 1177 has a cleanup function that clears pingReactionTimerRef.current as a side effect of the vibeCaption useEffect. VIBE_TRANSITION_QUOTES is missing 7 of 20 possible transition pairs. Header honorific uses isAfterHours = hour < 5 (time-based) while the vibe pill uses activity-based teamVibe.key, giving contradictory signals at odd hours.",
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Solo Spotlight and Lone Survivor Both Still Use Raw .id With No Normalization — Three Reviews Later",
+        "description": "WHY: App.jsx line 1234 reads SOLO_SPOTLIGHT_MESSAGES[activeWorkers[0]?.id]?.[teamVibe.key]. Office.jsx line 1457 reads LONE_SURVIVOR_WORKER_OVERRIDES[occ.worker.id]?.[vibe]. Both were flagged in review #64 and review #65 and remain unchanged. The activeIds derivation at App.jsx line 1181 already handles missing id by deriving from lowercase name with hyphens. If a worker arrives with name Carlos Ramirez and no id field, their derived id is carlos-ramirez but both maps key on carlos. Fix: in syncFromGitHub, set w.id = w.id || w.name?.toLowerCase().split(' ')[0] (first name only). Or add a normalizeWorkerId(w) utility to utils/constants.js. Carlos audits workers.json format; Maya owns the normalization function.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Window Vibe Tint Is Still Two Competing Systems and Crushing Gets a Green Overlay",
+        "description": "WHY: Office.css has two ::after systems targeting .office-window__sky. System 1 (parent-based, lines 1006-1033) has higher specificity (0,3,0) and wins for on-fire, crushing, slow-day. System 2 (element-based, lines 1036-1039) wins only for after-hours. Critical new finding: System 1 applies rgba(34,197,94,0.14) to crushing vibe window — a green tint at peak productivity. Green reads as deployment success, not the purple kinetic energy that defines crushing. in-flow has zero overlay in either system. Fix: delete System 2 entirely, add after-hours and in-flow entries to System 1, change crushing tint to rgba(167,139,250,0.15) matching VIBE_COLORS crushing purple, and make after-hours use mix-blend-mode: multiply with opacity 0.6 to darken the time-gradient sky regardless of hour.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "vibeCaption Cleanup Function Silently Kills Active Ping Reactions on Every Vibe Change",
+        "description": "WHY: Office.jsx line 1177 reads: return () => { clearTimeout(t); clearTimeout(pingReactionTimerRef.current); }. This is the cleanup of the vibeCaption useEffect (lines 1166-1178). React runs this cleanup every time the vibe dependency changes. So whenever the vibe shifts — which can happen while a worker is being pinged — pingReactionTimerRef.current is cleared prematurely. The 3-second display timer evaporates and pingReaction state may stay set until the next click. Remove the clearTimeout(pingReactionTimerRef.current) from the vibeCaption cleanup entirely. That ref manages its own lifecycle inside handleCharClick and pingReactionTimerRef has no relationship to vibe transitions.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Activity Log Header Count Lies When Any Filter Is Active — Still Unfixed From Review #60",
+        "description": "WHY: App.jsx line 1277 always renders Last {Math.min(activityLog.length, 20)} events regardless of active activityFilter or workerFilter. If activityFilter is errors and only 3 error entries exist, the header says Last 20 events while the log shows 3. Flagged in review #60 as should-priority and not yet addressed. The count needs to reflect post-filter length. Compute inline and show: 3 of 20 events (errors only) when a filter is active, or simply recount from the same filter expression already applied to the ActivityLog component on the line below.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "completeness",
+        "title": "VIBE_TRANSITION_QUOTES Missing 7 of 20 Pairs — Bloberto Silent on Common Transitions",
+        "description": "WHY: quotes.js lines 37-58 covers 13 pairs. Missing 7: on-fire to slow-day (incident resolved, everyone deflates), on-fire to after-hours (fire burns into the night), slow-day to on-fire (suddenly something breaks), slow-day to after-hours (drift continues into the dark), crushing to in-flow (peak momentum backs off — most frequent real-world drop, no quote at all), crushing to after-hours (legends refuse to leave), in-flow to after-hours (steady work becoming all-nighter). The most painful absence is crushing to in-flow: this is likely the most common vibe transition in any real team and Bloberto says nothing. Luna writes the 7 missing lines; Maya adds them to the object.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "narrative",
+        "title": "Header Honorific and Vibe Pill Give Contradictory Signals at Odd Hours",
+        "description": "WHY: App.jsx line 1051 sets isAfterHours = currentHour < 5. Line 1123 overrides the honorific to HONORIFICS['after-hours'] = night owl 🌙. But the vibe pill still shows teamVibe.label from activity-based calculation. At 3am with full team working, the header reads Good morning (wrong hour mapping), night owl (time-based honorific), and Crushing It (activity vibe). Three signals, three different truths. Fix: remove isAfterHours from the honorific lookup and always use teamVibe.key. The greeting string handles time context. The honorific should reinforce vibe consistently: Good morning, LEGEND — Crushing It reads as one coherent thought.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Worker Filter Bar Silently Disappears When workers.json Returns Flat Array Format",
+        "description": "WHY: App.jsx line 1307 renders worker filter pills from roster.map(). When workers.json is a flat array (not the structured format), roster stays empty [] and the filter bar renders only the All Workers button with no worker pills. Users see a near-empty filter bar with no explanation of why their teammates are missing from it. Fix A: derive roster from activeWorkers when roster.length === 0, using unique names from the active list. Fix B: hide the worker filter row entirely when roster.length === 0 with a conditional render. Option B prevents user confusion with zero code debt.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "wild",
+        "category": "animation",
+        "title": "The Office Window Is Time-Aware but Vibe-Blind — Give It Weather That Reads Both Axes",
+        "description": "WHY: WindowElement (Office.jsx lines 765-814) renders a sky gradient by clock hour and adds static clouds for daytime only. The vibe tint system is broken (bug 2). The bigger opportunity: replace flat tints with weather content that responds to vibe. In-flow: the existing slow-drifting clouds (animationDuration 11s, 16s) but visible at any hour. On-fire: a dark storm cloud div with rgba(30,0,0,0.6) that slides in from the right using a 4s keyframe. Crushing: a gold sun circle at top-center with radial glow and a brief scale pulse on vibe entry. Slow-day: one static flat grey cloud blocking the center. After-hours already has stars. Each weather state tells the office story without any text. The window becomes the emotional thermometer of the room — more alive than a tinted rectangle, and it fixes the visual tint bug as a side effect.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 65
   }
 ]
