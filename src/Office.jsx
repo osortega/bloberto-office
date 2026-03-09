@@ -144,6 +144,14 @@ const DOOR_LABELS = {
   'after-hours': '🔒 Locked up',
 }
 
+const WORKER_AWAY_DESK_LABELS = {
+  carlos: '↪ in the logs',
+  maya:   '↪ sketching',
+  dave:   '↪ headphones on',
+  sofia:  '↪ testing',
+  luna:   '↪ reviewing',
+}
+
 const VACANT_ADS = {
   'crushing':     { title: 'Staff Wizard',          req: 'Must maintain velocity without asking what velocity means' },
   'on-fire':      { title: 'URGENT: Firefighter',   req: 'Start Monday. Like, this Monday.' },
@@ -750,7 +758,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   )
 })
 
-function WindowElement() {
+function WindowElement({ vibe }) {
   const getHour = () => new Date().getHours()
   const [hour, setHour] = useState(getHour)
 
@@ -778,7 +786,7 @@ function WindowElement() {
   return (
     <div className="office-window" role="img" aria-label={`Office window showing ${timeLabel} sky`}>
       <span className="office-window__time-caption">{timeLabel}</span>
-      <div className="office-window__sky" style={{ background: getGradient(hour) }}>
+      <div className="office-window__sky" style={{ background: getGradient(hour) }} data-vibe={vibe}>
         {isMidnight && (
           <>
             <span className="office-window__star" style={{ left: '18%', top: '20%' }} aria-hidden="true" />
@@ -1366,7 +1374,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                     </div>
                   )}
                   {occ.idle && (
-                    <div className="desk__nameplate desk__nameplate--away">↪ away</div>
+                    <div className="desk__nameplate desk__nameplate--away">{WORKER_AWAY_DESK_LABELS[occ.worker.id] ?? '↪ away'}</div>
                   )}
                   {showAwaySign && (
                     <AwaySign workerId={occ.worker.id} idleMinutes={idleMinutes} />
@@ -1472,7 +1480,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         })}
 
         {/* Office window — time-aware sky view */}
-        <WindowElement />
+        <WindowElement vibe={vibe} />
 
         {/* Fern the office ficus — grows with vibeStreak */}
         <div
