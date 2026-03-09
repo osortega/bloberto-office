@@ -1,21 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️",
-      "status": "working",
-      "task": "Character voice: card taglines + lone survivor overrides",
-      "started_at": "2026-03-09T05:12:00Z"
-    },
-    {
-      "name": "Dave",
-      "role": "DevOps Engineer",
-      "emoji": "🚀",
-      "status": "working",
-      "task": "Character voice: per-worker error panic messages",
-      "started_at": "2026-03-09T05:12:00Z"
-    }
-  ],
-  "updated_at": "2026-03-09T05:12:00Z"
+  "workers": [],
+  "updated_at": "2026-03-09T05:30:00Z"
 }
