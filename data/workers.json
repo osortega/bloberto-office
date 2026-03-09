@@ -3,7 +3,7 @@
     {
       "name": "Maya",
       "role": "Frontend Dev",
-      "emoji": "🎨",
+      "emoji": "\ud83c\udfa8",
       "status": "working",
       "task": "Fix mobile worker names + stats bar overflow",
       "started_at": "2026-03-09T01:26:00Z"
@@ -11,7 +11,7 @@
     {
       "name": "Dave",
       "role": "DevOps",
-      "emoji": "🔧",
+      "emoji": "\ud83d\udd27",
       "status": "working",
       "task": "Fix Inter font, stuck card a11y, task tag focus, ping aria-live",
       "started_at": "2026-03-09T01:26:00Z"
@@ -19,38 +19,46 @@
     {
       "name": "Sofia",
       "role": "QA Engineer",
-      "emoji": "🔍",
+      "emoji": "\ud83d\udd0d",
       "status": "working",
-      "task": "QA review #32 — full site analysis",
+      "task": "QA review #32 \u2014 full site analysis",
       "started_at": "2026-03-09T01:45:00Z"
+    },
+    {
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "emoji": "\u2699\ufe0f",
+      "status": "working",
+      "task": "Fix late-night greeting + dispatch label navigation",
+      "started_at": "2026-03-09T02:01:11Z"
     }
   ],
   "roster": [
     {
       "name": "Maya",
       "role": "Frontend Dev",
-      "emoji": "🎨"
+      "emoji": "\ud83c\udfa8"
     },
     {
       "name": "Carlos",
       "role": "Backend Dev",
-      "emoji": "⚙️"
+      "emoji": "\u2699\ufe0f"
     },
     {
       "name": "Dave",
       "role": "DevOps",
-      "emoji": "🔧"
+      "emoji": "\ud83d\udd27"
     },
     {
       "name": "Sofia",
       "role": "QA Engineer",
-      "emoji": "🔍"
+      "emoji": "\ud83d\udd0d"
     },
     {
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙"
+      "emoji": "\ud83c\udf19"
     }
   ],
-  "updated_at": "2026-03-09T01:45:00Z"
+  "updated_at": "2026-03-09T02:01:11Z"
 }
