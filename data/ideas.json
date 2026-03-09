@@ -598,5 +598,80 @@
     ],
     "hire_proposals": [],
     "_previous_review": 65
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 67,
+    "timestamp": "2026-03-09T08:01:20Z",
+    "theme": "The camelCase graveyard -- quiet property name mismatches that bury entire features alive",
+    "visual_observations": "App.jsx line 346: ProgressBar receives worker.startedAt (camelCase) but live data uses started_at (snake_case) -- ETA never shows. App.jsx line 357: WORKER_TAGLINES[worker.id] is undefined for live workers with no id field -- card back taglines permanently silent. App.jsx line 1282: activity log header still shows Math.min(activityLog.length, 20) regardless of active filters. App.jsx line 916: justShipped confetti keyed by w.id (undefined for live data) -- shipping celebration never fires. Office.jsx line 1129: PING_REACTIONS[worker.id] undefined for live workers -- no per-character reaction triggers on click. Office.jsx line 1177: vibeCaption useEffect cleanup still clears pingReactionTimerRef on vibe change. Office.css line 1029: crushing sky overlay still rgba(34,197,94,0.14) -- green on a purple vibe, four reviews in. App.jsx line 266: Luna SOLO_SPOTLIGHT_MESSAGES has only crushing and after-hours; on-fire/in-flow/slow-day fall to the same dreamy default.",
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "ProgressBar startedAt Receives camelCase Key That No Live Worker Carries",
+        "description": "App.jsx line 346 passes startedAt={worker.startedAt} but every worker in the JSON uses started_at (snake_case). worker.startedAt is undefined for all live data, so workingMs (line 214) is null, workingMins is 0, and the eta guard (progress > 5 && workingMins > 1) is always false. ETA countdown never renders. Same mismatch hits line 511 where stuckWorkers[0].startedAt is the duration fallback. WHY: users lose the only forward-looking time signal on the card; a stuck worker with a mystery timer is just noise.",
+        "effort": "xs",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "WORKER_TAGLINES Keyed by .id -- Card Back Taglines Permanently Invisible for Live Workers",
+        "description": "App.jsx line 357: WORKER_TAGLINES[worker.id]. Workers from the live API have no id property -- only name (capitalised). So worker.id is undefined, WORKER_TAGLINES[undefined] is undefined, and the tagline block never renders. Every character card back is missing its personality line (e.g. The logs do not lie. for Carlos). Fix: use worker.id ?? worker.name?.toLowerCase() matching the pattern already on line 1234 for solo spotlight. WHY: the card back was designed to show character voice; a silently empty tagline wastes the flip interaction.",
+        "effort": "xs",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Crushing Window Sky Overlay Still Renders Green -- Fourth Call",
+        "description": "Office.css line 1029: .office-floor[data-vibe='crushing'] .office-window__sky::after has background: linear-gradient(180deg, rgba(34,197,94,0.14) 0%, transparent 70%). rgba(34,197,94) is Tailwind green-500 (#22c55e). VIBE_COLORS.crushing (App.jsx line 376) is #a78bfa -- violet-400. Every other vibe tint matches its canonical colour; crushing alone gets the wrong hemisphere. Fix: swap to rgba(167,139,250,0.14). WHY: the window is a mood ring for the office; when crushing reads green the visual grammar lies.",
+        "effort": "xs",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Activity Log Header Count Ignores Active Type and Worker Filters -- Unfixed Since Review 60",
+        "description": "App.jsx line 1282: header reads Last {Math.min(activityLog.length, 20)} events. activityLog is the raw unfiltered array; the filtered entries passed to ActivityLog on line 1319 are never consulted. When a user selects Errors or a specific worker, the header still claims 'Last 20 events' while the list shows 3. Fix: derive count from the same filtered chain used for the entries prop. WHY: users read the header to understand scope; a lying count destroys trust in the log as a diagnostic tool.",
+        "effort": "s",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "vibeCaption Cleanup Still Cancels Active Ping Reactions -- Third Review With No Fix",
+        "description": "Office.jsx line 1177, vibeCaption useEffect cleanup: return () => { clearTimeout(t); clearTimeout(pingReactionTimerRef.current); }. When vibe changes while a ping is visible, this cleanup fires and cuts the reaction short. The two timers are logically independent. Fix: remove clearTimeout(pingReactionTimerRef.current) from this cleanup -- pingReaction has its own cleanup in handleCharClick. WHY: the ping reaction is the one interactive moment of personality in the office; a background vibe change silently erasing it mid-sentence is disorienting.",
+        "effort": "xs",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "PING_REACTIONS[worker.id] Always Undefined -- No Live Worker Ever Gets a Personal Reaction",
+        "description": "Office.jsx line 1129: const reaction = PING_REACTIONS[worker.id]. Like the taglines bug, worker.id is undefined for all live API workers. PING_REACTIONS is keyed by lowercase id strings (luna, carlos, maya, dave, sofia). Every character click falls through to no reaction. Fix: resolve to worker.id ?? worker.name?.toLowerCase() before the lookup. WHY: clicking a character is the primary interactive gesture in the office view; silent clicks drain the space of life.",
+        "effort": "xs",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "justShipped Confetti Keyed by w.id -- Ship Celebration Never Fires for ID-less Workers",
+        "description": "App.jsx line 915: prevMap = new Map(prev.map(w => [w.id, w])). Line 916: justShipped filters by prevMap.get(w.id)?.status. When worker.id is undefined, prevMap collapses to one key (undefined) covering the whole team. Transition detection breaks; confetti never fires on task completion. Fix: use a stable key like worker.id ?? worker.name in both Map construction and filter lookup. WHY: confetti is the emotional payoff of watching the progress bar hit 100; losing it makes the office feel flat.",
+        "effort": "s",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "content",
+        "title": "Luna Has Three Blank Vibes in SOLO_SPOTLIGHT_MESSAGES -- She Reads Dreaming Alone During a Crisis",
+        "description": "App.jsx line 266: luna has entries for crushing and after-hours only -- on-fire, in-flow, and slow-day all fall to default: dreaming alone. Suggested: on-fire -> one creative in a burning building, the brief will still be beautiful; in-flow -> quiet studio, the best ideas arrive alone; slow-day -> slow day, Luna is probably redesigning the entire deck anyway. WHY: every other character has 4-5 vibe-matched entries; Luna is the only one who sounds asleep during a five-alarm incident.",
+        "effort": "xs",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 66
   }
 ]
