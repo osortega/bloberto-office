@@ -1208,7 +1208,7 @@ export default function App() {
           </div>
         ) : (
           <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
-            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={() => setPollingPaused(false)} />
+            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={() => { setPollingPaused(false); lastActivity.current = Date.now(); }} />
 
             <div className="section-header">
               <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>

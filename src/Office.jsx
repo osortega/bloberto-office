@@ -547,7 +547,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       errorInnerTimeoutRef.current = setTimeout(() => setErrorBubble(null), 2200)
     }, 2000 + wanderIdx * 1500)
     return () => { clearInterval(interval); clearTimeout(initialTimeout); clearTimeout(errorInnerTimeoutRef.current) }
-  }, [variant, worker.status])
+  }, [variant, worker.status, worker.id, wanderIdx])
 
   // Progress ring 100% burst
   useEffect(() => {
@@ -1264,7 +1264,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               <span className="wb-progress-label">avg task progress</span>
             </>
           )}
-          <span className="wb-task-count" style={{ fontSize: '0.4rem', color: 'inherit', opacity: 0.7 }}>
+          <span className="wb-task-count" style={{ fontSize: '0.4rem', color: 'inherit', opacity: 0.7, whiteSpace: 'nowrap' }}>
             {workingWorkers.length} active · {nonMgr.length} total
           </span>
           <div className="wb-history-dots" aria-hidden="true">
@@ -1358,7 +1358,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                       <div className="desk-monitor-screen--sleep" />
                     </div>
                   )}
-                  {(isWorking || hasError) && (DESK_SCREEN_SVG[occ.worker.id] || true) && (
+                  {(isWorking || hasError) && (
                     <div className="desk-monitor-screen">
                       {DESK_SCREEN_SVG[hasError ? (occ.worker.id + '_error') : occ.worker.id] || DESK_SCREEN_SVG[occ.worker.id] || (
                         <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1452,6 +1452,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                 activityEntries={occ.ghost ? activityEntries : []}
                 onClick={!occ.ghost && onWorkerClick ? handleCharClick : undefined}
                 isPinged={pingedId === occ.worker.id}
+                pingReaction={pingedId === occ.worker.id && pingReaction ? pingReaction : null}
               />
               {isLoneSurvivor && !occ.ghost && (
                 <div className='lone-survivor-label' style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>{LONE_SURVIVOR_WORKER_OVERRIDES[occ.worker.id]?.[vibe] ?? LONE_SURVIVOR_LABELS[vibe] ?? '🎯 solo run'}</div>
@@ -1479,6 +1480,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               tooltip={wanderTooltips[wIdx]}
               onClick={onWorkerClick ? handleCharClick : undefined}
               isPinged={pingedId === w.id}
+              pingReaction={pingedId === w.id && pingReaction ? pingReaction : null}
             />
           )
         })}
