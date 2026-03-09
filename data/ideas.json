@@ -1187,5 +1187,160 @@
     ],
     "hire_proposals": [],
     "_previous_review": 70
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 72,
+    "timestamp": "2026-03-09T19:02:28.193Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Puppeteer failed to launch in container (no dbus, pthread resource limits). Review based on full code audit of App.jsx, Office.jsx, Office.css, App.css — plus screenshot-luna-51-desktop.png and screenshot-luna-51-mobile.png captured in review 51.",
+    "theme": "Six things finally shipped, nine things stayed home, four things nobody wrote down yet",
+    "visual_observations": "Desktop screenshot from review 51 confirms: golden-hour window gradient rendering correctly (orange-to-peach, h 17-19). All five workers at desks. Ficus at small-plant stage. COFFEE TRIPLE SHOT label near the coffee machine. Conference table shows \"everyone is at their desk\" label under crushing vibe. ShortcutToast still visible in bottom-right corner (expected — new visitor session). Footer hardcoded v1.0.0-chaos confirmed. Vibe badge reads Crushing It. Streak badge reads LEGEND 🔥. Mobile screenshot shows FULL SYNC banner at top of office. Footer on mobile wraps to two lines with quote text, 1/9 counter, and v1.0.0-chaos pushing into a third line on narrower widths. Window sky at evening shows orange gradient — no stars visible in the deep purple hours (20-23) since stars only render at midnight (h 0-4). The vacant desk slot shows VACANT label at bottom center.",
+    "fixed_since_last_review": [
+      {
+        "title": "Streak Eulogy Toast Now Has a Dismiss Timer",
+        "was_flagged_in": [
+          70,
+          71
+        ],
+        "how_fixed": "App.jsx:958 — completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3500) now fires on the eulogy path. Toast auto-dismisses after 3.5 seconds. Two-review sticker finally peeled off."
+      },
+      {
+        "title": "Esc Shortcut Now Clears All Active Filters",
+        "was_flagged_in": [
+          70,
+          71
+        ],
+        "how_fixed": "App.jsx:826 — Esc handler now calls setSelectedTag(null), setWorkerFilter(null), setActivityFilter('all') before blur(). The shortcut does what the toast promised. Two-review debt paid."
+      },
+      {
+        "title": "IDLE_BUBBLE_EMOJIS Moved to Module Level as Character-Keyed WORKER_IDLE_BUBBLES",
+        "was_flagged_in": [
+          71
+        ],
+        "how_fixed": "Office.jsx:471-479 — WORKER_IDLE_BUBBLES is now a module-level const keyed by worker id (carlos, maya, dave, sofia, luna). DEFAULT_IDLE_BUBBLES handles unknown workers. No longer recreated on every Character render."
+      },
+      {
+        "title": "Activity Log System Filter Added",
+        "was_flagged_in": [
+          71
+        ],
+        "how_fixed": "App.jsx:1308 — { key: 'system', label: '⚙️ System' } is now in the filter bar array. activityFilter === 'system' returns e.type === 'system' at lines 1293 and 1347. Nine reviews worth of system events are now filterable."
+      },
+      {
+        "title": "Conference Table lastHuddle Post-Meeting Strip Now Renders",
+        "was_flagged_in": [
+          71
+        ],
+        "how_fixed": "Office.jsx:905-921 — when meetingWorkers.length === 0 and lastHuddle.current has names and a non-null endedAt within 30 minutes, a strip renders \"Last: {names} · {timeStr}\". The table remembers who was just there."
+      },
+      {
+        "title": "Luna SOLO_SPOTLIGHT_MESSAGES Completed — All Five Vibes Present",
+        "was_flagged_in": [
+          71
+        ],
+        "how_fixed": "App.jsx:267 — luna now has on-fire ('🔥 One creative in a burning building — the brief will still be beautiful.'), in-flow ('✨ Ideas arrive faster when the office goes quiet.'), and slow-day ('🌙 Slow day. The perfect kind for the ideas that need silence.'). Coverage complete."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Streak Eulogy Toast Renders Purple Celebration Border — type: info Is Ignored by the Renderer",
+        "description": "App.jsx:957 — setCompletionToast({ text: '💀 RIP the streak...', type: 'info' }) sets a type field but no .color. App.jsx:1107 — border is completionToast.color || '#6366f1'. Because .color is undefined on the eulogy path, the toast gets the same purple celebration border as a shipped-it toast. A death announcement styled like a birthday card is a category error. The fix is one line: add color: '#6b7280' (or '#374151') to the setCompletionToast call in the eulogy path so the border reads grief, not party. WHY: Bloberto's Office tells small visual stories. The streak dying in a purple glow is the wrong story — it should whisper, not sparkle.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "wanderTooltips Still Slot-Keyed — Carlos Gets \"Coffee Corner\" Only If He Wanders First",
+        "description": "Office.jsx:1481-1485 — wanderTooltips is an object keyed 1-4 by slot index: { 1: '☕ Heading to the coffee corner', 2: '💬 Lingering by the whiteboard', 3: '🪟 Staring out the window', 4: '🧘 Taking a mindful moment' }. The wIdx at line 1481 is (i % 4) + 1 where i is the index in the idleWorkers array. If Carlos is the second idle worker, he gets the whiteboard tooltip. If Luna is third, she gets the window tooltip. The assignment is positional, not personal. The fix is to key wanderTooltips by worker.id and fall back to the slot label. Carlos should always drift toward the coffee. Luna should always end up at the window. WHY: character identity is the whole point of the office view. Slot-based tooltips are slot-machine storytelling.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "ProgressBar Destructures updatedAt and Never Uses It — Dead Parameter, Third Review",
+        "description": "App.jsx:194 — function ProgressBar({ progress, updatedAt, startedAt }) — updatedAt is destructured but never referenced anywhere in the function body. startedAt is used for ETA calculation. updatedAt is passed at App.jsx:347 (updatedAt={worker.updated_at}) but goes nowhere. Either remove updatedAt from the signature and the call site, or use it — for instance, the progress bar could show a subtle \"stalled\" indicator when updatedAt has not changed in over 30 minutes even though progress < 100. WHY: dead parameters in a prop signature are misleading — they tell the next reader that updatedAt matters here, which it does not. Clean the contract or fulfill it.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "AwaySign Sticky Note Uses Generic AWAY_MESSAGES While Nameplate Has Worker-Specific Copy — Two Voices, Same Desk",
+        "description": "Office.jsx:437-451 — AwaySign uses a generic AWAY_MESSAGES array ('☕ Coffee run', '🧠 Deep think', '📞 On a call', etc.) indexed by a deterministic seed from workerId + idleMinutes. Meanwhile, Office.jsx:1395 — the desk nameplate renders WORKER_AWAY_DESK_LABELS[occ.worker.id] which has character-specific copy: carlos gets '↪ in the logs', luna gets '↪ reviewing'. Two systems, two personalities, one desk. The sticky note always sounds like a generic OOO — it should echo the nameplate voice. Add a WORKER_AWAY_NOTES map keyed by worker.id with character-specific sticky-note lines. Luna's sticky note should say something like \"back soon · reviewing briefs\" not \"🧠 Deep think\". WHY: the nameplate and the sticky note appear at the same time on the same desk. Having them speak in different registers breaks the character.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Office Window Has No Stars at Evening Hours (20-23) — The 9pm Sky Is a Purple Void",
+        "description": "Office.jsx:795-820 — WindowElement renders star spans only for the midnight block (h >= 0 && h <= 4). The evening block (h >= 20 && h <= 23) renders a deep purple gradient ('#4c1d95' to '#312e81') with nothing in it. A real window at 10pm has stars. The midnight path already has the pattern — four span.office-window__star elements with staggered left/top percentages. Extend that pattern to h >= 20. A slightly sparser constellation (2-3 stars) makes the evening sky legible as night without matching midnight's density. WHY: the window is a time clock. At 10pm it should look like night. Right now it looks like an empty container.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "feature",
+        "title": "Footer Quote Counter Calls 1/9 Before Any Bonus Quote Is Unlocked — The Counter Lies About the Experience",
+        "description": "App.jsx:1368 — the counter formula renders (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 / BONUS_TAGLINES.length + 1, which shows 1/9 on first load when quoteBonus === 0. The visitor is on the default vibe tagline — no click, no discovery. Showing 1/9 implies they are partway through something, which they are not. Two options: (a) hide the counter entirely when quoteBonus === 0 and show it only after the first click, framing it as a discovery counter; or (b) show ✦ (without a number) until the first bonus quote is unlocked, then show 1/8. WHY: the first number a visitor reads in the footer should not be a lie about how many quotes they have found.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Ficus Has No Grief State When vibeStreak Drops Back to Seedling — Four Reviews, No Wilt",
+        "description": "Office.jsx:1102 — the useEffect guard is if (prevPlantStageRef.current !== plantStage && plantStage !== 'seedling'). The explicit seedling exclusion means when vibeStreak drops and the plant reverts to seedling, neither the burst animation nor the plantToast fires. The plant silently shrinks. Add a separate branch: when prevPlantStageRef.current !== 'seedling' and plantStage === 'seedling', trigger a grief state — a separate CSS class like office-plant--grieving, a brief wilt animation, and a plantToast reading '😔 The ficus is starting over.' prevPlantStageRef.current still needs to be updated in both branches. WHY: the plant leveling up has fanfare. The plant dying has nothing. The asymmetry makes the streak feel unreal.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "TASK_TAG_DEFS Has No Meeting, Planning, or Retro Pattern — A Whole Class of Work Is Invisible",
+        "description": "App.jsx:165-171 — TASK_TAG_DEFS covers Bug, Ship, Design, QA, Data, and Docs. Tasks like 'roadmap review', 'planning session', 'retro prep', 'sprint standup', 'team sync' match no pattern and render no tag. Add a seventh entry: { pattern: /meeting|standup|planning|retro|sync|roadmap|align/i, label: 'Plan', emoji: '🗓️', className: 'task-tag--plan' }. Also add the corresponding CSS class. WHY: if you can filter by Docs but not by Planning, the tag system tells half the story of how the team actually spends its time.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Error Micro-Bubble Loop Fires at Uniform Intensity Forever — No Fatigue Model",
+        "description": "Office.jsx:538-551 — the error bubble interval fires every 12 seconds indefinitely, always picking a random message from WORKER_ERROR_BUBBLES[worker.id] or ERROR_BUBBLE_MESSAGES. There is no concept of time in error. The messages do not escalate. A worker who has been in error for 5 minutes should scream differently than one who has been in error for 5 seconds. Proposal: track errorDurationMs (Date.now() - first error timestamp). Under 2 minutes: show calm messages ('it was fine locally'). 2-10 minutes: escalate to panic ('WHY IS THIS STILL HAPPENING'). Over 10 minutes: slow the interval to 30 seconds and show resignation ('this is fine' 🔥 meme energy). WHY: uniform distress is not distress — it is ambience. Escalation makes the error state feel real.",
+        "effort": "medium",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "could",
+        "category": "visual",
+        "title": "vibeCaption Has No Cooldown — Oscillation Near a Threshold Spams the Overlay Every Poll Cycle",
+        "description": "Office.jsx:1183-1194 — the vibeCaption useEffect fires on every [vibe] change and clears after 2800ms. There is an isFirstVibe guard (skips the first render) but no minimum interval between displays. If the team vibe oscillates between on-fire and slow-day on every 30-second poll cycle (one worker coming and going), the caption fires every 30 seconds indefinitely. Add a lastCaptionTsRef and only fire the caption if Date.now() - lastCaptionTsRef.current > 90000 (90 seconds). WHY: the caption is a punctuation mark, not a ticker. It should announce a shift, not annotate noise.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "Dashboard Tab Should Flash a Transient 🎉 Badge When a Worker Ships",
+        "description": "App.jsx:1205 — the Dashboard tab badge only activates when errorCount > 0. When a worker completes their task (progress reaches 100), the workerConfetti fires and a completionToast appears, but the Dashboard tab itself shows nothing. If you are on the Office tab watching characters wander, you have no signal that something meaningful just happened on the other side. Proposal: add a shipBadgeActive state, set it true when the completion path fires (App.jsx:928-935), and clear it after 5 seconds. Render a 🎉 badge on the Dashboard tab while active — analogous to the error badge but transient and celebratory. WHY: tab badges are the cheapest form of ambient notification. A shipped badge would make the two tabs feel like they are watching the same event from different angles.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "wild",
+        "category": "character-voice",
+        "title": "Footer Version String Should Be the Last Joke in the Room — v1.0.0-chaos Is the Punchline That Never Changes",
+        "description": "App.jsx:1369 — <span>v1.0.0-chaos</span> is a hardcoded string. Every other element in the footer is dynamic — the tagline changes by vibe, the counter ticks, the sparkle twinkles. The version string sits there reading the same thing it read at launch, regardless of whether the team is crushing, on fire, or in a slow spiral. Proposal: create a VIBE_VERSIONS map (e.g. { crushing: 'v∞.0.0-locked-in', 'on-fire': 'v1.0.0-hotfix-incoming', 'in-flow': 'v2.0.0-clean-build', 'slow-day': 'v0.0.1-maybe', 'after-hours': 'v1.0.0-why-are-you-here' }) and render VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'. WHY: the version string is the last thing a visitor reads. It should close the story. Right now it just lingers.",
+        "effort": "small",
+        "assigned_to": "dave"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 71
   }
 ]
