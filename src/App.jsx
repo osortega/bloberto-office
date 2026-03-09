@@ -243,6 +243,14 @@ const WORKER_TAGLINES = {
   luna: 'Creative velocity is still velocity.'
 }
 
+const SOLO_SPOTLIGHT_MESSAGES = {
+  carlos: { 'on-fire': '📊 One backend between the servers and chaos.', 'crushing': '🧱 The whole stack is one person right now.', default: '⚙️ Solo shift. The logs are his only company.' },
+  sofia:  { 'on-fire': '🔍 Holding quality with both hands and no backup.', 'slow-day': '🔎 If there are bugs, she will find them. Alone.', default: '🔍 One set of eyes. Nothing gets past.' },
+  dave:   { 'after-hours': '🎧 One DevOps engineer. Infinite deployment anxiety.', default: '🚀 Solo deploy. No safety net.' },
+  maya:   { 'crushing': '💜 Shipping pixels at terminal velocity, unsupervised.', default: '🎨 One designer. Every pixel is hers.' },
+  luna:   { 'after-hours': '🌙 Creative review never clocks out.', default: '🌙 Dreaming alone. The ideas keep coming.' },
+}
+
 const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false, selectedTag = null, onTagClick = null, isDimmed = false }) {
   const [isFlipped, setIsFlipped] = useState(false)
   const cardRef = useRef(null)
@@ -1203,7 +1211,7 @@ export default function App() {
                     isDimmed={selectedTag !== null && !getTaskTags(activeWorkers[0].task).some(t => t.label === selectedTag)}
                   />
                 </div>
-                <p className="solo-spotlight-msg">🌟 Running solo today. Carrying the whole team on one pair of hands.</p>
+                <p className="solo-spotlight-msg">{SOLO_SPOTLIGHT_MESSAGES[activeWorkers[0]?.id]?.[teamVibe.key] ?? SOLO_SPOTLIGHT_MESSAGES[activeWorkers[0]?.id]?.default ?? '🌟 Running solo today...'}</p>
               </div>
             ) : (
               <div className="workers-grid">
