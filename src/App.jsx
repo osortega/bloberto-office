@@ -343,7 +343,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             return <div className="worker-duration" data-tier={tier}>{tier === 'stuck' ? '⚠️ ' : ''}⏱️ {formatDuration(worker.updated_at)}</div>
           })()}
 
-          <ProgressBar progress={worker.progress} updatedAt={worker.updated_at} startedAt={worker.startedAt} />
+          <ProgressBar progress={worker.progress} updatedAt={worker.updated_at} startedAt={worker.started_at} />
         </div>
 
         <div className="worker-card__back" aria-hidden={!isFlipped || undefined} tabIndex={!isFlipped ? -1 : undefined}>
@@ -769,12 +769,17 @@ export default function App() {
 
     if (workersResult.status === 'fulfilled') {
       const data = workersResult.value
+      const normalize = w => {
+        w.id = w.id || w.name?.toLowerCase().split(' ')[0]
+        w.startedAt = w.startedAt || w.started_at
+        return w
+      }
       // Support both flat array and {workers:[], roster:[]} formats
       if (Array.isArray(data)) {
-        setAllWorkers(data)
+        setAllWorkers(data.map(normalize))
         setRoster([])
       } else {
-        setAllWorkers(data.workers ?? [])
+        setAllWorkers((data.workers ?? []).map(normalize))
         setRoster(data.roster ?? [])
       }
       setIsLive(true)
@@ -1274,7 +1279,18 @@ export default function App() {
             <div className="section-header" style={{ marginTop: '2.5rem' }}>
               <div className="section-title">📋 Activity Log</div>
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                Last {Math.min(activityLog.length, 20)} events
+                {(() => {
+                  const isFiltered = activityFilter !== 'all' || workerFilter !== null
+                  const filtered = activityLog.filter(e => {
+                    if (activityFilter === 'hires') return e.type === 'hire'
+                    if (activityFilter === 'completions') return e.type === 'complete'
+                    if (activityFilter === 'errors') return e.type === 'error'
+                    return true
+                  }).filter(e => workerFilter !== null ? e.worker === workerFilter : true)
+                  return isFiltered
+                    ? `${filtered.length} of ${activityLog.length} events (filtered)`
+                    : `${activityLog.length} events`
+                })()}
               </span>
             </div>
             <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log by type">

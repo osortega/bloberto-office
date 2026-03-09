@@ -1174,7 +1174,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     };
     setVibeCaption(CAPTIONS[vibe] || null);
     const t = setTimeout(() => setVibeCaption(null), 2800);
-    return () => { clearTimeout(t); clearTimeout(pingReactionTimerRef.current); };
+    return () => { clearTimeout(t); };
   }, [vibe])
 
   // Roster members not currently active → ghost at empty desk

@@ -1,130 +1,135 @@
 {
   "analyst": "Sofia",
-  "review_number": 38,
-  "timestamp": "2026-03-09T08:45:00Z",
+  "review_number": 39,
+  "timestamp": "2026-03-09T09:15:00Z",
   "scores": {
-    "visual": 4.2,
+    "visual": 3.5,
     "ux": 3.5,
-    "responsiveness": 3.0,
-    "performance": 3.8,
-    "accessibility": 3.2,
+    "responsiveness": 3.5,
+    "performance": 5,
+    "accessibility": 3.5,
     "code_quality": 3.5,
-    "features": 4.0,
-    "fun_factor": 4.5
+    "features": 4.5,
+    "fun_factor": 5
   },
-  "overall_score": 3.7,
+  "overall_score": 4.1,
+  "delta_from_last": "+0.1 (was 4.0 in review #38)",
   "suggestions": [
     {
       "priority": "high",
       "category": "ux",
-      "title": "Bloberto speech bubble overlaps Office/Dashboard tabs on mobile",
-      "description": "On mobile (375px), Bloberto's speech bubble covers the Office tab, making it impossible to tap. The bubble z-index is higher than the tab bar. Either move the speech bubble below the tabs, reduce its width on mobile, or add a dismiss-on-tap behavior. This is the worst mobile UX issue right now.",
+      "title": "[CARRY-OVER #37/#38] Bloberto speech bubble obliterates the Office tab on mobile",
+      "description": "Still happening. Screenshot confirms it — the ambient speech bubble ('Velocity like this doesn't just happen…') physically covers the '🏢 Offic' tab label on mobile (375px), leaving it partially visible and unclickable. Root cause: `.office-floor` has `overflow: visible` (intentional for the bubble to escape upward), and the bubble's `z-index: 30` is uncontested by the tab-toggle which has no explicit z-index or stacking context. Fix: give `.tab-toggle` a stacking context — add `position: relative; z-index: 50` — so it's guaranteed above any escaping office content. Alternatively add `max-height` clamping to the speech bubble so it cannot grow above the office floor's top edge. On desktop the bubble sits in the gap between tabs and floor without overlap, so this is a mobile-only regression.",
       "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "Whiteboard text is unreadable on mobile — vertical letter stacking",
-      "description": "The whiteboard on mobile shows letters stacked vertically (W/H/I/T/E/B/O/A/R/D) because the container is too narrow. The actual vibe text inside is also clipped. This has been flagged in multiple prior reviews. Either hide the whiteboard on small screens or rotate it 90° with a transform. Carry-over from reviews #35-37.",
-      "effort": "small",
-      "assignee": "Maya"
+      "assignee": "Carlos"
     },
     {
       "priority": "high",
       "category": "visual",
-      "title": "Sofia's name label is RED and shouting compared to other workers",
-      "description": "In the desktop screenshot, Sofia's desk label shows 'SOFIA' in bright red/uppercase while Carlos and Maya have normal gray labels. This is because her QA role color (#f43f5e) is applied to the active worker label. It looks like an error state, not a 'working' state. The name color for active workers should be consistent — use the status color (green for working), not the role color.",
+      "title": "[CARRY-OVER #38] Whiteboard label is 'WH ITE BO AR D' — still broken on mobile",
+      "description": "Screenshot confirms it. The `.office-whiteboard::before` pseudo-element sets `content: 'WHITEBOARD'` with `letter-spacing: 0.15em` but no `white-space: nowrap`. Inside the narrow flexbox container (5.5% of 900px ≈ 50px), the word wraps character-by-character, producing the vertical stack. On desktop it's barely readable; on mobile (7.5% width at 375px) it renders as 'WH / ITE / BO / AR / D'. Fix: add `white-space: nowrap; overflow: hidden; text-overflow: clip;` to `.office-whiteboard::before`, or reduce `letter-spacing` to 0. The actual vibe text already has `white-space: nowrap` on `.wb-vibe-text` — the pseudo-element just needs the same treatment. Two-line fix.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Character `useEffect` dep array missing `worker.id` — wrong error bubbles possible",
+      "description": "In Office.jsx, the error bubble effect (line 534–550) references `WORKER_ERROR_BUBBLES[worker.id]` inside the callback but declares `}, [variant, worker.status])` as its dependency array. If `worker.id` changes while `variant` and `worker.status` stay the same (e.g. a desk slot is reassigned to a different worker with the same 'error' status), the effect does NOT re-run. The previous worker's error messages ('SIGKILL', 'db is lying to me') would keep firing for the new character. Fix: add `worker.id` to the dependency array: `}, [variant, worker.status, worker.id])`. Same applies to `WORKER_AWAY_DESK_LABELS` usage pattern elsewhere.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "[CARRY-OVER #38] Sunrise/gradient rectangle clips at right office edge",
+      "description": "Still visible in both screenshots — the orange-to-pink gradient rectangle (the time-of-day window) is labeled 'UNRIS' on mobile and 'UNRISE' on desktop because the right ~20% overflows the office-floor boundary. The `office-floor` has `overflow: visible`, so it bleeds into the page chrome. The `WindowElement` component needs either a tighter `right`/`width` CSS constraint, or the parent `.office-floor` needs `overflow: hidden` on its x-axis. Since `overflow: visible` is needed for the speech bubble escaping upward, consider `overflow: hidden clip` (x=hidden, y=visible) using the `overflow-x: hidden; overflow-y: visible` pattern. This would fix both the sunrise bleed AND leave the vertical speech bubble path open — though note this also clips the whiteboard pseudo.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "responsiveness",
-      "title": "Mobile layout: desk grid doesn't reflow — desks overlap and clip",
-      "description": "The office uses absolute positioning (DESKS array with left/top percentages). On mobile, desks overlap each other because the percentages don't account for the narrower viewport. Dave and Luna's desks are cramped. Consider a CSS grid or flexbox layout for mobile that stacks desks vertically or in a 2-column layout.",
-      "effort": "large",
-      "assignee": "Maya"
+      "category": "accessibility",
+      "title": "Office character divs lack semantic role — focusable but unspeakable",
+      "description": "The `Character` component (Office.jsx line 673–761) always renders with `tabIndex={0}` but only sets `role='button'` when `handleClick` is defined. Bloberto (manager) and ghost characters are keyboard-focusable with no role, meaning screen readers announce them as generic unlabeled divs. Bloberto responds to focus by showing a quote bubble but offers no keyboard-triggerable action and no role. Ghosts show a bubble on focus but are also role-less. Fix: add `role='img'` + `aria-label` for non-interactive characters (Bloberto, ghosts), and `role='button'` + `aria-label` for clickable ones. Alternatively, set `tabIndex={-1}` for Bloberto since he has no keyboard-activatable function.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "App.jsx (1366 lines) and Office.jsx (1552 lines) need splitting",
-      "description": "Both files are massive. WorkerCard, StatsBar, ActivityLog, and Dashboard are all self-contained components inside App.jsx that could be extracted. Office.jsx has CharacterAvatar, Desk components, and all the SVG definitions that could be in separate files. This is a carry-over but it's getting worse with each feature addition.",
-      "effort": "large",
-      "assignee": "Maya"
+      "category": "accessibility",
+      "title": "[CARRY-OVER #38] radiogroup arrow-key navigation still missing (WAI-ARIA violation)",
+      "description": "The two `.activity-filter-bar` groups use `role='radiogroup'` and now correctly set `aria-checked` (✅ fixed this cycle). But WAI-ARIA still requires ArrowLeft/ArrowRight keyboard navigation within each group. Currently Tab is the only way to move between radio options, which violates the radiogroup interaction model. The tab switcher already implements `handleTabKeyDown` with arrow key support — extract that pattern into a reusable `handleRadioGroupKeyDown(options, current, setter)` helper and apply to both filter bars. This is a copy-paste job.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Footer quote counter desynchronizes from tagline after 8 clicks",
+      "description": "App.jsx line 1360: the counter displays `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` as the numerator, making it cycle 1→9 over 9 steps. But the actual tagline uses `quoteBonus % BONUS_TAGLINES.length` (8 items), cycling 0→7. After 8 clicks the counter shows 9/9 but the tagline has already looped back to index 0. On click 9 the counter resets to 1 but the tagline is at index 1. They're permanently out of sync after the first loop. Fix: use the same modulo for both: `const taglineIdx = quoteBonus % BONUS_TAGLINES.length` for display and the counter should be `taglineIdx + 1` / `BONUS_TAGLINES.length`. Remove the `+1` in the denominator.",
+      "effort": "small",
+      "assignee": "Carlos"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "All desk screen SVGs are defined inline as constants — should be lazy or memoized per vibe",
-      "description": "DESK_SCREEN_SVG object at the top of Office.jsx contains 15 SVG definitions (5 normal + 5 error + partial). These are created on every module load. They include animated elements that run continuously. Consider wrapping error-state SVGs in a lazy loader so they only mount when a worker is in error state.",
-      "effort": "medium",
+      "title": "Activity log filtered three separate times per render — still no memoization",
+      "description": "The filtered activity log is computed three independent times on every render: (1) lines 1284–1290 for the event count label in the section header; (2) lines 1336–1344 when passing `entries` to `<ActivityLog>`; (3) inside `ActivityLog` itself as `[...entries].reverse().slice(0, 20)`. All three share the same `activityFilter` and `workerFilter` inputs. Wrap with `useMemo([activityLog, activityFilter, workerFilter])` and compute once. The count and the list should use the same memoized array. The inner `[...entries].reverse()` also creates a new array on every render — move the reverse+slice into the same useMemo call upstream.",
+      "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "No loading state or skeleton when dashboard data is being fetched",
-      "description": "When switching to Dashboard tab, if data hasn't loaded yet, the user sees either nothing or a flash. App.jsx fetches from GitHub raw URLs with cache-busting. There should be a skeleton/shimmer state while waiting for the first fetch to resolve.",
+      "category": "code",
+      "title": "[CARRY-OVER #38] Desk screen SVGs hardcoded dark backgrounds break light mode",
+      "description": "All `DESK_SCREEN_SVG` definitions in Office.jsx use `fill='#05050f'` (near-black) for the screen background. In light mode (`data-theme='light'`), these render as opaque black rectangles with no visible content, breaking visual coherence. The error-state SVGs use `fill='#1a0000'` — equally broken in light mode. Fix: replace hardcoded fills with a CSS variable: `fill='var(--desk-screen-bg, #05050f)'` and add `[data-theme='light'] { --desk-screen-bg: #e2e8f0; }` to the light mode block in Office.css. The SVG stroke colors (blue, purple, orange) are fine on light — only the background rect needs updating.",
       "effort": "medium",
       "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "Tab buttons use role assumptions without proper ARIA tab pattern",
-      "description": "The Office/Dashboard tabs should use role='tablist' on the container and role='tab' + aria-selected on each button. This was flagged in prior reviews as a role='radio' issue. The fix is straightforward: tablist/tab/tabpanel ARIA pattern. Carry-over.",
+      "category": "code",
+      "title": "ConferenceTable shadows outer `cx` and `orbitR` inside map callbacks",
+      "description": "Office.jsx lines 919 and 939 both declare `const cx = 52, orbitR = 38` inside the `meetingWorkers.map()` and `standupWorkers.map()` callbacks — directly shadowing the outer `const cx = 52, cy = 52, tableR = 28, chairR = 6, orbitR = 38` declared at line 840. Currently harmless because the values are identical, but it's a trap: if the outer layout values ever change, the seated character positions won't update. The inner declarations also shadow `cy` (which is 52, same as cx — accidentally correct). Remove the inner `const cx = 52, orbitR = 38` declarations and use the outer scope variables directly.",
       "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "visual",
-      "title": "Coffee cup and plant decorations clip against right edge on tablet widths",
-      "description": "At ~768px width, the coffee cup ('COFFEE TRIPLE SHOT') and the gradient rectangle (sunrise panel?) extend past the office border. The office container has overflow:hidden but the elements are positioned with percentage-based right offsets that don't scale well at intermediate widths.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "Add a quick stats summary to the Office tab header",
-      "description": "The office view shows characters at desks but no quick summary of how many are working/idle/error without switching to Dashboard. A small pill badge next to the 'Office' tab showing '4 working' or similar would add context without cluttering the view.",
-      "effort": "small",
-      "assignee": "Maya"
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "VIBE constants are scattered across 4 files — centralize in vibe.js",
-      "description": "VIBE_WEATHER_LABELS, VIBE_WEATHER_ICONS, DOOR_LABELS, LONE_SURVIVOR_LABELS are in Office.jsx. VIBE_WHITEBOARD is in constants.js. VIBE_QUOTES are in quotes.js. getTeamVibe is in vibe.js. All vibe-related constants should live in one place for consistency.",
-      "effort": "medium",
+      "title": "[CARRY-OVER #38] Unstable list keys in ActivityLog — index suffix still present",
+      "description": "App.jsx line 151: `key={entry.timestamp + entry.worker + i}`. The `+ i` index suffix still defeats the composite key uniqueness. If entries prepend (which they do — new entries are unshifted at line 967: `[{ ...newEvent }, ...prev]`), every existing key shifts by +1, forcing React to re-render all log entries instead of only appending. Remove `+ i` — the `timestamp + worker` composite should be unique enough. If duplicate timestamps are a genuine concern, add a `seq` or `id` field at the data source level.",
+      "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "low",
-      "category": "accessibility",
-      "title": "CharacterAvatar fallback emoji SVG text not hidden from screen readers",
-      "description": "When CharacterAvatar renders the generic emoji fallback (Office.jsx), the SVG contains a <text> element that screen readers will announce in addition to the aria-label. Add aria-hidden='true' to the inner text element. Carry-over from #37.",
+      "category": "code",
+      "title": "[CARRY-OVER #38] Direct `document.querySelector` calls — replace with refs",
+      "description": "Three calls remain in App.jsx: line 468 (`.workers-grid` scroll-into-view in StatsBar), line 496 (data-worker-name scroll in stuck-worker card onClick), line 504 (same in onKeyDown). These are fragile — class rename silently breaks the scroll. The stuck-worker selector interpolates `name` from worker data into a CSS attribute selector string, which could fail if names contain special characters. Replace with `useRef()` attached to `.workers-grid` and pass a `workerRef` map to StatsBar via context or props.",
       "effort": "small",
-      "assignee": "Maya"
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
-      "category": "visual",
-      "title": "Light mode is half-baked — either finish it or remove the toggle",
-      "description": "The sun/moon toggle exists but light mode produces washed-out office floor and low-contrast elements. Only 6 CSS selectors handle light mode in Office.css. Either add comprehensive light theme variables or hide the toggle and commit to dark-only. Carry-over.",
-      "effort": "large",
+      "category": "code",
+      "title": "[CARRY-OVER #38] z-index magic numbers scattered across four files",
+      "description": "z-index values found: 9999 × 3 (skip-link, confetti-layer, both toast divs inline), 200 (shortcut-toast), 150 (ghost-ooo-bubble), 100 (Office.css line 838), 60, 50, 30 (speech-bubble), 20, 12, 10, 5, 3, 2, 1. No defined scale anywhere. The speech bubble's z-index: 30 is what allows it to bleed above the office floor and overlap the tab-toggle (which has no z-index at all). Defining a scale in `:root` — `--z-tooltip: 30`, `--z-nav: 50`, `--z-toast: 100`, `--z-overlay: 9999` — would directly expose that the tab nav needs at minimum `--z-nav` to stay above floating office content.",
+      "effort": "small",
       "assignee": "Maya"
     }
   ],
-  "regression_notes": "Score stable at 3.7 (vs 3.75 in #37). The mobile whiteboard and ARIA tab issues remain unfixed across 4+ reviews — these need to be prioritized or explicitly deferred. Sofia's red name label is a new visual regression likely introduced when role colors were applied to active worker labels. The desktop experience remains strong. Mobile is where the pain is.",
+  "fixed_since_last": [
+    "✅ [HIGH CARRY-OVER #37/#38] aria-checked on role=radio filter buttons — FINALLY FIXED. Lines 1308, 1319, 1329 all correctly set aria-checked={...}. Two review cycles to land a one-line fix, but it's done. Screen readers can now announce the selected filter state."
+  ],
+  "regression_notes": "No regressions detected. The aria-checked fix is the only notable change this cycle. Both HIGH visual carry-overs (tooltip overlap, whiteboard text) remain unchanged — the CSS for both has not been modified. The sunrise clipping (medium) also unchanged. Overall the codebase is stable but these three visual bugs are becoming embarrassing for a product that's otherwise quite polished.",
   "kudos": [
-    "Bloberto's vibe-reactive face animations are genuinely delightful — the 'crushing' sparkle eyes are chef's kiss",
-    "The weather metaphor for team vibe (Clear skies, Storm conditions) is creative and immediately readable",
-    "Keyboard shortcuts (1/2/R/Esc) are a nice power-user touch",
-    "The dynamic speech bubbles with vibe-specific humor give real personality",
-    "Coffee tracker and office plants add warmth without cluttering"
+    "aria-checked is fixed — took two reviews but it shipped. That's one less WAI-ARIA violation.",
+    "The error bubble system for workers is genuinely delightful. 'undefined is not a function' appearing above Sofia's head during an error state is peak product personality.",
+    "Conference table meeting detection + standup mode is a clever feature — idle workers auto-gathering at the table is a great ambient storytelling device.",
+    "Ping reaction system (click a character, Bloberto responds with a worker-specific one-liner) is excellent mobile UX for a touch-first interaction that desktop users discover as a bonus.",
+    "prefers-reduced-motion coverage in Office.css is thorough — lists 20+ animated elements. Most teams skip this entirely.",
+    "The ficus plant growing with vibe streak is still one of the best gamification hooks I've seen in a monitoring tool."
   ]
 }
