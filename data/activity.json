@@ -211,5 +211,11 @@
     "worker": "Sofia",
     "message": "\ud83d\ude0c Full-idle banner \u2014 shows vibe-specific message when all workers idle",
     "timestamp": "2026-03-09T00:08:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Luna",
+    "message": "\ud83c\udf19 Creative review #60 \u2014 Puppeteer timed out, review #59 ideas still current and actionable",
+    "timestamp": "2026-03-09T02:35:00Z"
   }
 ]
