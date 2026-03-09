@@ -1033,6 +1033,12 @@
   background: rgba(156,163,175,0.22);
 }
 
+/* Per-element vibe tint overlays (data-vibe on sky itself) */
+.office-window__sky[data-vibe='on-fire']::after { content: ''; position: absolute; inset: 0; background: rgba(239,68,68,0.12); pointer-events: none; }
+.office-window__sky[data-vibe='crushing']::after { content: ''; position: absolute; inset: 0; background: rgba(234,179,8,0.08); pointer-events: none; }
+.office-window__sky[data-vibe='after-hours']::after { content: ''; position: absolute; inset: 0; background: rgba(67,56,202,0.1); pointer-events: none; }
+.office-window__sky[data-vibe='slow-day']::after { content: ''; position: absolute; inset: 0; background: rgba(148,163,184,0.1); pointer-events: none; }
+
 .office-window__star {
   position: absolute;
   width: 2px;
