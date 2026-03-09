@@ -1,103 +1,120 @@
 {
   "analyst": "Sofia",
-  "review_number": 50,
-  "timestamp": "2026-03-09T21:15:54Z",
+  "review_number": 51,
+  "timestamp": "2026-03-09T22:15:52Z",
   "scores": {
     "visual": 4,
-    "ux": 3,
-    "responsiveness": 3,
-    "performance": 4,
+    "ux": 3.5,
+    "responsiveness": 3.5,
+    "performance": 3.5,
     "accessibility": 3,
     "code_quality": 3,
-    "features": 4,
-    "fun_factor": 4
+    "features": 4.5,
+    "fun_factor": 5
   },
-  "overall_score": 3.5,
-  "carlos_fixes_verification": {
-    "honorific_night_owl_daytime_bug": "VERIFIED FIXED \u2014 isAfterHours guard correctly prevents night owl during business hours. Screenshot shows night owl at 21:19 which is appropriate.",
-    "paused_pill_touch_text": "PARTIALLY FIXED \u2014 Text correctly says Tap to refresh on touch devices. BUT the pill has pointer-events:none in CSS AND onClick={onResume} references an undefined variable in App scope. Functionally works via window-level touchstart listener, but the code is broken in two simultaneous ways.",
-    "ghost_tabIndex_a11y": "VERIFIED FIXED \u2014 Ghost characters get tabIndex={-1} because handleClick is undefined for them.",
-    "daytime_sky_brightness": "VERIFIED FIXED \u2014 .office-window__sky[data-daytime] CSS rule present. Hour ranges 0-4/5-8/9-16/17-19/20-23 now fully covered.",
-    "orphaned_team_vibe_mobile": "VERIFIED FIXED \u2014 Dashboard screenshot shows all 5 stat cards rendering cleanly."
-  },
+  "overall_score": 3.8,
+  "previous_score": 3.5,
+  "verified_fixes": [
+    "onResume is now properly defined as a useCallback at App.jsx line 843, passed as prop to StatsBar, and referenced correctly in the header pill onClick — no more undefined variable",
+    "polling-paused-pill CSS no longer has pointer-events:none — confirmed cursor:pointer with no blocking override. The pill is genuinely clickable now",
+    "Empty task label is guarded: {worker.task && (<div className='worker-task'>...)} at line 312 — no more floating 'Current Task' header with nothing below it"
+  ],
+  "carry_overs": [
+    "STRIKE 4 — Duplicate inline toast styles: App.jsx lines 1122-1143 and Office.jsx lines 1219-1241 still contain 12+ identical lines of inline style objects. Extract a .toast-popup CSS class already",
+    "STRIKE 3 — Activity filter role=radio buttons still have no arrow-key navigation — a proper radiogroup requires keyboard cycling between options, not just tab/click",
+    "STRIKE 3 — Mobile office floor text still sub-pixel illegible at 375px — nameplates, weather labels, whiteboard text are decorative noise, not readable content",
+    "STRIKE 3 — Bloberto speech bubble still escapes the office-floor boundary at top — visible in desktop screenshot, bubble renders above the border",
+    "STRIKE 2 — Footer tagline pagination counter (1/9) still visible inline — kills the whimsy of the rotating quote"
+  ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "onResume is undefined in App component header \u2014 dead click handler regression",
-      "description": "App.jsx line 1151: onClick={onResume} references a variable that does not exist in App scope. onResume is only defined as an inline prop passed to StatsBar (line 1216). Worse, the CSS for .polling-paused-pill sets pointer-events:none, so the click never fires and the undefined reference is silently masked. The pill text says Tap to refresh which works ONLY because window-level touchstart/mousemove listeners exist. The pill click itself is a no-op with a broken handler hiding behind pointer-events. Fix: define a handleResume callback in App and use it in both StatsBar and the header pill, and remove pointer-events:none so the pill is actually clickable as intended.",
-      "effort": "small"
+      "title": "Triple visibilitychange listeners — one silently misfires on every tab focus",
+      "description": "App.jsx registers THREE separate document.addEventListener('visibilitychange', ...) calls (lines 851, 873, 1074). The first one (handleVisibilityResume, line 851) calls onResume() on EVERY tab-show event — even if the user was only away for 2 seconds and wasn't idle at all. onResume() resets pollingPaused to false, resets lastActivity, AND triggers an immediate syncFromGitHub(). Meanwhile the second listener (line 873) restarts the polling interval. The result: every tab switch triggers an eager double-sync (immediate + interval), bypassing the idle-timeout guard that pollTick enforces. Fix: handleVisibilityResume should check if the user was actually paused before calling onResume(). Or consolidate all three handlers into one. Either way, three separate listeners for one event on the same component is a code smell waiting to bite.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "high",
+      "category": "accessibility",
+      "title": "sync-status--paused div is clickable but not keyboard accessible",
+      "description": "App.jsx line 482: the sync-status stat card gets onClick={pollingPaused ? onResume : undefined} when paused, but has no role='button', no tabIndex, and no onKeyDown handler. A keyboard user tabbing through the dashboard cannot reach or activate it. The title attribute 'Click to resume auto-refresh' hints at the intent but it's invisible to screen readers. Fix: add role='button' tabIndex={pollingPaused ? 0 : -1} and an onKeyDown handler for Enter/Space when pollingPaused. Same applies to the polling-paused-pill span in the header (line 1169) — it has onClick but no keyboard handler.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code_quality",
+      "title": "Duplicate Office.css vibe selectors — single-quote and double-quote versions clobber each other",
+      "description": "Office.css lines 91-92 define .office-floor[data-vibe='crushing'] and [data-vibe='on-fire'] with single quotes. Lines 97-98 define the same selectors with double quotes. CSS attribute selectors treat these identically — both match the same elements. The double-quote rules come later, so they win. But the single-quote rules at 91-92 override the 'in-flow', 'slow-day', 'after-hours' rules at 93-95 that come after them... wait, no: lines 93-95 are single-quote only and are NOT duplicated. The actual problem: 'crushing' and 'on-fire' each appear TWICE with different property sets. The double-quote version at 97-98 adds --grid-line override but the single-quote version at 91-92 also sets box-shadow. Because double-quote comes later, it wins on all properties, making lines 91-92 dead code. Delete them. Keep only the double-quote rules and consolidate the --grid-line with the other properties.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "ActivityLog reverses the entire entries array before slicing — reverse the slice",
+      "description": "App.jsx line 135: const displayed = [...entries].reverse().slice(0, 20). This spreads and reverses ALL entries (up to 50, as per the cap at line 1000) just to get the last 20. Use entries.slice(-20).reverse() instead — creates at most a 20-element array. Minor, but it runs on every render of ActivityLog and the current approach creates a full copy on every single poll cycle.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code_quality",
+      "title": "getRelativeTime duplicated inline in Office.jsx ghost bubble renderer",
+      "description": "App.jsx lines 55-64 defines a getRelativeTime() utility. Office.jsx lines 701-711 re-implements the identical logic inline inside the ghost bubble IIFE. The function isn't exported from App.jsx, and Office.jsx doesn't import it from a shared utils file. Move getRelativeTime (and formatIdleDuration, formatDuration) into src/utils/time.js and import where needed. This is exactly what utils/ is for.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
       "category": "ux",
-      "title": "Paused pill says Tap to refresh but CSS pointer-events:none blocks the tap",
-      "description": "The .polling-paused-pill has pointer-events:none; user-select:none in App.css making it explicitly non-interactive. But it tells mobile users Tap to refresh. A user tapping the pill directly gets nothing \u2014 the tap passes through to whatever is underneath. The resume only works incidentally because any touchstart on the window triggers the listener. This is a semantic mismatch and a UX lie. Either remove pointer-events:none and wire up a real click handler, or change the copy to Touch anywhere to refresh to match actual behavior.",
-      "effort": "small"
+      "title": "isDimmed incorrectly dims workers with no task when a tag filter is active",
+      "description": "App.jsx lines 1263, 1286, 1298: isDimmed={selectedTag !== null && !getTaskTags(w.task).some(...)}. When a worker has no task (task is null/undefined), getTaskTags returns [] and .some() returns false, so isDimmed becomes true. This means any worker without a current task gets greyed out whenever any tag filter is active — even though they haven't done anything wrong. They just don't have a task. Consider excluding taskless workers from dimming (always show them), or adding a special 'No Task' filter option.",
+      "effort": "small",
+      "assignee": "carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "code_quality",
+      "title": "STRIKE 4: Completion toast and plant toast inline styles — extract a CSS class",
+      "description": "App.jsx lines 1122-1143 and Office.jsx lines 1219-1241 contain near-identical inline style objects for fixed-position toast notifications (position, bottom, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation). Also: both render at fixed bottom center with zIndex 9999, meaning if a worker ships a task while the vibe streak levels up simultaneously, the toasts stack on top of each other invisibly. Extract a .toast-popup CSS class for static properties and use style only for the dynamic border color. This has been asked four times. The answer is the same every time.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "Activity filter buttons use role=radio but lack arrow-key navigation",
-      "description": "App.jsx lines 1311-1340: filter bars use role=radio on button elements inside role=radiogroup. A proper radio group requires arrow-key cycling between options (not just tab/click). Screen reader users will hear radio button but arrow keys do not navigate between filters. Either use actual input type=radio with styled labels, implement arrow-key handlers between filter buttons, or switch to role=button with aria-pressed which accurately describes toggle behavior.",
-      "effort": "medium"
+      "title": "STRIKE 3: Activity filter role=radio group missing arrow-key navigation",
+      "description": "App.jsx lines 1324-1362: two filter bars use role='radiogroup' with role='radio' on each button. ARIA radiogroup spec requires arrow keys to cycle between options — Tab should enter the group and arrows should move within it. Current implementation only responds to Tab and Enter/click. Screen reader users expect arrow navigation and will be confused when it doesn't work. Fix: either implement arrow-key handlers, or switch to role='button' with aria-pressed which accurately describes toggle behavior without implying keyboard contract you aren't honoring.",
+      "effort": "medium",
+      "assignee": "carlos"
     },
     {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Carlos idle card renders orphaned CURRENT TASK label with no task text",
-      "description": "Dashboard screenshot shows Carlos card with the bold CURRENT TASK header and nothing beneath it \u2014 worker.task is empty. The worker-task div renders the header unconditionally then outputs worker.task which is falsy. Results in a floating label with dead space. Guard the task section or show a No active task placeholder. The 100% progress bar on an IDLE worker with no task is also a confusing state.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
+      "priority": "low",
       "category": "visual",
-      "title": "Bloberto speech bubble clips outside office-floor container at top",
-      "description": "Desktop screenshot clearly shows the speech bubble This could have been a commit message. rendering above the office-floor boundary. The bubble is absolutely positioned relative to Character near the top of the floor. Fix: add overflow:visible to the container, or implement bubble direction flipping (show below when near top edge). Right now it looks like Bloberto is dreaming outside the building.",
-      "effort": "small"
+      "title": "STRIKE 3: Bloberto speech bubble escapes office boundary at top",
+      "description": "Office.jsx line 1453: Bloberto sits at top={4}, so 4% from the top of the office floor. The speech bubble renders above the character. At 4% depth, any bubble taller than ~26px escapes the border. The desktop screenshot confirms it — the bubble visually floats above the office outline. The floor has overflow:visible so no clipping, but it creates visual noise near the tab bar. Fix: flip bubble direction to render below the manager character, or add a min-top guard that shifts to a downward bubble when top < 15%.",
+      "effort": "small",
+      "assignee": "carlos"
     },
     {
-      "priority": "medium",
-      "category": "code_quality",
-      "title": "Completion toast and plant toast use duplicated inline style objects \u2014 third time asking",
-      "description": "App.jsx lines 1098-1121 and Office.jsx lines 1218-1241 both duplicate 12+ lines of identical inline styles: position:fixed, border-radius, box-shadow, animation, z-index, padding. Extract a .toast-popup CSS class and use style only for the dynamic border-color. This has been flagged in at least 3 previous reviews. At this point it is a tradition.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
+      "priority": "low",
       "category": "responsiveness",
-      "title": "Mobile office floor still illegible \u2014 sub-readability text and cramped layout",
-      "description": "At 375px the office floor compresses desk text to ~0.3-0.4rem. Nameplates, worker names, weather labels, and conference table text become unreadable. The office view on mobile is purely decorative. Consider: hiding sub-pixel text on mobile, making the floor horizontally scrollable with fixed min-width, or introducing a simplified character-grid view for narrow viewports.",
-      "effort": "large"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Tab button text truncated on narrow mobile viewport \u2014 Office becomes Offic",
-      "description": "At 375px the Office tab label truncates to the emoji plus four letters. The tab-toggle container does not give enough room. Quick fix: use shorter labels on small screens via CSS media query, or constrain tab text to just the emoji on mobile.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "features",
-      "title": "Worker filter in activity log uses allWorkers fallback instead of canonical roster",
-      "description": "App.jsx line 1330: worker filter list uses roster.length > 0 ? roster : allWorkers. When roster is empty only currently active workers appear as filter options. Should always use the full known roster so filters are stable regardless of who is currently active.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code_quality",
-      "title": "stuckWorkers memo uses tick counter as time-passage proxy \u2014 confusing pattern",
-      "description": "App.jsx line 440: stuckWorkers useMemo depends on [workers, tick] where tick is a counter from useTimeTick. Date.now() is called inside and tick just forces re-evaluation. This works but is misleading \u2014 the memo claims to depend on a counter when it cares about elapsed wall time. A cleaner approach: extract nowMs at render time and include it, or skip the memo since the calculation is cheap.",
-      "effort": "small"
+      "title": "STRIKE 3: Mobile office floor text is sub-pixel decorative noise",
+      "description": "At 375px, the office floor compresses to a width where whiteboard text, desk nameplates, conference table labels, and worker role text render at 0.3-0.45rem — genuinely unreadable. The office view on mobile is a visual pattern, not informational content. Either: (a) hide text elements under a breakpoint and show only icons/emojis, (b) give the floor a min-width and make it horizontally scrollable, or (c) add a mobile-specific simplified layout mode. The current state is fine as ambiance but misleading if users try to read it.",
+      "effort": "large",
+      "assignee": "maya"
     },
     {
       "priority": "low",
       "category": "fun_factor",
-      "title": "Footer tagline pagination counter breaks the vibe",
-      "description": "The footer shows 1/9 inline after the rotating tagline. At low opacity it is subtle but it turns a whimsical quote into a paginator. Sprint velocity is just vibes with a spreadsheet... 1/9. The magic evaporates. Remove the counter or show it only on hover as a tooltip.",
-      "effort": "small"
+      "title": "STRIKE 2: Footer tagline pagination counter undermines the bit",
+      "description": "App.jsx line 1390 renders a pagination counter inline after the rotating quote: '1/9'. At low opacity it's subtle, but it frames the rotating tagline as a content carousel rather than a whimsical easter egg. The vibe dies a little every time you see the number. Hide the counter or show it only on hover — let the discovery feel magical, not paginated.",
+      "effort": "small",
+      "assignee": "maya"
     }
   ],
-  "summary": "Review 50 and the scoreboard says 3.5, down from 3.9. Carlos verified fixes land mostly clean: TEAM VIBE card is back where it belongs, ghost tabIndex fixed, daytime sky brightness wired up, honorific logic is time-gated correctly. Four out of five, not bad. But the paused pill fix is a two-bug pile: pointer-events:none in CSS AND onClick referencing an undefined onResume variable in App scope. The pill says Tap to refresh and tapping it does nothing \u2014 they cancel each other out and call it shipped. The carry-overs watch from the corner for the fourth straight review: inline toast styles, radio a11y, mobile cramping, speech bubble clipping. The code is charming and the product has real personality. The execution needs tighter QA before declaring a fix done."
+  "summary": "Score climbs from 3.5 to 3.8. Carlos's three fixes from QA50 all verified clean: onResume is properly scoped, the paused pill is genuinely clickable now, and the empty task guard works. Progress. The kind that doesn't generate a post-mortem. But we've got new findings to fill the void: three visibilitychange listeners in the same component where the first one calls onResume() on every tab switch regardless of idle state — so every time you alt-tab back you get an eager double-sync that bypasses the idle guard you spent effort building. The sync-status--paused card is still just a div with onClick and no role or tabIndex, so keyboard users can't reach it. And the Office.css has duplicate vibe selectors in both single-quote and double-quote form with different property sets — one of them is dead code and it's been there since nobody noticed. Four carry-overs hit strike territory this review. The inline toast styles are on their fourth mention. At this point it's a feature."
 }

@@ -16,12 +16,12 @@
       "name": "Sofia",
       "role": "QA",
       "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #51 \u2014 live site + codebase analysis",
-      "progress": 10,
-      "updated_at": "2026-03-09T22:15:26Z",
+      "status": "idle",
+      "task": "",
+      "progress": 100,
+      "updated_at": "2026-03-09T22:24:22Z",
       "started_at": "2026-03-09T22:15:26Z"
     }
   ],
-  "updated_at": "2026-03-09T22:15:26Z"
+  "updated_at": "2026-03-09T22:24:22Z"
 }
