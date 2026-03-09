@@ -343,7 +343,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             return <div className="worker-duration" data-tier={tier}>{tier === 'stuck' ? '⚠️ ' : ''}⏱️ {formatDuration(worker.updated_at)}</div>
           })()}
 
-          <ProgressBar progress={worker.progress} updatedAt={worker.updated_at} startedAt={worker.started_at} />
+          <ProgressBar progress={worker.progress} updatedAt={worker.updated_at} startedAt={worker.startedAt || worker.started_at} />
         </div>
 
         <div className="worker-card__back" aria-hidden={!isFlipped || undefined} tabIndex={!isFlipped ? -1 : undefined}>
@@ -508,7 +508,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
           <span className="stat-label">⚠️ Stuck</span>
           <span className="stat-value">
             {stuckWorkers.length === 1
-              ? `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].updated_at || stuckWorkers[0].startedAt)}`
+              ? `${stuckWorkers[0].emoji} ${stuckWorkers[0].name} · ${formatDuration(stuckWorkers[0].updated_at || stuckWorkers[0].startedAt || stuckWorkers[0].started_at)}`
               : `${stuckWorkers.length} workers`}
           </span>
         </div>
