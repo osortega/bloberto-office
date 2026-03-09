@@ -691,6 +691,11 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
           {bubble.quote}
         </div>
       )}
+      {variant !== 'manager' && variant !== 'ghost' && pingReaction && (
+        <div className={`speech-bubble speech-bubble--visible`}>
+          {pingReaction}
+        </div>
+      )}
       {variant === 'ghost' && ghostBubble && (() => {
         const lastEvent = activityEntries.filter(e => e.worker === worker.name).at(-1)
         const relTime = lastEvent ? (() => {

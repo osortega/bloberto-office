@@ -219,13 +219,13 @@ function ProgressBar({ progress, updatedAt, startedAt }) {
     <div className="progress-wrapper">
       <div className="progress-header">
         <span className="progress-label">Progress</span>
-        <span className="progress-pct">{progress}%</span>
+        <span className="progress-pct">{typeof progress === 'number' ? progress : '—'}%</span>
         {eta !== null && eta < 120 && <span className="progress-eta">~{eta}m left</span>}
       </div>
       <div
         className="progress-bar-bg"
         role="progressbar"
-        aria-valuenow={progress}
+        aria-valuenow={typeof progress === 'number' ? progress : 0}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={`Progress: ${progress}%`}
@@ -1320,7 +1320,7 @@ export default function App() {
               >
                 All Workers
               </button>
-              {roster.map(member => (
+              {(roster.length > 0 ? roster : allWorkers).map(member => (
                 <button
                   key={member.name}
                   role="radio"
