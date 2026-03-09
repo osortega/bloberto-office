@@ -1,11 +1,11 @@
 {
   "analyst": "Sofia",
-  "review_number": 28,
-  "timestamp": "2026-03-08T23:45:49Z",
-  "screenshot_note": "Puppeteer/Chromium could not launch in this environment due to thread resource limits (pthread_create: Resource temporarily unavailable). Code analysis performed against /workspace/src/ source files. Visual reference cross-checked against qa26 and qa27 screenshot artifacts on disk.",
+  "review_number": 29,
+  "timestamp": "2026-03-09T00:15:45Z",
+  "screenshot_note": "Puppeteer launched but Chromium crashed with pthread_create: Resource temporarily unavailable. Code review performed against /workspace/src/ source files. Screenshots unavailable for this cycle — visual assessment cross-referenced against prior qa26/qa27/qa28 artifacts on disk.",
   "scores": {
     "visual": 5,
-    "ux": 4,
+    "ux": 3,
     "responsiveness": 3,
     "performance": 4,
     "accessibility": 3,
@@ -13,143 +13,123 @@
     "features": 5,
     "fun_factor": 5
   },
-  "overall_score": 4.0,
+  "overall_score": 3.9,
   "regression_summary": {
-    "from_review_27_high_fixed": 0,
-    "from_review_27_high_open": 3,
-    "from_review_27_medium_fixed": 0,
-    "from_review_27_medium_open": 4,
-    "from_review_27_low_fixed": 1,
-    "from_review_27_low_open": 5,
-    "new_issues_this_review": 4
+    "from_review_28_high_fixed": 0,
+    "from_review_28_high_open": 3,
+    "from_review_28_medium_fixed": 0,
+    "from_review_28_medium_open": 7,
+    "from_review_28_low_fixed": 0,
+    "from_review_28_low_open": 5,
+    "new_issues_this_review": 5
   },
-  "fixed_since_last_review": [
-    {
-      "title": "Vibe Sparkline Has No Legend or Context",
-      "resolution": "A hover legend showing the last 3 vibe-state pills was added via .sparkline-legend and .sparkline-legend__pill. The underlying sparkline already had per-circle <title> tags. Partially complete — see new issue about touch-device inaccessibility."
-    }
+  "fixed_since_last_review": [],
+  "carry_open_from_28": [
+    "Stats Bar 5-column fixed grid (HIGH) — repeat(5, 1fr) unchanged",
+    "Inter Font not loaded (HIGH) — index.html still has zero font imports",
+    "Mobile Office: worker names hidden at ≤480px (HIGH) — display:none still in Office.css line 1148",
+    "Fetch-Warn/Error Retry button missing isSyncing guard (MEDIUM) — both banners call onClick={syncFromGitHub} with no disabled prop",
+    "Footer quote counter modulo bug (MEDIUM) — (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 is still the formula",
+    "Escape key not clearing selectedTag filter (MEDIUM) — handler still only calls blur()",
+    "completionToast fully inline-styled (MEDIUM) — all 12 style props still inline",
+    "No aria-live region for sync completion (MEDIUM) — lastSynced state still announces nothing",
+    "Activity log worker filter roster-only (MEDIUM) — roster.map() still the source",
+    "App.jsx/Office.jsx monolith (MEDIUM) — Office.jsx grew from 1447 to 1463 lines (+16), App.jsx unchanged at 1285",
+    "Sparkline legend hover-only / no touch fallback (LOW) — no @media (hover: none) in App.css",
+    "polling-paused-pill conditional aria-live (LOW) — still conditionally mounted",
+    "getTaskTags() called twice per worker per render (LOW) — still computed at call site AND inside WorkerCard",
+    "Dead CSS 'Luna Review #41' block (LOW) — still present at App.css ~line 1099",
+    "Version string still v1.0.0-chaos (LOW) — twenty-nine reviews, still v1.0.0"
   ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Stats Bar 5-Column Fixed Grid Still Not Fixed (Regression Carry #27)",
-      "description": "App.css line 118 still reads `grid-template-columns: repeat(5, 1fr)`. The StatsBar renders 5 base cards plus up to 2 optional cards (error count, stuck workers), totalling 7 cells in a 5-column grid. The overflow silently wraps to an orphaned second row. This was the top-priority bug from review #27 and has received zero code changes. Fix: change to `grid-template-columns: repeat(auto-fill, minmax(160px, 1fr))`. One line. Zero risk.",
+      "title": "Stats Bar 5-Column Fixed Grid — Carry #27/#28, Third Strike",
+      "description": "App.css still reads `grid-template-columns: repeat(5, 1fr)`. The StatsBar renders 5 base cards plus up to 2 optional cards (error count, stuck workers) for a maximum of 7 cells. When both appear, the grid silently overflows to an orphaned second row. This has been the top-priority bug for three consecutive reviews and has received ZERO code changes. Fix: one line — `grid-template-columns: repeat(auto-fill, minmax(160px, 1fr))`. The responsive breakpoints at 900px (3-col) and 600px (2-col) already exist and should be removed once auto-fill is applied.",
       "effort": "small",
-      "assigned_to": "Maya"
+      "assign_to": "Maya"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Inter Font Still Not Loaded — Carry #27",
-      "description": "index.html still has no Google Fonts <link> or @import for Inter. The root in index.css declares `font-family: 'Inter', 'Segoe UI', system-ui` but Inter is never fetched. Windows users silently render in Segoe UI, Linux in whatever `sans-serif` resolves to. Thirteen reviews have passed since this was first flagged. Add one preconnect + stylesheet link to Google Fonts, or `npm install @fontsource/inter` and import it in main.jsx. Takes 5 minutes. Do it.",
+      "title": "Inter Font Still Not Loaded — Carry #27/#28, Third Strike",
+      "description": "index.html contains zero font imports. The root CSS declares `font-family: 'Inter', 'Segoe UI', system-ui` but Inter is never fetched. Every Windows user silently falls back to Segoe UI; Linux users get whatever `sans-serif` resolves to. This has been open since at least review #27 and has not received a single character of fix. Fix: add `<link rel='preconnect' href='https://fonts.googleapis.com'>` and `<link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap' rel='stylesheet'>` to index.html, OR run `npm install @fontsource/inter` and add `import '@fontsource/inter'` to main.jsx. Five minutes. That is all it takes.",
       "effort": "small",
-      "assigned_to": "Dave"
+      "assign_to": "Dave"
     },
     {
       "priority": "high",
       "category": "ux",
-      "title": "Mobile Office Floor: Names Gone, Workers Anonymous at 480px",
-      "description": "Office.css now applies `.char__name { display: none }` at 480px (≤480px breakpoint), which hides worker names entirely instead of the sub-pixel 0.32rem text flagged in review #27. This is arguably worse — the fix traded illegibility for invisibility. At 375px mobile, workers are now completely anonymous blobs. Between 481px and 600px, names still render at 0.44rem (~7px). Neither state is acceptable. Required: either a mobile-specific list/grid view that replaces the isometric layout at ≤640px, or a tap-to-reveal tooltip with worker name/status. The isometric floor is a desktop-first visualization; pretending otherwise isn't design, it's avoidance.",
+      "title": "Mobile Office Floor: Worker Names Still Absent at ≤480px — Carry #27/#28",
+      "description": "Office.css line 1148: `.char__name { display: none }` at the ≤480px breakpoint. Workers are completely anonymous blobs on every 375px mobile device. Between 481–600px, names render at 0.44rem (~7px), which is illegible in a different direction. Three reviews, zero movement. The isometric floor was designed for desktop; the fix is to either render a simple list/card layout in place of the floor at ≤640px, or add a tap-to-reveal tooltip overlay. Continuing to ship 'names deleted' as the mobile UX is not acceptable.",
       "effort": "large",
-      "assigned_to": "Maya"
+      "assign_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "NEW: Fetch-Warn Retry Button Missing isSyncing Guard",
-      "description": "The `fetchWarn` banner's Retry button (rendered when one of the two parallel fetches fails) calls `syncFromGitHub` with no `disabled` prop and no `isSyncing` check. Compare with the `sync-now-btn` in the header which correctly disables when `isSyncing` is true. A user seeing 'Some data may be stale' who clicks Retry rapidly can fire multiple concurrent fetches — each calling `Promise.allSettled([fetchWorkersFromGitHub(), fetchActivityFromGitHub()])` simultaneously, causing race conditions on `setAllWorkers`, `setRoster`, and `setActivityLog`. Fix: add `disabled={isSyncing}` to the Retry button in the warn banner (and the error banner, same issue).",
+      "title": "NEW: Fetch-Warn/Error Retry Buttons Missing isSyncing Guard — Carry #28",
+      "description": "Both `fetch-error-banner` and `fetch-warn-banner` Retry buttons call `onClick={syncFromGitHub}` with no `disabled={isSyncing}` prop. The `sync-now-btn` in the header correctly disables when isSyncing. A user mashing Retry during a slow network can fire multiple concurrent `Promise.allSettled` calls, each competing to write `setAllWorkers`, `setRoster`, and `setActivityLog`. Race condition: the last settled call wins, which may not be the most recent. One-line fix per button: add `disabled={isSyncing}` to both Retry buttons.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assign_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "NEW: Footer Quote Counter Modulo Logic Is Broken",
-      "description": "The footer quote counter shows `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 / (BONUS_TAGLINES.length + 1)`, e.g. '1/9 … 9/9' cycling every 9 clicks. But `showBonus` TOGGLES on every click — alternating between the vibe tagline and bonus taglines every 2 clicks, not every 9. The counter resets to '1/9' at click 9 while `showBonus` is true and the user sees a bonus tagline, making the counter completely misaligned with visible content. It also shows '9/9' when the vibe tagline is displayed (showBonus=false), which is wrong. Simplest fix: track a separate `quoteIndex` for bonus and show `${quoteIndex + 1}/${BONUS_TAGLINES.length}` only when `showBonus` is true, or remove the counter entirely.",
+      "title": "NEW: Activity Log 'Last N Events' Header Shows Unfiltered Count",
+      "description": "App.jsx line 1213: `Last {Math.min(activityLog.length, 20)} events` always reflects the total unfiltered `activityLog.length`, not the post-filter entry count. When a user activates the 'Errors' filter and sees 2 error entries, the header still says 'Last 20 events'. This is actively misleading. Fix: derive the displayed count from the filtered array. The cleanest approach: pass the filtered entries count as a prop or compute a local `filteredCount` variable before the JSX return, then render `Last {Math.min(filteredCount, 20)} events` (or `Last {filteredCount} of {activityLog.length} events` when a filter is active).",
       "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Escape Key Still Does Not Clear Active Tag Filter — Carry #27",
-      "description": "The global keydown handler at App.jsx line 765 still reads `else if (e.key === 'Escape') document.activeElement?.blur()`. When `selectedTag` is set, pressing Escape should also call `setSelectedTag(null)`. This is standard filter-UI keyboard behavior (see: Notion, Linear, GitHub Issues). A keyboard-only user has no way to clear the tag filter without a mouse click. One-line fix: `else if (e.key === 'Escape') { document.activeElement?.blur(); setSelectedTag(null); }`. This was marked medium-priority in review #27 and has had zero changes.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "completionToast Still Fully Inline-Styled — Carry #27",
-      "description": "The '🎉 X shipped it!' toast is still rendered with a dozen inline style properties: `background`, `border` (hardcoded hex color), `borderRadius`, `padding`, `fontSize`, `fontWeight`, `color`, `boxShadow` (hardcoded rgba), `zIndex`, `whiteSpace`, `pointerEvents`, and `animation`. Every other notification element in this app uses CSS classes. Create a `.completion-toast` class and a `--toast-accent` CSS custom property. Pass only `style={{ '--toast-accent': completionToast.color }}` as the inline override. This has been open since review #27.",
-      "effort": "small",
-      "assigned_to": "Maya"
+      "assign_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "No aria-live Announcement When Data Syncs — Carry #27",
-      "description": "The `isSyncing` and `lastSynced` state are both tracked. The sync status card in StatsBar updates visually when data arrives. But there is still no `aria-live='polite'` region announcing the outcome to screen readers. Add a visually-hidden `<span aria-live='polite' aria-atomic='true' className='sr-only'>` that renders `'Dashboard updated, ${activeWorkers.length} workers'` after each successful sync (triggered by the `lastSynced` state changing). The polling-paused pill now uses aria-live, showing the team knows the pattern — apply it to sync completion.",
+      "title": "NEW: Stuck Worker Stat Card Is Keyboard-Inaccessible",
+      "description": "The `stat-card--stuck` div in StatsBar (App.jsx line 453) has an `onClick` handler that scrolls to the stuck worker's card — a genuinely useful interaction — but has no `tabIndex`, no `role`, and no `onKeyDown`. Keyboard-only users cannot reach or activate it. It's a div with a click handler, invisible to tab order and screen readers. Fix: add `tabIndex={0}`, `role='button'`, and `onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); /* existing click logic */ } }}`. WCAG 2.1 SC 2.1.1 (Keyboard) failure.",
       "effort": "small",
-      "assigned_to": "Maya"
+      "assign_to": "Maya"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "Activity Log Worker Filter Shows Roster Workers Only — Carry #27",
-      "description": "The new worker filter pill bar (a welcome addition this cycle!) still derives its options from `roster.map(member => ...)`, which only includes workers listed in data/workers.json's `roster` array. System events by 'Bloberto', events by decommissioned workers, or workers present only in activity.json are silently unfiltered. Fix: derive filter options from `Array.from(new Set(activityLog.map(e => e.worker).filter(Boolean)))` and merge with roster, deduplicating by name. This ensures every worker name that actually appears in the log gets a filter pill.",
+      "category": "accessibility",
+      "title": "NEW: completionToast Uses aria-live on Conditionally Rendered Element",
+      "description": "The `completionToast` div (App.jsx ~line 1060) has `aria-live='polite'` but is conditionally rendered — it does not exist in the DOM until `completionToast` state is truthy, at which point it appears with its content already set. Per the ARIA spec, an aria-live region must be present in the DOM before its content changes to reliably trigger announcements. Most screen reader + browser combos will silently ignore this. The same pattern was flagged for polling-paused-pill in review #28. Fix: render a persistent, visually-hidden `<span aria-live='polite' aria-atomic='true' className='sr-only'>` that contains `completionToast ? '🎉 {completionToast.name} shipped it!' : ''`. The visible toast can remain conditional.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assign_to": "Maya"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "App.jsx and Office.jsx Grew Again — Carry #27",
-      "description": "App.jsx grew from 1,273 to 1,285 lines (+12). Office.jsx grew from 1,417 to 1,447 lines (+30). The new solo-spotlight layout, fetchWarn banner, polling-paused pill, and worker filter pills were all added inline rather than extracted. This is the third consecutive review flagging this. Each new feature added to these monoliths increases cognitive overhead and collision risk. Concrete next step: extract `StatsBar`, `ActivityLog`, `ActivityLogEntry`, `WorkerCard`, `VibeSparkline`, `ShortcutToast`, and `LoadingSkeleton` from App.jsx into `src/components/`. These are already discrete, named functions — the extraction is mechanical.",
-      "effort": "large",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "low",
       "category": "accessibility",
-      "title": "NEW: Sparkline Legend Is Hover-Only — Invisible on Touch Devices",
-      "description": "The new `.sparkline-legend` element (added this cycle to address review #27's 'no context' issue) is controlled by `.stat-card:hover .sparkline-legend { display: flex }`. On touch devices there is no hover state, so the legend is permanently hidden — the fix is inaccessible on the platform (mobile) where accessibility help is most needed. Fix: add `@media (hover: none) { .sparkline-legend { display: flex; } }` in App.css to always show the legend on touch devices. The SVG `aria-label` text is adequate for screen readers but sighted touch users still can't see the legend.",
+      "title": "NEW: Clickable Task Tags Have No :focus-visible Style",
+      "description": "When `onTagClick` is provided, task tag spans receive `tabIndex={0}` and `role='button'` — they are fully keyboard-interactive. But `.task-tag` has no `:focus-visible` CSS rule anywhere in App.css. The only defined focus styles are `.worker-card:focus-visible` and `.tab-toggle button:focus-visible`. Keyboard users tabbing through tags get no visible focus ring — a WCAG 2.4.7 (Focus Visible) violation. Fix: add `.task-tag:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }` to App.css.",
       "effort": "small",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "NEW: polling-paused-pill Uses Conditional aria-live (Unreliable)",
-      "description": "The `polling-paused-pill` span uses `aria-live='polite'` but the element is conditionally rendered (`{pollingPaused && <span aria-live='polite'>...`). An `aria-live` region must be present in the DOM before its content changes to reliably announce to screen readers — elements that are added to the DOM with content already set will not announce in all screen reader/browser combinations. Fix: always render the span but toggle its content: `<span aria-live='polite' aria-atomic='true' className='sr-only'>{pollingPaused ? '⏸ Auto-refresh paused. Move mouse to resume.' : ''}</span>`. The visible pill can remain conditional.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "performance",
-      "title": "getTaskTags() Still Called Twice Per Worker Per Render — Carry #27",
-      "description": "At every render of the workers grid, `getTaskTags(w.task)` is called once at the render site to compute `isDimmed` and once again inside WorkerCard to render the tag pills. With 6 workers and a selectedTag active, that is 12 regex evaluations per render cycle (6 patterns × 2 calls × 6 workers = 72 pattern tests). Compute tags once and pass as a prop: `const tags = getTaskTags(w.task)` at the call site, then `isDimmed={selectedTag !== null && !tags.some(t => t.label === selectedTag)}` and `tags={tags}` prop on WorkerCard. WorkerCard already receives the tags indirectly — this is pure redundancy.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "assign_to": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Dead CSS Block 'Mobile Header Fix (Luna Review #41)' Still Present — Carry #27",
-      "description": "App.css lines 1099–1117: the `/* === Mobile Header Fix (Luna Review #41) === */` block is still there. It targets `.tab-content` (no JSX match), `.header-subtitle` (no JSX match), and `.tab-toggle margin: 0.3rem 0` (duplicates existing .tab-toggle rules). The `.header h1` and `.header-subtitle` rules are dead selectors from a removed design. Additionally, the Office.css `@media (max-width: 480px)` block at line 2250 contains `.bloberto-character__name { display: none }` which is a ghost selector — the actual class is `.char__name`. Audit and purge dead selectors.",
+      "title": "NEW: VIBE_RANK Defined Twice — Duplicate Inline Object",
+      "description": "App.jsx line 350 defines `const VIBE_RANK = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }` at module scope for use in `VibeSparkline`. Line 892 defines an identical `const vibeRanking = { ... }` inline inside the vibe streak `useEffect`. These are byte-for-byte the same object. The inline one should just reference `VIBE_RANK`. DRY violation, and the duplication means the two can drift out of sync if vibe keys ever change.",
       "effort": "small",
-      "assigned_to": "Dave"
+      "assign_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "Version String Still v1.0.0-chaos — Carry #27",
-      "description": "The footer still shows `v1.0.0-chaos` through 28 reviews, including additions of: vibe sparklines, isometric office floor, worker confetti, activity log with type + worker filters, solo spotlight layout, polling pause detection, hash-based routing, and custom SVG character avatars. This communicates stasis to returning users and makes it impossible to reason about 'what changed'. At minimum bump to `v2.0.0-chaos`. Ideally adopt a date-based scheme: `v2026.03-chaos`. It's one string.",
+      "title": "NEW: Worker Filter Pills Have No Active-Clear Affordance (Inconsistent with Task Tags)",
+      "description": "The worker filter pill bar in the activity log and the task tag filter system in WorkerCard both use a 'click active item to deselect' pattern, but only the task tags show a ' ×' suffix on the active tag as a visual hint that clicking will clear the filter. The worker filter pills show the same active style (purple background) but no '×', leaving users to guess whether clicking the active pill will clear or do nothing. Minor inconsistency but the precedent already exists in the codebase. Fix: apply the same `{workerFilter === member.name ? ' ×' : ''}` pattern to worker filter pill labels, matching the task tag UX.",
       "effort": "small",
-      "assigned_to": "Dave"
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "desk__nameplate--away Font Size 0.28rem (4.5px) Is Physically Unreadable",
+      "description": "Office.css line 571: `.desk__nameplate--away { font-size: 0.28rem; }`. At standard 16px base font, 0.28rem is 4.5px — below the physical resolution of most non-retina screens and the legal minimum for readable body text under any accessibility standard. The '↪ away' label is functionally invisible. Either increase to a minimum readable size (at least 0.6rem to match the base nameplate), or add `aria-hidden='true'` if it's purely decorative and rely on the away sign (`AwaySign` component) for communication. Currently it is neither readable nor properly hidden.",
+      "effort": "small",
+      "assign_to": "Dave"
     }
   ],
-  "summary": "Review #28 — a net regression from #27's 4.4 down to 4.0, and honestly, that's being charitable. Three high-priority issues from last review sit completely untouched: the stats bar 5-column overflow, the missing Inter font, and mobile office unusability (which got 'fixed' by deleting worker names entirely at 480px — congratulations, the names are no longer illegible because they no longer exist). Zero of review #27's medium-priority issues were resolved. The files actually grew. Two new bugs arrived: the fetch-warn Retry button can fire concurrent fetches because it's missing `disabled={isSyncing}`, and the footer quote counter has a modulo logic mismatch that makes it display wrong positions relative to what's shown. On the positive side: the new worker filter pills in the activity log are genuinely useful (roster-only data source notwithstanding), the solo-spotlight layout for single workers is a lovely polish moment, and the fetchWarn partial-failure banner shows thoughtful resilience engineering. The sparkline legend from last review's suggestion was implemented, but it's hover-only with no touch fallback, which is the QA equivalent of fixing a leaky roof by putting a bucket under it. The fun factor and visual design remain elite — this codebase has taste in abundance. What it needs is a dedicated 'fix the backlog' sprint before adding more features. At current trajectory, review #29 will be measuring 1,300-line App.jsx additions against a list of 15 unresolved issues. Ship it? Yes. Proud of it? Ask again after the sprint."
+  "summary": "Review #29 — score drops to 3.9 from review #28's 4.0, and that math is generous. Zero issues were fixed from the previous review. Zero. Not one. The three high-priority bugs (stats bar grid overflow, missing Inter font, mobile worker anonymity) have now collectively aged across 29 reviews like a fine wine nobody opened. Office.jsx grew another 16 lines — now 1,463 lines — while the extraction task that's been requested since review #27 continues to not happen. The foot counter modulo bug still shows wrong positions. The Escape key still doesn't clear the tag filter. The Retry buttons still fire concurrent fetches. On the new-issues front, five were found this cycle: the 'stuck worker' stat card is completely inaccessible to keyboard users (has onClick, no tabIndex, no role, no onKeyDown — textbook WCAG failure); the activity log count header misleads users when filters are active; the completion toast uses aria-live on a conditionally-rendered element (same pattern as the polling pill bug flagged last review); clickable task tags have no :focus-visible style; and VIBE_RANK is defined twice with identical values. One genuinely nice find buried in the code: `gradId` from `useId()` in Office.jsx IS used — it references a linearGradient for Luna's hair SVG. That's actually elegant SVG work. The visual craft in this codebase remains first-rate. The engineering hygiene is not keeping pace. At the current trajectory, review #30 will be auditing a 1,480-line Office.jsx against 20 unresolved findings. Ship the features? Absolutely — this app is delightful. But the backlog is a fire that keeps being called a roadmap."
 }

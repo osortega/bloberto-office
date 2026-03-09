@@ -1,13 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Sofia",
-      "emoji": "🔍",
-      "role": "QA & Product Analyst",
-      "status": "working",
-      "task": "QA Review #29",
-      "started_at": "2026-03-09T00:15:00Z"
-    }
-  ],
-  "updated_at": "2026-03-09T00:15:00Z"
+  "workers": [],
+  "updated_at": "2026-03-09T00:21:00Z"
 }
