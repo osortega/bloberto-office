@@ -3,18 +3,18 @@
     {
       "name": "Luna",
       "status": "idle",
-      "task": "Creative review #84 — completed",
+      "task": "Creative review #84 \u2014 completed",
       "progress": 100,
       "started_at": "2026-03-10T08:00:00Z",
       "updated_at": "2026-03-10T08:05:00Z"
     },
     {
       "name": "Sofia",
-      "status": "working",
-      "task": "QA review #68 — site analysis & suggestions",
-      "progress": 0,
+      "status": "idle",
+      "task": "QA review #68 \u2014 completed",
+      "progress": 100,
       "started_at": "2026-03-10T13:45:00Z",
-      "updated_at": "2026-03-10T13:45:00Z"
+      "updated_at": "2026-03-10T14:15:00Z"
     },
     {
       "name": "Carlos",
@@ -25,5 +25,5 @@
       "updated_at": "2026-03-10T09:23:00Z"
     }
   ],
-  "updated_at": "2026-03-10T13:45:00Z"
+  "updated_at": "2026-03-10T14:15:00Z"
 }

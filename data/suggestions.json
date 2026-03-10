@@ -1,122 +1,131 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-10T12:45:00Z",
-  "review_number": 67,
+  "review_number": 68,
+  "timestamp": "2026-03-10T13:45:54Z",
   "scores": {
     "visual": 4,
     "ux": 3,
     "responsiveness": 3,
     "performance": 3,
-    "accessibility": 3,
-    "code_quality": 3,
-    "features": 4,
+    "accessibility": 2,
+    "code_quality": 2,
+    "features": 3,
     "fun_factor": 5
   },
-  "overall_score": 3.5,
+  "overall_score": 3.1,
+  "visual_notes": "Dark theme is genuinely polished. Custom SVG characters with per-worker personality (Dave's headphones, Sofia's magnifying glass, Luna's crescent) are charming and render crisply. The vibe-reactive whiteboard doodle (╰(*°▽°*)╯ vs (╯°□°)╯︵ ┻━┻) is a detail that earns its place. Office window gradient for time-of-day is a nice ambient touch. Bloberto's face expressions per vibe are legitimately good character work. Mobile is still cramped — 24px avatars on a 375px screen are barely identifiable.",
   "suggestions": [
     {
       "priority": "high",
-      "category": "code",
-      "title": "Split monolithic App.jsx (1424L) and Office.jsx (1659L) into per-component files",
-      "description": "Both files exceed 1400 lines and each contain 15-20+ components, constants, and hooks. App.jsx houses WorkerCard, StatsBar, ActivityLog, ActivityLogEntry, VibeSparkline, DeltaBadge, ShortcutToast, LoadingSkeleton, EmptyState, and the root App — all in one file. Office.jsx has CharacterAvatar (with 7 character variants × 2 error states = 14 code paths), Character, Desk, WallClock, ConferenceTable, VibeShockwave, WindowElement, AwaySign, and Office itself. This makes the codebase very hard to navigate, test, and review. Recommended split: src/components/WorkerCard.jsx, src/components/ActivityLog.jsx, src/components/StatsBar.jsx, src/components/office/Character.jsx, src/components/office/CharacterAvatar.jsx, src/components/office/Desk.jsx, src/components/office/ConferenceTable.jsx, src/components/office/WallClock.jsx. Start with CharacterAvatar — it's 280+ lines of pure SVG and a clean extraction target.",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "high",
-      "category": "performance",
-      "title": "Remove ?t=Date.now() cache-busting from GitHub Raw API fetches",
-      "description": "Both fetchWorkersFromGitHub and fetchActivityFromGitHub append '?t=' + Date.now() to the URL on every poll cycle (every 30s active / 60s hidden). This defeats browser caching, CDN caching, and GitHub's edge caching entirely — every single poll is a cold fetch. Since raw.githubusercontent.com serves static JSON files, the browser could cache responses and revalidate with ETag/Last-Modified headers. Fix: remove the cache-bust parameter and let the browser handle revalidation. If forced freshness is needed, use fetch() with cache: 'no-cache' (sends conditional request with If-None-Match) instead of a unique URL per request. This will reduce bandwidth and latency, and reduce load on GitHub's servers.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "ux",
-      "title": "Office view is effectively unusable on mobile — characters are ~15px tall at 375px width",
-      "description": "The office-floor uses aspect-ratio: 4/3 and max-width: 900px, so at 375px viewport width the floor renders at ~343px wide × 257px tall (accounting for 1rem padding on each side). With 6 desk positions spread across it, each character avatar is about 15-18px — impossible to tap or meaningfully distinguish. The hover cards (char-hover-card) don't trigger on touch since they're mouse-only. The click-to-navigate-to-dashboard behavior works, but users have no way to identify who they're tapping. Fix: at max-width: 600px, either (a) increase character size by reducing desk count and zooming the layout, (b) show a simplified grid-list of workers instead of the spatial layout, or (c) add a 'tap a desk to inspect' label and enlarge the touch target to at least 44×44px per WCAG 2.5.5.",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Duplicate CSS vibe selectors in Office.css — single-quote and double-quote variants both defined",
-      "description": "Office.css defines vibe overrides for .office-floor twice: once using single-quoted attribute selectors (lines ~91-95: [data-vibe='crushing'], [data-vibe='on-fire'], etc.) and again using double-quoted selectors (lines ~97-115: [data-vibe=\"crushing\"], [data-vibe=\"on-fire\"], etc.). The double-quote block is more specific (it also sets --grid-line) and overrides the single-quote block, making the first set dead code. Additionally, .office-floor[data-vibe='crushing'] and .office-floor[data-vibe=\"crushing\"] both appear and the second wins, so the first is never applied. Remove the single-quote block entirely (lines ~91-95) and keep only the comprehensive double-quote block.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Sparkline legend only visible on hover — inaccessible to keyboard and touch users",
-      "description": "The VibeSparkline legend (.sparkline-legend) uses CSS display:none by default and display:flex only on .stat-card:hover. The sparkline SVG has a <title> element with the vibe history as text, so screen readers can access the data, but sighted touch/keyboard users cannot see the legend at all. The color-coded pills showing recent vibe states ('crushing', 'in-flow') are purely hover-dependent. Fix: either (a) make the legend always visible at a reduced opacity (opacity: 0.55 default, 1 on hover/focus), or (b) show it on :focus-within the stat card as well (.stat-card:hover .sparkline-legend, .stat-card:focus-within .sparkline-legend { display: flex }). The font-size: 0.55rem on the pills is also below WCAG minimum — increase to at least 0.7rem.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "completionToast and workerConfetti toasts use massive inline style objects — move to CSS",
-      "description": "The completion toast in App.jsx is rendered with a 16-property inline style object directly in JSX (position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation). This pattern: (1) cannot be overridden by themes without !important, (2) is not inspectable or diffable in browser devtools the same way CSS classes are, (3) makes the JSX harder to read, and (4) buries the animation name 'badge-pop' in JSX rather than CSS where it's defined. The plantToast in Office.jsx has the same pattern. Create .completion-toast and .plant-toast CSS classes and use dynamic border-color only for the variable part (worker role color) via a CSS custom property.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Activity log hard-capped at 20 entries with no pagination or load-more",
-      "description": "ActivityLog renders displayed = [...entries].reverse().slice(0, 20) with no way for users to see older entries. The full activityLog state in App is also capped at 50 entries (.slice(0, 50) when injecting vibe transition events), meaning data beyond 50 events is silently dropped. For teams with active logs, this means events from earlier in the day disappear. Fix: add a 'Show more' button below the log that increases the display limit by 20, up to the total available. Also consider surfacing the total count ('Showing 20 of 47 events') even when unfiltered — currently that label only appears when filtered.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "medium",
       "category": "bug",
-      "title": "\"Just now\" time group label is misleading — covers entries that show \"3m ago\" or \"4m ago\"",
-      "description": "getTimeGroup() in App.jsx categorizes any entry within the last 5 minutes as 'Just now'. But getRelativeTime() in time.js shows 'just now' only for entries <1 minute old, and '3m ago', '4m ago' for entries 3-4 minutes old. This creates a visual mismatch: the group header says 'Just now' but the entry timestamp says '4m ago'. A user seeing '4m ago' under 'Just now' is likely confused. Fix: either (a) rename the group to 'Last 5 minutes', or (b) lower the 'Just now' threshold in getTimeGroup() from 5 minutes to 1 minute (matching getRelativeTime's definition of 'just now').",
+      "title": "stat-dispatch scroll button silently fails on Office tab",
+      "description": "In StatsBar, the 'Active' stat card dispatches a label (e.g. 'skeleton crew') with role='button' that calls document.querySelector('.workers-grid')?.scrollIntoView(). But .workers-grid only exists when the Dashboard tab is active. On the Office tab, the click does nothing — no feedback, no navigation, no error. Fix: check which tab is active and either switch to Dashboard first, or don't render the scroll affordance on the Office tab. Same issue on the Stuck card.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "performance",
+      "title": "Root-level useTimeTick causes entire App tree to re-render every 60 seconds",
+      "description": "App() calls useTimeTick(60_000) at line 676 and discards the return value. The stated purpose (keep relative timestamps fresh) is already served by StatsBar's own useTimeTick. Because the root App re-renders every 60s, ALL non-memoized children re-render: WorkerCard, ActivityLog, ActivityLogEntry, StatsBar, and Office. Most have React.memo but their props often change by reference (activityByWorker is a Map reconstructed each time). Remove the useTimeTick call from App(). The only place timestamps actually need to refresh is ActivityLogEntry — pass tick from StatsBar's useTimeTick as a prop, or use a dedicated context.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "accessibility",
+      "title": "Wandering idle characters lose keyboard focus to animation-driven positions",
+      "description": "Idle workers use CSS keyframe animations (char--wander-1 through char--wander-4) to physically move across the office floor. These elements have tabIndex={0} and role='button'. When a keyboard user tabs to them, the browser places focus on the element at its current animated position — which could be anywhere on screen, and changes every few seconds. The focus ring appears at an unpredictable location. Fix: for keyboard-only navigation, pause or suppress the wander animation on :focus-within, or provide a static accessible alternative (a skip-to-worker list in the sr-only region). At minimum, add CSS: .char:focus-within { animation-play-state: paused; }",
+      "effort": "medium",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "ux",
+      "title": "Error boundary recovery: no actionable CTA, just 'refresh the page'",
+      "description": "The ErrorBoundary fallback renders plain text: 'Something went wrong — refresh the page'. On mobile, users may not know how to hard-refresh. The fallback has no styling, no button, and no recovery path. Fix: add a styled <button onClick={() => window.location.reload()}>Refresh</button> inside the fallback, and wrap it in a centered container matching the app's design tokens. Also add componentDidCatch logging so errors aren't silently swallowed in production.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "formatDuration and formatIdleDuration are near-duplicate utility functions",
+      "description": "formatDuration (App.jsx ~L261) returns 'Working for Xh Ym'. formatIdleDuration (Office.jsx ~L470) returns 'Xh Ym'. These share identical arithmetic, differ only in the 'Working for' prefix and the <1m fallback text. Extract a single getHumanDuration(ms) into utils/time.js. Callers add the prefix. Also getRelativeTime and formatDuration both compute hours/mins from a timestamp diff — consolidate the date math. The current sprawl means any fix to the duration logic needs to happen in 4 places.",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "performance",
-      "title": "All 10 animated DESK_SCREEN_SVG error variants are instantiated at module load regardless of worker state",
-      "description": "DESK_SCREEN_SVG in Office.jsx is a top-level object constant that pre-builds all 10 SVG React elements (carlos, maya, dave, sofia, luna + their _error variants) at module load time. The 5 error SVGs (e.g. carlos_error) contain inline SVG <animate> elements. React does not mount these SVG animations until they appear in the DOM, so they don't run until rendered — but the React element objects are created eagerly. More impactfully, the CharacterAvatar function does a waterfall of if/else identity checks (workerId === 'bloberto', === 'carlos', etc.) without early returns after the manager check. Since CharacterAvatar is called for every desk occupant on every render, restructuring to a lookup map would be more efficient. Consider a MAP: { workerId: ComponentFn } pattern with React.lazy for the less-common generic fallback.",
-      "effort": "medium",
+      "category": "accessibility",
+      "title": "ConferenceTable aria-label is static and doesn't reflect meeting state",
+      "description": "ConferenceTable always has aria-label='Conference table' regardless of state. When a meeting is active (meetingWorkers.length >= 2), a screen reader user learns nothing about who is present or that a huddle is occurring. When standup is active, same problem. Fix: dynamically build the aria-label: e.g. 'Conference table — huddle in progress with Maya and Dave' or 'Conference table — standup active'. The existing conf-meeting-badge text ('Huddle · 3m') already has this information; surface it to the accessible tree.",
+      "effort": "small",
       "assignee": "Maya"
     },
     {
+      "priority": "medium",
+      "category": "performance",
+      "title": "window.matchMedia('(pointer: coarse)') called on every click in Character",
+      "description": "In the Character component's handleClick, window.matchMedia('(pointer: coarse)').matches is called inline on every single click event. This creates a new MediaQueryList object each time (browser GC pressure, minor but pointless). Additionally, the pointer-coarse check is repeated in App.jsx for the polling-paused button label. Fix: memoize at module level: const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches — or use a small useMediaQuery hook that subscribes to the change event for correctness (user can plug in a mouse after load).",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Ghost characters (OOO roster members) are hover-interactive but click-dead",
+      "description": "Ghost characters (roster members not currently active) show a 'OOO · Last seen: Xm ago' bubble on hover, suggesting they're interactive. But they have no onClick handler and tabIndex={-1}. A user on mobile (who triggers hover state on first tap) sees the bubble, taps again expecting something to happen — nothing. Fix: either make ghost characters fully non-interactive (remove ghostBubble state, set cursor:default) or make them clickable and navigate to their filtered activity log in the Dashboard. Don't leave affordances dangling.",
+      "effort": "small",
+      "assignee": "Dave"
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "Add idleness countdown notification before polling auto-pauses",
+      "description": "IDLE_TIMEOUT is 10 minutes of no mouse/keyboard/touch activity before polling pauses. Users get zero warning before this happens. A manager walks away for 8 minutes, comes back, and sees stale data with a 'PAUSED' pill they may not notice. Fix: show a subtle banner or badge at ~2 minutes before pause: '⏱ Auto-refresh pauses in 2m due to inactivity'. This also helps users understand WHY data went stale. The existing 15-second interval check in the polling-paused effect is the right place to add this threshold check.",
+      "effort": "small",
+      "assignee": "Dave"
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "Activity log needs load-more or virtualization for replay value",
+      "description": "The activity log is hard-capped at displaying 20 entries (displayed = [...entries].reverse().slice(0, 20)). The server may return more; they're fetched but discarded. For a team manager doing a retrospective, seeing 'Maya shipped 3 tasks today' requires scrolling through 20+ entries — which is impossible. Fix: add a 'Load more' button that increments the displayed count by 20. Alternatively, if the full array is already in memory (activityLog state), just paginate client-side. Also remove the server-side cap — let the client decide what to show.",
+      "effort": "medium",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "No export or share functionality for activity log data",
+      "description": "The activity log has type filters and worker filters — users are clearly expected to investigate specific worker histories. But there's no way to share a filtered view (no URL state for filters) and no way to export (CSV, clipboard). For a QA engineer or manager writing a post-mortem, copying 20 entries manually is a friction point. Fix: (1) serialize activityFilter and workerFilter to URL query params so filtered views are shareable; (2) add a small 'Copy log' button that puts the filtered entries on the clipboard as formatted text. Both are small wins.",
+      "effort": "medium",
+      "assignee": "Sofia"
+    },
+    {
       "priority": "low",
-      "category": "accessibility",
-      "title": "aria-live=\"polite\" on the polling-paused <button> element is semantically incorrect",
-      "description": "In App.jsx, the polling-paused pill renders: <button aria-live=\"polite\" onClick={onResume}>⏸ Paused · Move mouse to refresh</button>. The aria-live attribute is intended for non-interactive container elements that update in place (like a status region). Putting it on a <button> is incorrect — screen readers may announce the button label unpredictably as a live region update AND as a button label. The correct pattern is a nearby aria-live=\"polite\" <div role=\"status\"> that contains the status text, while the button remains a plain button. Alternatively, if the button IS the announcement, use aria-label on the button and a separate aria-live region that updates when pollingPaused changes.",
+      "category": "bug",
+      "title": "focusedWorker highlight clears on a timer rather than on user action",
+      "description": "handleWorkerClick sets focusedWorker and schedules a 3-second timeout to clear it. If the user clicks a worker card, tabs to the dashboard, and the card scrollIntoView runs, the 3s glow highlight disappears automatically — even if the user is still reading it. On slower connections, the data may not have loaded by the time the highlight vanishes. Fix: clear focusedWorker on any user interaction with the grid (onMouseMove, onKeyDown on the grid container) rather than on a fixed 3-second timer. The user should control when the focus state dismisses.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Dead CSS: empty .progress-wrapper {} rule in App.css",
-      "description": "App.css line 413 contains .progress-wrapper {} — an empty rule with no declarations. This is dead code. The class is applied in the ProgressBar component JSX but produces no styles. Either add the intended styles (if any were planned but omitted) or remove both the CSS rule and the className from the JSX. Small cleanup but reduces noise in style audits.",
+      "title": "vibe-history localStorage parse failure silently swallowed",
+      "description": "In the vibeHistory useEffect, localStorage.getItem and JSON.parse are wrapped in try/catch with an empty catch block (/* ignore */). If localStorage is full, corrupt, or in private-browsing mode, vibe history silently disappears with no fallback. This means the VibeSparkline shows nothing with no indication why. Fix: catch the error and set vibeHistory to []. Also add a defensive check: if (typeof window !== 'undefined' && window.localStorage) before the try. The /* ignore */ pattern is a code smell — at minimum add a console.warn so developers can detect storage issues during QA.",
       "effort": "small",
-      "assignee": "Maya"
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "No URL-encoded deep link to a specific worker — focused state is ephemeral",
-      "description": "Clicking a character in the Office view navigates to the Dashboard tab and sets focusedWorker for 3 seconds (a highlight pulse). But this state is not encoded in the URL, so refreshing the page or sharing a link loses the context. For a monitoring tool that teams use collaboratively ('hey look at Sofia's card'), sharing a direct link to a worker would be useful. Proposed URL scheme: #dashboard/worker=sofia. The existing hash-based tab navigation (#office, #dashboard) provides a pattern to extend. On load, parse window.location.hash for a worker segment and pre-set focusedWorker.",
+      "title": "Stuck worker alert (>2h) has no escalation path or acknowledgement",
+      "description": "The stat-card--stuck card correctly flags workers stuck for over 2 hours. But clicking it only scrolls to the worker card. There's no way to acknowledge the alert ('yes, I know Dave has been stuck, stop flashing') and no escalation — no ping, no external notification. For a real team manager, 2h stuck with no acknowledgement is exactly the scenario that needs an alert. Fix: add an 'Ack' button that stores the acknowledged timestamp in localStorage, suppresses the stuck badge for that worker for 1h, and shows a small 'acknowledged X ago' tag. This gives the UI memory.",
       "effort": "medium",
-      "assignee": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "performance",
-      "title": "color-mix(in srgb, ...) in Office.css has no fallback for unsupported browsers",
-      "description": "Office.css line ~310 uses color-mix(in srgb, var(--role-color, var(--accent)) 55%, transparent) for the active desk monitor glow. color-mix() has ~94% browser support as of early 2026 but is not supported in Firefox <113 or Safari <16.2, which still account for a small but real portion of users. In unsupported browsers the box-shadow property is silently ignored, so working desks lose their colored monitor glow entirely. Add a fallback before the color-mix line: box-shadow: 0 0 8px var(--accent); followed by the color-mix version so browsers that support it override the fallback.",
-      "effort": "small",
-      "assignee": "Maya"
+      "assignee": "Dave"
     }
   ]
 }
