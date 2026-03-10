@@ -2179,5 +2179,198 @@
     ],
     "hire_proposals": [],
     "_previous_review": 77
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 79,
+    "timestamp": "2026-03-10T02:01:16Z",
+    "theme": "Reviews 75-78 were haunted by phantom bugs \u2014 time to audit the auditors and fix what is actually broken",
+    "visual_observations": [
+      "Deep code review in lieu of Puppeteer. WallClock and WindowElement both use msUntilNextMinute alignment now \u2014 the drunk clock narrative is dead. Reviews 76-78 kept flagging a fixed bug.",
+      "Honorific was never broken. HONORIFICS[teamVibe.key] is pure vibe-driven, not time-driven. Night owl only shows when all workers are gone. During crushing sprints at 10pm the honorific is LEGEND. Three reviews of false accusation.",
+      "React.memo on WorkerCard IS being respected \u2014 activityByWorker useMemo at App.jsx:889 provides stable Map references. Reviews 77-78 were describing old code.",
+      "vibeCaption has a 90-second cooldown at Office.jsx:1200. Five consecutive reviews called this unfixed. It has been fixed.",
+      "Whiteboard says task progress (not avg task progress) when workingWorkers.length === 1 \u2014 Office.jsx:1299. Fixed. Eighteen reviews. Finally done.",
+      "Ficus grief toast works correctly. prevPlantStageRef = useRef(plantStage) initializes to current stage. Thirteen reviews of wrong diagnosis.",
+      "Window sky hours 20-23 still says dusk with a deep purple gradient and zero stars. The label and the sky disagree about what time it is.",
+      "The idle bubble timer is per-worker now but the emoji content index is still Math.floor((Date.now() + charCode * 4000) / 12000) \u2014 a global 12-second world clock. Workers just have different offsets, not independent clocks.",
+      "Footer counter no longer shows 1/9 on fresh load. Fixed. But after all 8 bonus quotes wrap, quoteBonus=9 produces counter 1/9 while showing bonus[0] which is quote 2 of 9 total. Counter and content out of sync.",
+      "ProgressBar receives updatedAt in its function signature but never uses it. The prop is destructured into the void."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "WallClock Now Clock-Aligned with msUntilNextMinute Pattern",
+        "was_flagged_in": [
+          75,
+          76,
+          77,
+          78
+        ],
+        "how_fixed": "Office.jsx:1007-1016 uses setTimeout(msUntilNextMinute) before the 60s interval. Confirmed fixed. Reviews 76-78 were looking at stale code."
+      },
+      {
+        "title": "WindowElement Interval Now Clock-Aligned",
+        "was_flagged_in": [
+          76,
+          77,
+          78
+        ],
+        "how_fixed": "Office.jsx:783-793 uses identical msUntilNextMinute pattern. Reviews 77 and 78 kept flagging a fixed bug as must-priority."
+      },
+      {
+        "title": "Honorific night owl During Crushing Was Never a Bug",
+        "was_flagged_in": [
+          76,
+          77,
+          78
+        ],
+        "how_fixed": "App.jsx:1160 uses HONORIFICS[teamVibe.key] \u2014 pure vibe-driven. If workers are crushing at midnight, teamVibe.key=crushing, honorific=LEGEND. Only after-hours vibe (workers.length=0) produces night owl. Always was correct."
+      },
+      {
+        "title": "React.memo on WorkerCard Now Respected via activityByWorker useMemo",
+        "was_flagged_in": [
+          77,
+          78
+        ],
+        "how_fixed": "App.jsx:889-894 builds a stable Map in useMemo. WorkerCard receives activityByWorker.get(w.name) from a stable reference, not inline filter().slice()."
+      },
+      {
+        "title": "vibeCaption Cooldown Is Live at 90 Seconds",
+        "was_flagged_in": [
+          75,
+          76,
+          77,
+          78
+        ],
+        "how_fixed": "Office.jsx:1200 \u2014 if (Date.now() - lastVibeCaptionRef.current < 90_000) return. Five consecutive reviews. Fixed. Confirmed."
+      },
+      {
+        "title": "Whiteboard Shows task progress for Solo Worker",
+        "was_flagged_in": [
+          77,
+          78
+        ],
+        "how_fixed": "Office.jsx:1299 \u2014 ternary: workingWorkers.length === 1 ? task progress : avg task progress. Eighteen reviews total. Finally done."
+      },
+      {
+        "title": "Ficus Grief Toast Now Fires Correctly",
+        "was_flagged_in": [
+          75,
+          76,
+          77,
+          78
+        ],
+        "how_fixed": "Office.jsx:1116 \u2014 prevPlantStageRef = useRef(plantStage) starts equal to current stage so no false fire on mount. plantToast state at line 1117 triggers popup correctly on stage change. Thirteen reviews, all wrong diagnosis."
+      },
+      {
+        "title": "Footer Quote Counter No Longer Shows 1/9 on Fresh Load",
+        "was_flagged_in": [
+          75,
+          76,
+          77,
+          78
+        ],
+        "how_fixed": "App.jsx:1396 \u2014 counter gated by quoteBonus > 0. On fresh load quoteBonus=0, counter hidden. The wrap bug at quoteBonus=9 remains."
+      },
+      {
+        "title": "sparkleUnseen Twinkle Fires for New Users",
+        "was_flagged_in": [
+          75
+        ],
+        "how_fixed": "App.jsx:711 \u2014 useState(() => !localStorage.getItem(footer-sparkle-seen)). New users get sparkleUnseen=true, twinkle class applied. Was working."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Window Sky Hours 20-23: dusk Label on a Night Gradient With No Stars",
+        "description": "Office.jsx line 811: const timeLabel uses a final else that labels hours 20-23 as dusk. But getGradient(20) returns linear-gradient(to bottom, #4c1d95, #312e81) \u2014 deep purple night. And isMidnight is hour >= 0 && hour <= 4 only, so hours 20-23 get zero stars. The window says dusk while looking like the void of space. Fix: rename isMidnight to isDeepNight and extend it to hour >= 20 || hour <= 4. Rename the timeLabel for hours 20-23 from dusk to night. Two small changes. This has appeared in every review since 75. Six reviews. It must end here.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Footer Quote Counter Wraps to 1/9 But Shows Bonus[0] \u2014 Content and Counter Out of Sync",
+        "description": "App.jsx line 1396: counter is (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1. With 8 bonus taglines denominator is 9. When quoteBonus reaches 9 (after clicking through all bonuses): counter shows (9 % 9) + 1 = 1, so 1/9. But content is BONUS_TAGLINES[(9-1) % 8] = BONUS_TAGLINES[0] \u2014 the first bonus which is quote 2 of 9 total. Counter says 1, content is 2. Out of sync. Fix: derive the counter from the content position. The shown quote index is (quoteBonus - 1) % 8 for bonus quotes. Its position in the full 9-quote sequence is ((quoteBonus - 1) % 8) + 2 (since vibe tagline is 1). Use that as numerator.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "idleBubble Emoji Content Index Still Rides the Global Wall Clock",
+        "description": "Office.jsx line 747: content index is Math.floor((Date.now() + (worker.id?.charCodeAt(0) ?? 0) * 4000) / 12000) % length. The bubble TIMER is now per-worker via wanderIdx stagger, which is good. But the content selection is still a global 12-second wall clock with per-worker offsets. At any given second you can predict every worker emoji from the formula. Fix: inside the idle micro-bubble useEffect, store a random content index in a useRef and advance it randomly when the bubble shows, completely decoupling content from wall time.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "ProgressBar updatedAt Prop Is Declared But Never Referenced Inside the Component",
+        "description": "App.jsx around line 198: function ProgressBar({ progress, updatedAt, startedAt }). The updatedAt parameter is destructured but never used in the component body. The ETA calculation uses startedAt only. The formatDuration call that uses updatedAt happens in WorkerCard, not ProgressBar. The prop exists in the contract but is honored by no one. Either remove it from the signature, or use it as a fallback when startedAt is absent: const workingMs = (startedAt || updatedAt) ? Date.now() - new Date(startedAt || updatedAt).getTime() : null. This has been open since review 75.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "wanderIdx Caps at 4 \u2014 With Five Idle Workers Two Share the Same Bubble Interval",
+        "description": "Office.jsx idle workers render: const wIdx = (i % 4) + 1. Worker index 0 and worker index 4 both get wIdx = 1. Their idle bubble timer is 8000 + 1 * 3000 = 11000ms. Both fire at the same moment. With all five workers idle (Carlos Maya Dave Sofia Luna), two will always synchronize their bubble display defeating the stagger intent. Fix: use a hash of the worker ID for a stable but diverse offset instead of wanderIdx, or simply let i run freely without the modulo cap since there are only ever 5 workers.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "WorkerCard Outer Div Has tabIndex={0} With No Interaction Handlers",
+        "description": "App.jsx line 302: the outer div has tabIndex={0} and role=article making it a keyboard tab stop. But there is no onKeyDown, no onClick, nothing. Keyboard users tab to the card and pressing Enter or Space does nothing. The inner info button handles the flip correctly, but the card itself is a dead focus stop. Fix: add onKeyDown to the outer div that calls setIsFlipped(true) on Enter or Space, matching what the info button does. Or remove tabIndex={0} and expose the card exclusively through its button children. The current state is a silent accessibility failure.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "could",
+        "category": "feature",
+        "title": "TASK_TAG_DEFS Missing Refactor Category \u2014 Engineering Invisible Work",
+        "description": "App.jsx lines 165-177: TASK_TAG_DEFS covers Bug Ship Design QA Data Docs Plan. No pattern for refactor or performance work. Tasks like refactor auth layer, performance optimization, clean up tech debt produce no tag. Engineering's most honest work is invisible to the dashboard. Fix: add pattern /refactor|cleanup|clean.?up|tech.?debt|optimize|performance|perf/i with label Refactor, emoji wrench, className task-tag--refactor, and a distinct CSS color like #14b8a6 teal.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Character Non-Manager pingReaction Sets bubble State That Is Never Displayed",
+        "description": "Office.jsx lines 533-537: the pingReaction useEffect runs for ALL Character variants and calls setBubble({ quote: pingReaction, show: true }). But for non-manager workers the speech bubble renders from the pingReaction prop directly at line 638, not from bubble.quote. The setBubble call for non-managers triggers a state update and re-render whose result is never read. The setTimeout to reset bubble.show also fires 3 seconds later for another orphan re-render. Fix: guard the setBubble and timerRef block with an early return if variant !== manager.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "feature",
+        "title": "lastHuddle Ref Missing startedAt \u2014 Elapsed Meeting Time Is Architecturally Blocked",
+        "description": "Office.jsx line 1172: const lastHuddle = useRef({ names: [], endedAt: null }). When a huddle starts at line 1173: lastHuddle.current = { names: meetingWorkers.map(w => w.name), endedAt: null }. No startedAt is ever set. ConferenceTable cannot show elapsed time during an active huddle because start time was never captured. Fix: add startedAt: Date.now() when setting the active huddle. ConferenceTable can then compute Date.now() - lastHuddle.current.startedAt to render a live meeting timer like In huddle for 8m. Flagged in review 76.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "Ghost OOO Bubble Knows the Role But Not the Last Deed",
+        "description": "Office.jsx ghost variant around line 702: the OOO bubble shows role and last-seen time. But activityEntries is already passed in and lastEvent is already fetched for relTime. The message field is right there. If the last activity was Shipped auth migration the ghost bubble could whisper: Last shipped: Shipped auth migration. Each ghost gets a eulogy instead of just a timestamp. One extra line: render lastEvent?.message to give absent workers a story rather than a vanishing act.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "office-life",
+        "title": "Whiteboard Doodles Are Static \u2014 They Should Escalate With vibeStreak",
+        "description": "Office.jsx around line 1313: five static ASCII faces, one per vibe, never change. But Office already receives vibeStreak as a prop. At streak 1 the crushing face is calm. At streak 5 it gets excited. At streak 10 legendary tier it should be full chaos energy. At streak 1 on-fire is tense. At streak 5 it escalates. Let the whiteboard doodle breathe with the room. It is the emotional thermometer of the office floor and right now it has three settings: fine, fine, and fine.",
+        "effort": "small",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 78
   }
 ]
