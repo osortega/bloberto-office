@@ -1,29 +1,13 @@
 {
   "workers": [
     {
-      "name": "Carlos",
+      "name": "Luna",
       "status": "working",
-      "task": "Fix 5 bugs from Luna review #83: titleIdxRef, footer counter, dead updatedAt prop, after-hours greeting, TASK_TAG_DEFS review pattern",
-      "progress": 0,
-      "started_at": "2026-03-10T04:36:00Z",
-      "updated_at": "2026-03-10T04:36:00Z"
-    },
-    {
-      "name": "Maya",
-      "status": "working",
-      "task": "Fix plantToast/completionToast overlap at bottom:2rem",
-      "progress": 0,
-      "started_at": "2026-03-10T04:36:00Z",
-      "updated_at": "2026-03-10T04:36:00Z"
-    },
-    {
-      "name": "Sofia",
-      "status": "working",
-      "task": "QA review #59 — live site + codebase analysis",
-      "progress": 0,
-      "started_at": "2026-03-10T06:15:00Z",
-      "updated_at": "2026-03-10T06:15:00Z"
+      "task": "Creative review #82",
+      "progress": 10,
+      "started_at": "2026-03-10T06:40:00Z",
+      "updated_at": "2026-03-10T06:40:00Z"
     }
   ],
-  "updated_at": "2026-03-10T06:15:00Z"
+  "updated_at": "2026-03-10T06:40:00Z"
 }
