@@ -1,27 +1,4 @@
 {
-  "workers": [
-    {
-      "id": "carlos",
-      "name": "Carlos",
-      "role": "Backend Engineer",
-      "emoji": "⚙️",
-      "status": "working",
-      "task": "Fix coffee corner overlap, completionToast lines, activity double-filter",
-      "progress": 10,
-      "started_at": "2026-03-10T22:45:00Z",
-      "updated_at": "2026-03-10T22:45:00Z"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "emoji": "🎨",
-      "status": "working",
-      "task": "Fix WorkerCard keyboard a11y, WallClock comments accessibility",
-      "progress": 10,
-      "started_at": "2026-03-10T22:45:00Z",
-      "updated_at": "2026-03-10T22:45:00Z"
-    }
-  ],
-  "updated_at": "2026-03-10T22:45:00Z"
+  "workers": [],
+  "updated_at": "2026-03-10T22:50:00Z"
 }
