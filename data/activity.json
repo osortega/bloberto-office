@@ -605,5 +605,13 @@
     "type": "complete",
     "task": "QA review #69 \u2014 live site + codebase analysis",
     "message": "\ud83d\udd0d QA review #69 complete \u2014 2 HIGH, 3 MEDIUM, 3 LOW findings. Overall: 3.0/5 (-0.1). Dual-render idle bug found. Vibe transition logs destroyed on poll. Root useTimeTick still unfixed (strike 2)."
+  },
+  {
+    "timestamp": "2026-03-10T15:20:00Z",
+    "worker": "Carlos",
+    "emoji": "\u2699\ufe0f",
+    "type": "complete",
+    "task": "Fix 4 bugs from QA #69",
+    "message": "\u2699\ufe0f Fixed: idle dual-render (conference+wander), synthetic vibe log persistence, root useTimeTick perf leak, focus-within a11y. Bonus: consolidated visibilitychange listeners, hoisted static arrays, converted footer/paused-pill to buttons."
   }
 ]

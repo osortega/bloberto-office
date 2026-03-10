@@ -15,15 +15,7 @@
       "progress": 100,
       "started_at": "2026-03-10T14:45:00Z",
       "updated_at": "2026-03-10T15:15:00Z"
-    },
-    {
-      "name": "Carlos",
-      "status": "working",
-      "task": "Fix 2 HIGH + 2 carry-over HIGH from QA #69",
-      "progress": 0,
-      "started_at": "2026-03-10T15:16:00Z",
-      "updated_at": "2026-03-10T15:16:00Z"
     }
   ],
-  "updated_at": "2026-03-10T15:16:00Z"
+  "updated_at": "2026-03-10T15:20:00Z"
 }
