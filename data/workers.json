@@ -1,14 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Sofia",
-      "emoji": "🔍",
-      "role": "QA & Product Analyst",
-      "status": "working",
-      "task": "QA review #71 — live site + codebase analysis",
-      "started_at": "2026-03-10T17:15:00Z",
-      "progress": 10
-    }
-  ],
-  "updated_at": "2026-03-10T17:15:00Z"
+  "workers": [],
+  "updated_at": "2026-03-10T18:15:44Z"
 }
