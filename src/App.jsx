@@ -194,7 +194,7 @@ function StatusBadge({ status }) {
 function ProgressBar({ progress, startedAt }) {
   const milestonesRef = useRef(new Set())
   const prevProgressRef = useRef(progress)
-  const flashTimerRef = useRef(null)
+  const innerFlashTimersRef = useRef([])
   const [flashClass, setFlashClass] = useState('')
 
   useEffect(() => {
@@ -213,10 +213,15 @@ function ProgressBar({ progress, startedAt }) {
     const timers = crossed.map((m, i) =>
       setTimeout(() => {
         setFlashClass(`progress-milestone-${m}`)
-        setTimeout(() => setFlashClass(''), 600)
+        const inner = setTimeout(() => setFlashClass(''), 600)
+        innerFlashTimersRef.current.push(inner)
       }, i * 700)
     )
-    return () => timers.forEach(clearTimeout)
+    return () => {
+      timers.forEach(clearTimeout)
+      innerFlashTimersRef.current.forEach(clearTimeout)
+      innerFlashTimersRef.current = []
+    }
   }, [progress])
 
   const workingMs = startedAt ? Date.now() - new Date(startedAt).getTime() : null

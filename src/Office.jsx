@@ -1542,10 +1542,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {/* Bloberto — always at manager desk, always visible */}
         <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} pingReaction={null} />
 
-        {/* Active workers at desks (working) or as ghosts (roster-only) — skip idle, they wander */}
+        {/* Active workers at desks (working) or as ghosts (roster-only) — skip idle (they wander) and standup workers (rendered at conference table) */}
         {DESKS.map((desk, i) => {
           const occ = deskOccupants[desk.id]
           if (!occ || occ.idle) return null
+          if (standupWorkers.includes(occ.worker)) return null
           return (
             <div key={occ.worker.id} style={{ position: 'absolute', left: `${desk.left + 7}%`, top: `${desk.top - 4}%` }}>
               <Character
