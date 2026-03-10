@@ -1,97 +1,111 @@
 {
   "analyst": "Sofia",
-  "review_number": 73,
-  "timestamp": "2026-03-10T19:45:46Z",
+  "review_number": 74,
+  "timestamp": "2026-03-10T20:45:48Z",
   "scores": {
     "visual": 5,
     "ux": 3,
     "responsiveness": 4,
-    "performance": 3,
+    "performance": 2,
     "accessibility": 3,
-    "code_quality": 3,
+    "code_quality": 2,
     "features": 5,
     "fun_factor": 5
   },
-  "overall_score": "3.9/5",
-  "visual_notes": "Screenshots taken from https://osortega.github.io/bloberto-office/. Desktop (1440x900): The office view is genuinely gorgeous — vibe-reactive floor, full character SVGs at desks (Sofia, Carlos, Maya, Dave, Luna all present), Bloberto at his CVO desk, golden-hour window, Ficus plant bottom-right, 'FULL SYNC' banner glowing, diagonal 'Clear skies — team at full strength' watermark on the floor. Sofia has a live speech bubble ('bugs have nowhere to hide') — reactive error bubble working as intended. Shortcut toast visible bottom-right. Mobile (375x812): Structurally intact — all workers visible, tabs readable, header compact. Office floor is cramped but functional. Worker names below desks are illegible pinhead text at mobile scale.",
+  "overall_score": "3.6/5",
+  "visual_notes": "Screenshots sourced from review #73 baseline — live screenshot capture unavailable in this environment (Chromium process fails with pthread_create resource limits). Code inspection confirms no new visual-affecting changes since #73. Visual state: Office floor still gorgeous — vibe-reactive floor, full character roster at desks, golden-hour window, Ficus plant, ConferenceTable, WallClock, vibe weather watermark, FULL SYNC banner. Bloberto remains at manager desk doing precisely nothing when clicked. Mobile: functional but cramped. Worker name labels still pinhead text. The office is beautiful on the outside and increasingly messy on the inside.",
   "prior_issues_status": [
     {
-      "title": "Bloberto hardcoded to never receive ping reactions — and now not even clickable",
+      "title": "Bloberto hardcoded to never receive ping reactions — not clickable",
       "status": "STILL_OPEN",
-      "evidence": "Office.jsx line 1551: <Character worker={bloberto} ... pingReaction={null} /> — no onClick prop, no PING_REACTIONS entry for bloberto. The blob does nothing when clicked. Third consecutive review."
+      "strike": 5,
+      "evidence": "Office.jsx line 1551: <Character worker={bloberto} left={46} top={4} variant='manager' managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} pingReaction={null} /> — still no onClick prop, still pingReaction={null} hardcoded. PING_REACTIONS object at line 181 still has zero entry for 'bloberto'. handleCharClick at line 1232 checks PING_REACTIONS[worker.id] — which returns undefined for bloberto — so even IF someone wired onClick it would silently do nothing. Five consecutive reviews. Five."
     },
     {
-      "title": "activityLog.filter() called 4× inline per render — still not memoized",
+      "title": "Footer quote cycling dead-ends silently at 8/8 — increment guard never fixed",
       "status": "STILL_OPEN",
-      "evidence": "activityByWorker is now memoized (improvement!), but the Dashboard section still runs 2 chained .filter().filter() calls inline — once for the count badge (line ~1346) and once for the ActivityLog props (line ~1403). Still not wrapped in useMemo. Went from 4 to 2, but the fix needed was a single memoized var for both."
+      "strike": 5,
+      "evidence": "App.jsx line 1425: setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p). BONUS_TAGLINES has 8 items. When quoteBonus hits 8: increment guard blocks, counter badge condition (quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length) evaluates false so badge disappears, click is silently swallowed. One-line fix: change to (p => (p % BONUS_TAGLINES.length) + 1). Has not been touched since the partial fix in review #71 that only fixed the display expression. Five consecutive reviews."
     },
     {
-      "title": "WORKER_ERROR_BUBBLES temporal dead zone risk — Office.jsx forward reference",
+      "title": "localStorage streak writes unguarded — crash risk",
       "status": "STILL_OPEN",
-      "evidence": "Character component defined at Office.jsx line 545. WORKER_ERROR_BUBBLES const defined at line 1146 — still 600+ lines below the component that references it. Code organization issue persists."
+      "strike": 4,
+      "evidence": "App.jsx lines 1036-1042: localStorage.getItem('bloberto-vibe-key'), localStorage.getItem('bloberto-vibe-streak'), localStorage.setItem('bloberto-vibe-key', ...), localStorage.setItem('bloberto-vibe-streak', ...) — still not in try/catch. The vibe history block immediately below at lines 1073-1080 correctly has try/catch. The streak block does not. iOS private browsing with full storage will throw on setItem, crashing the entire effect and silently killing vibe streak logic, streak eulogy toast, confetti burst on vibe rank increase, and vibe transition activity log entries."
     },
     {
-      "title": "Footer quote cycling silently dead-ends — modulo added for display, not for cycling",
+      "title": "WORKER_ERROR_BUBBLES temporal dead zone risk — forward reference 600 lines below Character",
       "status": "STILL_OPEN",
-      "evidence": "App.jsx line 1425: setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p). Caps at 8. At quoteBonus=8 the counter badge disappears (condition: quoteBonus < 8 is false) AND clicking is silently ignored. The modulo was added to the DISPLAY (quoteBonus - 1) % BONUS_TAGLINES.length but the INCREMENT guard was never fixed. Classic partial fix."
+      "strike": 5,
+      "evidence": "Character component defined at Office.jsx line 545. WORKER_ERROR_BUBBLES const defined at line 1146 — 601 lines below. Works at runtime (effects run post-module-load) but any attempt to extract Character into its own file produces a ReferenceError. The file is now 1662 lines. Also: WORKER_IDLE_BUBBLES, DEFAULT_IDLE_BUBBLES, ERROR_BUBBLE_MESSAGES are all in the same boat. Five consecutive reviews."
     }
   ],
   "verified_fixes": [
-    "activityByWorker useMemo — VERIFIED ✅ (App.jsx line 942: useMemo over activityLog and activeWorkers. Well structured, correctly includes fadingMap workers.)",
-    "Touch device hover cards (pinnedCard) — VERIFIED ✅ from prior review, still working in code",
-    "Activity filter bar flex-wrap on mobile — VERIFIED ✅ from prior review, still present",
-    "Vibe sparkline with legend pills — NEW FEATURE ✅ (VibeSparkline component with last-3 vibe pills)",
-    "Ficus plant growth system — NEW FEATURE ✅ (5 stages seeded by vibeStreak, with milestone toast)",
-    "ConferenceTable standup detection — NEW FEATURE ✅ (standupActive when 3+ working + vibe is crushing or in-flow)",
-    "Ghost desk 'away' sign — NEW FEATURE ✅ (AwaySign component with tier-based data-tier and dynamic message rotation)",
-    "hashchange listener for browser back/forward — NEW FEATURE ✅ (App.jsx line 712)"
+    "activityByWorker useMemo — VERIFIED (App.jsx line 942, still correctly memoized)",
+    "Touch device hover cards (pinnedCard toggle) — VERIFIED (Office.jsx line 728-734, still correct)",
+    "Activity filter bar flex-wrap on mobile — VERIFIED (still present)",
+    "hashchange listener for browser back/forward — VERIFIED (App.jsx line 712-719)",
+    "Vibe sparkline with legend pills — VERIFIED (App.jsx line 409-441)",
+    "Ficus plant growth system — VERIFIED (Office.jsx line 1175-1180, 5 stages)",
+    "ConferenceTable standup detection — VERIFIED (Office.jsx line 1209)",
+    "ErrorBoundary wrapping entire app — VERIFIED (App.jsx line 8-21, wraps the full App return)",
+    "Keyboard shortcut toast — VERIFIED (ShortcutToast component, App.jsx line 621, auto-dismisses at 7s)",
+    "Keyboard shortcuts (1, 2, R, Esc) — VERIFIED (App.jsx line 860-870)"
   ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Bloberto still cannot be clicked or pinged — strike 4",
-      "description": "Office.jsx line 1551: <Character worker={bloberto} left={46} top={4} variant='manager' managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} pingReaction={null} /> — pingReaction is hardcoded null AND there is no onClick prop. The Character component's handleClick gating logic at line 728 also gates on onClick existing. So: clicking Bloberto does nothing. No speech bubble, no ping animation, nothing. PING_REACTIONS has entries for all 5 workers but zero for 'bloberto'. Users absolutely try to click the giant manager character. Fix: (1) add onClick={handleCharClick} to the Bloberto Character render, (2) add PING_REACTIONS.bloberto array (manager one-liners like 'syncing team velocity', 'have you checked the backlog', etc.), (3) remove the hardcoded pingReaction={null} and wire it through the same pingedId state as workers.",
+      "title": "Bloberto still cannot be clicked or pinged — strike 5, final warning",
+      "description": "Office.jsx line 1551: <Character worker={bloberto} ... pingReaction={null} /> — no onClick prop, pingReaction hardcoded null. Five consecutive reviews. The fix is three lines: (1) Add onClick={handleCharClick} to the Bloberto Character render at line 1551. (2) Add a 'bloberto' key to PING_REACTIONS at line 181 with manager one-liners ('syncing team velocity', 'have you checked the velocity chart', 'the backlog is a known quantity', 'ship it and iterate', 'every sprint tells a story'). (3) Wire pingReaction={pingedId === bloberto.id && pingReaction ? pingReaction : null} same as workers at line 1568. The variant='manager' Character already handles speech-bubble display at line 754-758 — it just needs the reaction string. This is a 10-minute fix that has sat open for 5 reviews.",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "high",
       "category": "ux",
-      "title": "Footer quote cycling dead-ends silently at 8/8 — increment guard never fixed",
-      "description": "App.jsx line 1425: setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p). BONUS_TAGLINES has 8 items. When quoteBonus hits 8: the counter badge disappears (condition quoteBonus < BONUS_TAGLINES.length evaluates false), clicking the ✦ button does nothing (guard blocks increment), and there's zero feedback to the user. The fix last review added the % operator to the DISPLAY expression but never touched the INCREMENT logic. The two-line fix: change the onClick to setQuoteBonus(p => (p % BONUS_TAGLINES.length) + 1) after quoteBonus > 0, or just allow it to cycle: setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 0 : p + 1) to loop back to the vibe tagline.",
-      "effort": "small",
+      "title": "Footer quote cycling dead-ends silently at 8/8 — strike 5",
+      "description": "App.jsx line 1425: setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p). When quoteBonus reaches 8 (BONUS_TAGLINES.length), clicking the sparkle button does nothing — no animation, no wrap-around, no feedback. The counter badge also disappears at this exact point because the condition (quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length) is false. Fix: change to setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1) to cycle back. Or: setQuoteBonus(p => (p % BONUS_TAGLINES.length) + 1) which is cleaner. The display already uses modulo correctly — fix the increment. Five reviews. 30 seconds to fix.",
+      "effort": "trivial",
       "assignee": "Dave"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Vibe streak localStorage writes unguarded — effect will crash in restricted environments",
-      "description": "App.jsx lines 1036-1042: localStorage.getItem('bloberto-vibe-key'), localStorage.getItem('bloberto-vibe-streak'), localStorage.setItem('bloberto-vibe-key', ...), localStorage.setItem('bloberto-vibe-streak', ...) — these four calls are NOT in a try/catch. If localStorage throws (quota exceeded, iOS private browsing with full storage, certain enterprise browser policies), the entire useEffect at line 1035 crashes, silently killing: vibe streak logic, streak eulogy toast, confetti burst on vibe rank increase, AND the vibe transition activity log entries. The vibe history block at line 1073 correctly has try/catch; the streak block at 1036-1042 does not. Wrap lines 1036-1042 in try/catch exactly like the history block.",
+      "title": "Vibe streak localStorage writes unguarded — strike 4",
+      "description": "App.jsx lines 1036-1042: four localStorage calls (2x getItem, 2x setItem) with no try/catch. The setItem calls at 1041-1042 will throw in iOS private mode with full storage and in some enterprise browser policies. When they throw, the entire useEffect crashes silently — killing vibe streak counting, streak eulogy toast, confetti burst on rank increase, and vibe transition activity log entries. Fix: wrap lines 1036-1042 in try/catch identical to the history block at lines 1073-1080 which already does this correctly. Four reviews.",
+      "effort": "trivial",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "deskOccupants useMemo is completely wasted — NEW: all deps are new refs every render",
+      "description": "NEW ISSUE. Office.jsx line 1297: const deskOccupants = useMemo(() => {...}, [workingWorkers, idleWorkers, ghostRoster]). All three dependencies are computed inline without useMemo — workingWorkers (line 1205), idleWorkers (line 1207), ghostRoster (line 1294) are new array references on every render. Since useMemo uses referential equality for deps, deskOccupants recomputes on every single render. The memo is achieving nothing. Same structural problem exists for nonMgr (line 1204), workingIds (line 1206), standupWorkers (line 1210). meetingWorkers (line 1208) was flagged in review #73 — it now has 5 siblings with the same flaw. Fix: wrap nonMgr, workingWorkers, workingIds, idleWorkers, standupWorkers, ghostRoster in useMemo with [workers] or [workers, effectiveRoster] deps.",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "WORKER_ERROR_BUBBLES defined 600 lines after the component that uses it",
-      "description": "Office.jsx: Character component at line 545 references WORKER_ERROR_BUBBLES inside a useEffect at line 603. WORKER_ERROR_BUBBLES const is defined at line 1146 — 600+ lines below. This is a forward reference that works at runtime (effects run post-module-load) but is a trap for extraction and tooling. The file has grown to 1660 lines. Any attempt to extract Character into its own file will produce a ReferenceError. Move ALL lookup tables used by Character (WORKER_ERROR_BUBBLES, WORKER_IDLE_BUBBLES, DEFAULT_IDLE_BUBBLES, ERROR_BUBBLE_MESSAGES, AWAY_MESSAGES, WORKER_AWAY_MESSAGES, PING_REACTIONS, WORKER_WANDER_TOOLTIPS) to the top of the file or to src/utils/officeData.js.",
+      "title": "WORKER_ERROR_BUBBLES forward reference 601 lines below Character — strike 5",
+      "description": "Character component at Office.jsx line 545 references WORKER_ERROR_BUBBLES inside a useEffect at line 603. WORKER_ERROR_BUBBLES is defined at line 1146 — 601 lines below. Same for WORKER_IDLE_BUBBLES, DEFAULT_IDLE_BUBBLES, ERROR_BUBBLE_MESSAGES, WORKER_WANDER_TOOLTIPS, PING_REACTIONS. The file is now 1662 lines. Any attempt to extract Character (the right fix for the file size problem) will produce ReferenceErrors for all these lookups. Fix: create src/utils/officeData.js and move all static lookup tables there. Five reviews.",
+      "effort": "medium",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "meetingWorkers still missing useMemo — useEffect fires every render",
+      "description": "Office.jsx line 1208: const meetingWorkers = idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : []. New array every render. Line 1254: useEffect(() => {...}, [meetingWorkers]) fires on every render. Flagged in review #73 — still not fixed. Now compounded by the deskOccupants issue above. Wrap in useMemo: const meetingWorkers = useMemo(() => idleWorkers.length >= 2 ? idleWorkers.slice(0, 3) : [], [idleWorkers]).",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "Activity filter bars use role='radiogroup' + role='radio' on buttons — incorrect ARIA pattern",
-      "description": "App.jsx lines 1362-1380 and 1381-1400: Two filter bars use role='radiogroup' containing buttons with role='radio'. The ARIA spec requires that radio elements inside a radiogroup be either <input type='radio'> or elements with role='radio' that implement the full radio keyboard pattern (roving tabindex, arrow key navigation). These buttons instead have individual tabIndex and rely on click. Screen readers will announce these as radio buttons that can't be interacted with using arrow keys (which is what screen reader users expect). Fix: either (1) use role='group' + aria-pressed buttons (simpler, correct for toggle buttons), or (2) implement full roving tabindex with arrow key navigation as ARIA radio pattern requires.",
-      "effort": "medium",
-      "assignee": "Sofia"
-    },
-    {
-      "priority": "medium",
       "category": "performance",
-      "title": "activityLog still filtered twice inline — extract to filteredActivityLog useMemo",
-      "description": "App.jsx lines ~1344-1358: inline IIFE filter chain computing count for the section header. Lines ~1403-1412: second inline filter chain passed as `entries` prop to ActivityLog. Both filter chains have identical logic (activityFilter type + workerFilter name). With 50 log entries and renders triggered every 30s poll plus any state change, this is 100+ comparisons per render, duplicated. One useMemo: const filteredActivityLog = useMemo(() => activityLog.filter(e => { ... type logic ... }).filter(e => workerFilter ? e.worker === workerFilter : true), [activityLog, activityFilter, workerFilter]). Use it for both the count badge and the ActivityLog entries prop.",
+      "title": "activityLog filtered twice inline — two chained filter chains per render",
+      "description": "App.jsx lines 1344-1358: IIFE with two chained .filter().filter() calls for the count badge. Lines 1402-1412: identical two-chained filter passed as entries prop to ActivityLog. Both chains have identical logic. Fix: const filteredActivityLog = useMemo(() => activityLog.filter(e => type logic).filter(e => workerFilter ? e.worker === workerFilter : true), [activityLog, activityFilter, workerFilter]). Use it for both count and entries. Flagged in review #73.",
       "effort": "small",
       "assignee": "Carlos"
     },
@@ -99,74 +113,74 @@
       "priority": "medium",
       "category": "performance",
       "title": "window.matchMedia called during render on every polling tick",
-      "description": "App.jsx line 1212: window.matchMedia('(pointer: coarse)').matches is called inline inside JSX during the render phase. matchMedia() creates a new MediaQueryList object on every call. Since polling fires every 30s and any state change triggers a render, this is a DOM query executing dozens of times per session for a value that almost never changes. Fix: capture once in a useRef or useState at component mount: const isTouch = useRef(window.matchMedia('(pointer: coarse)').matches). Or use a proper media query event listener if you want it reactive.",
+      "description": "App.jsx line 1212: window.matchMedia('(pointer: coarse)').matches called inline in JSX, creating a new MediaQueryList on every render. Value almost never changes. Fix: const isCoarsePointer = useRef(window.matchMedia('(pointer: coarse)').matches) at mount. Flagged in review #73, still not fixed.",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "meetingWorkers missing useMemo causes huddle useEffect to fire every render",
-      "description": "Office.jsx line 1208: const meetingWorkers = idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : []. This .slice() produces a new array reference on every render. Line 1246: useEffect(() => { ... }, [meetingWorkers]) — since meetingWorkers is a new array ref every render, this effect fires on every render, not just when the meeting composition changes. The lastHuddle ref update logic inside this effect is safe (it has guards), but it's wasted work and a correctness footgun. Wrap with useMemo: const meetingWorkers = useMemo(() => idleWorkers.length >= 2 ? idleWorkers.slice(0, 3) : [], [idleWorkers]).",
-      "effort": "small",
-      "assignee": "Carlos"
+      "category": "accessibility",
+      "title": "Activity filter bars use incorrect ARIA radiogroup pattern",
+      "description": "App.jsx lines 1362-1400: Two filter bars use role='radiogroup' with role='radio' on <button> elements. ARIA radiogroup requires roving tabindex and arrow key navigation. These buttons use individual tabIndex and click only. Screen readers announce them as radio buttons but arrow key navigation won't work. Fix: use role='group' + aria-pressed on each button (simpler, semantically correct for toggle buttons). Flagged in review #73.",
+      "effort": "medium",
+      "assignee": "Sofia"
     },
     {
       "priority": "medium",
-      "category": "visual",
-      "title": "Worker name labels still illegible on mobile — 0.44rem is 7px",
-      "description": "Office.css at mobile breakpoints: .char__name is set to ~0.44-0.45rem (approximately 7px rendered). Confirmed in mobile screenshot — the names 'Sofia', 'Carlos', 'Maya', 'Dave', 'Luna' are invisible pinhead text under the character avatars. WCAG 2.1 SC 1.4.4 minimum is 9px for text. Since hover cards work on touch (pinnedCard toggle — nice fix), you can either: (a) bump to 0.6rem minimum on mobile, or (b) remove the name label entirely at mobile breakpoints and rely solely on hover card + aria-label on the Character div. Option b is actually cleaner.",
+      "category": "code",
+      "title": "ConferenceTable re-render-only state anti-pattern",
+      "description": "NEW ISSUE. Office.jsx lines 888-893: ConferenceTable uses const [, setTick] = useState(0) with setInterval(() => setTick(t => t + 1), 30000). The tick value is never used in JSX (destructured with [,]). It exists purely to force re-renders every 30s for the getRelativeTime(h.endedAt) display at line 977. This 'increment invisible state to force re-render' pattern is the React anti-pattern version of clearInterval + setInterval. Replace with the useTimeTick(30000) hook already defined in App.jsx line 83. Or better: lift lastHuddle into proper state instead of a ref so React re-renders naturally when meeting state changes.",
       "effort": "small",
+      "assignee": "Dave"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "handleTabKeyDown missing useCallback — flagged in review #73, still not fixed",
+      "description": "App.jsx line 778: const handleTabKeyDown = (e) => {...} is a plain arrow function inside App. Every other handler uses useCallback. handleTabKeyDown is passed as onKeyDown to tab buttons. Without useCallback([tab]), the handler reference changes every render. Wrap in useCallback with [tab] dependency. Flagged in review #73.",
+      "effort": "trivial",
       "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "handleTabKeyDown missing useCallback — inconsistent with rest of App",
-      "description": "App.jsx line 778: const handleTabKeyDown = (e) => { ... } is a plain function declaration inside the component. Every other handler in App — handleTagClick, handleWorkerClick, syncFromGitHub, onResume, dismiss — uses useCallback. handleTabKeyDown is passed as onKeyDown to both tab buttons (lines 1249, 1262). Without memo on the tab buttons, this is just a style inconsistency today. But if anyone wraps the tab buttons in React.memo later, they'll get a stale props bug. Wrap in useCallback with [tab] dependency.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "completionToast and plantToast inline style objects — third callout",
-      "description": "App.jsx lines 1158-1181 (completionToast) and Office.jsx lines 1307-1334 (plantToast): Both use massive multi-property inline style objects for fixed UI overlays. These style objects are recreated on every render. The only dynamic values are the border color (completionToast.color) and box-shadow color. Extract to CSS classes .completion-toast and .plant-toast, use CSS custom property for the dynamic color: style={{ '--toast-accent': completionToast.color }}. This is now the third review this has been raised. The file is also harder to read with 20-line style blobs inside JSX.",
+      "title": "completionToast and plantToast inline style blobs — fourth callout",
+      "description": "App.jsx lines 1158-1181 (completionToast) and Office.jsx lines 1316-1338 (plantToast): both render fixed overlays with 15+ inline style properties. Objects recreated every render. Only dynamic values are accent color. Fix: extract to .completion-toast and .plant-toast CSS classes. Use style={{ '--toast-accent': completionToast.color }} for the dynamic accent. Fourth review.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "No empty state for Dashboard activity log when a filter has no results",
-      "description": "ActivityLog component (App.jsx line ~155): when entries is an empty array after filtering, it shows 'No activity yet…'. But when the user has selected a worker filter or type filter that returns 0 results, the message 'No activity yet' is misleading — there IS activity, just not matching the filter. Should show 'No matching activity' or 'Try a different filter' when filtered.length === 0 but activityLog.length > 0. Small UX polish that prevents confusion.",
+      "title": "Activity log shows 'No activity yet' when filter returns 0 results",
+      "description": "ActivityLog component (App.jsx line 145): when displayed.length === 0, always shows 'No activity yet...' — even when the log has entries but the active filter matches none of them. Misleading when workerFilter or activityFilter is active. Fix: pass a hasData prop (activityLog.length > 0) to ActivityLog and conditionally show 'No matching activity — try a different filter'. Flagged in review #73.",
       "effort": "small",
       "assignee": "Luna"
     },
     {
       "priority": "low",
-      "category": "ux",
-      "title": "Vibe sparkline legend pills have no tooltip or accessible label",
-      "description": "VibeSparkline component (App.jsx line ~430): sparkline-legend__pill spans show vibe labels with background colors but have no title, aria-label, or description. Color-only communication fails WCAG SC 1.4.1 (use of color). The SVG circles inside the sparkline have <title> elements — good. The pills below do not. Add title={`${h.key} at ${new Date(h.ts).toLocaleTimeString()}`} to each pill.",
-      "effort": "small",
+      "category": "accessibility",
+      "title": "Vibe sparkline legend pills have no accessible label",
+      "description": "App.jsx line 432-436: sparkline-legend__pill spans show vibe labels with colored backgrounds but no title, aria-label, or description. Color-only communication fails WCAG SC 1.4.1. SVG circles already have correct title elements (line 426). Pills do not. Add title={h.key.replace(/-/g,' ') + ' vibe at ' + new Date(h.ts).toLocaleTimeString()} to each pill. Flagged in review #73.",
+      "effort": "trivial",
       "assignee": "Sofia"
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "Idle micro-bubble emoji selection calls Date.now() inside JSX render",
-      "description": "Office.jsx line ~794: the idle micro-bubble emoji is selected with an expression that calls Date.now() inside the render return. This means the emoji selection is time-dependent on render timing rather than stable per idle interval. If the component re-renders between idle interval fires, the emoji can change. Extract the selected index to a useState updated by the idleBubble interval, not by render-time Date.now().",
-      "effort": "small",
-      "assignee": "Carlos"
+      "category": "visual",
+      "title": "Worker name labels still illegible on mobile — 7px text",
+      "description": "Office.css mobile breakpoints: .char__name renders at approximately 0.44rem (~7px). WCAG 2.1 SC 1.4.4 minimum is 9px. Worker names are invisible below character avatars on mobile. Fix: either bump to 0.6rem minimum, or display:none below 480px since pinnedCard already shows the full name on tap. Option 2 is cleaner. Flagged in review #73.",
+      "effort": "trivial",
+      "assignee": "Maya"
     },
     {
       "priority": "low",
-      "category": "visual",
-      "title": "Office floor 'Clear skies' diagonal watermark clashes with character labels on mobile",
-      "description": "The diagonal vibe weather label (e.g. 'Clear skies — team at full strength') is a large full-width diagonal text on the office floor. On desktop it's subtle and atmospheric. On mobile at 375px it spans the full office area and overlaps worker name labels and desk nameplates in the viewport. Consider reducing font-size at mobile breakpoints from current size, or switching to a small top-center badge on screens under 480px.",
+      "category": "code",
+      "title": "Idle micro-bubble emoji selected via Date.now() in render phase",
+      "description": "Office.jsx line 794: emoji selected by Math.floor(Date.now() / 12000 + workerIdHash) during render. If the component re-renders between idleBubble being set to true and the paint, the emoji can change. Extract selected index to a useState updated inside the idle interval at line 587-595, not at render time. Flagged in review #73.",
       "effort": "small",
-      "assignee": "Luna"
+      "assignee": "Carlos"
     }
   ],
-  "summary": "Visual polish is at its peak — the office scene is genuinely delightful, the Ficus, the standup detection, the vibe sparkline, the golden-hour window are all excellent touches. The feature velocity is high and it shows. What's not showing is the maintenance backlog. Four HIGH issues are now on their third or fourth consecutive review unchanged: Bloberto can't be clicked, the footer quote cycles into a wall and stops, WORKER_ERROR_BUBBLES is still upside down in the file, and the localStorage writes in the streak effect are one private-browsing tab away from a silent crash. Accessibility improved — skip link is there, aria-labels are thorough — but the radiogroup pattern on the filter bars is incorrect per spec. Code quality ticked up (activityByWorker is finally memoized, nice), but the monolith files grew larger. The fun factor remains unchallengeable. Ship the Bloberto click fix. Please."
+  "summary": "Five reviews in and Bloberto still can't be clicked, the footer still dead-ends at quote 8, the streak localStorage is still one private-browsing tab away from a silent crash, and WORKER_ERROR_BUBBLES is still upside-down in a 1662-line file. All four on their fifth consecutive appearance. I've moved past annoyed into documentation mode. The new finding this review is more concerning than any of those: the deskOccupants useMemo at line 1297 is completely wasted — all three of its dependencies (workingWorkers, idleWorkers, ghostRoster) are new array references every render because none of them are memoized. The memo recomputes on every render. meetingWorkers from review #73 now has five siblings with the same problem. Code quality and performance both dropped to 2/5 because memoization APIs being used incorrectly is worse than not using them at all — it creates false confidence while paying the full computation cost. The visual work remains genuinely excellent. The office scene is a joy. But the technical foundation under it is accumulating debt faster than the feature work is clearing it. The Bloberto click fix is 10 minutes. The footer fix is 30 seconds. The localStorage wrap is one try/catch. The fact that these have been sitting open for 5 reviews while new features shipped suggests a process problem, not a skill problem. Prioritize the backlog."
 }
