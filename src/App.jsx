@@ -3,6 +3,7 @@ import './App.css'
 import Office from './Office.jsx'
 import { getTeamVibe } from './utils/vibe.js'
 import { ROLE_EMOJIS, STATUS_LABELS, STATUS_EMOJIS, ROLE_COLORS } from './utils/constants.js'
+import { getRelativeTime } from './utils/time.js'
 
 class ErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false } }
@@ -25,6 +26,14 @@ const ACTIVITY_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/activity.json'
 const POLL_INTERVAL_ACTIVE = 30_000
 const POLL_INTERVAL_HIDDEN = 60_000
+
+const AMBIENT_PARTICLES = Array.from({ length: 12 }, (_, i) => (
+  <span key={i} className="ambient-particle" style={{ '--i': i }} />
+))
+
+const CONFETTI_PIECES = Array.from({ length: 30 }, (_, i) => (
+  <span key={i} className="confetti-piece" style={{ '--i': i }} />
+))
 
 const STAT_DISPATCHES = {
   active: { 0: 'ghost town', 1: 'lone wolf', 2: 'dynamic duo', 3: 'skeleton crew', 4: 'full squad', 5: 'all hands' },
@@ -50,17 +59,6 @@ async function fetchActivityFromGitHub(signal) {
   const res = await fetch(ACTIVITY_API_URL + '?t=' + Date.now(), { signal })
   if (!res.ok) throw new Error(`Fetch error ${res.status}`)
   return res.json()
-}
-
-function getRelativeTime(timestamp) {
-  const diff = Date.now() - new Date(timestamp).getTime()
-  const mins = Math.floor(diff / 60_000)
-  const hours = Math.floor(diff / 3_600_000)
-  const days = Math.floor(diff / 86_400_000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  if (hours < 24) return `${hours}h ago`
-  return `${days}d ago`
 }
 
 function formatFullDateTime(timestamp) {
@@ -276,6 +274,11 @@ const SOLO_SPOTLIGHT_MESSAGES = {
   luna:   { 'crushing': '✨ Big creative energy, no audience needed.', 'after-hours': '🌙 Creative review never clocks out.', 'on-fire': '🔥 One creative in a burning building — the brief will still be beautiful.', 'in-flow': '✨ Ideas arrive faster when the office goes quiet.', 'slow-day': '🌙 Slow day. The perfect kind for the ideas that need silence.', default: '🌙 Dreaming alone. The ideas keep coming.' },
 }
 
+function getSoloSpotlightMsg(worker, vibeKey) {
+  const soloKey = (worker?.id ?? worker?.name)?.toLowerCase()
+  return SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[vibeKey] ?? SOLO_SPOTLIGHT_MESSAGES[soloKey]?.default ?? '🌟 Running solo today...'
+}
+
 const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = false, isFading = false, activityEntries = [], isFocused = false, selectedTag = null, onTagClick = null, isDimmed = false }) {
   const [isFlipped, setIsFlipped] = useState(false)
   const cardRef = useRef(null)
@@ -478,7 +481,10 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
           className="stat-dispatch"
           style={{ cursor: 'pointer' }}
           title="Scroll to workers"
+          role="button"
+          tabIndex={0}
           onClick={() => document.querySelector('.workers-grid')?.scrollIntoView({ behavior: 'smooth' })}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.querySelector('.workers-grid')?.scrollIntoView({ behavior: 'smooth' }) } }}
         >{getDispatch(STAT_DISPATCHES.active, active)}</span>
         <DeltaBadge delta={activeDelta} />
       </div>
@@ -488,7 +494,14 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
         <span className="stat-dispatch">{getDispatch(STAT_DISPATCHES.idle, idle)}</span>
         <DeltaBadge delta={idleDelta} />
       </div>
-      <div className={`stat-card sync-status${pollingPaused ? ' sync-status--paused' : ''}`} onClick={pollingPaused ? onResume : undefined} title={pollingPaused ? 'Click to resume auto-refresh' : undefined}>
+      <div
+        className={`stat-card sync-status${pollingPaused ? ' sync-status--paused' : ''}`}
+        onClick={pollingPaused ? onResume : undefined}
+        title={pollingPaused ? 'Click to resume auto-refresh' : undefined}
+        role={pollingPaused ? 'button' : undefined}
+        tabIndex={pollingPaused ? 0 : undefined}
+        onKeyDown={pollingPaused ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onResume() } } : undefined}
+      >
         <span className="stat-label">
           <span className={`live-dot ${pollingPaused ? 'paused' : isLive ? 'live' : 'offline'}`} />
           {pollingPaused ? 'PAUSED' : isLive ? 'Live' : 'Offline'}
@@ -660,7 +673,6 @@ function ShortcutToast() {
 const HONORIFICS = { crushing: 'LEGEND 🔥', 'on-fire': 'captain 🚨', 'in-flow': 'boss', 'slow-day': 'chief... you still there? 😐', 'after-hours': 'night owl 🌙' }
 
 export default function App() {
-  useTimeTick(60_000) // keep relative timestamps fresh
   const [allWorkers, setAllWorkers] = useState([])
   const [roster, setRoster] = useState([])
   const [activityLog, setActivityLog] = useState([])
@@ -710,6 +722,7 @@ export default function App() {
   const newClearTimersRef    = useRef({})   // { [id]: timeoutId }
   const justShippedTimersRef = useRef([])   // outer stagger timer IDs
   const titleIdxRef          = useRef(0)    // persists tab-title rotation across effect re-runs
+  const titleStateRef        = useRef({ frames: ["😴 Bloberto's Office — All quiet"], workingCount: 0, errCount: 0 })
   const [fadingMap, setFadingMap] = useState({})
   const [newIds,    setNewIds]    = useState(new Set())
   const [doorEvent, setDoorEvent] = useState(null)
@@ -718,7 +731,7 @@ export default function App() {
   const focusedWorkerTimerRef = useRef(null)
   const [selectedTag, setSelectedTag] = useState(null)
   const [quoteBonus, setQuoteBonus] = useState(0)
-  const [sparkleUnseen] = useState(() => !localStorage.getItem('footer-sparkle-seen'))
+  const [sparkleUnseen, setSparkleUnseen] = useState(() => !localStorage.getItem('footer-sparkle-seen'))
 
   const handleTagClick = useCallback((tag) => {
     setSelectedTag(prev => prev === tag ? null : tag)
@@ -811,7 +824,10 @@ export default function App() {
 
     if (activityResult.status === 'fulfilled') {
       const activity = activityResult.value
-      setActivityLog(Array.isArray(activity) ? activity : [])
+      setActivityLog(Array.isArray(activity) ? (prev => {
+        const synthetics = prev.filter(e => e.source === 'synthetic')
+        return [...synthetics, ...activity].slice(0, 50)
+      }) : (prev => prev))
       setActivityError(null)
     } else {
       setActivityError('Could not load activity log. Check your connection and try again.')
@@ -854,15 +870,11 @@ export default function App() {
     syncFromGitHub()
   }, [syncFromGitHub])
 
-  useEffect(() => {
-    const handleVisibilityResume = () => { if (!document.hidden) onResume() }
-    document.addEventListener('visibilitychange', handleVisibilityResume)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityResume)
-  }, [onResume])
-
+  // Single consolidated visibilitychange handler: resume+refetch, poll interval reset, title animation
   useEffect(() => {
     const controller = new AbortController()
     syncFromGitHub(controller.signal)
+
     const getInterval = () =>
       document.visibilityState === 'hidden' ? POLL_INTERVAL_HIDDEN : POLL_INTERVAL_ACTIVE
 
@@ -871,20 +883,47 @@ export default function App() {
       syncFromGitHub()
     }
 
-    let timer = setInterval(pollTick, getInterval())
+    let pollTimer = setInterval(pollTick, getInterval())
+    let titleTimer = setInterval(() => {
+      if (!titleStateRef.current) return
+      const { frames } = titleStateRef.current
+      titleIdxRef.current = (titleIdxRef.current + 1) % frames.length
+      document.title = frames[titleIdxRef.current]
+    }, 8_000)
 
     const handleVisibilityChange = () => {
-      clearInterval(timer)
-      timer = setInterval(pollTick, getInterval())
+      // 1. Resume + refetch on becoming visible
+      if (!document.hidden) onResume()
+      // 2. Reset polling interval
+      clearInterval(pollTimer)
+      pollTimer = setInterval(pollTick, getInterval())
+      // 3. Title animation
+      if (document.visibilityState === 'hidden') {
+        clearInterval(titleTimer)
+        const { errCount, workingCount } = titleStateRef.current
+        document.title = errCount > 0
+          ? '⚠️ Someone needs help — Bloberto Office'
+          : workingCount > 0
+          ? '🔨 Team is shipping — Bloberto Office'
+          : '💤 Office is quiet — Bloberto Office'
+      } else {
+        const { frames } = titleStateRef.current
+        document.title = frames[titleIdxRef.current % frames.length]
+        titleTimer = setInterval(() => {
+          titleIdxRef.current = (titleIdxRef.current + 1) % titleStateRef.current.frames.length
+          document.title = titleStateRef.current.frames[titleIdxRef.current]
+        }, 8_000)
+      }
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
       controller.abort()
-      clearInterval(timer)
+      clearInterval(pollTimer)
+      clearInterval(titleTimer)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [syncFromGitHub])
+  }, [onResume, syncFromGitHub])
 
   const activeWorkers = useMemo(
     () => allWorkers.filter(
@@ -1018,6 +1057,7 @@ export default function App() {
       const VIBE_LABELS = { 'after-hours': 'After Hours', 'slow-day': 'Slow Day', 'on-fire': 'On Fire', 'in-flow': 'In Flow', 'crushing': 'Crushing It' }
       setActivityLog(prev => [{
         type: 'system',
+        source: 'synthetic',
         worker: null,
         message: `🌡️ Vibe: ${VIBE_LABELS[prevKey] ?? prevKey} → ${VIBE_LABELS[teamVibe.key] ?? teamVibe.key}`,
         timestamp: new Date().toISOString()
@@ -1053,7 +1093,7 @@ export default function App() {
     if (!link.parentNode) document.head.appendChild(link)
   }, [activeWorkers, fetchError])
 
-  // ── Tab title: cycles every 8s showing worker status ──
+  // ── Tab title: update titleStateRef so the consolidated visibilitychange handler stays current ──
   useEffect(() => {
     const workingCount = activeWorkers.filter(w => w.status === 'working').length
     const idleCount = activeWorkers.filter(w => w.status === 'idle').length
@@ -1068,39 +1108,9 @@ export default function App() {
           `${teamVibe.label} — Bloberto's Office`,
         ]
 
-    let idx = titleIdxRef.current
-    document.title = frames[idx]
-    let timer = setInterval(() => {
-      idx = (idx + 1) % frames.length
-      titleIdxRef.current = idx
-      document.title = frames[idx]
-    }, 8_000)
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        clearInterval(timer)
-        if (errCount > 0) {
-          document.title = '⚠️ Someone needs help — Bloberto Office'
-        } else if (workingCount > 0) {
-          document.title = '🔨 Team is shipping — Bloberto Office'
-        } else {
-          document.title = '💤 Office is quiet — Bloberto Office'
-        }
-      } else {
-        idx = titleIdxRef.current
-        document.title = frames[idx]
-        timer = setInterval(() => {
-          idx = (idx + 1) % frames.length
-          titleIdxRef.current = idx
-          document.title = frames[idx]
-        }, 8_000)
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => {
-      clearInterval(timer)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    titleStateRef.current = { frames, workingCount, errCount, idleCount }
+    if (document.visibilityState !== 'hidden') {
+      document.title = frames[titleIdxRef.current % frames.length]
     }
   }, [activeWorkers, teamVibe])
 
@@ -1121,15 +1131,11 @@ export default function App() {
     <ErrorBoundary>
     <div className="app">
       <div className="ambient-particles" data-vibe={teamVibe.key} aria-hidden="true">
-        {Array.from({ length: 12 }, (_, i) => (
-          <span key={i} className="ambient-particle" style={{ '--i': i }} />
-        ))}
+        {AMBIENT_PARTICLES}
       </div>
       {confettiActive && (
         <div className="confetti-layer" aria-hidden="true">
-          {Array.from({ length: 30 }, (_, i) => (
-            <span key={i} className="confetti-piece" style={{ '--i': i }} />
-          ))}
+          {CONFETTI_PIECES}
         </div>
       )}
       {workerConfetti && (
@@ -1192,14 +1198,14 @@ export default function App() {
           </span>
           <button className='sync-now-btn' onClick={() => syncFromGitHub()} disabled={isSyncing} aria-label='Sync now' title='Refresh data (R)'>↺</button>
           {pollingPaused && (
-            <span
+            <button
               className="polling-paused-pill"
               title="Auto-refresh paused due to inactivity"
               aria-live="polite"
               onClick={onResume}
             >
               ⏸ Paused · {window.matchMedia('(pointer: coarse)').matches ? 'Tap to refresh' : 'Move mouse to refresh'}
-            </span>
+            </button>
           )}
           <button
             className="theme-toggle"
@@ -1251,16 +1257,14 @@ export default function App() {
             onKeyDown={handleTabKeyDown}
           >
             📊 Dashboard
-            {errorCount > 0 && <span className='tab-error-badge'>{errorCount}</span>}
+            {errorCount > 0 && <span className='tab-error-badge' aria-label={`${errorCount} error${errorCount !== 1 ? 's' : ''}`}>{errorCount}</span>}
           </button>
         </div>
 
-        {tab === 'office' ? (
-          <div role="tabpanel" id="tabpanel-office" aria-labelledby="tab-office">
-            <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} vibeStreak={vibeStreak} />
-          </div>
-        ) : (
-          <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard">
+        <div role="tabpanel" id="tabpanel-office" aria-labelledby="tab-office" hidden={tab !== 'office'}>
+          <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} vibeStreak={vibeStreak} />
+        </div>
+        <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard" hidden={tab !== 'dashboard'}>
             <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={onResume} />
 
             <div className="section-header">
@@ -1289,7 +1293,7 @@ export default function App() {
                     isDimmed={selectedTag !== null && !getTaskTags(activeWorkers[0].task).some(t => t.label === selectedTag)}
                   />
                 </div>
-                <p className="solo-spotlight-msg">{(() => { const soloKey = (activeWorkers[0]?.id ?? activeWorkers[0]?.name)?.toLowerCase(); return SOLO_SPOTLIGHT_MESSAGES[soloKey]?.[teamVibe.key] ?? SOLO_SPOTLIGHT_MESSAGES[soloKey]?.default ?? '🌟 Running solo today...' })()} </p>
+                <p className="solo-spotlight-msg">{getSoloSpotlightMsg(activeWorkers[0], teamVibe.key)} </p>
               </div>
             ) : (
               <div className="workers-grid">
@@ -1405,18 +1409,16 @@ export default function App() {
               roster={roster}
             />
           </div>
-        )}
       </main>
 
       <footer className="footer">
         Built with 💜 and mild existential dread by <span>🫠 Bloberto</span>
-        &nbsp;&middot;&nbsp; <span
+        &nbsp;&middot;&nbsp; <button
           key={`${teamVibe.key}-${quoteBonus}`}
           className="footer-tagline"
-          style={{ cursor: 'pointer' }}
           title="tap for another thought"
-          onClick={() => { localStorage.setItem('footer-sparkle-seen', '1'); setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p) }}
-        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span>{quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length && <span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {quoteBonus}/{BONUS_TAGLINES.length}</span>} &nbsp;&middot;&nbsp;
+          onClick={() => { localStorage.setItem('footer-sparkle-seen', '1'); setSparkleUnseen(false); setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p) }}
+        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</button>{quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length && <span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {quoteBonus}/{BONUS_TAGLINES.length}</span>} &nbsp;&middot;&nbsp;
         <span>{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}</span>
       </footer>
     </div>

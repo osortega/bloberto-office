@@ -3,6 +3,16 @@ import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
 import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
 import { VIBE_QUOTES, VIBE_TRANSITION_QUOTES } from './utils/quotes.js'
+import { getRelativeTime } from './utils/time.js'
+
+const OFFICE_AMBIENT_PARTICLES = Array.from({ length: 7 }, (_, i) => (
+  <span key={i} className="ambient-particle" style={{
+    '--i': i,
+    left: `${10 + i * 12}%`,
+    top: `${20 + (i * 17) % 60}%`,
+    animationDelay: `${i * 3}s`
+  }} />
+))
 
 
 const DESK_SCREEN_SVG = {
@@ -745,16 +755,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       )}
       {variant === 'ghost' && ghostBubble && (() => {
         const lastEvent = activityEntries.filter(e => e.worker === worker.name).at(-1)
-        const relTime = lastEvent ? (() => {
-          const diff = Date.now() - new Date(lastEvent.timestamp).getTime()
-          const mins = Math.floor(diff / 60_000)
-          const hours = Math.floor(diff / 3_600_000)
-          const days = Math.floor(diff / 86_400_000)
-          if (mins < 1) return 'just now'
-          if (mins < 60) return `${mins}m ago`
-          if (hours < 24) return `${hours}h ago`
-          return `${days}d ago`
-        })() : null
+        const relTime = lastEvent ? getRelativeTime(lastEvent.timestamp) : null
         return (
           <div className='ghost-ooo-bubble'>📵 OOO<br/><span className='ghost-ooo-role'>{worker.role}</span>{relTime && <span className='ghost-last-seen'>Last seen: {relTime}</span>}</div>
         )
@@ -965,8 +966,7 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
         if (!h || !h.names.length || h.endedAt === null) return null
         const elapsed = Date.now() - h.endedAt
         if (elapsed > 30 * 60 * 1000) return null
-        const mins = Math.floor(elapsed / 60000)
-        const timeStr = mins < 1 ? 'just now' : `${mins}m ago`
+        const timeStr = getRelativeTime(h.endedAt)
         return (
           <div style={{ opacity: 0.5, fontSize: '0.38rem', textAlign: 'center', marginTop: '2px' }}>
             Last: {h.names.join(', ')} · {timeStr}
@@ -1565,8 +1565,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           )
         })}
 
-        {/* Idle workers wandering the lower floor */}
-        {idleWorkers.map((w, i) => {
+        {/* Idle workers wandering the lower floor — exclude those already at conference table */}
+        {idleWorkers.filter(w => !meetingWorkers.includes(w)).map((w, i) => {
           const wIdx = (i % 4) + 1
           const WORKER_WANDER_TOOLTIPS = {
             carlos: ['☕ Checking server metrics', '📊 Reviewing the logs', '🔌 Debugging in his head'],
@@ -1650,14 +1650,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
 
         <div className="ambient-particles" aria-hidden="true">
-          {[...Array(7)].map((_, i) => (
-            <span key={i} className="ambient-particle" style={{
-              '--i': i,
-              left: `${10 + i * 12}%`,
-              top: `${20 + (i * 17) % 60}%`,
-              animationDelay: `${i * 3}s`
-            }} />
-          ))}
+          {OFFICE_AMBIENT_PARTICLES}
         </div>
 
       </div>
