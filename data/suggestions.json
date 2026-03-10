@@ -1,7 +1,7 @@
 {
   "analyst": "Sofia",
-  "review_number": 61,
-  "timestamp": "2026-03-10T07:45:48Z",
+  "review_number": 62,
+  "timestamp": "2026-03-10T08:22:00Z",
   "scores": {
     "visual": 4,
     "ux": 3,
@@ -14,169 +14,155 @@
   },
   "overall_score": 3.4,
   "meta": {
-    "previous_score": 3.5,
-    "delta": "-0.1",
+    "previous_score": 3.4,
+    "delta": "0.0 flat. Two nice new features added (ShortcutToast, solo spotlight messages) but zero bugs fixed from the 19 open issues carried from review 61. Bug backlog growing faster than it shrinks.",
     "fixes_confirmed": [],
     "still_broken": [
-      "overflow:visible bleed on office-floor (Office.css line 84) — ambient particles and decorative elements visibly bleed outside teal border in desktop screenshot",
-      "Triple visibilitychange listeners (App.jsx lines 859, 881, 1101) — three separate document.addEventListener('visibilitychange') calls still present",
-      "completionToast 16-property inline style block (App.jsx lines 1150–1166) — all 16 properties still hardcoded inline",
-      "Duplicate dead CSS selectors with single quotes (Office.css lines 91–95) — single-quote vibe selectors still precede double-quote duplicates with extra --grid-line vars",
-      "Tab panel ARIA broken — conditional render means inactive tab's aria-controls always points to a non-existent DOM node",
-      "polling-paused-pill is a <span> with onClick (App.jsx line 1197) — not keyboard accessible, no role, no button semantics",
-      "window.matchMedia('(pointer: coarse)').matches called inline during JSX render (App.jsx line 1202)",
-      "No H2 headings anywhere in App.jsx or Office.jsx — section titles use divs",
-      "sparkleUnseen useState has no setter (App.jsx line 721) — localStorage is set on click but state never updates, animation persists after first visit",
-      "Activity log filter logic computed twice per render — IIFE in header count (line 1338) and prop passed to ActivityLog (line 1395) are identical, neither memoized",
-      "stat-dispatch active span has cursor:pointer and onClick but no tabIndex or role=button — keyboard inaccessible",
-      "getRelativeTime duplicated in Office.jsx — ghost bubble IIFE (line 748) and whiteboard huddle IIFE (line 969) are both inline reimplementations; App.jsx has the canonical version at line 55",
-      "tab-error-badge <span> has no aria-label — screen reader reads only the number with no context (e.g. '3' instead of '3 errors')",
-      "Array.from({ length: 12 }) for ambient particles runs on every render (App.jsx line 1125) — stable array should be a module-level constant",
-      "Mobile speech bubble overlaps the Office tab toggle — confirmed in mobile screenshot, 'Night crew came to work. Respect.' sits directly over the tab bar"
+      "overflow:visible bleed on office-floor (Office.css line 84) \u2014 desktop screenshot confirms coffee station, SUNRISE artwork, cactus, and ambient particle orb all visibly outside the teal border. Tenth review this has appeared.",
+      "Triple visibilitychange listeners (App.jsx lines 859, 881, 1100) \u2014 three separate addEventListener calls still present, firing redundant state updates on every tab switch.",
+      "completionToast 16-property inline style block (App.jsx lines 1149-1166) \u2014 all 16 properties still hardcoded inline; only border and boxShadow are dynamic.",
+      "Duplicate dead CSS selectors with single quotes (Office.css lines 91-95) \u2014 single-quote vibe selectors still precede double-quote duplicates with extra --grid-line vars.",
+      "Tab panel ARIA broken \u2014 conditional ternary render means only one tabpanel exists in DOM; inactive aria-controls points to nonexistent node (App.jsx line 1258).",
+      "polling-paused-pill is a span with onClick (App.jsx line 1196) \u2014 no role, no tabIndex, no keyboard handler.",
+      "window.matchMedia called inline during JSX render (App.jsx line 1201) \u2014 layout query on every render, SSR-unsafe.",
+      "No H2 headings anywhere \u2014 Active Workers and Activity Log section titles use div.section-title (lines 1267, 1333).",
+      "sparkleUnseen useState has no setter (App.jsx line 721) \u2014 localStorage written on click but state never updated; twinkle persists all session.",
+      "Activity log filter logic computed twice per render \u2014 identical filter chains in IIFE count label (lines 1335-1350) and ActivityLog entries prop (lines 1394-1403). Neither memoized.",
+      "stat-dispatch active span has cursor:pointer and onClick but no tabIndex or role=button (App.jsx lines 477-482) \u2014 keyboard inaccessible.",
+      "getRelativeTime duplicated in Office.jsx \u2014 ghost bubble IIFE (lines 748-757) and whiteboard huddle IIFE (line 969) are ad-hoc reimplementations of App.jsx canonical version at line 55. Implementations have already drifted.",
+      "tab-error-badge span has no aria-label (App.jsx line 1254) \u2014 screen reader reads bare number with no context.",
+      "Array.from with length 12 for ambient particles runs on every render (App.jsx line 1124) \u2014 stable array should be module-level constant.",
+      "Mobile speech bubble overlaps Office tab toggle \u2014 confirmed in mobile screenshot at 375px.",
+      "handleTabKeyDown not wrapped in useCallback (App.jsx line 760) \u2014 plain arrow function recreated every render, passed to two memoized tab buttons.",
+      "StatsBar computes workers.filter three separate times for active/idle/errorCount (lines 447-449) \u2014 single reduce pass would suffice.",
+      "Third inline relative-time IIFE in Office.jsx whiteboard huddle label (line 969) \u2014 codebase has three separate implementations.",
+      "Spread Array(7) allocation in Office.jsx ambient-particles (line 1654) \u2014 same render-time waste as App.jsx Array.from."
     ],
     "new_issues": [
-      "handleTabKeyDown is not wrapped in useCallback (App.jsx line 760) — plain arrow function recreated every render, passed to two memoized tab buttons, defeating their memo",
-      "StatsBar computes workers.filter three separate times for active/idle/errorCount (lines 447–449) — a single reduce pass would be more efficient",
-      "Third inline relative-time IIFE in Office.jsx whiteboard huddle label (line 969) — codebase now has three separate ad-hoc implementations of the same relative-time logic; App.jsx getRelativeTime still unused in Office",
-      "[...Array(7)] allocation in Office.jsx ambient-particles (line 1654) — same class of wasteful render allocation as the App.jsx Array.from items previously flagged"
+      "footer-tagline span has onClick+cursor:pointer but no tabIndex, role=button, or onKeyDown (App.jsx line 1414) \u2014 the quote rotator is completely keyboard inaccessible. Third location with this exact bug pattern after polling-paused-pill and stat-dispatch.",
+      "stat-card sync-status div has onClick when pollingPaused but no role, tabIndex, or onKeyDown (App.jsx line 491) \u2014 the Stuck card directly below it at line 506 correctly has role=button + tabIndex + onKeyDown; sync-status was missed. Inconsistent accessibility.",
+      "SOLO_SPOTLIGHT_MESSAGES lookup is an IIFE in JSX (App.jsx line 1292) \u2014 multi-step inline IIFE with optional chaining, toLowerCase, and two fallback levels computed on every render. Extract to getSoloMessage helper or useMemo."
     ]
   },
   "suggestions": [
     {
       "priority": "critical",
       "category": "CSS / Layout",
-      "title": "Fix overflow:visible bleed on .office-floor",
-      "description": "Office.css line 84: change `overflow: visible` to `overflow: hidden`. Decorative ambient particles, speech bubbles, and outside-boundary elements are visibly clipping outside the teal border in the desktop screenshot. This has been flagged since review #8. Elements that need to escape the boundary (tooltips, speech bubbles) can use position:fixed or a portal instead.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Fix overflow:visible bleed on .office-floor \u2014 review #10",
+      "description": "Office.css line 84: overflow:visible causes coffee station, SUNRISE artwork, cactus, and ambient particle orb to render outside the teal border \u2014 confirmed in desktop screenshot. Change to overflow:hidden. Elements needing to escape (speech bubbles, tooltips, hover cards) should use position:fixed or a React portal. This has been open for ten consecutive reviews.",
+      "effort": "small"
     },
     {
       "priority": "critical",
       "category": "Accessibility / ARIA",
-      "title": "Fix broken tab panel ARIA — inactive panel is always absent from DOM",
-      "description": "App.jsx renders only one tabpanel at a time via ternary (`tab === 'office' ? <div id='tabpanel-office'> : <div id='tabpanel-dashboard'>`). This means the inactive tab's `aria-controls` attribute always references an element that doesn't exist, which is an ARIA error. Fix: render both panels and toggle visibility with `hidden` attribute or CSS `display:none` so both DOM nodes are always present for AT.",
-      "effort": "small",
-      "assigned_to": "Dave"
+      "title": "Fix broken tab panel ARIA \u2014 inactive panel absent from DOM",
+      "description": "App.jsx line 1258: tabs rendered via ternary means the inactive panel DOM node does not exist, making aria-controls point to nothing. Fix: render both panels always and toggle with the hidden attribute or display:none so both IDs are always present for assistive technologies.",
+      "effort": "small"
     },
     {
       "priority": "critical",
       "category": "Performance / Correctness",
       "title": "Consolidate three visibilitychange listeners into one",
-      "description": "App.jsx attaches three separate `document.addEventListener('visibilitychange', ...)` listeners: handleVisibilityResume (line 859), handleVisibilityChange for polling (line 881), and handleVisibilityChange for document title (line 1101). Each fires on every tab switch, causing redundant state updates and making event ordering fragile. Merge all three into a single useEffect that handles resume, polling pause, and title update in one handler.",
-      "effort": "medium",
-      "assigned_to": "Carlos"
+      "description": "App.jsx attaches three separate visibilitychange listeners: line 859 (resume+refetch), line 881 (polling interval reset), line 1100 (document title animation). All fire on every tab switch in undefined order. Merge into a single useEffect that handles all three responsibilities atomically.",
+      "effort": "medium"
     },
     {
       "priority": "high",
       "category": "Accessibility",
-      "title": "Replace polling-paused-pill <span> with <button>",
-      "description": "App.jsx line 1197: `<span className='polling-paused-pill' onClick={onResume}>` is not keyboard accessible and has no implicit interactive role. Screen readers will not announce it as clickable. Replace with `<button>` and move the `window.matchMedia` call out of the render expression (see separate issue). Also add `aria-label='Resume auto-refresh'`.",
-      "effort": "small",
-      "assigned_to": "Dave"
-    },
-    {
-      "priority": "high",
-      "category": "Performance / Correctness",
-      "title": "Move window.matchMedia out of JSX render",
-      "description": "App.jsx line 1202: `window.matchMedia('(pointer: coarse)').matches` is called inline in JSX during every render. This forces a layout query on each render cycle and crashes in SSR contexts. Move it into a `useRef` initialized once, or use a `useEffect` with a `matchMedia.addEventListener('change', ...)` listener to reactively track pointer type.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "CSS / Code Quality",
-      "title": "Remove duplicate single-quote attribute selectors in Office.css",
-      "description": "Office.css lines 91–95 define `.office-floor[data-vibe='crushing']`, `[data-vibe='on-fire']` etc. with single-quoted attribute values. Lines 97+ then redefine the same elements with double-quoted selectors PLUS additional properties (--grid-line custom properties, ::before rules). The single-quote versions are dead weight — they are overridden by the double-quote duplicates and create confusion. Delete lines 91–95 entirely.",
-      "effort": "small",
-      "assigned_to": "Maya"
+      "title": "Fix four inaccessible clickable elements \u2014 spans and divs with onClick but no keyboard semantics",
+      "description": "Four locations have onClick with no keyboard semantics: (1) polling-paused-pill span (line 1196), (2) footer-tagline span (line 1414) NEW, (3) stat-dispatch Active span (line 477), (4) stat-card sync-status div when paused (line 491) NEW. Items 1/2/3 should become button elements. Item 4 should add role=button, tabIndex=0, and onKeyDown for Enter/Space \u2014 matching the adjacent Stuck card at line 506 which already does this correctly.",
+      "effort": "small"
     },
     {
       "priority": "high",
       "category": "Accessibility",
-      "title": "Fix sparkleUnseen — state never updates after first click",
-      "description": "App.jsx line 721: `const [sparkleUnseen] = useState(...)` has no setter. When the user clicks the footer sparkle, `localStorage.setItem('footer-sparkle-seen', '1')` is called but the React state is never updated, so `sparkleUnseen` remains `true` and the twinkle animation continues for the entire session. Add the setter: `const [sparkleUnseen, setSparkleUnseen] = useState(...)` and call `setSparkleUnseen(false)` in the onClick.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Fix sparkleUnseen \u2014 state never updates after click",
+      "description": "App.jsx line 721: const [sparkleUnseen] = useState destructs without a setter. Clicking the footer sparkle calls localStorage.setItem but state never updates, so sparkleUnseen stays true and the twinkle animation runs all session. Add setter: const [sparkleUnseen, setSparkleUnseen] = useState and call setSparkleUnseen(false) in onClick.",
+      "effort": "small"
     },
     {
       "priority": "high",
       "category": "CSS / Mobile",
       "title": "Fix mobile speech bubble overlapping Office tab toggle",
-      "description": "Confirmed in mobile screenshot (375px): Bloberto's speech bubble renders above the character but bleeds upward and overlaps the Office/Dashboard tab toggle. The bubble uses `position:absolute; bottom:calc(100% + 8px); z-index:30`. The office-floor sits below the tab bar with insufficient clearance at small viewports. Fix: cap the speech-bubble's max upward travel in mobile media query (`@media (max-width: 480px) { .speech-bubble { bottom: auto; top: calc(100% + 4px); } }`) to push it downward instead, or add `overflow:visible` clip region that starts below the tab bar.",
-      "effort": "medium",
-      "assigned_to": "Maya"
+      "description": "Confirmed in mobile screenshot at 375px: speech bubble renders upward and covers the Office tab button. Bubble uses position:absolute; bottom:calc(100% + 8px). Fix with mobile media query: @media (max-width: 480px) { .speech-bubble { bottom: auto; top: calc(100% + 4px); } } to push it downward under the character instead.",
+      "effort": "small"
     },
     {
       "priority": "high",
       "category": "Code Quality",
       "title": "Extract completionToast inline style block to CSS class",
-      "description": "App.jsx lines 1150–1166: the completionToast renders with 16 inline style properties including position, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, and animation. The only dynamic properties are the border color and box-shadow glow. Move the 14 static properties to `.completion-toast` in App.css and keep only `border` and `boxShadow` inline (or use CSS custom properties like `--toast-color`).",
-      "effort": "small",
-      "assigned_to": "Maya"
+      "description": "App.jsx lines 1149-1166: 14 of 16 style properties are static (position, transform, background, borderRadius, padding, fontSize, fontWeight, color, zIndex, whiteSpace, pointerEvents, animation). Move to .completion-toast in App.css. Expose only dynamic border and boxShadow via CSS custom properties --toast-border-color and --toast-glow-color.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "Performance / Correctness",
+      "title": "Move window.matchMedia out of JSX render",
+      "description": "App.jsx line 1201: window.matchMedia pointer coarse .matches called inline in JSX on every render. Forces layout query per cycle and throws in SSR. Move to a useRef initialized once, or a useEffect with matchMedia.addEventListener to reactively track pointer type.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "CSS / Code Quality",
+      "title": "Remove duplicate single-quote vibe selectors in Office.css",
+      "description": "Office.css lines 91-95 define vibe selectors with single-quoted attribute values. Lines 97+ redefine the same selectors with double quotes and additional properties. The single-quote versions are overridden and dead weight. Delete lines 91-95 entirely.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "Accessibility",
-      "title": "Add accessible labels to tab-error-badge and section headings",
-      "description": "Two issues: (1) App.jsx line 1255: `<span className='tab-error-badge'>{errorCount}</span>` reads as a bare number to screen readers. Add `aria-label={`${errorCount} error${errorCount !== 1 ? 's' : ''}`}`. (2) No H2 elements exist anywhere in the component tree — section titles like 'Active Workers', 'Activity Log', '🏢 Office' use `<div className='section-title'>`. Replace with `<h2>` elements for proper document outline and screen reader navigation.",
-      "effort": "small",
-      "assigned_to": "Dave"
-    },
-    {
-      "priority": "medium",
-      "category": "Accessibility",
-      "title": "Make stat-dispatch active link keyboard accessible",
-      "description": "App.jsx ~line 478: the 'Active' stat-dispatch `<span>` has `cursor:'pointer'` and `onClick` that scrolls to `.workers-grid` but no `tabIndex`, `role='button'`, or `onKeyDown` handler. Keyboard users cannot activate it. Either convert to a `<button>` (preferred) or add `tabIndex={0}`, `role='button'`, and a keyDown handler for Enter/Space.",
-      "effort": "small",
-      "assigned_to": "Dave"
+      "title": "Add H2 headings to sections and aria-label to tab-error-badge",
+      "description": "Two fixes: (1) Active Workers (line 1267) and Activity Log (line 1333) use div.section-title; replace with h2 for proper document outline. (2) tab-error-badge span at line 1254 reads as a bare number to screen readers; add aria-label with errorCount plus the word errors.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "Performance",
-      "title": "Memoize filtered activity log entries — currently computed twice per render",
-      "description": "App.jsx: the activity log is filtered with identical logic in two places on every Dashboard render: (1) an IIFE inside the count display label (line ~1338) and (2) passed directly to `<ActivityLog entries={activityLog.filter(...)} />` (line 1395). Extract to a single `useMemo`: `const filteredEntries = useMemo(() => activityLog.filter(...).filter(...), [activityLog, activityFilter, workerFilter])`. Use `filteredEntries` in both places.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Memoize filtered activity log \u2014 computed twice per render",
+      "description": "Identical activity log filter logic runs twice per Dashboard render: IIFE count label (lines 1335-1350) and ActivityLog entries prop (lines 1394-1403). Extract to a single useMemo keyed on activityLog, activityFilter, workerFilter and reference it in both places.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "Code Quality",
-      "title": "Consolidate three getRelativeTime implementations into a shared utility",
-      "description": "The codebase now has three separate inline relative-time implementations: App.jsx has the canonical `getRelativeTime` function (line 55). Office.jsx has an IIFE inside the ghost bubble render (line ~748–757) and another IIFE in the whiteboard huddle label (line ~969). Move `getRelativeTime` to `src/utils/time.js` and import it in both files. This will also enable proper unit testing.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Consolidate three getRelativeTime implementations into src/utils/time.js",
+      "description": "App.jsx has canonical getRelativeTime at line 55. Office.jsx has two IIFEs at lines 748 and 969 that have already drifted \u2014 ghost bubble version returns just now for under 1 min while huddle version omits that case. Move to src/utils/time.js and import everywhere.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "Performance",
       "title": "Memoize handleTabKeyDown with useCallback",
-      "description": "App.jsx line 760: `handleTabKeyDown` is declared as a plain arrow function inside the component body, recreated on every render. It is passed to two `role='tab'` buttons that could otherwise benefit from React.memo. Wrap with `useCallback((e) => { ... }, [tab])` to stabilize the reference.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "description": "App.jsx line 760: handleTabKeyDown is a plain arrow function recreated every render, passed to two role=tab buttons that are otherwise memo-wrapped. Wrap with useCallback.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "Performance",
-      "title": "Reduce StatsBar's triple workers.filter to a single reduce pass",
-      "description": "StatsBar (App.jsx lines 447–449) calls `workers.filter(w => w.status === 'working')`, `workers.filter(w => w.status === 'idle')`, and `workers.filter(w => w.status === 'error')` as three separate array passes on every render. Replace with a single `useMemo(() => workers.reduce(...), [workers])` that accumulates all three counts in one pass. Low priority but adds up as the roster grows.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Reduce StatsBar triple workers.filter to single reduce pass",
+      "description": "StatsBar lines 447-449 iterates workers three times for active, idle, errorCount. Replace with a single useMemo reduce pass accumulating all three counts in one iteration.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "Code Quality",
+      "title": "Extract SOLO_SPOTLIGHT_MESSAGES IIFE from JSX to helper function",
+      "description": "App.jsx line 1292: solo spotlight message computed as a multi-step IIFE with optional chaining, toLowerCase, and two fallback levels inline in JSX. Extract to getSoloMessage(worker, vibeKey) or compute via useMemo. Makes JSX scannable and logic independently testable.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "Performance",
-      "title": "Move ambient-particle Array.from / spread to module-level constant",
-      "description": "App.jsx line 1125: `Array.from({ length: 12 }, (_, i) => ...)` allocates a new array on every render for the ambient particles layer (which never changes). Same pattern in Office.jsx line 1654 with `[...Array(7)]`. Since the particle count is static, define `const AMBIENT_INDICES = Array.from({ length: 12 }, (_, i) => i)` at module scope and map over it. The conditional confetti arrays (lines 1131, 1138) are fine as-is since they only render during transient states.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Move ambient-particle array allocations to module-level constants",
+      "description": "App.jsx line 1124: Array.from with length 12 allocates on every render for static ambient particles. Office.jsx line 1654: spread Array(7) same pattern. Define AMBIENT_PARTICLE_INDICES at module scope in each file. The confetti arrays at lines 1130 and 1137 are fine since they guard transient states.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "Code Quality",
-      "title": "Move toggleTheme to useCallback",
-      "description": "App.jsx: `const toggleTheme = () => setTheme(...)` is a plain arrow function recreated every render and passed to the theme-toggle `<button>`. Wrap in `useCallback` for consistency with the rest of the codebase's memoization approach and to avoid unnecessary re-renders if the button is ever extracted into a memo'd component.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Wrap toggleTheme in useCallback and move orphan inline margin to CSS",
+      "description": "Two minor cleanups: (1) toggleTheme at line 758 is a plain arrow function; wrap in useCallback for consistency with surrounding code. (2) section-header at line 1332 has style marginTop 2.5rem as an orphan inline style; move to a CSS modifier class.",
+      "effort": "small"
     }
   ]
 }
