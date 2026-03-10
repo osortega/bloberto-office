@@ -1,176 +1,271 @@
 {
-  "analyst": "Sofia",
   "review_number": 52,
-  "timestamp": "2026-03-09T23:15:00Z",
-  "screenshot_note": "Puppeteer succeeded this cycle (--single-process flag resolved thread limits). Fresh desktop (1280x800) and mobile (375x812) screenshots captured from the live site. Bloberto speech bubble escape confirmed visually at top of office floor. Footer counter '1/9' confirmed visible. Everything else assessed from source code.",
+  "analyst": "Sofia",
+  "timestamp": "2026-03-09T23:45:47Z",
+  "screenshots": {
+    "desktop_office": "qa52-desktop-office.png",
+    "desktop_dashboard": "qa52-desktop-dashboard2.png",
+    "mobile_office": "qa52-mobile-office.png",
+    "mobile_dashboard": "qa52-mobile-dashboard2.png"
+  },
   "scores": {
     "visual": 3.5,
     "ux": 3.5,
     "responsiveness": 3.5,
-    "performance": 3.5,
-    "accessibility": 2,
+    "performance": 3.0,
+    "accessibility": 2.0,
     "code_quality": 2.5,
     "features": 4.5,
-    "fun_factor": 5
+    "fun_factor": 5.0
   },
-  "overall_score": 3.5,
-  "previous_score": 3.7,
-  "verified_fixes": [
-    "Nothing. Zero. The entire QA51 suggestion list carries forward unchanged. The three pre-QA51 fixes (onResume scoping, paused-pill clickability guard, empty task guard) remain intact from before. Everything Carlos was asked to do in QA51 is still sitting in the backlog, untouched. The inline toast styles have now been in the 'to fix' column for six consecutive reviews. The app is stable — nothing broke. Nothing improved either."
-  ],
-  "carry_overs": [
-    "STRIKE 6 — Duplicate inline toast styles: App.jsx lines 1120-1143 (completionToast) and Office.jsx lines 1217-1240 (plantToast) still have 12+ near-identical inline style objects each. ShortcutToast — in the same file — uses a CSS class correctly. The developer demonstrably knows the right pattern. These two toasts are now a performance art piece about selective attention.",
-    "STRIKE 5 — Activity filter role=radiogroup buttons have no arrow-key navigation. App.jsx lines 1324-1342 and 1343-1363. Still just tab/click. The ARIA contract for radiogroup requires arrow-key cycling. Still not delivered. Assistive technology users encounter a broken interaction every time they reach this section.",
-    "STRIKE 5 — Mobile office floor text is physically unreadable at 375px. Workers, desks, nameplates, whiteboard content all compress to sub-pixel sizes. Confirmed in fresh 375x812 screenshot. The floor looks busy in all the wrong ways on mobile.",
-    "STRIKE 5 — Bloberto speech bubble escapes the office boundary at top. Confirmed in fresh desktop AND mobile screenshots — the bubble 'Wait you shipped at THIS hour?! Legends. 🏆' is visibly floating above the office floor border. Bloberto is positioned at top: ~4%, bubble renders above. Five reviews. The bubble still escapes.",
-    "STRIKE 4 — Footer tagline pagination counter still visible. Fresh screenshot confirms '1/9' at opacity 0.55 next to the rotating quote. The taglines are great. The progress indicator turns them into a content carousel. Still paginated.",
-    "STRIKE 3 — Triple visibilitychange listeners still active. App.jsx line 850 (handleVisibilityResume — calls onResume() unconditionally on EVERY tab-show, even after a 2-second tab switch), line 873 (restarts poll interval), line 1074 (updates document.title). Handler at line 850 calls onResume() without checking whether polling was actually paused. Every tab switch triggers an eager sync that bypasses the idle-timeout guard.",
-    "STRIKE 3 — sync-status--paused div (App.jsx line 482) and polling-paused-pill span (line 1170) both still lack role='button', tabIndex, and onKeyDown. Keyboard users cannot resume polling. The paused-pill also has onClick inline with aria-live which is semantically incoherent — aria-live is for announcing dynamic changes, not for labeling interactive elements.",
-    "STRIKE 3 — Office.css duplicate vibe selectors. Lines 91-92 use single-quote attribute selectors for .office-floor[data-vibe='crushing'] and [data-vibe='on-fire']; lines 97-98 use double-quote selectors for the same elements and additionally set --grid-line. Lines 91-92 are dead code.",
-    "STRIKE 3 — ActivityLog spreads and reverses the full entries array before slicing. App.jsx line 135: [...entries].reverse().slice(0, 20). Should be entries.slice(-20).reverse(). This copies up to 50 entries on every render of the log.",
-    "STRIKE 3 — getRelativeTime still duplicated inline in Office.jsx ghost bubble IIFE (lines 702-710). The identical 7-line logic exists in App.jsx at line 55. utils/ exists and is imported. The function belongs in utils/time.js. Third time asking.",
-    "STRIKE 3 — isDimmed still incorrectly dims workers with no current task. getTaskTags(null) returns [] → .some() returns false → isDimmed = true whenever a tag filter is active. An idle worker with no task gets greyed out as if they don't match the filter. Fix: add !!w.task guard.",
-    "STRIKE 2 — Worker card flip has no focus management. When the ℹ️ button flips the card, focus stays on the button which is now inside the aria-hidden front panel. The back panel's Close button never receives focus. Keyboard users flip the card and are immediately stranded. WCAG 2.4.3 Focus Order violation.",
-    "STRIKE 2 — Footer tagline span (App.jsx line 1384-1390) has cursor:pointer, onClick, and title='tap for another thought' but no tabIndex, role, or onKeyDown. Keyboard users can neither discover nor activate quote cycling.",
-    "STRIKE 2 — ErrorBoundary (App.jsx lines 7-19) has getDerivedStateFromError but no componentDidCatch. Production errors are silently swallowed. No console log, no stack trace, no error reporting hook."
+  "overall_score": 3.4,
+  "previous_issues_status": [
+    {
+      "issue": "STRIKE 2: Worker card flip strands keyboard focus in aria-hidden panel",
+      "status": "still-open",
+      "new_label": "STRIKE 3"
+    },
+    {
+      "issue": "STRIKE 2: Footer tagline span is a secret button (no role/tabIndex)",
+      "status": "still-open",
+      "new_label": "STRIKE 3"
+    },
+    {
+      "issue": "STRIKE 6: Inline toast styles",
+      "status": "still-open",
+      "new_label": "STRIKE 7"
+    },
+    {
+      "issue": "STRIKE 5: Activity filter radiogroup missing arrow-key navigation",
+      "status": "still-open",
+      "new_label": "STRIKE 6"
+    },
+    {
+      "issue": "NEW: stat-dispatch Scroll to workers keyboard dead zone",
+      "status": "still-open",
+      "new_label": "STRIKE 2"
+    },
+    {
+      "issue": "NEW: Activity log filter predicate written out twice",
+      "status": "still-open",
+      "new_label": "STRIKE 2"
+    },
+    {
+      "issue": "STRIKE 2: ErrorBoundary has no componentDidCatch",
+      "status": "still-open",
+      "new_label": "STRIKE 3"
+    },
+    {
+      "issue": "STRIKE 5: Office elements escape boundary (speech bubble + expanded)",
+      "status": "still-open",
+      "new_label": "STRIKE 6 \u2014 expanded: coffee corner, weather label, DUSK window ALL confirmed escaping in screenshots"
+    },
+    {
+      "issue": "STRIKE 3: Triple visibilitychange listeners \u2014 one fires unconditionally",
+      "status": "still-open",
+      "new_label": "STRIKE 4"
+    },
+    {
+      "issue": "NEW: completionToast timer ref clobbers itself on multi-worker ship",
+      "status": "still-open",
+      "new_label": "STRIKE 2"
+    },
+    {
+      "issue": "NEW: Sparkline legend pills use array index as React key",
+      "status": "still-open",
+      "new_label": "STRIKE 2"
+    },
+    {
+      "issue": "STRIKE 3: sync-status--paused + polling-paused-pill not keyboard-accessible",
+      "status": "still-open",
+      "new_label": "STRIKE 4"
+    },
+    {
+      "issue": "STRIKE 3: Utility functions not extracted to src/utils/",
+      "status": "still-open",
+      "new_label": "STRIKE 4"
+    },
+    {
+      "issue": "STRIKE 3: isDimmed incorrectly dims workers with no current task",
+      "status": "still-open",
+      "new_label": "STRIKE 4"
+    },
+    {
+      "issue": "STRIKE 5: Mobile office floor text remains illegible at 375px",
+      "status": "still-open",
+      "new_label": "STRIKE 6"
+    },
+    {
+      "issue": "STRIKE 4: Footer tagline pagination counter kills the magic",
+      "status": "still-open",
+      "new_label": "STRIKE 5"
+    },
+    {
+      "issue": "STRIKE 3: Office.css duplicate vibe selectors lines 91-95 dead code",
+      "status": "still-open",
+      "new_label": "STRIKE 4"
+    }
   ],
   "suggestions": [
     {
       "priority": "high",
-      "category": "accessibility",
-      "title": "STRIKE 2: Worker card flip strands keyboard focus in aria-hidden panel",
-      "description": "App.jsx line 305: setIsFlipped(true) flips the card but focus stays on the ℹ️ button, which is now inside the aria-hidden front panel (line 295: aria-hidden={isFlipped || undefined}). A keyboard user has just activated a button that made the focused element invisible to the accessibility tree. Fix: add a closeButtonRef and a useEffect that calls closeButtonRef.current?.focus() when isFlipped transitions to true. On close (line 355), return focus to the ℹ️ button via a similar ref. This is WCAG 2.4.3 Focus Order. It is also the minimum expected behavior from any flipcard pattern. The fix is 8 lines.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "STRIKE 2: Footer tagline span is a secret button that keyboard users can't find",
-      "description": "App.jsx line 1384-1390: the footer-tagline span has style={{ cursor: 'pointer' }}, onClick, and title='tap for another thought' — but no tabIndex, no role, no onKeyDown. Keyboard users can neither discover the feature nor trigger it. Fix: convert to a <button>, or add tabIndex={0}, role='button', aria-label='Cycle to next tagline', and onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setQuoteBonus(p => p + 1) }}. While you're there, either hide the ' {n}/{total}' counter (STRIKE 4) or change it to aria-label on the button so the count is accessible without being visually intrusive.",
-      "effort": "small",
-      "assignee": "maya"
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "STRIKE 6: Inline toast styles — the number speaks for itself",
-      "description": "App.jsx lines 1120-1143 (completionToast) and Office.jsx lines 1217-1240 (plantToast): 12+ inline style properties each, near-identical, for fixed-position notification toasts. ShortcutToast — added after both — uses .shortcut-toast CSS class correctly. Extract a .toast-popup class with the shared styles (position, background, border-radius, padding, font, box-shadow base, z-index, animation). Keep only dynamic border-color as inline. Also: both toasts share zIndex:9999 at fixed bottom-center — if a worker ships while the plant levels up they render on top of each other invisibly. The CSS class can also handle stacking with a transform offset. Six reviews. The suggestion text now has more history than most PRs.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "STRIKE 5: Activity filter radiogroup still missing arrow-key navigation",
-      "description": "App.jsx lines 1324-1342 and 1343-1363: two filter bars use role='radiogroup' with role='radio' on each button and aria-checked. The ARIA spec for radiogroup requires arrow keys to cycle between options — Tab enters the group, arrow keys navigate within it. Current implementation ignores arrow keys. Screen readers will announce these as radio buttons and users will expect navigation that never comes. Fix option A (recommended): change role to 'toolbar' with role='button' + aria-pressed, which accurately describes toggle buttons without the arrow-key contract. Fix option B: add onKeyDown to the radiogroup divs capturing ArrowLeft/ArrowRight to cycle selection — same pattern as handleTabKeyDown at line 752. Either is fine. Standing here doing nothing is not.",
+      "category": "visual",
+      "title": "STRIKE 6 (EXPANDED): Coffee corner, DUSK window, and weather label all escape the office floor \u2014 confirmed in screenshots",
+      "description": "The office floor has overflow:visible, and at least 3 elements render visually outside the floor boundary at both desktop (1280px) and mobile (375px): (1) The coffee corner div with 'COFFEE TRIPLE SHOT' label floats into the page background at the right; (2) The office window/DUSK sky element appears in the grey page background outside the floor; (3) The vibe weather label ('Clear skies \u2014 team at full strength') renders below and outside the floor boundary. This was originally the speech bubble escape bug \u2014 it has spread. Fix: audit all absolute-positioned Office elements with left/top > 85%. Either constrain overflow:hidden on the floor and use overflow:visible on a wrapper, or pull the escaping elements back within the floor bounds.",
       "effort": "medium",
-      "assignee": "carlos"
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "STRIKE 4: handleVisibilityResume fires unconditional fetch on every tab-in, bypassing idle timeout",
+      "description": "App.jsx line 851: `const handleVisibilityResume = () => { if (!document.hidden) onResume() }`. This triggers a full syncFromGitHub() + clears pollingPaused on EVERY tab-in, regardless of whether the user was idle. The IDLE_TIMEOUT that suppresses polling is completely bypassed by tab switches. Tab away 2 seconds, come back: unconditional resync. Meanwhile the polling effect (line 869) ALSO has a visibilitychange listener that resets the poll interval. That's two visibilitychange handlers both firing on every tab-in, plus the title effect (line 1055) is a third. Fix the resume listener: gate it behind a minimum-away duration check before calling syncFromGitHub().",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "STRIKE 7: Inline toast styles \u2014 completionToast and plantToast share 100+ lines of duplicated inline CSS",
+      "description": "App.jsx lines 1122-1145 (completionToast) and Office.jsx lines 1226-1249 (plantToast) each have massive inline style objects: position:fixed, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation \u2014 all inline and nearly identical. This is strike 7. Extract to a single .toast-popup CSS class in App.css. The two dynamic properties (border color and box-shadow tint based on worker role color) can stay as inline style overrides. Everything else is static.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "NEW: stat-dispatch 'Scroll to workers' is another keyboard dead zone",
-      "description": "App.jsx lines 469-473: the active stat card's dispatch span has style={{ cursor: 'pointer' }}, onClick, and title='Scroll to workers' — but no tabIndex, no role, no onKeyDown. It's the same pattern as polling-paused-pill and sync-status--paused, both of which are on the STRIKE 3 carry-over list. Fix: either wrap in a <button> or add tabIndex={0}, role='button', onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') document.querySelector('.workers-grid')?.scrollIntoView({ behavior: 'smooth' }) }}. This is the fourth interactive element in the app styled as a span with an onClick and no keyboard support. It's a pattern problem at this point.",
+      "category": "accessibility",
+      "title": "STRIKE 6: Activity filter radiogroup missing arrow-key navigation (WCAG 2.1 SC 2.1.1)",
+      "description": "App.jsx lines 1325-1364: two role=radiogroup containers, each with role=radio buttons. The ARIA radiogroup pattern requires arrow keys to move between options \u2014 Tab should jump over the group, not cycle through every button. Currently users Tab through every single filter option. Add onKeyDown to each radio button: ArrowRight/ArrowDown focus next sibling, ArrowLeft/ArrowUp focus previous, wrap around. Tab exits the group. This has been open since QA #46 \u2014 strike 6.",
       "effort": "small",
-      "assignee": "carlos"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "code_quality",
-      "title": "NEW: Activity log filter predicate written out twice",
-      "description": "The exact same filter logic for activityFilter + workerFilter is written in full at App.jsx lines 1309-1321 (for the event count display in the section-header) and again at lines 1364-1372 (for the entries passed to ActivityLog). If a new filter type is added, it must be added in two places. If one is changed and the other isn't, the count and the actual log will disagree. Fix: extract a const filteredActivity = useMemo(() => activityLog.filter(...), [activityLog, activityFilter, workerFilter]) above the JSX, then use filteredActivity.length for the count and filteredActivity for the log. One source of truth.",
+      "category": "accessibility",
+      "title": "NEW: polling-paused-pill aria-live is unreliable \u2014 live region must be in DOM from page load",
+      "description": "App.jsx line 1173: the polling-paused-pill span has aria-live='polite', but it only mounts when pollingPaused becomes true. ARIA live regions need to exist in the DOM from page load to reliably fire announcements \u2014 dynamically mounting an element with aria-live does not guarantee the AT picks it up (tested failure mode on NVDA + Chrome). Fix: always render a wrapper `<div aria-live='polite' aria-atomic='true'>` and conditionally render the content inside it. Bonus: this element also still lacks tabIndex, role=button, and onKeyDown (STRIKE 4 on keyboard accessibility).",
       "effort": "small",
-      "assignee": "carlos"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "code_quality",
-      "title": "STRIKE 2: ErrorBoundary has no componentDidCatch — errors vanish silently",
-      "description": "App.jsx lines 7-19: the ErrorBoundary class has getDerivedStateFromError (correct) but no componentDidCatch(error, errorInfo). When the app crashes in production, the user sees 'Something went wrong — refresh the page' and you see nothing. No console log, no stack trace, no error detail. In dev, React's overlay covers this. In production you're flying blind. Fix: add componentDidCatch(error, errorInfo) { console.error('ErrorBoundary:', error, errorInfo) } at minimum. When an error reporting service is eventually added, this is the hook. The error message div also uses 5 inline styles — add a .error-boundary-message CSS class.",
+      "category": "bug",
+      "title": "STRIKE 3: Worker card flip does not move keyboard focus to back panel",
+      "description": "App.jsx line 304-376: clicking the info button flips the card and sets the front panel to aria-hidden. But focus stays on the now-aria-hidden info button. A keyboard user is stranded. The back panel's Close button has tabIndex=0 when flipped, but nothing moves focus there. Fix: add a ref to the Close button, then after setIsFlipped(true) call closeButtonRef.current?.focus() inside a useEffect or callback. On close, return focus to the info button. Standard card-flip accessibility pattern.",
       "effort": "small",
-      "assignee": "carlos"
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "STRIKE 2: completionToast timer ref clobbers itself when multiple workers ship simultaneously",
+      "description": "App.jsx lines 950-960: inside a forEach loop, each iteration overwrites `completionToastTimerRef.current` and `workerConfettiTimerRef.current`. If 3 workers ship at once, 3 staggered setTimeout calls are created but only the last timer ID is stored. On unmount, only the last timer gets cleared \u2014 the first two leak. Fix: store all timer IDs in an array ref (e.g. `completionTimersRef.current = []`) and clear all of them on cleanup.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "STRIKE 3: ErrorBoundary has no componentDidCatch \u2014 runtime errors vanish silently",
+      "description": "App.jsx lines 7-20: ErrorBoundary has getDerivedStateFromError (shows fallback UI) but no componentDidCatch(error, info). In production, when something crashes, there is zero error reporting \u2014 no console output, no stack trace, no way to know what failed. For a live monitoring dashboard this is painful. Add componentDidCatch with at minimum console.error(error, info). Bonus: surface a 'Details' or 'Copy error' button in the fallback UI so the user can actually report the issue.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "visual",
-      "title": "STRIKE 5: Bloberto speech bubble escapes office boundary — screenshot proof, again",
-      "description": "Fresh desktop and mobile screenshots from this review cycle both show the speech bubble floating above the office floor's top border. Bloberto is at ~top:4%, the bubble renders above the character with no clipping. The office-floor has overflow:visible. Fix options: (a) flip bubble to render below the character when top < 15% (CSS position conditional via a data attribute); (b) move Bloberto down to top:10-12%, which still reads as 'top of office' visually; (c) add overflow:hidden to office-floor and accept that any above-character bubble gets clipped. Option (b) is one line. It's been five reviews.",
+      "title": "NEW: Sofia's role is 'QA Analyst' in workers.json but constants only maps 'QA Engineer' \u2014 robot emoji fallback on dashboard",
+      "description": "The dashboard worker card shows Sofia with role 'QA Analyst'. ROLE_EMOJIS and ROLE_COLORS in constants.js only have 'QA Engineer' as a key. Result: getRoleEmoji('QA Analyst') returns the fallback '\ud83e\udd16', and Sofia's dashboard card avatar shows a robot. ROLE_COLORS also falls back to '#6b7280' (grey). The Office view is unaffected because CharacterAvatar checks workerId === 'sofia' directly. Fix: either update workers.json to use 'QA Engineer', or add 'QA Analyst' as an alias in the constants maps.",
       "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code_quality",
-      "title": "STRIKE 3: Triple visibilitychange listeners — one of them fires unconditionally",
-      "description": "App.jsx lines 849-853: handleVisibilityResume calls onResume() on EVERY tab-show event regardless of whether the user was idle. onResume() calls setPollingPaused(false) + syncFromGitHub(). So: switch away from tab for 3 seconds, switch back — you get an immediate sync and the idle timer resets. This bypasses the 10-minute IDLE_TIMEOUT guard in pollTick entirely. Fix for line 850: add a pollingPaused check — if (!document.hidden && pollingPaused) onResume(). Or consolidate all three visibilitychange handlers (lines 850, 873, 1074) into one. Three separate useEffect instances registering to the same document event on a single component is code smell regardless.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "low",
-      "category": "code_quality",
-      "title": "NEW: completionToast timer ref clobbers itself when multiple workers ship simultaneously",
-      "description": "App.jsx lines 950-960: when justShipped.length > 1, each worker's shipping animation schedules via setTimeout(() => { setCompletionToast(...); completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3000) }, i * 2600). Each worker's inner timer assignment overwrites completionToastTimerRef.current. Worker 0's cleanup timer (fires at t+3000ms) will set completionToast to null, cutting off worker 1's toast at t+2600ms before its own 3000ms cleanup fires. Worker 1 gets a truncated toast. In practice with only 5 workers this is a rare edge case but it's a logic bug. Fix: generate per-toast unique timer IDs or use a queue pattern instead of shared ref.",
-      "effort": "small",
-      "assignee": "carlos"
-    },
-    {
-      "priority": "low",
-      "category": "code_quality",
-      "title": "NEW: Sparkline legend pills use array index as React key",
-      "description": "App.jsx line 416: {history.slice(-3).map((h, i) => (<span key={i} className='sparkline-legend__pill' ...>))} — using array index as key means React can't correctly reconcile if the slice changes. When history grows and the displayed window shifts, pill 0 (index 0) might represent a different vibe entry than before, causing stale DOM recycling. Fix: use key={h.ts} since each history entry has a timestamp and timestamps are unique. One character change per key prop.",
-      "effort": "small",
-      "assignee": "maya"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "accessibility",
-      "title": "STRIKE 3: sync-status--paused and polling-paused-pill still keyboard-inaccessible",
-      "description": "App.jsx line 482: sync-status div has onClick={pollingPaused ? onResume : undefined} but no role, tabIndex, or onKeyDown. Line 1170: polling-paused-pill span has onClick and aria-live but no role, tabIndex, or onKeyDown. Note on the pill: aria-live announces dynamic content changes — it doesn't make an element interactive. The pill needs role='button' tabIndex={0} AND onKeyDown separately. Fix both: when pollingPaused is true, add role='button' tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onResume() }}.",
+      "title": "STRIKE 3: Footer tagline span is a ghost button \u2014 no role, no tabIndex, no keyboard handler",
+      "description": "App.jsx line 1388: `<span className='footer-tagline' style={{cursor:'pointer'}} onClick={...}>`. Clicks cycle through quotes \u2014 but keyboard users cannot find or activate this. Add role='button' tabIndex={0} and onKeyDown (Enter and Space). Also: while you're touching this line, please remove the '1/9' pagination counter (STRIKE 5) right next to it.",
       "effort": "small",
-      "assignee": "carlos"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
-      "category": "code_quality",
-      "title": "STRIKE 3: Utility functions still not extracted to src/utils/",
-      "description": "App.jsx defines getRelativeTime() at line 55, formatDuration() at line 243, formatIdleDuration() at line 424. Office.jsx re-implements getRelativeTime as an inline IIFE at lines 702-710. utils/ has vibe.js, constants.js, and quotes.js — already extracted. The time utilities belong in utils/time.js. Would also enable unit testing of the time formatting logic and eliminate the Office.jsx IIFE duplication in one move.",
+      "category": "accessibility",
+      "title": "STRIKE 4: sync-status--paused card + polling-paused-pill both clickable but not keyboard-reachable",
+      "description": "App.jsx line 483: sync-status card has onClick=onResume when paused, no tabIndex, no role, no onKeyDown. Line 1174: polling-paused-pill span has onClick=onResume, same problem. Both let mouse users resume polling but lock out keyboard users. Two different interactive elements, same exact fix: tabIndex={pollingPaused ? 0 : -1} role='button' onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onResume() }}.",
       "effort": "small",
-      "assignee": "carlos"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
-      "category": "code_quality",
-      "title": "STRIKE 3: isDimmed incorrectly dims workers with no current task",
-      "description": "App.jsx lines 1263, 1286, 1298: isDimmed={selectedTag !== null && !getTaskTags(w.task).some(t => t.label === selectedTag)}. When w.task is null, getTaskTags returns [] and .some() returns false, so isDimmed becomes true. An unassigned worker gets greyed out whenever any tag filter is active. They're not 'not matching the filter' — they simply have no task. Fix: isDimmed={selectedTag !== null && !!w.task && !getTaskTags(w.task).some(t => t.label === selectedTag)}. Add the !!w.task guard. Three lines, three reviews.",
+      "category": "accessibility",
+      "title": "STRIKE 2: stat-dispatch 'Scroll to workers' \u2014 pointer only, keyboard excluded",
+      "description": "App.jsx lines 471-474: the Active count stat card's dispatch text has `style={{cursor:'pointer'}}` and onClick to scroll to the workers grid, but no tabIndex, no role='button', no onKeyDown. Add the standard interactive-span pattern.",
       "effort": "small",
-      "assignee": "carlos"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
-      "category": "responsiveness",
-      "title": "STRIKE 5: Mobile office floor text remains illegible at 375px",
-      "description": "Fresh 375px screenshot confirms: desk nameplates, COFFEE TRIPLE SHOT label, worker role text, whiteboard content — all sub-pixel or barely legible. The floor works fine as ambient decoration. It fails as informational content. Three viable options: (a) @media (max-width: 480px) rules to scale text to minimum 0.55rem across all office-floor text elements — fastest; (b) give office-floor a min-width:600px and allow overflow-x:auto scroll within its container; (c) add a mobile-simplified layout mode. Option (a) is a morning's work.",
-      "effort": "large",
-      "assignee": "maya"
+      "category": "code",
+      "title": "STRIKE 2: Activity log filter predicate duplicated \u2014 computed once for the count label, again to pass to ActivityLog",
+      "description": "App.jsx lines 1311-1323: an inline IIFE computes filtered.length using the type+worker filter predicates. Lines 1366-1375: the exact same filter is applied again to pass entries to <ActivityLog>. The same if/else chain is written twice. Extract: `const filteredEntries = activityLog.filter(typeFilter).filter(workerFilter)` before the JSX, then use `filteredEntries.length` for the count and `filteredEntries` for the component prop.",
+      "effort": "small",
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
-      "category": "fun_factor",
-      "title": "STRIKE 4: Footer tagline pagination counter still there, still killing the magic",
-      "description": "Fresh screenshot confirms ' 1/9' in the footer at opacity 0.55. The taglines are genuinely good — 'the standup is 15 minutes. the anxiety is forever' deserves to land as a discovered moment, not a content carousel with a progress bar. The counter converts an easter egg into a UI widget. Remove it entirely, or show it only on hover with CSS transition. The ✦ sparkle on first visit is the right energy. The '1/9' is the wrong energy.",
+      "category": "code",
+      "title": "NEW: VIBE_LABELS and vibeRanking defined inside useEffect \u2014 static objects recreated on every vibe change",
+      "description": "App.jsx line 986: `const vibeRanking = { 'after-hours': 0, 'slow-day': 1, ... }` and line 995: `const VIBE_LABELS = { 'after-hours': 'After Hours', ... }` \u2014 both defined inside the [teamVibe.key] useEffect. These are pure static constants with zero closure dependencies. They are recreated fresh on every vibe change. Move both to module scope alongside VIBE_COLORS and VIBE_RANK (which are already there, correctly).",
       "effort": "small",
-      "assignee": "maya"
+      "assigned_to": "Carlos"
     },
     {
       "priority": "low",
-      "category": "code_quality",
-      "title": "STRIKE 3: Office.css duplicate vibe selectors — lines 91-92 are dead code",
-      "description": "Office.css lines 91-92 define .office-floor[data-vibe='crushing'] and [data-vibe='on-fire'] with single-quote attribute selectors. Lines 97-98 define the same selectors with double-quote attribute selectors (CSS treats both identically), and additionally set --grid-line. The double-quote rules come later in the cascade and win on all shared properties. Lines 91-92 set box-shadow and border-color; lines 97-98 set the same values plus --grid-line. Lines 91-92 are dead code. Delete them.",
+      "category": "code",
+      "title": "STRIKE 4: getRelativeTime, formatDuration still living in App.jsx \u2014 four reviews of asking nicely",
+      "description": "App.jsx lines 55-63 (getRelativeTime), 66-75 (formatFullDateTime), 244-252 (formatDuration): pure date utilities, no React, no state. Office.jsx has a duplicate inline relative-time calculation at lines 710-718. All of these belong in src/utils/time.js. Extract, export, import in both files. This is strike 4. If this hits strike 5, I'm filing it as a HIGH.",
       "effort": "small",
-      "assignee": "carlos"
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "STRIKE 4: isDimmed incorrectly dims workers with no task when a tag filter is active",
+      "description": "App.jsx lines 1264 and 1287: `isDimmed={selectedTag !== null && !getTaskTags(w.task).some(t => t.label === selectedTag)}`. When w.task is null/undefined, getTaskTags returns [] so .some() is false, so the worker gets dimmed. But a worker with no task is neutral \u2014 they haven't opted out of having a 'Design' or 'Bug' tag; they just have no task. Fix: `isDimmed={selectedTag !== null && !!w.task && !getTaskTags(w.task).some(t => t.label === selectedTag)}`.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "STRIKE 4: Office.css lines 91-95 are dead code \u2014 overridden completely by lines 97-115",
+      "description": "Office.css lines 91-95 use single-quoted attribute selectors (`[data-vibe='crushing']`). Lines 97-115 use double-quoted (`[data-vibe=\"crushing\"]`). In CSS, single and double quotes in attribute selectors are equivalent \u2014 same specificity, same elements matched. Lines 97-115 come later and override all shared properties. The first block (91-95) is 100% dead code. The only thing the second block adds is the `--grid-line` custom property. Delete lines 91-95.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "STRIKE 2: Sparkline legend pills use array index as React key",
+      "description": "App.jsx line 417: `history.slice(-3).map((h, i) => <span key={i} ...>)`. Index keys cause incorrect reconciliation when the history array shifts \u2014 React will reuse existing DOM nodes instead of re-rendering with new values. Use `h.ts` (the timestamp from the vibe history entry object) as the key: `key={h.ts}`.",
+      "effort": "small",
+      "assigned_to": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "STRIKE 6: Sub-pixel text in office floor is still unreadable on mobile",
+      "description": "Office.jsx line 921: `fontSize: '0.38rem'` for the conference table last-huddle timestamp. Line 1480: `fontSize: '0.45rem'` for the lone-survivor label. These are 6-7px at standard viewport. They were illegible at desktop; on mobile they are literally invisible. Remove the inline text and convert to a tooltip (title attribute, already used elsewhere) or a tooltip on hover/tap. Or just delete the sub-pixel labels \u2014 they communicate nothing at that size.",
+      "effort": "small",
+      "assigned_to": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "STRIKE 5: Footer tagline pagination counter (1/9) is ruining the secret easter egg",
+      "description": "App.jsx line 1391: `{(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}`. The '1/9' counter turns a charming discoverable easter egg into a progress bar. It also reveals there are only 8 bonus quotes \u2014 the illusion of endless wit is shattered. The \u2726 sparkle icon already signals interactivity. Remove the counter entirely. If discoverability is the concern, a subtle dot-row on hover is less intrusive.",
+      "effort": "small",
+      "assigned_to": "Maya"
     }
-  ],
-  "summary": "Score drops from 3.7 to 3.5. Fresh screenshots captured this cycle — Puppeteer finally cooperated. The visual confirmation is not welcome news: Bloberto's speech bubble is still floating above the office floor border (STRIKE 5), the footer counter '1/9' is still plainly visible (STRIKE 4), and the mobile layout still has the same compressed-text issues (STRIKE 5). The entire QA51 list carried forward unchanged. Inline toast styles hit STRIKE 6. The radio group arrow-key gap and mobile floor text both hit STRIKE 5. Three items from QA51's new findings (worker card flip focus trap, footer span keyboard gap, ErrorBoundary silence) are now at STRIKE 2 having been completely ignored. Accessibility score drops from 2.5 to 2.0 — not because new issues were introduced, but because nothing was fixed and the cumulative picture is genuinely bad for keyboard users: there are now at least six interactive elements in the app with onClick but no keyboard handler. Code quality drops from 3.0 to 2.5 with the addition of a new DRY violation (duplicate activity filter predicate), sparkline index keys, and a multi-toast timer race condition. Four new findings this cycle. The app is still visually delightful and functionally solid — the features are good and the fun factor remains perfect. But the gap between the visual polish and the keyboard/screen reader experience keeps widening. Assign carlos a focused half-day on accessibility before QA53 or the a11y score hits 1.5."
+  ]
 }

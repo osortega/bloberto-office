@@ -7,15 +7,7 @@
       "task": "Creative review #72",
       "started_at": "2026-03-09T23:00:00Z",
       "progress": 10
-    },
-    {
-      "name": "Sofia",
-      "role": "QA Analyst",
-      "status": "working",
-      "task": "QA review #52 \u2014 live site + codebase analysis",
-      "started_at": "2026-03-09T23:45:28Z",
-      "progress": 10
     }
   ],
-  "updated_at": "2026-03-09T23:45:28Z"
+  "updated_at": "2026-03-10T00:15:50Z"
 }
