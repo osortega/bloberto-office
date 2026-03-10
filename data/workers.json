@@ -1,13 +1,13 @@
 {
   "workers": [
     {
-      "name": "Luna",
-      "status": "idle",
-      "task": "Creative review #84 — completed",
-      "progress": 100,
-      "started_at": "2026-03-10T07:00:00Z",
-      "updated_at": "2026-03-10T07:05:00Z"
+      "name": "Sofia",
+      "status": "working",
+      "task": "QA review #60 — live site + codebase analysis",
+      "progress": 5,
+      "started_at": "2026-03-10T07:15:00Z",
+      "updated_at": "2026-03-10T07:15:00Z"
     }
   ],
-  "updated_at": "2026-03-10T07:05:00Z"
+  "updated_at": "2026-03-10T07:15:00Z"
 }
