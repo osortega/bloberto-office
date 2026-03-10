@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-10T16:45:00Z"
+  "workers": [
+    {
+      "name": "Carlos",
+      "status": "working",
+      "task": "Fix 2 HIGH bugs from QA #70 — standup dual-render + ProgressBar timeout leak",
+      "progress": 5,
+      "started_at": "2026-03-10T16:46:00Z",
+      "updated_at": "2026-03-10T16:46:00Z"
+    }
+  ],
+  "updated_at": "2026-03-10T16:46:00Z"
 }
