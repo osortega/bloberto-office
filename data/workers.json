@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-10T21:05:00Z"
+  "workers": [
+    {
+      "name": "Luna",
+      "status": "working",
+      "task": "Creative review #85",
+      "progress": 0,
+      "started_at": "2026-03-10T21:30:00Z",
+      "updated_at": "2026-03-10T21:30:00Z"
+    }
+  ],
+  "updated_at": "2026-03-10T21:30:00Z"
 }
