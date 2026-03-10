@@ -1126,7 +1126,7 @@ function WallClock({ vibeKey }) {
       className="office-wall-clock"
       width="22" height="22" viewBox="0 0 22 22"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label={`Wall clock showing ${displayH}:${displayM}`}
+      aria-label={`Wall clock showing ${displayH}:${displayM} — ${CLOCK_COMMENTS[vibeKey] || CLOCK_COMMENTS['in-flow']}`}
       role="img"
       style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'auto' }}
     >
@@ -1221,6 +1221,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const workingIds     = useMemo(() => new Set(workingWorkers.map(w => w.id)), [workingWorkers])
   const idleWorkers    = useMemo(() => nonMgr.filter(w => w.status === 'idle' && !workingIds.has(w.id)), [nonMgr, workingIds])
   const meetingWorkers = useMemo(() => idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : [], [idleWorkers])
+  const meetingWorkerIds = useMemo(() => new Set(meetingWorkers.map(w => w.id)), [meetingWorkers])
+  const coffeeWorkers  = useMemo(() => idleWorkers.filter(w => !meetingWorkerIds.has(w.id)), [idleWorkers, meetingWorkerIds])
   const standupActive  = workingWorkers.length >= 3 && (vibe === 'crushing' || vibe === 'in-flow')
   const standupWorkers = useMemo(() => standupActive ? workingWorkers.slice(0, 4) : [], [standupActive, workingWorkers])
   const hasAnyError    = nonMgr.some(w => w.status === 'error')
@@ -1528,11 +1530,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
 
         {/* Coffee corner — top right */}
-        <div className={`coffee-corner${idleWorkers.length >= 2 ? ' coffee-corner--chatting' : ''}${idleWorkers.length === 1 ? ' coffee-corner--solo' : ''}`} data-vibe={vibe}>
-          {idleWorkers.length === 1 && (
+        <div className={`coffee-corner${coffeeWorkers.length >= 2 ? ' coffee-corner--chatting' : ''}${coffeeWorkers.length === 1 ? ' coffee-corner--solo' : ''}`} data-vibe={vibe}>
+          {coffeeWorkers.length === 1 && (
             <div className="coffee-corner__solo-badge">
-              <CharacterAvatar workerId={idleWorkers[0].id} role={idleWorkers[0].role} name={idleWorkers[0].name} size={14} emoji={idleWorkers[0].emoji} />
-              <span className="coffee-corner__solo-label">☕ {idleWorkers[0].name.split(' ')[0]} refueling</span>
+              <CharacterAvatar workerId={coffeeWorkers[0].id} role={coffeeWorkers[0].role} name={coffeeWorkers[0].name} size={14} emoji={coffeeWorkers[0].emoji} />
+              <span className="coffee-corner__solo-label">☕ {coffeeWorkers[0].name.split(' ')[0]} refueling</span>
             </div>
           )}
           <div className="coffee-corner__chat-badge" aria-hidden="true">
@@ -1542,7 +1544,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               <rect x="9" y="0" width="18" height="11" rx="4" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1"/>
               <polygon points="23,11 23,15 19,11" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1" strokeLinejoin="round"/>
             </svg>
-            <span className="coffee-corner__chat-label">☕ {idleWorkers.length >= 2 ? idleWorkers.slice(0, 2).map(w => w.name.split(' ')[0]).join(' & ') : 'chatting'}</span>
+            <span className="coffee-corner__chat-label">☕ {coffeeWorkers.length >= 2 ? coffeeWorkers.slice(0, 2).map(w => w.name.split(' ')[0]).join(' & ') : 'chatting'}</span>
           </div>
           <div className="coffee-corner__body">
             <div className="coffee-steam" aria-hidden="true">
@@ -1551,7 +1553,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             <span className="coffee-corner__emoji">☕</span>
           </div>
           <span className="coffee-corner__label">Coffee</span>
-          <span className="sr-only">Coffee corner{idleWorkers.length >= 2 ? ' — people chatting' : ''}</span>
+          <span className="sr-only">Coffee corner{coffeeWorkers.length >= 2 ? ' — people chatting' : ''}</span>
         </div>
 
         {/* Door — bottom center */}
