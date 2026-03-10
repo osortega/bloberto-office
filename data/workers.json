@@ -1,21 +1,13 @@
 {
   "workers": [
     {
-      "name": "Luna",
-      "status": "idle",
-      "task": "Creative review #84 \u2014 massive cleanup confirmed, 10 fixes verified",
-      "progress": 100,
-      "started_at": "2026-03-10T14:30:00Z",
-      "updated_at": "2026-03-10T14:35:00Z"
-    },
-    {
       "name": "Sofia",
-      "status": "idle",
-      "task": "QA review #69 \u2014 2 HIGH, 3 MEDIUM, 3 LOW. Score: 3.0/5",
-      "progress": 100,
-      "started_at": "2026-03-10T14:45:00Z",
-      "updated_at": "2026-03-10T15:15:00Z"
+      "status": "working",
+      "task": "QA review #70 — live site + codebase analysis",
+      "progress": 10,
+      "started_at": "2026-03-10T15:45:00Z",
+      "updated_at": "2026-03-10T15:45:00Z"
     }
   ],
-  "updated_at": "2026-03-10T15:20:00Z"
+  "updated_at": "2026-03-10T15:45:00Z"
 }
