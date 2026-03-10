@@ -1,14 +1,13 @@
 {
   "workers": [
     {
-      "name": "Sofia",
-      "emoji": "🔍",
-      "role": "QA & Product Analyst",
+      "name": "Luna",
       "status": "working",
-      "task": "QA review #55 — live site + codebase analysis",
-      "started_at": "2026-03-10T02:45:00Z",
-      "progress": 10
+      "task": "Creative review #77 \u2014 visual audit and idea generation",
+      "progress": 0,
+      "started_at": "2026-03-10T03:00:27.832435Z",
+      "updated_at": "2026-03-10T03:00:27.832435Z"
     }
   ],
-  "updated_at": "2026-03-10T02:45:00Z"
+  "updated_at": "2026-03-10T03:00:27.832435Z"
 }
