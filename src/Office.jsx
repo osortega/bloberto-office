@@ -106,11 +106,11 @@ const BLOBERTO_TITLES = {
 }
 
 const VIBE_WEATHER_LABELS = {
-  'crushing': '☀️ Clear skies — team at full strength',
-  'on-fire': '⛈️ Storm conditions — all hands',
-  'in-flow': '⛅ Partly cloudy — steady progress',
-  'slow-day': '🌧️ Drizzle — easy does it',
-  'after-hours': '🌙 Night sky — the stars are watching',
+  'crushing': 'Clear skies — team at full strength',
+  'on-fire': 'Storm conditions — all hands',
+  'in-flow': 'Partly cloudy — steady progress',
+  'slow-day': 'Drizzle — easy does it',
+  'after-hours': 'Night sky — the stars are watching',
 }
 const VIBE_WEATHER_ICONS = {
   'on-fire':    '⛈️',
@@ -142,6 +142,14 @@ const DOOR_LABELS = {
   'in-flow':     '⚡ Focus zone',
   'slow-day':    '☁️ Come on in',
   'after-hours': '🔒 Locked up',
+}
+
+const DOOR_ICONS = {
+  'crushing':    '🚀',
+  'on-fire':     '🧯',
+  'in-flow':     '⚡',
+  'slow-day':    '☁️',
+  'after-hours': '🔒',
 }
 
 const WORKER_AWAY_DESK_LABELS = {
@@ -868,6 +876,12 @@ const CHAIR_ANGLES = [0, 60, 120, 180, 240, 300]
 
 function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], lastHuddle }) {
   const vibe = vibeKey || 'in-flow'
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    if (meetingWorkers.length < 2) return
+    const id = setInterval(() => setTick(t => t + 1), 30_000)
+    return () => clearInterval(id)
+  }, [meetingWorkers.length])
 
   // How many chairs are visible per vibe
   const visibleCount = vibe === 'crushing' ? 6 : vibe === 'in-flow' ? 4 : 1
@@ -962,7 +976,14 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
 
       {meetingWorkers.length >= 2 && standupWorkers.length === 0 && (
         <>
-          <div className="conf-meeting-badge">Huddle</div>
+          <div className="conf-meeting-badge">
+            Huddle{(() => {
+              const startedAt = lastHuddle?.current?.startedAt
+              if (!startedAt) return null
+              const mins = Math.floor((Date.now() - startedAt) / 60_000)
+              return <span style={{ opacity: 0.8, marginLeft: '4px', fontVariantNumeric: 'tabular-nums' }}>{mins < 1 ? '' : `· ${mins}m`}</span>
+            })()}
+          </div>
           {meetingWorkers.map((w, i) => {
             const angle = CHAIR_ANGLES[i];
             const rad = (angle * Math.PI) / 180;
@@ -1216,7 +1237,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
   useEffect(() => {
     if (meetingWorkers.length >= 2) {
-      lastHuddle.current = { names: meetingWorkers.map(w => w.name), endedAt: null }
+      if (lastHuddle.current.endedAt !== null || lastHuddle.current.names.length === 0) {
+        lastHuddle.current = { names: meetingWorkers.map(w => w.name), startedAt: Date.now(), endedAt: null }
+      }
     } else if (meetingWorkers.length === 0 && lastHuddle.current.names.length > 0 && lastHuddle.current.endedAt === null) {
       lastHuddle.current = { ...lastHuddle.current, endedAt: Date.now() }
     }
@@ -1511,7 +1534,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {/* Door — bottom center */}
         <div className={`office-door${doorEvent ? ` office-door--${doorEvent}` : ''}`} data-vibe={vibe}>
           {doorEvent === 'arrive' && <span className="office-door__notify-dot" aria-hidden="true" />}
-          <span className="office-door__icon">{vibe === 'after-hours' ? '🔒' : doorEvent === 'arrive' ? '🚪✨' : '🚪'}</span>
+          <span className="office-door__icon">{doorEvent === 'arrive' && vibe !== 'after-hours' ? `${DOOR_ICONS[vibe] ?? '🚪'}✨` : (DOOR_ICONS[vibe] ?? '🚪')}</span>
           <span className="office-door__label">{DOOR_LABELS[vibe] ?? 'Entrance'}</span>
           <span className="sr-only">Exit and entrance</span>
         </div>

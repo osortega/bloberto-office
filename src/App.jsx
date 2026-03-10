@@ -205,20 +205,20 @@ function ProgressBar({ progress, startedAt }) {
     }
     prevProgressRef.current = progress
     const MILESTONES = [25, 50, 75, 100]
-    // First pass: collect ALL newly crossed milestones
-    let highest = null
+    const crossed = []
     for (const m of MILESTONES) {
       if (progress >= m && !milestonesRef.current.has(m)) {
         milestonesRef.current.add(m)
-        highest = m
+        crossed.push(m)
       }
     }
-    // Second pass: show the highest one; cancel old timer only when setting a new flash
-    if (highest !== null) {
-      if (flashTimerRef.current) clearTimeout(flashTimerRef.current)
-      setFlashClass(`progress-milestone-${highest}`)
-      flashTimerRef.current = setTimeout(() => setFlashClass(''), 600)
-    }
+    const timers = crossed.map((m, i) =>
+      setTimeout(() => {
+        setFlashClass(`progress-milestone-${m}`)
+        setTimeout(() => setFlashClass(''), 600)
+      }, i * 700)
+    )
+    return () => timers.forEach(clearTimeout)
   }, [progress])
 
   const workingMs = startedAt ? Date.now() - new Date(startedAt).getTime() : null
@@ -1007,9 +1007,8 @@ export default function App() {
     prevStreakRef.current = newStreak
 
     // Confetti burst when vibe rank increases
-    const vibeRanking = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }
     const prevKey = previousVibeKeyRef.current
-    if (prevKey !== null && vibeRanking[teamVibe.key] > (vibeRanking[prevKey] ?? -1)) {
+    if (prevKey !== null && VIBE_RANK[teamVibe.key] > (VIBE_RANK[prevKey] ?? -1)) {
       if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current)
       setConfettiActive(true)
       confettiTimerRef.current = setTimeout(() => setConfettiActive(false), 2500)
@@ -1092,6 +1091,7 @@ export default function App() {
         document.title = frames[idx]
         timer = setInterval(() => {
           idx = (idx + 1) % frames.length
+          titleIdxRef.current = idx
           document.title = frames[idx]
         }, 8_000)
       }
@@ -1415,8 +1415,8 @@ export default function App() {
           className="footer-tagline"
           style={{ cursor: 'pointer' }}
           title="tap for another thought"
-          onClick={() => { localStorage.setItem('footer-sparkle-seen', '1'); setQuoteBonus(p => p + 1) }}
-        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span>{quoteBonus > 0 && <span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {Math.min(quoteBonus, BONUS_TAGLINES.length)}/{BONUS_TAGLINES.length}</span>} &nbsp;&middot;&nbsp;
+          onClick={() => { localStorage.setItem('footer-sparkle-seen', '1'); setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p) }}
+        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span>{quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length && <span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {quoteBonus}/{BONUS_TAGLINES.length}</span>} &nbsp;&middot;&nbsp;
         <span>{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}</span>
       </footer>
     </div>
