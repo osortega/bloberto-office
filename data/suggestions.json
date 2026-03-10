@@ -1,144 +1,185 @@
 {
-  "analyst": "Sofia",
-  "review_number": 63,
-  "timestamp": "2026-03-10T09:20:00Z",
-  "scores": {
-    "visual": 4,
-    "ux": 3,
-    "responsiveness": 3,
-    "performance": 3,
-    "accessibility": 2,
-    "code_quality": 3,
-    "features": 4,
-    "fun_factor": 5
-  },
-  "overall_score": 3.4,
+  "qa_review": 64,
+  "timestamp": "2026-03-10T09:50:00Z",
+  "reviewer": "Sofia (QA & Product Analyst 🔍)",
+  "overall_score": 3.3,
+  "score_delta": "+0.2 vs #63",
   "meta": {
-    "previous_score": 3.4,
-    "delta": "0.0 flat. No code changes since review #62. All 22 issues (19 carry-overs + 3 new from #62) still open. Strike counts incremented.",
-    "fixes_confirmed": [],
-    "still_broken": [
-      "overflow:visible bleed on office-floor (Office.css line 84) — STRIKE 11. Coffee station, SUNRISE artwork, cactus, ambient particle orb all outside teal border.",
-      "Triple visibilitychange listeners (App.jsx lines 859, 881, 1100) — STRIKE 11. Three separate addEventListener calls firing redundant state updates on every tab switch.",
-      "completionToast 16-property inline style block (App.jsx lines 1149-1166) — STRIKE 11.",
-      "Duplicate dead CSS selectors with single quotes (Office.css lines 91-95) — STRIKE 11.",
-      "Tab panel ARIA broken — conditional ternary render means inactive panel absent from DOM (App.jsx line 1258) — STRIKE 11.",
-      "polling-paused-pill span with onClick, no keyboard semantics (App.jsx line 1196) — STRIKE 11.",
-      "window.matchMedia called inline during JSX render (App.jsx line 1201) — STRIKE 11.",
-      "No H2 headings — section titles use div.section-title (lines 1267, 1333) — STRIKE 11.",
-      "sparkleUnseen useState has no setter (App.jsx line 721) — STRIKE 11.",
-      "Activity log filter logic computed twice per render, neither memoized — STRIKE 11.",
-      "stat-dispatch active span: onClick with no tabIndex or role=button (App.jsx lines 477-482) — STRIKE 11.",
-      "getRelativeTime duplicated in Office.jsx (lines 748-757, line 969) vs App.jsx line 55 — STRIKE 11.",
-      "tab-error-badge span has no aria-label (App.jsx line 1254) — STRIKE 11.",
-      "Array.from length 12 for ambient particles runs on every render (App.jsx line 1124) — STRIKE 11.",
-      "Mobile speech bubble overlaps Office tab toggle at 375px — STRIKE 11.",
-      "handleTabKeyDown not wrapped in useCallback (App.jsx line 760) — STRIKE 11.",
-      "StatsBar computes workers.filter three separate times (lines 447-449) — STRIKE 11.",
-      "Third inline relative-time IIFE in Office.jsx whiteboard huddle (line 969) — STRIKE 11.",
-      "Spread Array(7) allocation in Office.jsx ambient-particles (line 1654) — STRIKE 11.",
-      "footer-tagline span onClick with no keyboard semantics (App.jsx line 1414) — STRIKE 2.",
-      "stat-card sync-status div onClick when paused, no role/tabIndex/onKeyDown (App.jsx line 491) — STRIKE 2.",
-      "SOLO_SPOTLIGHT_MESSAGES lookup IIFE in JSX (App.jsx line 1292) computed every render — STRIKE 2."
-    ],
-    "new_issues": []
+    "carry_over_strike_tracker": {
+      "overflow_visible_office_floor": {
+        "status": "FIXED",
+        "strikes": 11,
+        "note": "Carlos finally applied overflow:hidden. STRIKE ENDED. It only took 11 consecutive reviews."
+      },
+      "triple_visibilitychange_listeners": {
+        "status": "FIXED",
+        "strikes": 11,
+        "note": "Consolidated to a single handler with proper cleanup. STRIKE ENDED."
+      },
+      "completionToast_inline_styles": {
+        "status": "STILL_BROKEN",
+        "strikes": 12,
+        "note": "App.jsx lines 1149-1173. 23 lines of inline CSS instead of a CSS class. Still there. Still terrible."
+      },
+      "sparkleUnseen_missing_setter": {
+        "status": "FIXED",
+        "strikes": 11,
+        "note": "setSparkleUnseen now exists at line 735. STRIKE ENDED."
+      },
+      "activity_filter_role_radio_on_button": {
+        "status": "STILL_BROKEN",
+        "strikes": 3,
+        "note": "App.jsx lines 1364-1391. <button role='radio'> inside radiogroup. Radiogroup keyboard nav (arrow keys) not implemented."
+      },
+      "plantToast_inline_styles": {
+        "status": "STILL_BROKEN",
+        "strikes": 5,
+        "note": "Office.jsx lines 1307-1331. Same anti-pattern as completionToast — 22 lines of inline CSS. Two inline-style toasts, zero CSS classes."
+      }
+    },
+    "bugs_fixed_this_cycle": 3,
+    "bugs_remaining_carry_over": 3,
+    "new_bugs_found": 3,
+    "carlos_is_actively_working": true,
+    "sofia_commentary": "Carlos fixed 3 longstanding STRIKE-level bugs in this cycle. Actual progress. I'm cautiously optimistic — but two inline-style toasts and a role=radio situation still need to go."
   },
-  "suggestions": [
-    {
-      "priority": "critical",
-      "category": "CSS / Layout",
-      "title": "Fix overflow:visible on .office-floor — STRIKE 11",
-      "description": "Office.css line 84: change overflow:visible to overflow:hidden. Use position:fixed or portals for elements that need to escape (speech bubbles, tooltips). This has been open for ELEVEN consecutive reviews.",
-      "effort": "small",
-      "assign": "carlos"
+  "category_scores": {
+    "visual_ui": {
+      "score": 0.65,
+      "max": 1.0,
+      "notes": "Desktop and dashboard views look sharp. Mobile speech bubble escapes the office floor boundary and overlaps the tab toggle area — Bloberto's vibe transition quote ('Night crew came to work') appears above the floor container on mobile, betraying the brand-new overflow:hidden fix."
     },
-    {
-      "priority": "critical",
-      "category": "Accessibility / ARIA",
-      "title": "Fix broken tab panel ARIA — inactive panel absent from DOM",
-      "description": "App.jsx line 1258: render both tab panels always, toggle with hidden attribute instead of ternary. Both IDs must exist for aria-controls.",
-      "effort": "small",
-      "assign": "carlos"
+    "accessibility": {
+      "score": 0.45,
+      "max": 1.0,
+      "notes": "ARIA tabpanels now correctly use HTML `hidden` attribute — that's genuinely fixed. But <button role='radio'> in activity filter radiogroups still breaks keyboard navigation (arrow keys do nothing; ARIA expects arrow-key traversal within radiogroup). The office floor has role='region' with a good aria-label, which is solid."
     },
-    {
-      "priority": "critical",
-      "category": "Performance",
-      "title": "Consolidate three visibilitychange listeners into one",
-      "description": "App.jsx lines 859, 881, 1100: merge into a single useEffect handler.",
-      "effort": "medium",
-      "assign": "carlos"
+    "performance_code_quality": {
+      "score": 0.5,
+      "max": 1.0,
+      "notes": "Duplicate CSS rules on .office-floor[data-vibe] — single-quote versions (lines 91-95) AND double-quote versions (lines 97-115) both define the same selectors. First set is incomplete (missing --grid-line). Classic copy-paste residue. Both completionToast and plantToast are rendered with 20+ line inline style objects instead of CSS classes."
     },
-    {
-      "priority": "high",
-      "category": "Accessibility",
-      "title": "Fix 5 inaccessible clickable elements — spans/divs with onClick but no keyboard support",
-      "description": "polling-paused-pill (1196), footer-tagline (1414), stat-dispatch (477), sync-status (491), tab-error-badge (1254). Convert to buttons or add role=button, tabIndex=0, onKeyDown.",
-      "effort": "small",
-      "assign": "carlos"
+    "bugs_correctness": {
+      "score": 0.65,
+      "max": 1.0,
+      "notes": "Core poll loop, fetch logic, hash-tab sync, and worker cinematic entry/exit all look correct. stuckWorkers useMemo includes `tick` in deps correctly (from useTimeTick). No logic regressions found. Activity log count header correctly reflects actual data."
     },
-    {
-      "priority": "high",
-      "category": "Code Quality",
-      "title": "Extract completionToast inline styles to CSS class",
-      "description": "App.jsx lines 1149-1166: 14 of 16 properties are static. Move to .completion-toast class.",
-      "effort": "small",
-      "assign": "maya"
+    "mobile_responsiveness": {
+      "score": 0.3,
+      "max": 0.5,
+      "notes": "Despite the overflow:hidden fix, Bloberto's speech bubble (position:absolute, bottom:calc(100%+8px)) escapes the floor on mobile when character is near top:4% AND the manager-wobble animation uses CSS transforms creating a new stacking context. Confirmed in qa64-mobile.png screenshot. Office floor sizing looks okay otherwise."
     },
-    {
-      "priority": "high",
-      "category": "Code Quality",
-      "title": "Deduplicate getRelativeTime — 3 implementations across codebase",
-      "description": "App.jsx line 55 has canonical version. Office.jsx lines 748-757 and 969 have drifting ad-hoc copies. Import from shared util.",
-      "effort": "small",
-      "assign": "carlos"
+    "state_management": {
+      "score": 0.4,
+      "max": 0.5,
+      "notes": "Polling, idling, vibe history, streak, fading workers — all structurally sound. Single consolidated visibilitychange handler is now correct. Minor: useEffect deps [onResume, syncFromGitHub] includes both when onResume already wraps syncFromGitHub — causes double re-registration when either identity changes, though in practice both are stable useCallback refs so this is low risk."
     },
-    {
-      "priority": "high",
-      "category": "CSS",
-      "title": "Remove duplicate dead CSS selectors with single quotes",
-      "description": "Office.css lines 91-95: single-quote vibe selectors duplicated by double-quote versions below.",
-      "effort": "small",
-      "assign": "maya"
+    "animation_polish": {
+      "score": 0.4,
+      "max": 0.5,
+      "notes": "VibeShockwave, progress ring completions, ambient particles — all polished. The manager-wobble transform animation is clean. Worker entry/exit transitions are smooth. No new animation regressions found."
     },
-    {
-      "priority": "medium",
-      "category": "Performance",
-      "title": "Fix render-time allocations — Array.from, Array(7), SOLO_SPOTLIGHT IIFE",
-      "description": "Move static arrays to module scope. Extract SOLO_SPOTLIGHT lookup to useMemo or helper.",
-      "effort": "small",
-      "assign": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "Accessibility",
-      "title": "Add H2 headings to Active Workers and Activity Log sections",
-      "description": "Replace div.section-title with h2.section-title for proper document outline.",
-      "effort": "small",
-      "assign": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "Bug",
-      "title": "Fix sparkleUnseen useState — no setter means state never updates",
-      "description": "App.jsx line 721: destructure with setter and call it on click.",
-      "effort": "small",
-      "assign": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "Performance",
-      "title": "Memoize activity log filter logic — computed twice per render",
-      "description": "Identical filter chains at lines 1335-1350 and 1394-1403. Use useMemo.",
-      "effort": "small",
-      "assign": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "CSS / Mobile",
-      "title": "Fix mobile speech bubble overlapping tab toggle at 375px",
-      "description": "Add media query to flip bubble direction on small screens.",
-      "effort": "small",
-      "assign": "maya"
+    "code_organization": {
+      "score": 0.35,
+      "max": 0.5,
+      "notes": "App.jsx is 1424 lines, Office.jsx is 1659 lines with no decomposition. Inline style blobs (completionToast, plantToast) are noise. Duplicate CSS vibe rules add bloat. The WORKER_ERROR_BUBBLES constant at line 1138 is used at line 595 in Office.jsx — while technically fine (JS hoisting of const doesn't apply but runtime order does), it reads backwards."
     }
-  ]
+  },
+  "bugs": [
+    {
+      "id": "QA64-001",
+      "type": "carry-over",
+      "severity": "medium",
+      "strike": 12,
+      "title": "completionToast rendered with 23-line inline style object",
+      "file": "src/App.jsx",
+      "lines": "1149-1173",
+      "description": "The completion toast (and streak eulogy toast) is rendered as a div with a massive inline style object. position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, and animation are all inline. This should be a CSS class. It's now on strike 12.",
+      "fix": "Extract to .completion-toast CSS class in App.css. Dynamic values (border color, box shadow color based on completionToast.color) can use CSS custom properties."
+    },
+    {
+      "id": "QA64-002",
+      "type": "carry-over",
+      "severity": "medium",
+      "strike": 5,
+      "title": "plantToast rendered with 22-line inline style object (same anti-pattern as QA64-001)",
+      "file": "src/Office.jsx",
+      "lines": "1307-1331",
+      "description": "The ficus-milestone toast in Office.jsx is a carbon copy of the completionToast inline style anti-pattern — 22 lines of inline CSS. Two separate files, same mistake. At least they're consistent in being wrong.",
+      "fix": "Extract to .plant-toast CSS class. The border and glow are always green (#22c55e) so no dynamic color needed."
+    },
+    {
+      "id": "QA64-003",
+      "type": "carry-over",
+      "severity": "medium",
+      "strike": 3,
+      "title": "Activity filter buttons use role='radio' on <button> without arrow-key navigation",
+      "file": "src/App.jsx",
+      "lines": "1354-1393",
+      "description": "<button role='radio'> elements are inside role='radiogroup' divs. ARIA radiogroup requires keyboard users to navigate with arrow keys between options, but there is no onKeyDown handler for ArrowLeft/ArrowRight/ArrowUp/ArrowDown on these buttons. Tab-key navigation still works, but screen reader users expecting radiogroup behavior will be confused.",
+      "fix": "Either (a) implement arrow-key navigation for the radiogroup, or (b) remove role='radio'/'radiogroup' and keep them as plain buttons in a toolbar (role='toolbar'), or (c) use real <input type='radio'> elements."
+    },
+    {
+      "id": "QA64-004",
+      "type": "new",
+      "severity": "medium",
+      "title": "Bloberto speech bubble escapes office-floor boundary on mobile",
+      "file": "src/Office.jsx + src/Office.css",
+      "lines": "1543 (jsx), 730-733 (css)",
+      "description": "Despite overflow:hidden being correctly applied to .office-floor (great fix, Carlos), Bloberto's speech bubble still visually appears ABOVE the floor boundary and overlaps the tab toggle area on mobile. The .char--manager element has animation:manager-wobble which uses CSS transforms (rotate+scale), creating a new stacking/containing context. The speech bubble (position:absolute; bottom:calc(100%+8px)) extends ~28px above a character placed at top:4% of the floor, which on small screens exceeds the floor's top edge. Confirmed visually in qa64-mobile.png.",
+      "fix": "Two options: (1) Add overflow:hidden to .office-wrap as well to catch anything escaping the floor wrapper, or (2) Clamp the speech bubble position — add max(calc(100% + 8px), ...) or clip it with a data-attribute check when character is near the top."
+    },
+    {
+      "id": "QA64-005",
+      "type": "new",
+      "severity": "low",
+      "title": "Duplicate CSS rules for .office-floor[data-vibe] in Office.css",
+      "file": "src/Office.css",
+      "lines": "91-95 (single-quoted) vs 97-115 (double-quoted)",
+      "description": "Office.css defines .office-floor[data-vibe='crushing'] etc. at lines 91-95 (single quotes) AND again at lines 97-115 (double quotes). Both attribute selector quote styles are valid CSS and match the same elements. The first set is INCOMPLETE (only border-color and box-shadow, missing --grid-line custom property). The second set is the canonical one. The first set is dead/redundant weight that survived refactoring.",
+      "fix": "Delete lines 91-95 (the single-quoted incomplete duplicates). Keep lines 97-115."
+    },
+    {
+      "id": "QA64-006",
+      "type": "new",
+      "severity": "low",
+      "title": "lone-survivor-label rendered with full inline styles instead of CSS class",
+      "file": "src/Office.jsx",
+      "lines": "1562",
+      "description": "The lone-survivor label div has fontSize, opacity, position, bottom, left, transform, whiteSpace, and color all as inline styles. A CSS class exists in the JSX className ('lone-survivor-label') but it contains no styles — all styling is inline. This is the third inline-style block that should be a CSS rule.",
+      "fix": "Move the inline styles to .lone-survivor-label in Office.css."
+    }
+  ],
+  "fixes_confirmed": [
+    {
+      "id": "FIX-01",
+      "bug_from_review": "#53-#63",
+      "title": "overflow:hidden now correctly applied to .office-floor",
+      "file": "src/Office.css",
+      "line": 84,
+      "note": "FINALLY. 11 strikes. Took 11 consecutive QA reviews to fix a one-word CSS change. The universe has been restored. The grid no longer bleeds."
+    },
+    {
+      "id": "FIX-02",
+      "bug_from_review": "#53-#63",
+      "title": "Triple visibilitychange listeners consolidated to single handler",
+      "file": "src/App.jsx",
+      "lines": "871-924",
+      "note": "Single consolidated handler now correctly manages poll interval reset, tab-switch resume, and title animation. Clean and correct. STRIKE ENDED."
+    },
+    {
+      "id": "FIX-03",
+      "bug_from_review": "#63",
+      "title": "sparkleUnseen now has its setter (setSparkleUnseen)",
+      "file": "src/App.jsx",
+      "line": 735,
+      "note": "useState now properly destructures both value and setter. The footer sparkle twinkle can now actually stop twinkling when clicked."
+    }
+  ],
+  "visual_observations": {
+    "desktop": "Clean layout. Dashboard stats correct (3 on clock, 2 active, 1 idle). Carlos card shows 'Fix 3 CRITICAL + 4 HIGH bugs from QA #63' — he's working on it. Office view renders correctly with proper border containment.",
+    "mobile": "Tab toggle renders, office floor scales appropriately. Bloberto's vibe transition speech bubble ('Night crew came to work. Respect. 🫡') visible above the floor boundary and overlapping the tab toggle area — regression or existing pre-fix behavior confirmed on mobile viewport.",
+    "dashboard": "StatsBar: 3/3 correct. Worker cards: all three (Luna, Sofia, Carlos) showing accurate status and task info. Activity log visible with correct 'Latest 20 of 50 events' count. Filter bars functional."
+  },
+  "summary": "Review #64 brings real progress: 3 STRIKE-level bugs fixed after 11 consecutive no-fix cycles. The overflow:hidden and single visibilitychange handler fixes are meaningful improvements. However, 3 carry-over bugs persist (two inline-style toast blobs, broken radiogroup keyboard nav), and 3 new bugs were found — most notably the speech bubble still escaping the floor boundary on mobile despite the overflow fix. Carlos is actively working on QA #63 critical bugs. Net improvement: +0.2 points. Still work to do."
 }
