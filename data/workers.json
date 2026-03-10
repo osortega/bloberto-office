@@ -11,10 +11,10 @@
     {
       "name": "Sofia",
       "status": "working",
-      "task": "QA review #65 \u2014 site analysis & suggestions",
+      "task": "QA review #66 \u2014 site analysis & suggestions",
       "progress": 0,
-      "started_at": "2026-03-10T10:45:00Z",
-      "updated_at": "2026-03-10T10:45:00Z"
+      "started_at": "2026-03-10T11:15:19Z",
+      "updated_at": "2026-03-10T11:15:19Z"
     },
     {
       "name": "Carlos",
@@ -25,5 +25,5 @@
       "updated_at": "2026-03-10T09:23:00Z"
     }
   ],
-  "updated_at": "2026-03-10T10:45:00Z"
+  "updated_at": "2026-03-10T11:15:19Z"
 }
