@@ -1157,7 +1157,7 @@ export default function App() {
         </div>
         <div className="header-right">
           <div className="header-badge">
-            {greeting}, <span key={teamVibe.key} className="honorific">{HONORIFICS[isAfterHours ? 'after-hours' : (teamVibe.key === 'after-hours' ? 'slow-day' : teamVibe.key)] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
+            {greeting}, <span key={teamVibe.key} className="honorific">{HONORIFICS[teamVibe.key] ?? 'boss'}</span> &nbsp;&middot;&nbsp;{' '}
             {new Date().toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'short',

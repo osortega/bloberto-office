@@ -1,13 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Maya",
-      "status": "working",
-      "task": "Fix honorific override bug from Luna review #77",
-      "progress": 0,
-      "started_at": "2026-03-10T02:05:00Z",
-      "updated_at": "2026-03-10T02:05:00Z"
-    }
-  ],
-  "updated_at": "2026-03-10T02:05:00Z"
+  "workers": [],
+  "updated_at": "2026-03-10T02:10:00Z"
 }
