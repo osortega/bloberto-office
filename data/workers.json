@@ -4,11 +4,20 @@
       "id": "carlos",
       "name": "Carlos",
       "status": "working",
-      "task": "Bug fixes — WallClock drift, sparkleUnseen, React.memo bypass, honorific override",
+      "task": "Bug fixes \u2014 WallClock drift, sparkleUnseen, React.memo bypass, honorific override",
       "progress": 0,
       "started_at": "2026-03-10T02:16:00Z",
       "updated_at": "2026-03-10T02:16:00Z"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "status": "working",
+      "task": "QA review #54 \u2014 live site + codebase analysis",
+      "progress": 0,
+      "started_at": "2026-03-10T02:15:00Z",
+      "updated_at": "2026-03-10T02:15:00Z"
     }
   ],
-  "updated_at": "2026-03-10T02:16:00Z"
+  "updated_at": "2026-03-10T02:15:00Z"
 }
