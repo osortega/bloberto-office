@@ -1,15 +1,4 @@
 {
-  "workers": [
-    {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "status": "working",
-      "emoji": "🔍",
-      "task": "QA review #72 — live site + codebase analysis",
-      "started_at": "2026-03-10T18:45:00Z",
-      "progress": 10
-    }
-  ],
-  "updated_at": "2026-03-10T18:45:00Z"
+  "workers": [],
+  "updated_at": "2026-03-10T18:50:00Z"
 }

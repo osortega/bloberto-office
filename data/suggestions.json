@@ -1,64 +1,83 @@
 {
   "analyst": "Sofia",
-  "review_number": 71,
-  "timestamp": "2026-03-10T17:45:46Z",
+  "review_number": 72,
+  "timestamp": "2026-03-10T18:50:00Z",
   "scores": {
     "visual": 4,
-    "ux": 4,
+    "ux": 3,
     "responsiveness": 3,
     "performance": 3,
     "accessibility": 3,
     "code_quality": 3,
-    "features": 5,
+    "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 4,
+  "overall_score": "3.5/5",
+  "verified_fixes": [
+    "Standup dual-render (Carlos QA#70 fix) — VERIFIED ✅",
+    "ProgressBar inner setTimeout leak (Carlos QA#70 fix) — VERIFIED ✅",
+    "useTimeTick perf leak (Carlos QA#69 fix) — VERIFIED ✅",
+    "Idle dual-render conference+wander (Carlos QA#69 fix) — VERIFIED ✅"
+  ],
+  "carry_overs": [
+    "Bloberto hardcoded to never receive ping reactions — STRIKE 2 (Carlos)",
+    "activityLog.filter() called 3× inline per render — STRIKE 2 (Carlos)",
+    "Hover cards inaccessible on touch devices — STRIKE 2 (Maya)",
+    "WORKER_ERROR_BUBBLES temporal dead zone risk — STRIKE 2 (Carlos)",
+    "Footer quote cycling dead-end — STRIKE 2 (Dave)",
+    "Character name labels 0.44rem unreadable on mobile — STRIKE 2 (Maya)",
+    "App.jsx/Office.jsx monolith files — STRIKE 2 (Carlos)",
+    "103 timer instances with complex interdependencies — STRIKE 2 (Carlos)",
+    "completionToast/plantToast inline styles — STRIKE 2 (Maya)",
+    "Worker filter buttons overflow on mobile — STRIKE 2 (Maya)",
+    "Idle micro-bubble Date.now() expression in render — STRIKE 2 (Carlos)"
+  ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
       "title": "Bloberto hardcoded to never receive ping reactions",
-      "description": "Line 1543 of Office.jsx passes `pingReaction={null}` hardcoded to Bloberto's Character. The entire ping + reaction system (PING_REACTIONS map, pingReaction state, handleCharClick) supports per-worker quotes, but Bloberto is permanently excluded. Either intentional (document it clearly) or a bug — if intentional, Bloberto should have manager-specific ping reactions since he already fires ambient broadcast quotes. Fix: wire up pingReaction for Bloberto the same way other workers are wired, or add a comment explaining the design choice.",
+      "description": "pingReaction={null} is hardcoded on the Bloberto character component. The sonar ping animation (char--pinged, sonar-ping keyframe) is fully implemented in CSS but can never trigger on Bloberto because the prop is always null. This breaks the click-to-interact feature for the main character. Fix: wire pingReaction state to Bloberto the same way it's wired to workers.",
       "effort": "small",
       "assigned_to": "Carlos"
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "activityLog.filter() called 3× inline in the same render — not memoized",
-      "description": "In App.jsx, `activityLog.filter()` is called three separate times in the dashboard render path: once for the count display (inline IIFE), once for the ActivityLog component `entries` prop, and a third time with the same logic but chained. These are not wrapped in useMemo so they re-run on every render cycle including the 60-second tick from useTimeTick. Extract into a single `useMemo(() => filteredActivity, [activityLog, activityFilter, workerFilter])` and pass the result downstream. Low effort, real gain as the activity log grows.",
+      "category": "performance",
+      "title": "activityLog.filter() called 3× inline per render — not memoized",
+      "description": "The activity log section runs three separate .filter() passes on the full activityLog array inline in JSX every render. With a growing log (100+ entries), this is wasteful. Extract into a single useMemo that returns { filteredByType, filteredByWorker, combinedFiltered } and only recomputes when activityLog, activeFilter, or workerFilter changes.",
       "effort": "small",
       "assigned_to": "Carlos"
     },
     {
       "priority": "high",
       "category": "ux",
-      "title": "Hover cards are completely inaccessible on touch devices",
-      "description": "Character hover cards in the Office view (the char-hover-card showing task + progress) are triggered by `onMouseEnter`/`onMouseLeave`. On touch devices (the whole mobile experience), these never fire. Mobile users clicking a character do get the ping animation and are navigated to the dashboard, but they can't see the tooltip/hover-card inline info. Fix: add `onTouchStart` → `setPinnedCard(true)` with a tap-outside-to-dismiss handler, or convert to a proper popover accessible on touch. The `@media (hover: none)` block in Office.css exists but only suppresses hover styling — it doesn't provide an alternative interaction.",
+      "title": "Hover cards completely inaccessible on touch devices",
+      "description": "The char-hover-card and desk monitor tooltips rely entirely on :hover CSS which doesn't work on mobile. The CSS has a @media (hover: none) rule for vacant desk cards but not for worker hover cards. Touch users can't see worker details (task, progress, role). Need: onClick toggle for hover cards on touch devices, or use the existing click-to-inspect mechanism to show a persistent card.",
       "effort": "medium",
       "assigned_to": "Maya"
     },
     {
       "priority": "high",
-      "category": "performance",
-      "title": "WORKER_ERROR_BUBBLES used 543 lines before it's defined — temporal dead zone bomb",
-      "description": "In Office.jsx, `WORKER_ERROR_BUBBLES` is referenced at line 595 (inside the Character component's useEffect) but defined at line 1138. This works at runtime because the useEffect fires after module evaluation, but it's a hoisting trap: during refactoring or if the Component is called during module init, you'd get a ReferenceError. Move all constant tables (WORKER_ERROR_BUBBLES, FULL_IDLE_MESSAGES, PLANT_STAGE_MESSAGES, BLOBERTO_TITLES, VIBE_WEATHER_LABELS, DOOR_ICONS, etc.) to the top of the file, or better yet into utils/constants.js which already holds this category of data.",
+      "category": "bug",
+      "title": "WORKER_ERROR_BUBBLES temporal dead zone risk",
+      "description": "WORKER_ERROR_BUBBLES is a const array defined around line 543 but referenced earlier in the component. JavaScript hoists const declarations but not their initialization — accessing before the declaration line throws a ReferenceError. Currently works by coincidence (the reference is inside a useEffect that runs after mount), but any refactor that moves it could cause a crash. Move all const arrays to the top of the file or to a constants module.",
       "effort": "small",
       "assigned_to": "Carlos"
     },
     {
       "priority": "high",
       "category": "ux",
-      "title": "Footer cycling quotes silently stop — no user feedback",
-      "description": "The footer's 'tap for another thought' button cycles through BONUS_TAGLINES (8 quotes). The condition `quoteBonus < BONUS_TAGLINES.length` in the counter display means nothing shows after the last quote — the button still renders but clicking it does nothing visible (the `setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p)` guard silently prevents incrementing). Users will tap a button that looks functional and get no response. Fix: either loop with modulo, show a 'all out of wisdom 🫠' state, or add a visual indicator that the well is dry.",
+      "title": "Footer quote cycling silently stops at end of array",
+      "description": "The footer tagline cycles through TAGLINES array but when it reaches the end, it stays on the last item forever. No wrap-around, no visual indication. Fix: modulo the index (idx % TAGLINES.length) to cycle infinitely, or add a subtle 'refresh' button.",
       "effort": "small",
       "assigned_to": "Dave"
     },
     {
       "priority": "medium",
-      "category": "visual",
-      "title": "Character name labels at 0.44rem are unreadably small on mobile",
-      "description": "The `.char__name` font-size drops to 0.44rem at ≤600px breakpoint in Office.css. At 375px viewport (standard iPhone), this renders name labels as approximately 6-7px text — well below WCAG minimum of 11px for non-decorative text. The Office view already compensates by navigating to dashboard on character click, but the names are decorative enough to warrant at least 0.65rem. Consider hiding the inline name label on mobile and relying solely on the dashboard card view, or bump to 0.6–0.7rem and accept potential overlap.",
+      "category": "ux",
+      "title": "Character name labels at 0.44rem unreadable on mobile",
+      "description": "At 480px viewport width, .char__name is set to 0.45rem (about 7px). This is below the minimum readable size for most users. Bump to at least 0.55rem on mobile, or hide names entirely and rely on hover/tap cards.",
       "effort": "small",
       "assigned_to": "Maya"
     },
@@ -66,82 +85,74 @@
       "priority": "medium",
       "category": "code",
       "title": "App.jsx and Office.jsx are monolith files (1432 and 1660 lines)",
-      "description": "App.jsx contains the ErrorBoundary, all utility functions (formatFullDateTime, getDispatch, getTimeGroup), all sub-components (ActivityLogEntry, ActivityLog, StatusBadge, ProgressBar, WorkerCard, VibeSparkline, DeltaBadge, StatsBar, EmptyState, LoadingSkeleton, ShortcutToast), all constants (STAT_DISPATCHES, TASK_TAG_DEFS, VIBE_COLORS, VIBE_RANK, etc.), and the root App component. Office.jsx has 1660 lines of the same pattern. This makes diffs noisy, code reviews painful, and onboarding slow. Recommended split: extract WorkerCard + StatusBadge + ProgressBar → components/WorkerCard.jsx, StatsBar + VibeSparkline → components/StatsBar.jsx, ActivityLog* → components/ActivityLog.jsx. In Office.jsx, extract Character + CharacterAvatar → components/Character.jsx.",
+      "description": "Both files exceed 1400 lines with deeply nested JSX. Extract: ActivityLog component, VibeDashboard component, WorkerCard component, ConferenceTable component. This is a refactor debt item — not blocking but making every future change harder.",
       "effort": "large",
       "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "103 timer instances (setTimeout/setInterval) with complex interdependencies",
-      "description": "App.jsx has 46 setTimeout/setInterval calls and Office.jsx has 57. While most have corresponding cleanups, the sheer volume makes auditing correctness difficult. Specific concern: in Character.jsx, the `idleInnerTimeoutRef` and `errorInnerTimeoutRef` are separate from `timerRef` but all three can fire near-simultaneously during status changes. The `justShippedTimersRef` array pattern for staggered confetti is correct but fragile — the cleanup in the useEffect return fires before new timers are set on the next effect run, creating a brief double-scheduling window. Consider a custom `useTimers()` hook that auto-registers all timers for unified cleanup.",
-      "effort": "medium",
+      "title": "103 timer instances with complex interdependencies",
+      "description": "Counted 103 setTimeout/setInterval calls across the codebase. Many have cleanup in useEffect returns, but the interaction between timers (e.g., speech bubble timeout vs poll interval vs animation timers) creates subtle state races. Consider a centralized timer manager or at minimum document the timer dependency graph.",
+      "effort": "large",
       "assigned_to": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "Task tags missing role/tabIndex when onTagClick is null",
-      "description": "In WorkerCard, task tags conditionally receive `role='button'`, `tabIndex={0}`, and keyboard handlers only when `onTagClick` is provided. When onTagClick is null (the prop defaults to null), the tags are inert spans. However, they still render inside a card with `tabIndex={0}` and `role='article'` — a keyboard user navigating the card will find seemingly clickable colored labels that do nothing and have no role. Since onTagClick appears to always be passed in the current dashboard render, this is a latent risk. Add role='button' unconditionally when tags are displayed, or document that these are display-only without the handler.",
-      "effort": "small",
-      "assigned_to": "Sofia"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
+      "category": "visual",
       "title": "completionToast and plantToast use inline styles instead of CSS classes",
-      "description": "Both toast elements (completionToast in App.jsx and plantToast in Office.jsx) are implemented as fully inline-styled divs with hardcoded position, background, border, padding, font-weight, boxShadow, zIndex, etc. This makes them impossible to override with CSS theming (light mode), hard to animate uniformly, and duplicated logic. A shared `.toast` CSS class with modifier variants would allow the light theme to properly style these. Right now in light mode, the toast border inherits `var(--surface2)` background which may be nearly invisible against the page background.",
+      "description": "Toast notifications for worker completion and plant milestones use inline style objects in JSX instead of CSS classes. This makes them un-themeable and inconsistent with the rest of the app's CSS-driven theming. Extract to .completion-toast and .plant-toast CSS classes.",
       "effort": "small",
       "assigned_to": "Maya"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Worker filter buttons in activity log will overflow on narrow mobile screens",
-      "description": "The second activity filter bar (the per-worker filter row) renders a button for every roster member inline. On a 375px screen with 5+ workers, these buttons will either overflow, wrap awkwardly, or trigger a horizontal scrollbar. The existing activity type filter bar has the same issue but has fewer items. Both need either `flex-wrap: wrap` with proper gutters, or a `<select>` dropdown for mobile. Currently there is no max-width scroll container or wrapping rule for `.activity-filter-bar` below 480px.",
+      "title": "Worker filter buttons overflow on narrow mobile screens",
+      "description": "Activity log filter bar renders a button per worker inline. On 375px with 5+ workers, buttons overflow or wrap awkwardly. Add flex-wrap: wrap with proper gap, or switch to a <select> dropdown on mobile.",
       "effort": "small",
       "assigned_to": "Maya"
     },
     {
       "priority": "medium",
-      "category": "ux",
-      "title": "Idle micro-bubble selection uses a complex inline Date.now() expression in render",
-      "description": "Line 786 of Office.jsx: `(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor((Date.now() / 12000) + (worker.id ? [...worker.id].reduce((h, c) => h * 31 + c.charCodeAt(0), 0) : 0)) % ...]` — this is a time-based deterministic selector running on every render. While clever (same worker always shows same bubble in a given 12s window), it's illegible, fragile, and causes a subtle issue: when the 12s boundary crosses during a render, the bubble can change mid-display without the `idleBubble` state changing. Extract into a `getIdleBubble(workerId, tick)` utility function and pass in a `tick` derived from `useTimeTick(12000)`.",
+      "category": "code",
+      "title": "Idle micro-bubble Date.now() expression in render is illegible",
+      "description": "Line ~786: complex inline expression using Date.now() with charCode hashing runs on every render. Extract to getIdleBubble(workerId, tick) utility function.",
       "effort": "small",
       "assigned_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "VIBE_RANK, VIBE_COLORS, VIBE_HISTORY_KEY, BLOBERTO_TITLES scattered across files",
-      "description": "Constants that describe the same domain concept (vibe states) are split between App.jsx (VIBE_RANK, VIBE_COLORS, VIBE_HISTORY_KEY, HONORIFICS), Office.jsx (BLOBERTO_TITLES, VIBE_WEATHER_LABELS, DOOR_ICONS, DOOR_LABELS), and utils/constants.js (VIBE_WHITEBOARD, ROLE_EMOJIS). There's no single source of truth for vibe-related mappings. Consolidate vibe constants into utils/vibe.js or a new utils/vibeConstants.js. This would make adding a new vibe state a single-file change instead of hunting across 3 files.",
+      "title": "Vibe constants scattered across 3 files",
+      "description": "VIBE_RANK, VIBE_COLORS, VIBE_HISTORY_KEY in App.jsx; BLOBERTO_TITLES, VIBE_WEATHER_LABELS in Office.jsx; VIBE_WHITEBOARD in constants.js. Consolidate to a single vibe constants file.",
       "effort": "medium",
       "assigned_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Dashboard solo worker card is center-aligned but left-aligned on reload",
-      "description": "When exactly 1 worker is active, the dashboard uses a special `workers-grid--solo-card` layout that centers the card. If the page loads with 1 worker already active (no transition from 0→1), the card appears immediately centered which is fine. But when transitioning from 2+ workers to 1, the fadingMap causes the fading card to still be present and the solo layout doesn't activate (condition checks `Object.keys(fadingMap).length === 0`), so the single worker snaps to the normal left-aligned grid, then jumps to centered after the fade completes 400ms later. A smooth transition would feel more polished.",
+      "title": "Dashboard solo worker card layout jump",
+      "description": "When transitioning from 2+ workers to 1, the solo card layout doesn't activate until fading workers complete (400ms delay), causing a visual jump from left-aligned to centered.",
       "effort": "small",
       "assigned_to": "Maya"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "No deep-linking to a specific worker card",
-      "description": "The app supports tab deep-linking via URL hash (#office, #dashboard) which is great. But there's no way to link directly to a specific worker's card (e.g., #dashboard/sofia). The focusedWorker mechanism already scrolls to and highlights a worker when navigating from office→dashboard click, so the infrastructure exists. Adding support for ?worker=sofia in the URL would allow sharing a direct link to a specific team member's status, which is genuinely useful for async check-ins.",
+      "title": "No deep-linking to specific worker card",
+      "description": "Tab deep-linking via hash works (#office, #dashboard) but can't link to a specific worker. The focusedWorker mechanism exists — extend it to support ?worker=sofia in URL.",
       "effort": "medium",
       "assigned_to": "Dave"
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "Vibe sparkline re-reads localStorage on every vibe change instead of using state",
-      "description": "In the vibe streak useEffect in App.jsx, `localStorage.getItem(VIBE_HISTORY_KEY)` and `JSON.parse` are called on every teamVibe.key change. The result is then stored in both localStorage and React state (vibeHistory). This is fine for infrequent vibe changes but it means the component is bypassing its own state (vibeHistory) to re-read from storage on every update, which is redundant. Use the vibeHistory state as the source of truth and only write to localStorage as a side effect. Also: the try/catch around the localStorage block silently swallows all errors — at minimum log them in development.",
+      "title": "Vibe sparkline re-reads localStorage redundantly",
+      "description": "On every vibe change, localStorage.getItem + JSON.parse runs even though the data is already in React state (vibeHistory). Use state as source of truth, only write to localStorage.",
       "effort": "small",
       "assigned_to": "Carlos"
     }
   ],
-  "summary": "Bloberto's Office is a genuinely delightful product — it's ambitious, characterful, and packed with thoughtful details that make monitoring a team actually fun. The vibe system, custom SVG characters, per-worker desk screens, ambient quotes, dynamic favicon, and plant streak are all A+ ideas executed well. That said, the codebase is starting to creak under its own weight: App.jsx and Office.jsx are monoliths at 1432 and 1660 lines respectively, 103 timer instances create a subtle memory/state correctness risk, and the activity log filter runs three inline passes per render when one memoized pass would do. On the frontend quality side, the hardcoded `pingReaction={null}` on Bloberto is a quiet bug that kills a feature that's otherwise fully implemented, and mobile touch users are locked out of the hover-card details that desktop users get on mouse-over. The 0.44rem character name labels on mobile are technically readable only by people with microscopes. Overall: the fun factor and feature set are legitimately impressive for what this is — it just needs a refactor pass to split the files, memoize the hot paths, and fix the handful of bugs before adding more features."
+  "summary": "QA Review #72: No code changes since review #71 — all 16 suggestions carry over to strike 2. Carlos's QA#69-70 fixes (useTimeTick, idle dual-render, standup dual-render, ProgressBar leak) remain verified and solid. The top 5 HIGH items are unchanged: Bloberto ping exclusion, unmemoized activity filters, touch-inaccessible hover cards, TDZ risk, and footer cycling dead-end. All are small-effort fixes that would meaningfully improve the product. The codebase is feature-rich and genuinely fun (fun_factor: 5/5) but accumulating tech debt — the monolith files and timer complexity make every change riskier. Score holds at 3.5/5 until the HIGH carry-overs get addressed."
 }
