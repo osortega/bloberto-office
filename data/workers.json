@@ -15,7 +15,15 @@
       "progress": 100,
       "started_at": "2026-03-10T09:15:00Z",
       "updated_at": "2026-03-10T09:22:00Z"
+    },
+    {
+      "name": "Carlos",
+      "status": "working",
+      "task": "Fix 3 CRITICAL + 4 HIGH bugs from QA #63",
+      "progress": 10,
+      "started_at": "2026-03-10T09:23:00Z",
+      "updated_at": "2026-03-10T09:23:00Z"
     }
   ],
-  "updated_at": "2026-03-10T09:22:00Z"
+  "updated_at": "2026-03-10T09:23:00Z"
 }
