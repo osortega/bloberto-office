@@ -161,11 +161,41 @@ const VACANT_ADS = {
 }
 
 const PING_REACTIONS = {
-  luna: 'Creative review in progress...',
-  carlos: 'Check the logs. It is ALWAYS in the logs.',
-  maya: 'Check the PRs — purple and correct as always.',
-  dave: 'He hears you through the headphones.',
-  sofia: 'Found 3 more bugs already.',
+  luna: [
+    'Creative review in progress...',
+    'Hold on — still absorbing the aesthetic.',
+    'Three concepts half-finished. Which one do you need?',
+    'I was just about to have a breakthrough.',
+    'The moodboard is alive. Give me a moment.',
+  ],
+  carlos: [
+    'Check the logs. It is ALWAYS in the logs.',
+    'Have you checked the logs? I have. Seven times.',
+    'Log level: obsessive. Status: investigating.',
+    'The logs know. The logs always know.',
+    'stdout, stderr, and my gut all say the same thing.',
+  ],
+  maya: [
+    'Check the PRs — purple and correct as always.',
+    'The spacing was wrong. I fixed it. You are welcome.',
+    'That shade of purple was off by 3 hex digits. Fixed.',
+    'Component looks great. The design system agrees.',
+    'Pixel-perfect or it ships on Monday. Your choice.',
+  ],
+  dave: [
+    'He hears you through the headphones.',
+    'Infrastructure stable. Dave unavailable.',
+    'The pipeline is green. Dave is in the zone.',
+    'Headphones on means the servers are behaving.',
+    'Caught it in the logs before you pinged. Already fixed.',
+  ],
+  sofia: [
+    'Found 3 more bugs already.',
+    'Edge case discovered. Writing the test now.',
+    'Coverage is at 94%. That is not 100%.',
+    'The bug was there before you wrote the code.',
+    'Repro steps: steps 1 through 7. You are welcome.',
+  ],
 }
 
 
@@ -1104,7 +1134,6 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     [workers, effectiveRoster],
   )
 
-  const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming']
   const plantStage = vibeStreak <= 1 ? 'seedling'
     : vibeStreak <= 3 ? 'sprout'
     : vibeStreak <= 5 ? 'small-plant'
@@ -1113,6 +1142,14 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const plantStageEmoji = { seedling: '🌱', sprout: '🌱', 'small-plant': '🌿', leafy: '🌿', blooming: '🌸' }
   const plantStageLabel = plantStage.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ')
 
+  const PLANT_STAGE_MESSAGES = {
+    sprout:        '🌱 First leaves! The ficus is sprouting.',
+    'small-plant': '🌿 Getting taller every day...',
+    leafy:         '🍀 The ficus is thriving!',
+    blooming:      '🌸 Full bloom! The office smells incredible.',
+    grief:         '🥀 The office ficus withered. The streak is gone.',
+  }
+
   // Ficus milestone burst
   const prevPlantStageRef = useRef(plantStage)
   const [plantMilestone, setPlantMilestone] = useState(false)
@@ -1120,10 +1157,16 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   useEffect(() => {
     if (prevPlantStageRef.current !== plantStage && plantStage !== 'seedling') {
       setPlantMilestone(true)
-      setPlantToast(true)
+      setPlantToast(plantStage)
       const t1 = setTimeout(() => setPlantMilestone(false), 1800)
       const t2 = setTimeout(() => setPlantToast(false), 3000)
+      prevPlantStageRef.current = plantStage
       return () => { clearTimeout(t1); clearTimeout(t2) }
+    } else if (prevPlantStageRef.current !== plantStage && prevPlantStageRef.current !== 'seedling' && plantStage === 'seedling') {
+      setPlantToast('grief')
+      const t = setTimeout(() => setPlantToast(false), 3500)
+      prevPlantStageRef.current = plantStage
+      return () => clearTimeout(t)
     }
     prevPlantStageRef.current = plantStage
   }, [plantStage])
@@ -1160,7 +1203,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     if (pingTimerRef.current) clearTimeout(pingTimerRef.current)
     setPingedId(worker.id)
     pingTimerRef.current = setTimeout(() => setPingedId(null), 700)
-    const reaction = PING_REACTIONS[worker.id]
+    const reactions = PING_REACTIONS[worker.id]
+    const reaction = reactions ? reactions[Math.floor(Math.random() * reactions.length)] : undefined
     if (reaction) {
       setPingReaction(reaction)
       clearTimeout(pingReactionTimerRef.current)
@@ -1241,7 +1285,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           aria-live="polite"
           style={{
             position: 'fixed',
-            bottom: '2rem',
+            bottom: '5.5rem',
             left: '50%',
             transform: 'translateX(-50%)',
             background: 'var(--surface2)',
@@ -1258,7 +1302,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             animation: 'badge-pop 0.3s cubic-bezier(0.34,1.56,0.64,1) both',
           }}
         >
-          🌱 The office ficus leveled up!
+          {PLANT_STAGE_MESSAGES[plantToast] ?? '🌱 The office ficus leveled up!'}
         </div>
       )}
       <div
