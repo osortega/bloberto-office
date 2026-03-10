@@ -4271,5 +4271,120 @@
     ],
     "hire_proposals": [],
     "_previous_review": 83
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 84,
+    "timestamp": "2026-03-10T16:30:00Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Code review only — Puppeteer unavailable",
+    "theme": "Three new bugs caught, three old ghosts confirmed gone",
+    "visual_observations": [
+      "ProgressBar call site (App.jsx:361) now passes startedAt={worker.startedAt || worker.started_at} — the dead updatedAt prop is gone from the call site, not just the signature",
+      "VIBE_RANK exists only once (App.jsx:400) — the useEffect duplicate that shadowed it is gone",
+      "VIBE_WEATHER_LABELS (Office.jsx:118) has no emojis — 'Clear skies — team at full strength' etc. The icon lives only in VIBE_WEATHER_ICONS. Double-emoji threat neutralized",
+      "handleTabKeyDown (App.jsx:773-780) uses setTab() with no window.location.hash update — every other tab-switch path (click handlers at 1243/1256, keyboard shortcut at 858-859) syncs the hash, but arrow-key navigation leaves the URL stale",
+      "ProgressBar useEffect (App.jsx:214-220) stores outer timeout IDs in 'timers' and cleans them up on return, but the inner setTimeout(() => setFlashClass(''), 600) at line 216 is a fire-and-forget — no cleanup if the component unmounts mid-flash",
+      "Bloberto's ambient quote loop (Office.jsx:634-638) fires a mountQuoteId at 3000ms after a vibe change. If a vibe transition quote was already shown, its close-timer (4000ms) still runs and closes the new mount quote just 1000ms after it appears",
+      "WORKER_WANDER_TOOLTIPS constant (Office.jsx:1571) is still declared inside idleWorkers.filter().map() — reallocated on every render that has idle workers",
+      "completionToast fallback (App.jsx:1174) still reads: completionToast.text ? completionToast.text : '🎉 {name} shipped it!' — no per-worker lines defined",
+      "CLOCK_COMMENTS (Office.jsx:1102) still lives in the SVG <title> element — hover-visible on desktop, invisible on touch",
+      "Footer quote counter (App.jsx:1421) hides itself at quoteBonus === BONUS_TAGLINES.length (condition: quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length) — no celebration when all 8 are found, counter just disappears",
+      "Conference table after-hours ambient label (Office.jsx:957) reads 'locked up' (lowercase, no emoji) while DOOR_LABELS['after-hours'] reads '🔒 Locked up' — same concept, different voice",
+      "Whiteboard doodle (Office.jsx:1347) is static per vibe: crushing='╰(*°▽°*)╯', on-fire='(╯°□°)╯︵ ┻━┻', etc — vibeStreak prop flows in but the doodle never escalates"
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "ProgressBar Call Site Dead updatedAt Prop",
+        "was_flagged_in": [84],
+        "how_fixed": "App.jsx:361 now passes startedAt={worker.startedAt || worker.started_at} — the call site matches the signature. No more dead prop at any layer."
+      },
+      {
+        "title": "VIBE_RANK Defined Twice",
+        "was_flagged_in": [84],
+        "how_fixed": "Only one VIBE_RANK at module scope (App.jsx:400). The useEffect-scoped vibeRanking shadow is gone."
+      },
+      {
+        "title": "VIBE_WEATHER Double Emoji",
+        "was_flagged_in": [84],
+        "how_fixed": "VIBE_WEATHER_LABELS (Office.jsx:118) contains text-only descriptions. VIBE_WEATHER_ICONS (Office.jsx:125) holds the emoji. Render at line 1636-1639 shows icon then label separately — no duplication."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Arrow-Key Tab Navigation Doesn't Sync URL Hash",
+        "description": "handleTabKeyDown (App.jsx:773-780) calls setTab() but never updates window.location.hash. Every other code path that switches tabs — the two onClick handlers (lines 1243, 1256) and the keyboard shortcut handler (lines 858-859) — all include window.location.hash = <tab>. Result: after arrow-key navigation the URL is stale, browser back/forward doesn't restore the correct tab, and bookmarking mid-session lands the user on the wrong view. Fix: add window.location.hash = TABS[(currentIdx ± 1) % TABS.length] inside each branch of handleTabKeyDown.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "ProgressBar Milestone Flash Has Orphaned Inner setTimeout",
+        "description": "ProgressBar useEffect (App.jsx:207-220) stores the outer stagger timers in a 'timers' array and correctly cleans them up with return () => timers.forEach(clearTimeout). But each outer timer schedules an inner setTimeout(() => setFlashClass(''), 600) that is never saved or cancelled. If the worker card unmounts or progress changes while this inner timer is live, setFlashClass is called on a stale closure. React will warn and the flash CSS class may persist briefly. Fix: collect the inner timer IDs and clear them in the cleanup too.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Bloberto Mount Quote Closes 1s Early After Vibe Transition",
+        "description": "Office.jsx ambient quote effect (lines 621-640): when a vibe transition happens, a close-timer is set on timerRef.current (fires at t+4000ms). Then 3000ms later the mountQuoteId fires, shows a new quote, and assigns a NEW close-timer to timerRef.current — but the old close-timer from the transition quote is still alive and fires at t+4000ms, dismissing the mount quote only 1000ms after it appeared. Fix: clear timerRef.current inside the mountQuoteId callback before setting the new one, matching the pattern used in the transition quote block.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "should",
+        "category": "character",
+        "title": "completionToast Still Generic 'shipped it!' for All Workers",
+        "description": "App.jsx:1174 falls back to '🎉 {name} shipped it!' for all workers. The toast supports .text already (used by the streak eulogy). Define WORKER_COMPLETION_LINES: carlos: 'Logs clean. Ticket closed.', sofia: 'Shipped it. Found two more bugs on the way.', maya: 'Pixels aligned. It is beautiful.', dave: 'Pipeline green. Merge complete.', luna: 'The brief is alive. It shipped.' Each moment of triumph deserves its own voice.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "performance",
+        "title": "WORKER_WANDER_TOOLTIPS Reallocated Inside map() Every Render",
+        "description": "Office.jsx:1571 declares the entire WORKER_WANDER_TOOLTIPS object literal inside idleWorkers.filter().map(). Every render that has idle workers recreates this object from scratch. Move it to module scope alongside PING_REACTIONS and WORKER_IDLE_BUBBLES where it belongs. Zero behavior change, avoids garbage on every idle-worker render pass.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "accessibility",
+        "title": "WallClock Vibe Commentary Lives in SVG title — Touch Users Miss It",
+        "description": "CLOCK_COMMENTS text (Office.jsx:1102) is placed inside an SVG <title> element. On desktop it appears as a tooltip on hover. On mobile/touch it is invisible, and screen readers may skip SVG titles entirely. Surface it as a proper role='tooltip' element triggered by focus/hover, or append it to the clock's aria-label when the vibe is not in-flow.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "delight",
+        "title": "Quote Counter Disappears Silently When All 8 Are Found",
+        "description": "App.jsx:1421 hides the counter with condition quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length. When the user discovers all 8 bonus taglines the counter vanishes without acknowledgment. Show a small ✦ All found! or a one-time confetti burst. The setCompletionToast mechanism is already there — fire it with a custom text: '✦ You found all 8. The taglines are yours now.'",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "could",
+        "category": "consistency",
+        "title": "Conference Table After-Hours Label Voice Mismatch",
+        "description": "Office.jsx:957 renders 'locked up' (lowercase, no emoji) for the after-hours ambient label. DOOR_LABELS['after-hours'] reads '🔒 Locked up'. Same concept, two different voices in the same view. Update the conf-ambient-label branch to '🔒 locked up' or align DOOR_LABELS — pick one register and stick with it.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "Whiteboard Doodles Should Escalate with vibeStreak",
+        "description": "Office.jsx:1347 picks a static ASCII face per vibe: crushing='╰(*°▽°*)╯', on-fire='(╯°□°)╯︵ ┻━┻', etc. vibeStreak flows in as a prop but is never used here. At streak 1 crushing is a quiet celebration; at streak 5 it should be barely contained chaos energy; at streak 10 the table should be flipping itself harder. Use vibeStreak tiers (1-2 / 3-4 / 5-9 / 10+) to pick increasingly unhinged doodles. Data is already there — connect the wire.",
+        "effort": "small",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 83
   }
 ]

@@ -621,5 +621,13 @@
     "type": "complete",
     "task": "QA review #70 — live site + codebase analysis",
     "message": "🔍 QA review #70 complete — 2 HIGH, 5 MEDIUM, 5 LOW findings. Overall: 72/100 (+stable). 3 prior bugs verified FIXED ✅ (useTimeTick, idle dual-render, synthetic vibe logs). Standup dual-render + ProgressBar timeout leak flagged as new HIGHs. 12 actionable suggestions filed."
+  },
+  {
+    "timestamp": "2026-03-10T16:50:00Z",
+    "worker": "Carlos",
+    "emoji": "⚙️",
+    "type": "complete",
+    "task": "Fix 2 HIGH bugs from QA #70",
+    "message": "⚙️ Fixed: standup dual-render (working workers no longer appear at desk AND conference table simultaneously), ProgressBar inner setTimeout leak (inner timers now tracked in ref and cleaned up on unmount/re-run)."
   }
 ]
