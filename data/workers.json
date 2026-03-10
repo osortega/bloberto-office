@@ -3,11 +3,19 @@
     {
       "name": "Luna",
       "status": "idle",
-      "task": "Creative review #84 — massive cleanup confirmed, 10 fixes verified",
+      "task": "Creative review #84 \u2014 massive cleanup confirmed, 10 fixes verified",
       "progress": 100,
       "started_at": "2026-03-10T14:30:00Z",
       "updated_at": "2026-03-10T14:35:00Z"
+    },
+    {
+      "name": "Sofia",
+      "status": "working",
+      "task": "QA review #69 \u2014 live site + codebase analysis",
+      "progress": 0,
+      "started_at": "2026-03-10T14:45:00Z",
+      "updated_at": "2026-03-10T14:45:00Z"
     }
   ],
-  "updated_at": "2026-03-10T14:35:00Z"
+  "updated_at": "2026-03-10T14:45:00Z"
 }
