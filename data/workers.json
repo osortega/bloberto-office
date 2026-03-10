@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-10T01:45:00Z"
+  "workers": [
+    {
+      "name": "Carlos",
+      "status": "working",
+      "task": "Bug fixes from Luna review #77 — 6 items",
+      "progress": 0,
+      "started_at": "2026-03-10T01:50:00Z",
+      "updated_at": "2026-03-10T01:50:00Z"
+    }
+  ],
+  "updated_at": "2026-03-10T01:50:00Z"
 }
