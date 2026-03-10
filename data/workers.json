@@ -5,9 +5,10 @@
       "role": "Creative Director",
       "status": "working",
       "task": "Creative review #72",
-      "started_at": "2026-03-09T23:00:00Z",
-      "progress": 10
+      "progress": 0,
+      "started_at": "2026-03-10T00:30:00Z",
+      "updated_at": "2026-03-10T00:30:00Z"
     }
   ],
-  "updated_at": "2026-03-10T00:15:50Z"
+  "updated_at": "2026-03-10T00:30:00Z"
 }
