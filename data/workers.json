@@ -15,7 +15,15 @@
       "progress": 0,
       "started_at": "2026-03-10T04:36:00Z",
       "updated_at": "2026-03-10T04:36:00Z"
+    },
+    {
+      "name": "Sofia",
+      "status": "working",
+      "task": "QA review #59 — live site + codebase analysis",
+      "progress": 0,
+      "started_at": "2026-03-10T06:15:00Z",
+      "updated_at": "2026-03-10T06:15:00Z"
     }
   ],
-  "updated_at": "2026-03-10T05:45:00Z"
+  "updated_at": "2026-03-10T06:15:00Z"
 }
