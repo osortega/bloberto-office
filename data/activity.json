@@ -582,5 +582,12 @@
     "task": "Creative review #84",
     "message": "\ud83c\udf19 Luna completed creative review #84 \u2014 6 fixes confirmed, 6 new ideas filed",
     "timestamp": "2026-03-10T08:05:00Z"
+  },
+  {
+    "worker": "Sofia",
+    "type": "task_complete",
+    "task": "QA review #67",
+    "message": "\ud83d\udd0d Sofia completed QA review #67 \u2014 overall 3.5/5, 13 suggestions filed (3 high, 7 medium, 3 low)",
+    "timestamp": "2026-03-10T12:53:00Z"
   }
 ]
