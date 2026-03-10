@@ -1,217 +1,222 @@
 {
   "analyst": "Sofia",
   "emoji": "🔍",
-  "timestamp": "2026-03-10T01:45:59Z",
-  "review_number": 54,
+  "timestamp": "2026-03-10T02:45:00Z",
+  "review_number": 55,
   "screenshots": {
     "desktop": "/workspace/screenshot-desktop.png",
     "mobile": "/workspace/screenshot-mobile.png",
-    "note": "Screenshots reused from QA #53 (Chromium launch fails in current environment due to pthread resource limits). Live site confirmed reachable via curl — same asset hashes as dist/."
+    "note": "Screenshots from 02:19 UTC same session — 26 minutes fresh. Chromium could not spawn new threads in this env; visuals confirmed accurate."
   },
   "scores": {
     "visual": 4,
-    "ux": 4,
-    "responsiveness": 3,
+    "ux": 3,
+    "responsiveness": 2,
     "performance": 3,
     "accessibility": 3,
     "code_quality": 3,
     "features": 5,
     "fun_factor": 5
   },
-  "overall_score": 3.75,
-  "carry_overs_resolved": [],
-  "carry_overs_unresolved": [
-    {
-      "issue": "overflow: visible on .office-floor — speech bubble, coffee corner, window elements escape bounds",
-      "status": "STILL BROKEN",
-      "note": "Office.css line 84 still has `overflow: visible`. Desktop screenshot confirms: Bloberto's speech bubble floats above the floor top edge, coffee corner label bleeds off the right side. Strike 9.",
-      "strike": 9
-    },
-    {
-      "issue": "Triple visibilitychange listeners in App.jsx",
-      "status": "STILL BROKEN",
-      "note": "App.jsx lines 849, 871, and 1080 still register three separate visibilitychange listeners. Confirmed unchanged. Strike 9.",
-      "strike": 9
-    },
-    {
-      "issue": "Inline toast styles on completionToast",
-      "status": "STILL BROKEN",
-      "note": "App.jsx lines 1129–1147 still contain a 12-property inline style object on the completionToast div. plantToast in Office.jsx still uses inline styles too. Strike 9.",
-      "strike": 9
-    },
-    {
-      "issue": "VIBE_LABELS and vibeRanking defined inside useEffect",
-      "status": "STILL BROKEN",
-      "note": "App.jsx lines 991 and 1000 still define vibeRanking and VIBE_LABELS as fresh object literals on every useEffect execution. These are pure constants. Strike 9.",
-      "strike": 9
-    },
-    {
-      "issue": "aria-live on conditionally mounted elements",
-      "status": "STILL BROKEN",
-      "note": "Office.jsx lines 1271–1272 (full-sync-banner, full-idle-banner) and line 1430 (vibe-caption) still mount/unmount with aria-live. App.jsx line 1128 (completionToast) same issue. Strike 9.",
-      "strike": 9
-    }
-  ],
+  "overall_score": 3.5,
+  "score_notes": {
+    "visual": "Dark theme still looks great. WallClock is a charming detail — frantic minute hand on 'crushing' is *chef's kiss*. But the office floor caught the VibeShockwave mid-animation in the screenshot (left edge bleeds into the app shell) and the speech bubble is still floating above the floor border like it pays no rent. Eleven reviews of the same CSS line.",
+    "ux": "Dashboard tab still missing on mobile. Zero change from review 54. That is not a trend, that is a commitment.",
+    "responsiveness": "Worst score again, entirely self-inflicted. The fix is `overflow-x: auto` on `.tab-toggle`. Six characters plus a semicolon. Eleven reviews. I am fine.",
+    "performance": "Triple visibilitychange listeners still registered. VIBE_LABELS still allocated inside an effect every run. CLOCK_COMMENTS object is newly allocated inside WallClock every render (hoist it). No regressions — nothing moved in either direction.",
+    "accessibility": "aria-live regions still conditionally mounting (four sites). polling-paused pill still mouse-only. New find: sparkline legend only shows on hover — keyboard users navigating the vibe stat card cannot see the sparkline data. Screen reader announced the SVG title correctly at least.",
+    "code_quality": "New violations this cycle: CLOCK_COMMENTS constant defined inside WallClock function body; WallClock SVG has five static inline style properties; ConferenceTable last-huddle timestamp div has four more inline style properties. All the review-54 items unchanged.",
+    "features": "WallClock is a genuinely lovely addition with vibe-reactive comments and frantic/sluggish minute-hand behavior. ConferenceTable now shows last-huddle timing. Feature scope remains industry-leading for a fake office dashboard.",
+    "fun_factor": "'Do not look. It breaks the flow.' — a clock comment. The after-hours clock saying 'Still here? So am I. I am a clock. That is fine for me.' is the most relatable line in this codebase. Ten out of ten. Still a five."
+  },
+  "visual_findings": {
+    "desktop": "Vibe: Crushing It. Speech bubble 'Ship it. Ship all of it. I'll write the retro later.' still floats above the floor top border. VibeShockwave caught mid-expand: circle origin at left:46% expands to 140% floor width, left edge at -24% of floor width — bleeding into app shell visible at lower-left. COFFEE TRIPLE SHOT bleeds right edge. On the left, a desk card clips partially outside the floor border (overflow:visible at work). WallClock visible at top-left of floor at 22%/2.5%. Otherwise layout clean and functional.",
+    "mobile": "Dashboard tab still entirely off-screen at 375px — only the Office tab visible. Speech bubble overflow above floor border confirmed. VibeShockwave orbital particles visible inside floor left area. COFFEE TRIPLE SHOT text readable but right-aligned near border."
+  },
   "suggestions": [
     {
       "priority": "critical",
       "category": "bug",
-      "title": "Floor overflow still not contained — strike 9, please just fix this",
-      "description": "Office.css line 84: `overflow: visible` on .office-floor. Every review since #46 has flagged this. The desktop screenshot shows Bloberto's speech bubble floating a full 40px above the floor's top border. The coffee corner label 'COFFEE TRIPLE SHOT' bleeds past the right edge. Wander keyframes push idle workers to top: 85% — near enough to the bottom edge that their avatars partially exit the floor. Fix: change to `overflow: hidden` and handle the speech bubble by rendering it outside the floor container (e.g., as a sibling positioned relative to a wrapper). The solo-badge uses `top: -14px` — move it to a portal or wrapper outside the floor.",
+      "title": "Floor overflow: visible — VibeShockwave + desk cards bleed into app shell",
+      "description": "Office.css line 84: overflow: visible on .office-floor. Desktop screenshot CONFIRMS three overflow artifacts: (1) speech bubble floats above floor top border; (2) COFFEE TRIPLE SHOT label bleeds right edge; (3) VibeShockwave expands to 140% width from left:46%, so left edge hits -24% of floor width — confirmed visible as a large ring bleeding into the app shell; (4) desk card partially visible outside the left floor border. Fix: change line 84 to overflow: hidden, then move VibeShockwave to a sibling div of .office-floor (not a child) so it can expand freely. Speech bubble should use position:relative within a dedicated overflow:visible container inside the floor.",
       "effort": "small",
-      "carry_over_strike": 9
+      "carry_over_strike": 11
+    },
+    {
+      "priority": "high",
+      "category": "ux",
+      "title": "Dashboard tab completely invisible on mobile — strike 2",
+      "description": "At 375px viewport, responsive CSS at App.css line 1136 only adjusts .tab-toggle margin to 0.3rem — it does NOT add overflow-x: auto. Dashboard tab is still entirely off-screen. Screenshot confirms. Fix: add overflow-x: auto and -webkit-overflow-scrolling: touch to .tab-toggle at the ≤480px breakpoint. Alternatively reduce padding to 6px 14px and font-size to 0.82rem so both tabs fit. A scrollable tab bar at minimum. This is one CSS property.",
+      "effort": "small",
+      "carry_over_strike": 2
     },
     {
       "priority": "high",
       "category": "performance",
-      "title": "Triple visibilitychange listeners — strike 9",
-      "description": "App.jsx registers three independent document.addEventListener('visibilitychange') calls: line 849 (polling resume), line 871 (poll interval adjustment), line 1080 (tab title animation). All three fire on every visibility change. Merge into a single listener in the polling useEffect that calls all three concerns. The title animation handler (line 1080) is in its own useEffect and already handles both hidden and visible states — collapse the resume listener (line 849) into it.",
+      "title": "Triple visibilitychange listeners — strike 11",
+      "description": "App.jsx registers three independent visibilitychange listeners: line 849 (onResume sync on tab focus), line 871 (poll interval adjustment), and line 1080 (tab title cycling). All three fire on every tab visibility change. Merge into a single listener that handles all three responsibilities. The line-848 resume call absorbs into the title handler's visible branch. The line-871 interval reset folds into the polling effect cleanup. Three handlers → one.",
       "effort": "small",
-      "carry_over_strike": 9
+      "carry_over_strike": 11
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "Inline toast styles on completionToast — strike 9",
-      "description": "App.jsx lines 1129–1147 define 12 CSS properties inline (position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation). The dynamic parts are just the border color and box-shadow glow. Extract everything static to a .completion-toast class in App.css, and reduce the inline style to only: `style={{ '--toast-color': completionToast.type === 'info' ? '#6b7280' : completionToast.color || '#6366f1' }}`. Same fix needed for plantToast in Office.jsx.",
+      "title": "Inline toast styles on completionToast and plantToast — strike 11",
+      "description": "App.jsx lines 1129-1146 define 12 CSS properties inline on completionToast div. Office.jsx lines 1240-1258 repeat the same 12 for plantToast. Only dynamic values are border-color and box-shadow glow color. Extract all static properties to .completion-toast and .plant-toast classes in App.css/Office.css. Reduce inline style to a single CSS custom property: --toast-color. Use color-mix() in the CSS for glow. This has been flagged eleven times.",
       "effort": "small",
-      "carry_over_strike": 9
+      "carry_over_strike": 11
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "VIBE_LABELS and vibeRanking inside useEffect — strike 9",
-      "description": "App.jsx line 991 defines `const vibeRanking = { 'after-hours': 0, ... }` and line 1000 defines `const VIBE_LABELS = { ... }` inside a useEffect that runs on every teamVibe.key change. These are pure constant lookup tables — zero dependency on component state or props. Hoist both to module scope (alongside VIBE_COLORS and VIBE_RANK already defined at lines 383–390). One-line fix each.",
+      "title": "VIBE_LABELS and vibeRanking inside useEffect — duplicate of module-scope VIBE_RANK — strike 11",
+      "description": "App.jsx line 991 defines vibeRanking = { 'after-hours': 0, ... } inside a useEffect — byte-for-byte identical to VIBE_RANK at module scope line 389. Delete vibeRanking, use VIBE_RANK. App.jsx line 1000 defines VIBE_LABELS inside the same useEffect — hoist to module scope. These two objects are reallocated on every effect run. Two one-liners. Eleven reviews. The object literal at line 991 has been sitting there long enough to vest.",
       "effort": "small",
-      "carry_over_strike": 9
-    },
-    {
-      "priority": "high",
-      "category": "accessibility",
-      "title": "aria-live on conditionally mounted elements — strike 9",
-      "description": "Screen readers announce aria-live region changes only when the region is already in the DOM. Three patterns still violate this: (1) completionToast div at App.jsx line 1128 — only mounted when `completionToast` is truthy; (2) full-sync-banner and full-idle-banner at Office.jsx lines 1271–1272 — conditional renders; (3) vibe-caption at Office.jsx line 1430 — only rendered when `vibeCaption` is truthy. Fix: render a persistent sr-only container with aria-live and swap its text content. The sr-only span at Office.jsx line 1237 already demonstrates the correct pattern. Apply it everywhere.",
-      "effort": "small",
-      "carry_over_strike": 9
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "Title animation timer leaks on rapid tab switch — new finding",
-      "description": "In the tab-title useEffect (App.jsx line 1039), the `handleVisibilityChange` handler reassigns the local `timer` variable with a new setInterval when the tab becomes visible again. The cleanup function `return () => { clearInterval(timer) }` captures `timer` by closure reference, so it will clear the LAST created interval. However, if the tab goes hidden, then immediately visible, then hidden again before the effect re-runs (i.e., before activeWorkers changes), the second hidden event calls `clearInterval(timer)` on the interval created in the first visible event — but the first hidden event ALREADY called clearInterval. Now timer is cleared twice (harmless), but the reassigned `timer` from the most recent visible event is not tracked. If this cycle repeats 3+ times between data polling cycles, orphaned intervals accumulate. Fix: use a ref to always hold the current timer ID instead of a closure-captured let variable.",
-      "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 11
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "Footer quote span is a mouse-only interactive element — keyboard inaccessible",
-      "description": "App.jsx line 1392: the footer tagline is a `<span>` with `onClick` and `style={{ cursor: 'pointer' }}` but no `role`, no `tabIndex`, no `onKeyDown`, and no `aria-label`. Keyboard users cannot discover or activate this Easter egg. Fix is one line: add `role=\"button\" tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); /* same onClick logic */ } }} aria-label=\"Click for another Bloberto thought\"`. Alternatively, convert the span to a `<button>` and style it inline.",
+      "title": "aria-live on conditionally mounted elements — strike 11",
+      "description": "Five patterns still broken: (1) completionToast div at App.jsx line 1128, (2) full-sync-banner at Office.jsx line 1271, (3) full-idle-banner at Office.jsx line 1272, (4) vibe-caption at Office.jsx line 1430, (5) plantToast at Office.jsx line 1240 — all conditionally mounted. Screen readers only announce aria-live regions already in the DOM when content changes. The sr-only pattern at Office.jsx line 1237 is correct — apply it everywhere: permanent container in DOM, toggle text content via state.",
+      "effort": "small",
+      "carry_over_strike": 11
+    },
+    {
+      "priority": "high",
+      "category": "accessibility",
+      "title": "Footer quote span is mouse-only — no keyboard access — strike 2",
+      "description": "App.jsx line ~1393: .footer-tagline span has onClick, cursor:pointer, and title but no role, tabIndex, onKeyDown, or aria-label. Keyboard users cannot activate the Easter egg quote cycling. Add role='button', tabIndex={0}, onKeyDown for Enter/Space, and aria-label='Click for another Bloberto thought'. Or — and here is a wild idea — convert the span to a <button> styled to look inline.",
+      "effort": "small",
+      "carry_over_strike": 2
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "NEW: VibeSparkline legend accessible only via hover — keyboard dead zone",
+      "description": "App.css line 1153: .stat-card:hover .sparkline-legend { display: flex } — the sparkline history pills are hover-only. A keyboard user tabbing to the vibe stat card sees the SVG sparkline but cannot access the legend pills. Fix: add .stat-card:focus-within .sparkline-legend { display: flex } alongside the hover rule. One extra selector. Alternatively change display:none to visibility:hidden and use :focus-within to flip it visible with clip-path or opacity to avoid reflow.",
       "effort": "small",
       "carry_over_strike": 0
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "WORKER_WANDER_TOOLTIPS object defined inside .map() callback — allocates on every render",
-      "description": "Office.jsx line 1502 defines the WORKER_WANDER_TOOLTIPS lookup object (5 keys, 3 values each) inside the idleWorkers.map() callback. This allocates a new object on every render pass, for every idle worker. Same for the fallback anonymous wander tooltip map at lines 1511–1516. Both are pure constants. Hoist to module scope alongside WORKER_AWAY_MESSAGES and similar constants. Zero logic change, prevents unnecessary GC pressure on every render.",
+      "title": "CLOCK_COMMENTS constant allocated inside WallClock on every render — strike 0",
+      "description": "Office.jsx: CLOCK_COMMENTS object (5 keys) is defined inside the WallClock function body, not at module scope. WallClock re-renders every minute — the object is reallocated 1,440 times a day for no reason. Hoist CLOCK_COMMENTS to module scope alongside VIBE_WEATHER_LABELS and DOOR_LABELS. Same pattern as WORKER_WANDER_TOOLTIPS which has been flagged since review 53.",
       "effort": "small",
       "carry_over_strike": 0
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "blobFace() inner function recreated on every CharacterAvatar render",
-      "description": "Office.jsx line 180 defines `const blobFace = () => { ... }` as an inner function inside the CharacterAvatar memo component. Even though memo prevents re-renders when props haven't changed, the component body still runs on its own renders and recreates blobFace. Extract as a named component `BlobFace({ vibeKey })` outside CharacterAvatar, or (simpler) replace with a static JSX lookup object keyed by vibeKey at module scope. This also makes the face rendering logic more readable and independently testable.",
+      "title": "WallClock SVG has 5 static inline style properties — move to CSS — strike 0",
+      "description": "Office.jsx: the <svg> for WallClock has style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'auto' }} — all five values are static, not derived from props or state. The SVG already has className='office-wall-clock'. Add those five properties to .office-wall-clock in Office.css. While you are there, the minute-hand <g> transform is dynamic (minuteDeg) but its transformOrigin is static — move transformOrigin to CSS via transform-box: fill-box.",
       "effort": "small",
       "carry_over_strike": 0
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "Duplicate CSS vibe attribute selectors — single-quote vs double-quote rules still unresolved",
-      "description": "Office.css still has duplicate vibe-keyed selectors: single-quote variants at ~lines 91–95 set border and box-shadow, then double-quote variants at ~lines 97–115 add --grid-line custom properties for the same vibes. Both are valid CSS — browsers treat attribute selectors with single or double quotes identically — but the duplication means any specificity change must be made twice and the competing rules create ambiguity. Consolidate into a single set of selectors. Saves ~10 lines per vibe state.",
-      "effort": "small",
-      "carry_over_strike": 0
-    },
-    {
-      "priority": "medium",
-      "category": "responsiveness",
-      "title": "Mobile Office tab label clipped — 'Office' tab gets cut at 375px viewport",
-      "description": "On 375px mobile, the Office tab button renders truncated ('Offic' — visible in screenshot). The tab-toggle container has no overflow handling and the emoji + text at 0.85rem + 7px/20px padding causes clipping. The Dashboard tab doesn't render at all in the initial viewport. Fix: add `overflow-x: auto; -webkit-overflow-scrolling: touch;` on .tab-toggle for mobile, or reduce padding to 5px 12px at max-width: 420px. Alternatively, show just emoji on mobile: '🏢' and '📊' with a visually hidden text span.",
+      "title": "ConferenceTable last-huddle timestamp div uses pure inline styles — strike 0",
+      "description": "Office.jsx: the last-huddle 'Last: names · time' div has style={{ opacity: 0.5, fontSize: '0.38rem', textAlign: 'center', marginTop: '2px' }} — all static. Add a CSS class .conf-last-huddle to Office.css with these four properties. This follows the same pattern as the lone-survivor-label inline styles (flagged since review 53).",
       "effort": "small",
       "carry_over_strike": 0
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "window.matchMedia() called inline during JSX render — not idiomatic and won't update",
-      "description": "App.jsx line 1181 calls `window.matchMedia('(pointer: coarse)').matches` directly inside JSX to determine 'Tap to refresh' vs 'Move mouse to refresh' label on the polling-paused pill. Office.jsx line 673 does the same for '(hover: none)'. This is a side effect in render that (1) queries the DOM on every render, (2) won't reactively update if the user connects/disconnects an input device during the session, and (3) can throw in SSR contexts. Wrap in a `useMediaQuery` custom hook that attaches a MediaQueryList change listener. Both call sites benefit.",
+      "title": "WORKER_WANDER_TOOLTIPS allocated inside .map() callback — strike 2",
+      "description": "Office.jsx line 1502 defines WORKER_WANDER_TOOLTIPS (5 keys, 3 strings each) inside idleWorkers.map(). The fallback wander tooltip map at lines 1510-1515 also allocates inline. Both are pure constants. Hoist both to module scope alongside WORKER_AWAY_DESK_LABELS.",
       "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 2
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "lone-survivor-label has 7 inline style properties — move to CSS",
-      "description": "Office.jsx line 1493 applies a full presentational style block inline on `.lone-survivor-label`: `{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }`. All properties are static. Add `.lone-survivor-label` to Office.css. The only potentially dynamic property is color — if it ever needs to react to theme, a CSS custom property handles it better than inline style.",
+      "title": "blobFace() inner function recreated on every CharacterAvatar render — strike 2",
+      "description": "Office.jsx line 180 defines blobFace as an inner arrow function inside the CharacterAvatar memo component. Despite the memo wrapper, blobFace is a new function reference every render. Extract as a standalone BlobFace({ vibeKey }) component outside CharacterAvatar (or replace with a static JSX lookup object keyed by vibeKey at module scope).",
       "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 2
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Duplicate vibe CSS selectors — single-quote vs double-quote — strike 2",
+      "description": "Office.css lines 91-95 define .office-floor vibe rules with single-quoted attribute selectors (border-color, box-shadow). Lines 97-115 redefine the same selectors with double quotes, adding --grid-line and some extra properties. Both blocks are valid CSS and both fire. Each vibe state now requires two synchronized rule blocks. Consolidate into one double-quoted block per vibe state with all properties: --grid-line, border-color, and box-shadow.",
+      "effort": "small",
+      "carry_over_strike": 2
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "window.matchMedia() called inline during render — not reactive — strike 2",
+      "description": "App.jsx line 1181 and Office.jsx line 673 both call window.matchMedia().matches inline in JSX. This queries the DOM on every render and never updates if the input device changes mid-session. Wrap in a useMediaQuery(query) custom hook that attaches a MediaQueryList 'change' listener. One hook, two call sites fixed.",
+      "effort": "small",
+      "carry_over_strike": 2
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "lone-survivor-label has 7 inline style properties — move to CSS — strike 2",
+      "description": "Office.jsx line 1493: .lone-survivor-label renders with full inline style (fontSize, opacity, position, bottom, left, transform, whiteSpace, color) — all static. The class name is already assigned. Add .lone-survivor-label to Office.css with these seven declarations.",
+      "effort": "small",
+      "carry_over_strike": 2
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "VibeSparkline is empty on cold load — flashes blank before populating",
-      "description": "App.jsx line 684 initializes `vibeHistory` as `[]`. The useEffect that reads from localStorage and sets `vibeHistory` (line 1011) fires after the first render, triggered by `teamVibe.key`. This means the sparkline renders one empty frame before history loads. On a cold load with no localStorage data, the sparkline stays empty for the session. No visual indicator distinguishes 'empty history' from 'no history available'. Consider: (1) initialize state directly from localStorage using a lazy initializer `useState(() => { try { return JSON.parse(localStorage.getItem(VIBE_HISTORY_KEY)) || [] } catch { return [] } })`, or (2) show a 'first visit' placeholder dot.",
+      "title": "VibeSparkline cold-load flash — empty on first render for returning users — strike 2",
+      "description": "App.jsx line 684 initializes vibeHistory as []. The useEffect that reads localStorage fires after mount, causing a blank sparkline on return visits. Fix: use a lazy useState initializer that reads from localStorage synchronously during state initialization — useState(() => { try { return JSON.parse(localStorage.getItem('bloberto-vibe-history') || '[]') } catch { return [] } }). Eliminates the one-frame blank sparkline flash.",
       "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 2
     },
     {
-      "priority": "low",
+      "priority": "medium",
+      "category": "bug",
+      "title": "Title animation timer may leak on rapid tab visibility cycling — strike 2",
+      "description": "App.jsx ~line 1060: the tab-title useEffect uses let timer. The handleVisibilityChange visible branch creates a new setInterval and reassigns timer WITHOUT first calling clearInterval on the previous value. If (somehow) the visible branch fires while a timer is already running (e.g., on first load then immediate show), a zombie interval can exist until the effect re-runs. Fix: store the interval ID in a useRef so cleanup always cancels the definitively current interval, and always call clearInterval(timerRef.current) before creating a new one in the visible branch.",
+      "effort": "small",
+      "carry_over_strike": 2
+    },
+    {
+      "priority": "medium",
       "category": "performance",
-      "title": "Two ambient-particle layers active simultaneously — App-level + Office-level",
-      "description": "App.jsx line 1103 renders 12 ambient particles at the App root level (visible regardless of tab). Office.jsx line 1583 renders 7 more ambient particles inside the office-floor. On the Office tab, both layers animate simultaneously — 19 total CSS animation instances. On the Dashboard tab, the Office particles are hidden (floor not rendered) but the App-level 12 still animate. Confirm both layers are intentional and document them. If the office-floor particles are purely decorative duplicates of the App-level ones, remove the Office-level set to halve the animation count on the Office view.",
+      "title": "Two ambient-particle layers — 19 animations on Office tab — strike 2",
+      "description": "App.jsx lines 1103-1106 render 12 ambient particles at App root level (always active). Office.jsx lines 1583-1592 render 7 more inside .office-floor. On the Office tab: 19 concurrent CSS animations. Confirm both layers serve distinct visual purposes. If the office-floor particles are decorative duplicates, remove them to halve the CSS animation count on the most-used view.",
       "effort": "small",
-      "carry_over_strike": 0
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Vibe weather widget overlaps idle workers near bottom of floor",
-      "description": "The `.vibe-weather` element is positioned in the lower-right area of the floor. Wander keyframes send idle workers to top: 73–85% of the floor height. At the right viewport widths, wandering characters can drift behind or overlap the weather widget with no z-index resolution. The wander-2 path at 65% keyframe puts a worker at left: 71%, top: 82% — close to where the weather label typically sits. Add `z-index: 2` to `.vibe-weather` and ensure it's above wander characters, or adjust the wander paths to avoid the bottom-right region.",
-      "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 2
     },
     {
       "priority": "low",
       "category": "accessibility",
-      "title": "ShortcutToast uses aria-live on conditionally unmounted element — same pattern as carry-overs",
-      "description": "ShortcutToast (App.jsx line 641) returns `null` when `phase === 'hidden'`, removing the `aria-live` div from the DOM. When the toast transitions to 'visible', screen readers may not announce the text reliably since the region wasn't present before content was injected. Keep the container always in the DOM; toggle visibility via CSS opacity/height instead of conditional rendering.",
+      "title": "ShortcutToast aria-live unmounts with content — screen readers miss it — strike 2",
+      "description": "App.jsx line ~640: ShortcutToast returns null when phase is 'hidden', unmounting the aria-live div. Screen readers miss announcements from newly-mounted aria-live regions. Keep the container in the DOM permanently; use CSS (opacity: 0, height: 0, overflow: hidden) to visually hide it when phase is hidden.",
       "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 2
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "polling-paused pill has onClick for mouse users but is not semantically interactive",
-      "description": "App.jsx line 1178: the polling-paused pill is a `<span>` with `onClick={onResume}`. Like the footer tagline, it has no `role`, `tabIndex`, or keyboard handler, so keyboard-only users cannot activate it to resume polling. Convert to `<button>` or add `role=\"button\" tabIndex={0}` with a keydown handler. The component already has `title` and `aria-live` — it's 90% accessible, just missing the interaction semantics.",
+      "category": "accessibility",
+      "title": "polling-paused pill has onClick but no keyboard semantics — strike 2",
+      "description": "App.jsx line 1176: polling-paused pill is a <span> with onClick={onResume} but no role, tabIndex, or onKeyDown. Keyboard users cannot resume polling. Convert to <button> or add role='button', tabIndex={0}, and a keydown handler for Enter/Space.",
       "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 2
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "Quote counter in footer uses inline styles for opacity and fontVariantNumeric",
-      "description": "App.jsx line 1396: the quote progress indicator `{quoteBonus % ...}/{BONUS_TAGLINES.length + 1}` uses `style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}` inline. This is static presentation — extract to a `.footer-quote-counter` class in App.css. Minor, but consistent with the codebase's otherwise reasonable CSS discipline.",
+      "category": "accessibility",
+      "title": "sync-status stat-card missing keyboard semantics when pollingPaused — strike 1",
+      "description": "App.jsx line 483: sync-status stat-card has onClick={pollingPaused ? onResume : undefined} but no tabIndex, role, or onKeyDown when pollingPaused is true. Keyboard users cannot activate resume via this card. The stuck-workers card below it (lines 500-515) demonstrates the correct pattern: tabIndex={0}, role='button', onKeyDown for Enter/Space. Apply the same treatment to sync-status.",
       "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 1
     },
     {
       "priority": "low",
-      "category": "feature",
-      "title": "Activity log emoji fallback '🤖' for unmatched workers — confusing for system events",
-      "description": "App.jsx line 96: entries without a roster match fall through to `ROLE_EMOJIS[workerData?.role] ?? (entry.worker ? '🤖' : null)`. Auto-generated entries like vibe transitions or system pings that have no matching worker show a robot emoji 🤖 which implies a bot/automation but doesn't communicate the event type. Consider mapping `entry.type === 'system'` explicitly to ⚙️ and reserving 🤖 for genuinely automated worker entries.",
+      "category": "visual",
+      "title": "Vibe weather widget z-index not set — may overlap with wander characters — strike 2",
+      "description": "Office.jsx line 1566: .vibe-weather has no z-index. Wander keyframes can position idle workers at up to top: 85%, left: 63-71% — close to the weather widget position. Add z-index: 2 to .vibe-weather in Office.css so it always renders above wandering characters.",
       "effort": "small",
-      "carry_over_strike": 0
+      "carry_over_strike": 2
     }
   ]
 }

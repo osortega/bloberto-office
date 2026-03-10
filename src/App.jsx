@@ -192,7 +192,7 @@ function StatusBadge({ status }) {
   )
 }
 
-function ProgressBar({ progress, updatedAt, startedAt }) {
+function ProgressBar({ progress, startedAt }) {
   const milestonesRef = useRef(new Set())
   const prevProgressRef = useRef(progress)
   const [flashClass, setFlashClass] = useState('')
@@ -291,7 +291,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
     .reverse()
 
   return (
-    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`} data-worker-name={worker.name}>
+    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`} data-worker-name={worker.name} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsFlipped(f => !f) } }}>
       <div className="worker-card__inner">
         <div className="worker-card__front" aria-hidden={isFlipped || undefined} tabIndex={isFlipped ? -1 : undefined}>
           <div className="worker-header">

@@ -744,7 +744,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       </div>
       <div className="char__name">{firstName}</div>
       {variant === 'idle' && idleBubble && (
-        <div className="idle-micro-bubble">{(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor((Date.now() + (worker.id?.charCodeAt(0) ?? 0) * 4000) / 12000) % (WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES).length]}</div>
+        <div className="idle-micro-bubble">{(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor((Date.now() / 12000) + (worker.id ? [...worker.id].reduce((h, c) => h * 31 + c.charCodeAt(0), 0) : 0)) % (WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES).length]}</div>
       )}
       {errorBubble && (
         <div className="idle-micro-bubble" data-type="error">{errorBubble}</div>
@@ -801,10 +801,11 @@ function WindowElement({ vibe }) {
     return 'linear-gradient(to bottom, #050510, #1e1b4b)'  // midnight 0-4
   }
 
-  const isMidnight = hour >= 0 && hour <= 4
+  const isNight = (hour >= 0 && hour <= 4) || hour >= 20
+  const isMidnight = isNight
   const isDaytime = hour >= 9 && hour <= 16
   const isGoldenHour = hour >= 17 && hour <= 19
-  const timeLabel = hour < 5 ? 'midnight' : hour <= 8 ? 'sunrise' : hour <= 16 ? 'daylight' : hour <= 19 ? 'golden hour' : 'dusk'
+  const timeLabel = hour < 5 ? 'midnight' : hour <= 8 ? 'sunrise' : hour <= 16 ? 'daylight' : hour <= 19 ? 'golden hour' : 'night'
 
   return (
     <div className="office-window" role="img" aria-label={`Office window showing ${timeLabel} sky`}>
