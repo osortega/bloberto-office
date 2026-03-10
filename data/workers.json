@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-10T20:15:00Z"
+  "workers": [
+    {
+      "name": "Sofia",
+      "emoji": "🔍",
+      "role": "QA & Product Analyst",
+      "status": "working",
+      "task": "QA review #74 — live site + codebase analysis",
+      "started_at": "2026-03-10T20:45:00Z"
+    }
+  ],
+  "updated_at": "2026-03-10T20:45:00Z"
 }
