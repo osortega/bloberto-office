@@ -1937,5 +1937,116 @@
     ],
     "hire_proposals": [],
     "_previous_review": 75
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 77,
+    "timestamp": "2026-03-10T01:00:00Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Puppeteer network timeout in container (Network.enable timed out). Full code review of App.jsx, Office.jsx, Office.css, App.css, and all utils/. Previous screenshot from review 76 consulted for visual context.",
+    "theme": "The memo wraps nothing, the clock lies to the window, and the ficus has been grieving in silence for twelve reviews",
+    "visual_observations": [
+      "App.jsx:655 — `useTimeTick(60_000)` called at App root with return value discarded. Forces a whole-app re-render every 60 seconds including WorkerCard, StatsBar, ActivityLog, and all children — with no memoization guard against this tick.",
+      "App.jsx:1257,1273-1274,1291 — `activityEntries={activityLog.filter(e => e.worker === w.name).slice(-3)}` passes a newly allocated array to WorkerCard on every render. WorkerCard is React.memo'd but memo uses shallow prop comparison — a new array reference always triggers a re-render. The memo wrapper is completely bypassed.",
+      "Office.jsx:783-789 — WindowElement useEffect: `setInterval(() => { const h = getHour(); setHour(prev => ...) }, 60000)` anchored to page-load time. WallClock got the msUntilNextMinute fix in review 76. WindowElement missed it. If the page loads at 19:59:45, the sky shows 'golden hour' until 20:00:45, then snaps to 'dusk' 45 seconds late.",
+      "App.jsx:1082 — `isAfterHours = currentHour < 5 || currentHour >= 20` — EXPANDED since last review. Hours 20-23 now get the after-hours greeting correctly. This is a genuine partial fix. However: App.jsx:1152 still reads `HONORIFICS[isAfterHours ? 'after-hours' : ...]` — the honorific is STILL overridden to 'night owl' at hours 20-23, including for 'crushing' vibe at 10pm.",
+      "Office.jsx:747 — `Math.floor(Date.now() / 12000) % length` — idle bubble emoji picker still uses wall-clock time as index. At any given 12-second window, all idle workers display the same positional index from their respective arrays simultaneously. Carlos and Maya still 'think' in unison.",
+      "Office.jsx:1188-1200 — vibeCaption useEffect fires on every vibe change with no cooldown guard. isFirstVibe skips the mount; nothing skips rapid oscillations. A team bouncing between 'in-flow' and 'slow-day' every poll cycle shows the caption overlay every 30 seconds.",
+      "App.jsx:1388 — `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` renders '1/9' when quoteBonus=0. The visitor has not clicked anything but the counter says they found quote #1.",
+      "Office.jsx:1111,1114-1122 — ficus milestone useEffect: the early `return` at line 1120 exits before `prevPlantStageRef.current = plantStage` at line 1122. The ref stays at 'seedling' after initial mount. When the streak drops and plantStage reverts to 'seedling', `'seedling' !== 'seedling'` is false — grief toast cannot fire. Twelve reviews. Structural.",
+      "App.jsx:294 — `<div ... tabIndex={0} role='article' ...>` outer WorkerCard div is keyboard-focusable but has no onKeyDown or onClick. Pressing Enter or Space does nothing. Keyboard users land on a dead zone.",
+      "Office.jsx:1278 — `<span className='wb-progress-label'>avg task progress</span>` renders unconditionally when any worker is active. With exactly one worker, the whiteboard calls their number an 'average'. First flagged in review 60. This is review 77. That is seventeen consecutive reviews for a one-word ternary."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "isAfterHours Extended to Cover Hours 20-23 for Greeting",
+        "was_flagged_in": [75, 76],
+        "how_fixed": "App.jsx:1082 — `isAfterHours = currentHour < 5 || currentHour >= 20`. The greeting now correctly shows '🌃 Burning the midnight oil' or '🦉 Still at it' for evening hours instead of 'Good evening'. Partial fix — the honorific lookup still overrides the vibe-based honorific at these hours."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "performance",
+        "title": "WorkerCard React.memo Is Completely Bypassed by Inline filter().slice() Props",
+        "description": "App.jsx lines 1257, 1273, 1291 — `activityEntries={activityLog.filter(e => e.worker === w.name).slice(-3)}` is called inside the workers-grid .map() on every render. This allocates a fresh array reference on each call regardless of whether the underlying entries changed. WorkerCard is wrapped with React.memo (line 271) which uses shallow comparison — a new array reference always triggers a re-render even with identical contents. The memo optimization is structurally defeated. Every 30-second poll cycle and every 60-second tick causes all 5 WorkerCards to re-render from scratch. Fix: compute entries once outside the map loop as a Map keyed by worker name — `const entriesByWorker = useMemo(() => { const m = {}; for (const e of activityLog) { if (e.worker) (m[e.worker] = m[e.worker] || []).push(e) } return m }, [activityLog])` — then pass `(entriesByWorker[w.name] || []).slice(-3)`. Alternatively: use a stable slice by wrapping in useMemo per worker. WHY: React.memo is a promise that a component won't re-render unless its data changes. Passing inline filter().slice() makes that promise impossible to keep. This affects every single card on every poll cycle.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "WindowElement Interval Not Clock-Aligned — WallClock's Fixed Twin Is Still Running Late",
+        "description": "Office.jsx:783-789 — `setInterval(() => { const h = getHour(); setHour(prev => prev === h ? prev : h) }, 60000)` is anchored to page-load time, not to the real minute boundary. WallClock got the exact fix it needed in review 76: `const msUntilNextMinute = 60000 - (Date.now() % 60000); const timeout = setTimeout(() => { setTime(new Date()); id = setInterval(..., 60000) }, msUntilNextMinute)`. The same pattern applies to WindowElement's useEffect — just swap `setTime` for `setHour(getHour())`. If the page loads at 19:59:45, the sky shows golden-hour orange until 20:00:45, then snaps to the night-purple gradient 45 seconds late. This is the WallClock twin bug identified in review 76 and still not merged. The pattern is already in the codebase — copy-paste fix. WHY: the sky gradient and the wall clock tell complementary stories about what time it is. Having one accurate and one drifting breaks the clock metaphor at exactly the moment a visitor is most likely to notice it.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Honorific Still Overridden to 'night owl' at Hours 20-23 Despite Crushing Vibe",
+        "description": "App.jsx:1082 — isAfterHours was correctly extended to `currentHour < 5 || currentHour >= 20` (partial fix confirmed). The greeting now fires correctly. But App.jsx:1152 — `HONORIFICS[isAfterHours ? 'after-hours' : (teamVibe.key === 'after-hours' ? 'slow-day' : teamVibe.key)] ?? 'boss'` — still uses isAfterHours to force the 'after-hours' key at hours 20-23, returning 'night owl 🌙' regardless of team vibe. At 10pm during a crushing sprint the header reads 'Burning the midnight oil, night owl 🌙 · Crushing It'. The honorific and the vibe badge contradict each other. Fix: remove the isAfterHours override from the honorific lookup entirely — `HONORIFICS[teamVibe.key] ?? 'boss'`. The greeting already handles the time context with '🌃 Burning the midnight oil'. The honorific should reinforce the energy, not override it. WHY: 'Burning the midnight oil, LEGEND 🔥' is a coherent and energizing thought. 'Burning the midnight oil, night owl 🌙' during peak productivity is a small but distinct deflation.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "idleBubble Global Clock Makes All Workers Daydream in Unison — Fifth Review",
+        "description": "Office.jsx:747 — `(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor(Date.now() / 12000) % length]` — the index is derived from wall-clock Unix time divided by 12 seconds. Every idle worker computes the same index at the same instant. At 12:00:00 Carlos shows ☕ (index 0), Maya shows 💜 (index 0), Sofia shows 🔍 (index 0). At 12:00:12 they all advance together. WORKER_IDLE_BUBBLES was correctly added in review 71 to give each character their own emoji array. The synchronized picker throws that work away. One-line fix: seed the index with a character-specific offset — `Math.floor((Date.now() + (worker.id?.charCodeAt(0) ?? 0) * 4000) / 12000) % length`. This drifts each character's 12-second window by their first-character code multiplied by 4 seconds, making their thoughts genuinely independent. WHY: idle bubbles are thought windows. Synchronized thought windows look like a system glitch. Staggered windows look like five different minds.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "vibeCaption Has No Cooldown — Oscillating Teams See the Caption Every 30 Seconds — Fifth Review",
+        "description": "Office.jsx:1188-1200 — `setVibeCaption(CAPTIONS[vibe] || null)` fires on every [vibe] change. The isFirstVibe.current guard only prevents the initial mount. A team sitting on the boundary between 'in-flow' (40-70% working) and 'slow-day' (below 40%) — one worker toggling every poll — generates a caption every 30 seconds: '⚡ In the zone' → '☁️ Easy does it' → '⚡ In the zone'. Add `const lastVibeCaptionRef = useRef(0)` and guard: `if (Date.now() - lastVibeCaptionRef.current < 90_000) return; lastVibeCaptionRef.current = Date.now()` before the setVibeCaption call. 90-second minimum interval between captions. WHY: the vibe caption is a punctuation mark, not a ticker. One word that announces a shift. That word loses all meaning when it appears every 30 seconds.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Footer Quote Counter Shows 1/9 on Fresh Load Before Any Click — Sixth Review",
+        "description": "App.jsx:1388 — `{(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}` — BONUS_TAGLINES has 8 entries so denominator is 9. On fresh load quoteBonus=0, so `(0 % 9) + 1 = 1`. The visitor has not clicked anything but the UI announces they have found quote 1 of 9. The denominator bundles the default vibe tagline into the discovery set which is not a bonus. Fix: render the counter only after the first click — `{quoteBonus > 0 && <span ...>{quoteBonus}/{BONUS_TAGLINES.length + 1}</span>}`. The footer sparkle (now correctly preserved until first click since review 76) should be the only invitation — the counter should reward the action, not precede it. WHY: discovery counters are motivating only when accurate. A counter that starts at 1/9 before the visitor has done anything teaches them that UI numbers here are decorative.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "accessibility",
+        "title": "WorkerCard Outer Div Is Keyboard-Focusable but Dead — Enter and Space Do Nothing",
+        "description": "App.jsx:294 — `<div ref={cardRef} className={classes.join(' ')} tabIndex={0} role='article' ...>`. The outer div is focusable (tabIndex=0) and has a semantic role, but has no onKeyDown handler. When a keyboard user tabs to a worker card and presses Enter or Space — the natural expectation for an interactive focusable element — nothing happens. The flip is triggered only by the nested ℹ️ button, which requires a second tab stop. Fix: add `onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setIsFlipped(f => !f) } }}` to the outer div. This makes the card flip on keyboard activation at the outer div level, consistent with what a sighted user can do by clicking anywhere on the card. WHY: keyboard users and screen reader users are real Bloberto's Office visitors. A focusable element that doesn't respond to keyboard activation is an accessibility contract broken in plain sight.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Whiteboard Says 'avg task progress' When One Person Is the Entire Team — Review 60 Through Review 77",
+        "description": "Office.jsx:1278 — `<span className='wb-progress-label'>avg task progress</span>` renders unconditionally whenever workingWorkers.length > 0. When exactly one worker is active, their progress is the average by definition — but the label still says 'avg'. This was first flagged in review 60 as a 'should' item with the note 'The Whiteboard Calls It an Average With One Person in the Room'. That was seventeen review cycles ago. The fix is a single ternary: `{workingWorkers.length === 1 ? 'task progress' : 'avg task progress'}`. One JSX change. One word difference. Zero logic change. WHY: this has survived seventeen consecutive reviews, which means it keeps getting triaged out in favor of larger items. But it is visible every time a solo worker is active — which is a common state — and it says something factually wrong on a UI element that is supposed to be the most prominent data surface in the office. If this doesn't land in review 77, it should be assigned with a deadline.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Ficus Grief Toast Architecturally Blocked — prevPlantStageRef Never Updated on Growth — Twelve Reviews",
+        "description": "Office.jsx:1114-1122 — the ficus milestone useEffect: `if (prevPlantStageRef.current !== plantStage && plantStage !== 'seedling') { setPlantMilestone(true); ...; return () => {...} }`. The early `return` exits the effect body before reaching `prevPlantStageRef.current = plantStage` at line 1122. The ref stays at 'seedling' after initial mount. When the streak drops and plantStage reverts to 'seedling', the check evaluates `'seedling' !== 'seedling'` = false and no grief toast fires. The fix requires two lines added inside the if-branch: (1) `prevPlantStageRef.current = plantStage` before the early return so growth events update the ref; (2) a separate `else if (prevPlantStageRef.current !== 'seedling' && plantStage === 'seedling')` branch to set plantToast with a grief message. Flagged since review 65. Twelve consecutive reviews. The structural cause has been clearly identified since review 74. WHY: the ficus growing has fanfare and a toast. The ficus dying has silence. The asymmetry makes the streak system feel like a one-way ratchet rather than a living thing. The grief is supposed to happen — the code just structurally prevents it from firing.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "wild",
+        "category": "reliability",
+        "title": "ErrorBoundary Swallows All Errors Silently — No Logging, No Recovery, No componentDidCatch",
+        "description": "App.jsx:7-20 — the ErrorBoundary class has `getDerivedStateFromError()` but no `componentDidCatch(error, errorInfo)`. This means any render error in the component tree is caught, the UI switches to 'Something went wrong — refresh the page', and the actual error is permanently lost. No stack trace. No component name. No way to reproduce. The error message itself offers no retry button — the only recovery is a full page refresh. Fix in two steps: (1) add `componentDidCatch(error, errorInfo) { console.error('[Bloberto ErrorBoundary]', error, errorInfo) }` — at minimum the stack trace appears in the developer console; (2) add a retry button to the fallback render: `<button onClick={() => this.setState({ hasError: false })} ...>↺ Try again</button>`. A third improvement would show the error.message in non-production environments. WHY: an error boundary that catches without logging is production-blind. When the office breaks for a real user, the developer gets a bug report that says 'Something went wrong' with nothing else. The boundary should be the last line of defense and the first source of truth.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 76
   }
 ]
