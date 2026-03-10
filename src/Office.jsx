@@ -744,7 +744,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       </div>
       <div className="char__name">{firstName}</div>
       {variant === 'idle' && idleBubble && (
-        <div className="idle-micro-bubble">{(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor(Date.now() / 12000) % (WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES).length]}</div>
+        <div className="idle-micro-bubble">{(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor((Date.now() + (worker.id?.charCodeAt(0) ?? 0) * 4000) / 12000) % (WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES).length]}</div>
       )}
       {errorBubble && (
         <div className="idle-micro-bubble" data-type="error">{errorBubble}</div>
@@ -781,11 +781,16 @@ function WindowElement({ vibe }) {
   const [hour, setHour] = useState(getHour)
 
   useEffect(() => {
-    const id = setInterval(() => {
-      const h = getHour()
-      setHour(prev => prev === h ? prev : h)
-    }, 60000)
-    return () => clearInterval(id)
+    let id
+    const msUntilNextMinute = 60000 - (Date.now() % 60000)
+    const timeout = setTimeout(() => {
+      setHour(getHour())
+      id = setInterval(() => {
+        const h = getHour()
+        setHour(prev => prev === h ? prev : h)
+      }, 60000)
+    }, msUntilNextMinute)
+    return () => { clearTimeout(timeout); clearInterval(id) }
   }, [])
 
   const getGradient = (h) => {
@@ -1143,6 +1148,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const [pingReaction, setPingReaction] = useState(null)
   const [vibeCaption, setVibeCaption] = useState(null)
   const isFirstVibe = useRef(true)
+  const lastVibeCaptionRef = useRef(0)
   const pingTimerRef = useRef(null)
   const pingReactionTimerRef = useRef(null)
   const prevVibeForNameplate = useRef(vibe)
@@ -1192,6 +1198,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
   useEffect(() => {
     if (isFirstVibe.current) { isFirstVibe.current = false; return; }
+    if (Date.now() - lastVibeCaptionRef.current < 90_000) return;
     const CAPTIONS = {
       crushing: '\u{1F680} Team locked in',
       'on-fire': '\u{1F525} All hands',
@@ -1200,6 +1207,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
       'after-hours': '\u{1F319} Burning the midnight oil'
     };
     setVibeCaption(CAPTIONS[vibe] || null);
+    lastVibeCaptionRef.current = Date.now();
     const t = setTimeout(() => setVibeCaption(null), 2800);
     return () => { clearTimeout(t); };
   }, [vibe])
@@ -1288,7 +1296,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           {workingWorkers.length > 0 && (
             <>
               <span className="wb-progress-pct">{avgProgress}%</span>
-              <span className="wb-progress-label">avg task progress</span>
+              <span className="wb-progress-label">{workingWorkers.length === 1 ? 'task progress' : 'avg task progress'}</span>
             </>
           )}
           <span className="wb-task-count" style={{ fontSize: '0.4rem', color: 'inherit', opacity: 0.7, whiteSpace: 'nowrap' }}>

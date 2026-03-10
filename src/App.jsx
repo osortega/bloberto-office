@@ -885,6 +885,14 @@ export default function App() {
 
   const teamVibe = useMemo(() => getTeamVibe(activeWorkers), [activeWorkers])
 
+  const activityByWorker = useMemo(() => {
+    const map = new Map()
+    for (const w of [...activeWorkers, ...Object.values(fadingMap ?? {})]) {
+      map.set(w.name, activityLog.filter(e => e.worker === w.name).slice(-3))
+    }
+    return map
+  }, [activityLog, activeWorkers, fadingMap])
+
   // ── Diff activeWorkers vs previous snapshot ──
   useEffect(() => {
     const currentIds = new Set(activeWorkers.map(w => w.id))
@@ -1254,7 +1262,7 @@ export default function App() {
                     worker={activeWorkers[0]}
                     index={0}
                     isNew={newIds.has(activeWorkers[0].id)}
-                    activityEntries={activityLog.filter(e => e.worker === activeWorkers[0].name).slice(-3)}
+                    activityEntries={activityByWorker.get(activeWorkers[0].name) ?? []}
                     isFocused={focusedWorker === activeWorkers[0].id}
                     selectedTag={selectedTag}
                     onTagClick={handleTagClick}
@@ -1277,7 +1285,7 @@ export default function App() {
                         worker={w}
                         index={i}
                         isNew={newIds.has(w.id)}
-                        activityEntries={activityLog.filter(e => e.worker === w.name).slice(-3)}
+                        activityEntries={activityByWorker.get(w.name) ?? []}
                         isFocused={focusedWorker === w.id}
                         selectedTag={selectedTag}
                         onTagClick={handleTagClick}
@@ -1290,7 +1298,7 @@ export default function App() {
                         worker={w}
                         index={activeWorkers.length}
                         isFading
-                        activityEntries={activityLog.filter(e => e.worker === w.name).slice(-3)}
+                        activityEntries={activityByWorker.get(w.name) ?? []}
                         selectedTag={selectedTag}
                         onTagClick={handleTagClick}
                         isDimmed={selectedTag !== null && !getTaskTags(w.task).some(t => t.label === selectedTag)}
@@ -1385,7 +1393,7 @@ export default function App() {
           style={{ cursor: 'pointer' }}
           title="tap for another thought"
           onClick={() => { localStorage.setItem('footer-sparkle-seen', '1'); setQuoteBonus(p => p + 1) }}
-        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span><span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
+        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span>{quoteBonus > 0 && <span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span>} &nbsp;&middot;&nbsp;
         <span>{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}</span>
       </footer>
     </div>
