@@ -7,7 +7,15 @@
       "progress": 100,
       "started_at": "2026-03-10T08:00:00Z",
       "updated_at": "2026-03-10T08:05:00Z"
+    },
+    {
+      "name": "Sofia",
+      "status": "working",
+      "task": "QA review #62 — site analysis & code review",
+      "progress": 0,
+      "started_at": "2026-03-10T08:15:00Z",
+      "updated_at": "2026-03-10T08:15:00Z"
     }
   ],
-  "updated_at": "2026-03-10T08:05:00Z"
+  "updated_at": "2026-03-10T08:15:00Z"
 }
