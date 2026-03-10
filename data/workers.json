@@ -1,14 +1,13 @@
 {
   "workers": [
     {
-      "name": "Sofia",
-      "status": "done",
-      "task": "QA review #75 — live site + codebase analysis",
-      "progress": 100,
-      "started_at": "2026-03-10T21:45:00Z",
-      "completed_at": "2026-03-10T21:53:00Z",
-      "updated_at": "2026-03-10T21:53:00Z"
+      "name": "Carlos",
+      "status": "working",
+      "task": "Fix 6 HIGH bugs from Sofia QA #75",
+      "progress": 0,
+      "started_at": "2026-03-10T22:16:00Z",
+      "updated_at": "2026-03-10T22:16:00Z"
     }
   ],
-  "updated_at": "2026-03-10T21:53:00Z"
+  "updated_at": "2026-03-10T22:16:00Z"
 }
