@@ -1,13 +1,4 @@
 {
-  "workers": [
-    {
-      "name": "Luna",
-      "status": "working",
-      "task": "Creative review #85",
-      "progress": 0,
-      "started_at": "2026-03-10T22:00:00Z",
-      "updated_at": "2026-03-10T22:00:00Z"
-    }
-  ],
-  "updated_at": "2026-03-10T22:00:00Z"
+  "workers": [],
+  "updated_at": "2026-03-10T22:05:00Z"
 }
