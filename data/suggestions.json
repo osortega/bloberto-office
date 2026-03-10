@@ -1,253 +1,124 @@
 {
   "analyst": "Sofia",
-  "review_number": 69,
-  "timestamp": "2026-03-10T14:45:45Z",
+  "review_number": 70,
+  "timestamp": "2026-03-10T15:45:00Z",
   "screenshots": {
-    "desktop": "screenshot-sofia-desktop-69.png",
-    "mobile": "screenshot-sofia-mobile-69.png"
+    "desktop": "screenshot-desktop.png",
+    "mobile": "screenshot-mobile.png"
   },
   "scores": {
-    "visual": 4,
-    "ux": 3,
-    "responsiveness": 3,
-    "performance": 2,
-    "accessibility": 2,
-    "code_quality": 2,
-    "features": 3,
-    "fun_factor": 5
+    "visual": 7,
+    "ux": 7,
+    "responsiveness": 7,
+    "performance": 7,
+    "accessibility": 6,
+    "code_quality": 6,
+    "features": 8,
+    "fun_factor": 9
   },
-  "overall_score": 3.0,
-  "visual_notes": "Still genuinely nice. Bloberto's expression system, vibe-reactive whiteboard doodles, per-worker SVG desk screens, the ficus that grows with streak — this is all still charming and rendering crisply. 'COFFEE TRIPLE SHOT' CSS easter egg on the crushing coffee corner made me smile against my will. The Bloberto speech bubble clips above the viewport frame on both desktop and mobile when rendered near the top — z-index propagation is fine but the parent container clips the bubble. One confirmed visual defect: Luna's WorkerCard progress header displays bare '%' with no preceding number in the dashboard screenshot (Sofia correctly shows '0%'). Bar fill appears complete, so the value IS computed — this points to a layout/overflow issue in the progress-header flex row where the progress-pct span text gets clipped but the '%' suffix character survives. Needs a repro. Mobile still cramped at 375px; the weather label ('Clear skies — team at full strength') competes with the vibe indicator for the same vertical zone.",
-  "carry_over": [
-    {
-      "id": "co-stat-dispatch-scroll",
-      "from_review": 68,
-      "title": "stat-dispatch scroll button silently fails on Office tab",
-      "status": "RESOLVED",
-      "strike": 0,
-      "resolution_note": "StatsBar is now rendered exclusively inside the Dashboard tabpanel (hidden attribute on the office panel keeps it inaccessible). The .workers-grid target co-exists in the same panel. Scroll works correctly. Architecture solved this implicitly — but document.querySelector('.workers-grid') is still a global DOM query with no panel scoping. Fine for now, worth revisiting if panels ever get portaled."
-    },
-    {
-      "id": "co-root-usetimetick",
-      "from_review": 68,
-      "title": "Root-level useTimeTick causes entire App tree to re-render every 60 seconds",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "high",
-      "category": "performance",
-      "description": "App.jsx line 676: useTimeTick(60_000) is called with its return value discarded. Every 60 seconds this fires setTick(), causing App to re-render, propagating to all non-memoized children. The comment says 'keep relative timestamps fresh' but StatsBar already has its own useTimeTick for this purpose. Two reviews, zero action. The fix is one line: delete it.",
-      "effort": "trivial",
-      "assignee": "Carlos"
-    },
-    {
-      "id": "co-wander-keyboard-focus",
-      "from_review": 68,
-      "title": "Wandering idle characters lose keyboard focus to animation-driven positions",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "high",
-      "category": "accessibility",
-      "description": "Idle workers still receive tabIndex={0} when onClick is present (Office.jsx Character component line 739) and still get char--wander-1 through char--wander-4 CSS animation classes (line 710). No animation-play-state: paused on :focus-within was added. A keyboard user tabbing to an idle character chases a moving target. The one-line CSS fix (.char:focus-within { animation-play-state: paused; }) has been sitting in the previous review for a full cycle.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "id": "co-error-boundary-cta",
-      "from_review": 68,
-      "title": "Error boundary recovery: no actionable CTA, no componentDidCatch",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "high",
-      "category": "ux",
-      "description": "ErrorBoundary (App.jsx lines 8–21) renders plain inline-styled text 'Something went wrong — refresh the page'. No button, no componentDidCatch logging, no styling that matches the app's design tokens. Two reviews, zero action. On mobile there is no browser refresh button in the page — users with zero technical literacy are stuck. The fix is ~10 lines of JSX and one lifecycle method.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "id": "co-format-duration-dupe",
-      "from_review": 68,
-      "title": "formatDuration and formatIdleDuration are near-duplicate utility functions",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "medium",
-      "category": "code",
-      "description": "Both functions still exist in their original locations (App.jsx ~L250 and Office.jsx ~L472). Identical arithmetic, differ only in prefix. Every future bug in duration math requires two fixes.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "id": "co-conf-aria-label",
-      "from_review": 68,
-      "title": "ConferenceTable aria-label is static and doesn't reflect meeting state",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "medium",
-      "category": "accessibility",
-      "description": "Office.jsx line 908: aria-label='Conference table' regardless of huddle/standup state. The meeting badge text ('Huddle · 3m', 'STANDUP') is in the accessible tree but not on the landmark. Dynamic label should surface attendee names and meeting type.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "id": "co-matchmedia-inline",
-      "from_review": 68,
-      "title": "window.matchMedia('(pointer: coarse)') called inline at render",
-      "status": "PARTIALLY_ADDRESSED",
-      "strike": 2,
-      "priority": "medium",
-      "category": "performance",
-      "description": "Character component was updated to use (hover: none) instead — a slight improvement. However App.jsx line 1204 still calls window.matchMedia('(pointer: coarse)').matches inline inside JSX during render of the polling-paused pill. This fires on every App render (including the 60s useTimeTick re-renders). Memoize at module level or extract a useMediaQuery hook.",
-      "effort": "small",
-      "assignee": "Carlos"
-    },
-    {
-      "id": "co-ghost-click-dead",
-      "from_review": 68,
-      "title": "Ghost characters are hover-interactive but click-dead",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "medium",
-      "category": "ux",
-      "description": "Office.jsx line 1557: onClick={!occ.ghost && onWorkerClick ? handleCharClick : undefined}. Ghost characters still receive no onClick, have tabIndex={-1}, yet show a hover bubble suggesting interactivity. Mobile first-tap shows the bubble, second tap does nothing. Either make them fully non-interactive (remove ghostBubble state, set pointer-events:none) or wire up a meaningful click action.",
-      "effort": "small",
-      "assignee": "Dave"
-    },
-    {
-      "id": "co-idle-countdown",
-      "from_review": 68,
-      "title": "No warning before polling auto-pauses",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "medium",
-      "category": "feature",
-      "description": "IDLE_TIMEOUT is still 10 minutes with no countdown warning. The 15s interval check at App.jsx ~L757 is the right injection point for a '2 minutes before pause' banner.",
-      "effort": "small",
-      "assignee": "Dave"
-    },
-    {
-      "id": "co-activity-log-cap",
-      "from_review": 68,
-      "title": "Activity log hard-capped at 20 entries with no load-more",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "medium",
-      "category": "feature",
-      "description": "ActivityLog component (App.jsx line 133) still slices to 20. Dashboard screenshot confirms 50 events are fetched and available. The section header counter correctly reports 'Latest 20 of 50 events' in logic but the label is confusingly truncated. Load-more or pagination client-side costs ~15 lines.",
-      "effort": "medium",
-      "assignee": "Carlos"
-    },
-    {
-      "id": "co-no-export",
-      "from_review": 68,
-      "title": "No export or share functionality for activity log data",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "medium",
-      "category": "feature",
-      "description": "Still no URL state for filter params, still no copy-to-clipboard. Still waiting.",
-      "effort": "medium",
-      "assignee": "Sofia"
-    },
-    {
-      "id": "co-focused-worker-timer",
-      "from_review": 68,
-      "title": "focusedWorker highlight clears on a timer rather than on user action",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "low",
-      "category": "ux",
-      "description": "App.jsx line 790: 3-second setTimeout still clears focusedWorker unconditionally. Should clear on user grid interaction.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "id": "co-localstorage-silent",
-      "from_review": 68,
-      "title": "vibe-history localStorage parse failure silently swallowed",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "low",
-      "category": "code",
-      "description": "App.jsx line 1072: } catch { /* ignore */ } still present. At minimum needs console.warn.",
-      "effort": "trivial",
-      "assignee": "Carlos"
-    },
-    {
-      "id": "co-stuck-no-ack",
-      "from_review": 68,
-      "title": "Stuck worker alert has no acknowledgement or escalation path",
-      "status": "UNRESOLVED",
-      "strike": 2,
-      "priority": "low",
-      "category": "feature",
-      "description": "Stuck card (>2h) still only scrolls to worker card. No ack, no snooze, no external ping surface.",
-      "effort": "medium",
-      "assignee": "Dave"
-    }
-  ],
+  "overall_score": 72,
+  "prior_bugs_verified": {
+    "useTimeTick_root_leak": "FIXED — useTimeTick now scoped to StatsBar only, not called at App root",
+    "idle_dual_render": "FIXED — idleWorkers.filter(w => !meetingWorkers.includes(w)) correctly excludes conference-seated workers from wander loop",
+    "synthetic_vibe_logs_destroyed_on_poll": "FIXED — syncFromGitHub preserves e.source === 'synthetic' entries before merging fresh activity data"
+  },
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Idle workers rendered twice: both wandering the floor AND seated at conference table",
-      "description": "Office.jsx line 1200: meetingWorkers = idleWorkers.slice(0, 3) when idleWorkers.length >= 2. ConferenceTable renders these workers as seated avatars (line 987). Line 1569 then renders ALL idleWorkers as wandering Character components. Net result: if Maya and Dave are idle, Maya appears both as a wander-animated char on the office floor AND as a tiny seated avatar inside the conference table circle simultaneously. This is a phantom-clone bug — same worker, two locations, one screen. Fix: exclude meetingWorkers from the idleWorkers.map render: filter with (w, i) => !meetingWorkers.some(m => m.id === w.id) before mapping wandering characters, or alternatively remove the seated-avatar rendering from ConferenceTable and just show the meeting badge.",
+      "title": "Standup dual-render: working workers appear at desk AND at conference table simultaneously",
+      "description": "When standupActive is true (3+ workers, vibe 'crushing' or 'in-flow'), standupWorkers are rendered inside ConferenceTable as CharacterAvatars (Office.jsx line 1002-1018). But those same working workers are ALSO rendered as full Character components at their desks via the deskOccupants loop (lines 1546-1566). Carlos fixed the idle version of this in #69 but missed the working/standup case. A worker can visually appear twice simultaneously. Fix: skip standup workers from the desk Character render, or don't show avatars in the conference table for workers who are at active desks.",
       "effort": "small",
-      "assignee": "Dave"
+      "assignee": "Carlos"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Synthetic vibe-transition log entries are destroyed on every poll cycle",
-      "description": "App.jsx line 1056: when the team vibe changes, a synthetic system event ('Vibe: In Flow → Crushing It') is prepended to activityLog. However App.jsx line 828 runs on every 30-second poll: setActivityLog(Array.isArray(activity) ? activity : []). This unconditionally replaces the entire log with fresh server data, discarding any synthetic entries added since the last poll. Worst case: vibe changes at T+29s, the entry lives for 1 second before the next poll wipes it. Users watching the activity log see vibe events flash and vanish — or never see them at all on a slow connection. Fix: merge synthetic entries into the server data on poll (deduplicate by type+timestamp), or tag them with source:'synthetic' and re-apply after each server replace. Alternatively, maintain a separate syntheticEvents state that ActivityLog merges client-side without going through setActivityLog.",
+      "title": "ProgressBar milestone effect: inner cleanup timeout is never cancelled on unmount",
+      "description": "In ProgressBar (App.jsx lines 213-219), when a milestone is crossed, an outer setTimeout (staggered per milestone) fires setFlashClass(), then schedules an inner setTimeout(() => setFlashClass(''), 600) to clear it. The outer timers are tracked in the 'timers' array and cleaned up on effect re-run. The inner timers are NOT tracked and NOT cancelled. If the component unmounts between the outer and inner firing (e.g., worker goes from working to idle mid-animation), the inner callback fires setFlashClass on an unmounted component. While React 18 silently ignores this, it is a state-leak pattern. Fix: store inner timer IDs in a ref and clear them in the cleanup.",
       "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Luna's progress percentage renders as bare '%' with no numeric value",
-      "description": "Dashboard screenshot (desktop and mobile) shows Luna's WorkerCard progress header as '  %' — the numeric value does not appear before the percent sign, while Sofia's card correctly shows '0%'. The progress bar fill for Luna appears complete (green, full-width), suggesting progress=100 is computed. ProgressBar renders: {typeof progress === 'number' ? progress : '—'}%. The bar fill width uses Math.min(progress, 100) and Luna's bar IS full, so progress reaches the render. The most likely cause is a flex layout overflow in .progress-header where the number '100' is pushed out of bounds but the '%' suffix character, being shorter, still fits. Repro: set a worker to progress:100 and observe the header. Fix: add min-width:0 to .progress-pct and ensure the progress-header row has overflow:visible or a sufficient minimum width.",
+      "title": "meetingWorkers array not memoized — huddle tracking useEffect fires every render",
+      "description": "In Office.jsx, meetingWorkers is computed as a plain variable (line 1200): 'const meetingWorkers = idleWorkers.length >= 2 ? idleWorkers.slice(...) : []'. This produces a new array reference on every render. The useEffect at line 1238 depends on [meetingWorkers], so it runs on EVERY render of the Office component — not just when meeting state actually changes. The lastHuddle.current ref guards against spurious updates internally, but the effect still runs needlessly. Fix: wrap meetingWorkers in useMemo with dependencies [idleWorkers]. Same applies to standupWorkers.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Tabpanel elements missing tabIndex — keyboard users can't navigate into panel content",
+      "description": "The two role='tabpanel' divs (App.jsx lines 1264 and 1267) have no tabIndex attribute. Per ARIA best practice, visible tabpanels should have tabIndex={0} so keyboard users can Tab into the panel content after selecting a tab with arrow keys. Without it, focus goes straight past the panel content to the next interactive element in the DOM. This affects the entire tab navigation flow for screen reader and keyboard-only users.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "medium",
       "category": "performance",
-      "title": "activityByWorker Map creates new array references on every recompute, defeating WorkerCard React.memo",
-      "description": "App.jsx line 935: the activityByWorker useMemo runs activityLog.filter(...).slice(-3) inside a Map.set call. Array.filter() always returns a new array reference. Every time activityLog, activeWorkers, or fadingMap changes, every WorkerCard receives a new activityEntries prop reference — even if the underlying entries are identical. WorkerCard is wrapped in React.memo, but memo does a shallow comparison: new array reference === different props === re-render. On a 30-worker team this means 30 WorkerCards re-render every 30 seconds unnecessarily. Fix: either deep-compare activity entries before setting (expensive) or pre-compute per-worker slices as a stable Map using a JSON key or structural comparison, or move the activity-slice computation inside WorkerCard itself (so it runs only when that card's data changes).",
+      "title": "Manual sync (keyboard R + sync button) fires fetch with no AbortController",
+      "description": "The initial mount fetch (App.jsx line 876) correctly uses an AbortController to cancel in-flight requests on cleanup. However, the keyboard shortcut handler (line 861: syncFromGitHub()) and the sync button onClick (line 1199: syncFromGitHub()) both call syncFromGitHub without passing a signal. If a user hammers R repeatedly, or the component unmounts mid-request, these fetches cannot be cancelled. Each one can produce orphaned state updates. Fix: create and pass an AbortController signal in each call site, or manage a shared abort ref at the component level.",
       "effort": "medium",
       "assignee": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "Bloberto speech bubble clips above viewport on office view load",
-      "description": "Desktop and mobile screenshots both show the Bloberto speech bubble ('Wait you shipped at THIS hour?! Legends. 🏆') extending above the top border of the office-floor container. The character is positioned at top:4%, left:46% inside the floor. The speech bubble has position:absolute and a negative top offset to appear above the avatar. The office-floor likely has overflow:hidden (or the parent wraps it), clipping the bubble at the container boundary. Fix: change the office-floor or its parent to overflow:visible, or reposition Bloberto lower (top:8%) so the bubble has clearance. The speech bubble is a key delight feature — it should be fully visible.",
+      "category": "ux",
+      "title": "quoteBonus footer tagline counter hard-caps at BONUS_TAGLINES.length — button dies silently",
+      "description": "In App.jsx line 1420, quoteBonus increments up to BONUS_TAGLINES.length (8) and then stops: 'p < BONUS_TAGLINES.length ? p + 1 : p'. Once all 8 bonus taglines are exhausted, clicking the footer button does nothing. There's no cycling back to start and no visual indication the button has stopped working. The sparkle still shows, the cursor is still pointer, but it's dead. Fix: cycle back with p % BONUS_TAGLINES.length, or show a 'Start over' state, or just let it loop.",
+      "effort": "small",
+      "assignee": "Dave"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Office floor right edge clips content on desktop — window element partially off-screen",
+      "description": "In the desktop screenshot, the right edge of the office floor is touching or slightly beyond the viewport boundary. The white/bright 'window' element at the right side appears to be partially clipped. The office floor container extends fully to the right edge with no breathing room. On smaller 1280px viewports (which is our test size), content at the right percentages (desks at left:57%, characters offset further) runs close to the boundary. Fix: either reduce the office floor's right-side percentage positions slightly, or ensure overflow:hidden with visible margins on the wrapper.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "getTeamVibe never returns 'after-hours' for an active team — time context ignored",
+      "description": "In vibe.js, getTeamVibe() only returns 'after-hours' when workers.length === 0. If any worker is active — even at 2am — the vibe will be 'crushing', 'in-flow', or 'slow-day'. The window element already reads actual clock time and renders a night sky. The WallClock renders actual time. But the vibe system is disconnected from time-of-day entirely. An on-fire incident at midnight looks identical to one at noon. Consider a secondary signal: if currentHour is outside business hours AND vibe would otherwise be 'slow-day', return 'after-hours' instead.",
+      "effort": "medium",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Mobile: 'Office' tab label truncated at 375px viewport",
+      "description": "On the mobile screenshot at 375x812, the Office tab label shows as 'Offic' — the 'e' is cut. The tab-toggle has flex layout and both tabs share width, but the Office tab appears to lose its trailing character. This is likely a combination of the tab icon emoji (🏢) and text not fitting. Fix: reduce the tab font-size slightly on mobile, or ensure min-width on the tab-toggle, or abbreviate gracefully.",
       "effort": "small",
       "assignee": "Maya"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Vibe transition log entries injected into global activityLog instead of a separate feed",
-      "description": "The synthetic vibe transition event (App.jsx L1056) is inserted into the same activityLog state that the server populates. This means: (1) the poll wipes it (covered in HIGH bug above), (2) it appears in the filtered activity log alongside real server events which can confuse users doing incident post-mortems ('did Carlos actually get an error, or is that a vibe entry?'), and (3) the 'system' filter bucket is shared between real system events from the server and synthetic client-generated ones. Better design: maintain a vibeTransitionLog state array alongside activityLog. ActivityLog component accepts both and renders them merged/sorted. Server polls only reset activityLog, never vibeTransitionLog.",
-      "effort": "medium",
+      "title": "handleTabKeyDown not memoized in App component",
+      "description": "App.jsx line 773 defines handleTabKeyDown as a plain function in the render body. It's passed as onKeyDown to the two tab buttons. Since it captures 'tab' state via closure and is re-created every render, it triggers no real bugs but violates the pattern of the rest of the file which consistently uses useCallback for event handlers. Wrap in useCallback([tab]) for consistency and to avoid unnecessary re-renders of the tab buttons.",
+      "effort": "small",
+      "assignee": "Carlos"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Activity log filter logic duplicated across three locations",
+      "description": "The activity filter predicate (type === 'hire', 'complete', 'error', 'system') is written out three separate times: once in the count display calculation (lines 1341-1347), once in the ActivityLog entries prop (lines 1398-1407), and conceptually in ActivityLog's own reverse/slice (lines 132-155). This means updating filter behavior requires touching multiple places. Extract to a named filterActivity(entries, typeFilter, workerFilter) function and call it from all three locations.",
+      "effort": "small",
       "assignee": "Carlos"
     },
     {
       "priority": "low",
       "category": "accessibility",
-      "title": "Section header 'Active Workers (N)' has no association to the workers-grid it labels",
-      "description": "The .section-header div and .workers-grid div are siblings — there is no aria-labelledby relationship between them. A screen reader navigating by region or landmark encounters the grid with no announced label. Fix: add an id to the section-header's title span (e.g. id='workers-grid-label') and aria-labelledby='workers-grid-label' to the workers-grid div. Similar issue applies to the Activity Log section.",
-      "effort": "trivial",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Worker task string 'Creative review #68 — visual + code analysis' is stale in the live data",
-      "description": "The dashboard screenshot shows Luna assigned to 'Creative review #68' while Sofia works on 'QA review #42'. We are now on review #69. The workers.json data file is manually updated and has fallen behind. This is not a code bug but an ops/data discipline issue — the live monitor's credibility depends on its data being current. Suggestion: add a data freshness indicator showing when workers.json was last modified (GitHub API returns Last-Modified headers on raw content fetches), and warn when it is older than 2 hours.",
-      "effort": "medium",
-      "assignee": "Sofia"
+      "title": "Bloberto speech bubble overflows office floor boundary — not visible to screen readers",
+      "description": "In the desktop screenshot, Bloberto's speech bubble ('Night crew came to work. Respect.') renders above the office floor div's top boundary. It's a visually floating element. If the parent has overflow:hidden it would clip; if not, it bleeds into the tab bar area. The speech bubble has no aria-live region in the Office component context (there's an sr-only span at line 1306 for ping reactions, but not for Bloberto's ambient quotes). Bloberto's wisdom is invisible to screen readers. Add an aria-live='polite' region that mirrors Bloberto's current quote.",
+      "effort": "small",
+      "assignee": "Dave"
     }
-  ]
+  ],
+  "sofia_notes": "Carlos actually delivered this time — three for three on the #69 bugs. useTimeTick moved to StatsBar (verified), idle dual-render correctly filtered (verified), synthetic vibe logs survive the poll (verified). Nice. That said, he left behind standup's identical twin problem for working workers — same class of bug, different status. The ProgressBar has a nested timeout that's just floating out there uncleaned. The meetingWorkers array getting a new reference every render is the kind of thing that seems harmless until the useEffect dependency comparison bites you. Accessibility score drops to 6 because the tabpanel tabIndex gap is a real keyboard navigation break, not cosmetic. The app still has excellent personality — the vibe sparklines, the idle micro-bubbles, the Bloberto quotes are all delightful. Fun factor stays at 9. But we are shipping subtle memory patterns and I have a spreadsheet."
 }
