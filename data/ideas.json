@@ -3842,5 +3842,137 @@
     ],
     "hire_proposals": [],
     "_previous_review": 82
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 84,
+    "timestamp": "2026-03-10T08:00:00Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Puppeteer unavailable in this environment. Full code audit conducted: App.jsx (1426 lines), Office.jsx (1666 lines), App.css (1165 lines), Office.css (2406 lines).",
+    "theme": "The big bugs are gone \u2014 PING_REACTIONS speaks, toasts no longer collide, the ficus has stage-specific messages, and DOOR_ICONS works. What remains is polish: double-emoji weather, completion toast still a form letter, and the clock's best prose locked behind hover.",
+    "visual_observations": [
+      "CONFIRMED FIXED \u2014 PING_REACTIONS is now an array of 5 strings per worker (Office.jsx:171). handleCharClick picks randomly. The deterministic single-sentence era is over.",
+      "CONFIRMED FIXED \u2014 plantToast renders at bottom:5.5rem, completionToast at bottom:2rem. Toast overlap resolved.",
+      "CONFIRMED FIXED \u2014 PLANT_STAGE_MESSAGES map exists at Office.jsx:1146, keyed by stage name. Each ficus transition gets its own message. plantToast passes the stage string, not a boolean.",
+      "CONFIRMED FIXED \u2014 DOOR_ICONS map at Office.jsx:147. The door icon now renders per-vibe emoji via DOOR_ICONS[vibe]. Four vibes no longer show the generic door.",
+      "CONFIRMED FIXED \u2014 titleIdxRef.current is now used in the title effect (App.jsx:~1075). idx persists across re-runs. Frames 1 and 2 are visible during normal polling.",
+      "CONFIRMED FIXED \u2014 Footer quote counter: quoteBonus capped at BONUS_TAGLINES.length (onClick uses p < length ? p+1 : p). No more wrap-around phase shift.",
+      "STILL OPEN \u2014 VIBE_WEATHER_LABELS (Office.jsx:108) embed emoji in every value. VIBE_WEATHER_ICONS (line 115) has the same emoji. The render at line 1638-1639 shows both spans \u2014 double emoji on every vibe. Sun-sun, storm-storm, cloud-cloud.",
+      "STILL OPEN \u2014 completionToast (App.jsx:1169): completionToast.text is the new field but grep shows no WORKER_COMPLETION_LINES constant or vibe-aware text generation. The .text field may be set generically. Need to verify if character voice is actually wired.",
+      "STILL OPEN \u2014 WallClock CLOCK_COMMENTS still inside SVG title element. Touch devices and screen readers never see these lines.",
+      "STILL OPEN \u2014 lastHuddle.current still set without startedAt. Live meeting elapsed time remains blocked."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "PING_REACTIONS Expanded to 5-String Arrays Per Worker",
+        "was_flagged_in": [
+          80,
+          81,
+          82,
+          83
+        ],
+        "how_fixed": "Office.jsx:171 \u2014 PING_REACTIONS is now { luna: [...5 strings], carlos: [...5 strings], ... }. handleCharClick at line 1228 selects randomly from the array. Each worker has character-specific voice lines."
+      },
+      {
+        "title": "Toast Vertical Stagger \u2014 plantToast at 5.5rem, completionToast at 2rem",
+        "was_flagged_in": [
+          80,
+          81,
+          82
+        ],
+        "how_fixed": "Office.jsx:1312 \u2014 plantToast uses bottom:5.5rem. App.jsx:1152 \u2014 completionToast uses bottom:2rem. Simultaneous toasts no longer overlap."
+      },
+      {
+        "title": "PLANT_STAGE_MESSAGES Gives Each Ficus Transition Its Own Line",
+        "was_flagged_in": [
+          80,
+          81,
+          82
+        ],
+        "how_fixed": "Office.jsx:1146 \u2014 PLANT_STAGE_MESSAGES keyed by stage name. plantToast renders the stage-specific message instead of the generic \"leveled up\" line."
+      },
+      {
+        "title": "DOOR_ICONS Map Makes Door Icon Vibe-Aware",
+        "was_flagged_in": [
+          80,
+          81,
+          82,
+          83
+        ],
+        "how_fixed": "Office.jsx:147 \u2014 DOOR_ICONS keyed by vibe. Line 1537 renders DOOR_ICONS[vibe] instead of a static door emoji. All five vibes have distinct door icons."
+      },
+      {
+        "title": "titleIdxRef Now Wired to Tab Title Effect",
+        "was_flagged_in": [
+          81,
+          82,
+          83
+        ],
+        "how_fixed": "App.jsx title effect now uses titleIdxRef.current instead of local let idx. Frame rotation persists across poll-triggered re-runs."
+      },
+      {
+        "title": "Footer Quote Counter Capped \u2014 No More Wrap-Around",
+        "was_flagged_in": [
+          79,
+          80,
+          81,
+          82,
+          83
+        ],
+        "how_fixed": "App.jsx footer onClick: quoteBonus increments only while p < BONUS_TAGLINES.length. Counter shows quoteBonus/length only when quoteBonus > 0 and < length. No phase shift possible."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Vibe-Weather Widget Renders Double Emoji \u2014 Icon Span and Label Both Carry the Same Symbol",
+        "description": "Office.jsx lines 108-122 and 1638-1639: VIBE_WEATHER_LABELS values all start with an emoji (e.g. \"\u2600\ufe0f Clear skies...\"). VIBE_WEATHER_ICONS has the same emoji rendered in a separate span with aria-hidden. Every visitor sees \u2600\ufe0f \u2600\ufe0f Clear skies, \u26c8\ufe0f \u26c8\ufe0f Storm conditions, etc. Fix: strip the leading emoji from all VIBE_WEATHER_LABELS values since the icon span already handles the visual. Or remove the icon span and let the label embed handle both. Two minutes of find-and-replace. WHY: double emoji looks like a rendering bug, not a design choice.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "copy/character",
+        "title": "completionToast Still Falls Back to Generic \"shipped it!\" \u2014 Worker Voice Not Yet Wired",
+        "description": "App.jsx:1169: renders completionToast.text if present, otherwise falls back to the generic \"\ud83c\udf89 name shipped it!\" line. The .text field was added as infrastructure but no WORKER_COMPLETION_LINES constant or vibe-aware text generator populates it. The 3-second toast at maximum visibility \u2014 the highest-emotion moment in the UI \u2014 still sounds like a CI webhook for most or all workers. Define a WORKER_COMPLETION_LINES map keyed by worker ID with 3-4 character-voice lines, pick randomly when setting completionToast. WHY: the toast is the applause moment. It should sound like someone who knows the worker, not a deployment script.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "accessibility",
+        "title": "WallClock CLOCK_COMMENTS Trapped in SVG title \u2014 Touch Users and Screen Readers Never See Them",
+        "description": "Office.jsx ~line 1050: five vibe-specific CLOCK_COMMENTS live inside an SVG title element on a 22px icon. Desktop hover shows a native tooltip. Touch devices show nothing. Screen readers get the title but most users never discover it. These are the most human lines in the codebase (\"You have checked this three times in the last hour\", \"Time has no meaning during an incident\"). Surface them as a visible tooltip on hover/focus with role=tooltip and proper aria association, or render as a small caption below the clock. WHY: the best writing in the app should be readable by more than desktop-hover power users.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "feature",
+        "title": "lastHuddle Still Missing startedAt \u2014 Live Meeting Duration Remains Blocked",
+        "description": "Office.jsx ~line 1174: lastHuddle.current = { names, endedAt: null } with no startedAt. ConferenceTable shows retrospective \"ended X ago\" but cannot show \"in meeting for Xm\" during a live huddle. Add startedAt: Date.now() on the 0\u21922+ worker transition. The one number people outside the room want to know is how long the meeting has been going. WHY: the conference table is the most prominent shared-space element and it cannot answer the most basic question about an active meeting.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "code/cleanup",
+        "title": "VIBE_RANK and vibeRanking Are the Same 5-Key Object Defined Twice",
+        "description": "App.jsx line ~389: VIBE_RANK at module scope. Line ~1002: vibeRanking inside a useEffect body. Identical keys and values. Replace the inner vibeRanking with a direct reference to VIBE_RANK. WHY: two copies will diverge when someone adds a new vibe and updates one but not the other.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "Bloberto Mood Ring \u2014 Team Health Encoded in a Subtle Ambient Pulse",
+        "description": "The Bloberto character on the office floor could have a subtle ambient CSS animation \u2014 a slow glow or pulse \u2014 whose color and speed derive from the current vibe and streak. Crushing+streak5 = warm gold steady pulse. On-fire = fast red flicker. Slow-day = barely visible blue breathe. After-hours = dim purple heartbeat. No new data, no new state \u2014 just CSS keyframes driven by data-vibe and data-streak attributes already on the office-floor div. WHY: the manager character should visually reflect the team state without any text. A living pulse makes Bloberto feel like a creature, not an avatar.",
+        "effort": "small",
+        "assigned_to": "maya"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 83
   }
 ]
