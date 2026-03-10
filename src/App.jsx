@@ -166,10 +166,11 @@ const TASK_TAG_DEFS = [
   { pattern: /fix|bug|hotfix|broken|error/i,                        label: 'Bug',    emoji: '🔴', className: 'task-tag--bug' },
   { pattern: /deploy|ship|release|publish|ci|cd|pipeline/i,         label: 'Ship',   emoji: '🟠', className: 'task-tag--ship' },
   { pattern: /design|ui|ux|css|layout|frontend|component/i,         label: 'Design', emoji: '🟣', className: 'task-tag--design' },
-  { pattern: /test|qa|spec|review|coverage|lint/i,                   label: 'QA',     emoji: '🔵', className: 'task-tag--qa' },
+  { pattern: /test|qa|spec|code.?review|coverage|lint/i,             label: 'QA',     emoji: '🔵', className: 'task-tag--qa' },
   { pattern: /data|migration|schema|db|database|query/i,            label: 'Data',   emoji: '🟤', className: 'task-tag--data' },
   { pattern: /docs|readme|changelog|write/i,                         label: 'Docs',   emoji: '🟢', className: 'task-tag--docs' },
   { pattern: /plan|roadmap|sprint|kickoff|standup|meeting|agenda|discuss|ceremony|sync/i, label: 'Plan', emoji: '🟡', className: 'task-tag--plan' },
+  { pattern: /refactor|optimiz|benchmark|perf|cleanup|clean.?up|tech.?debt|legacy/i,     label: 'Refactor', emoji: '🔧', className: 'task-tag--refactor' },
 ]
 
 /**
@@ -347,7 +348,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             return <div className="worker-duration" data-tier={tier}>{tier === 'stuck' ? '⚠️ ' : ''}⏱️ {formatDuration(worker.updated_at)}</div>
           })()}
 
-          <ProgressBar progress={worker.progress} updatedAt={worker.updated_at} startedAt={worker.startedAt || worker.started_at} />
+          <ProgressBar progress={worker.progress} startedAt={worker.startedAt || worker.started_at} />
         </div>
 
         <div className="worker-card__back" aria-hidden={!isFlipped || undefined} tabIndex={!isFlipped ? -1 : undefined}>
@@ -700,6 +701,8 @@ export default function App() {
   const prevActiveWorkersRef = useRef([])
   const fadingTimersRef      = useRef({})   // { [id]: timeoutId }
   const newClearTimersRef    = useRef({})   // { [id]: timeoutId }
+  const justShippedTimersRef = useRef([])   // outer stagger timer IDs
+  const titleIdxRef          = useRef(0)    // persists tab-title rotation across effect re-runs
   const [fadingMap, setFadingMap] = useState({})
   const [newIds,    setNewIds]    = useState(new Set())
   const [doorEvent, setDoorEvent] = useState(null)
@@ -951,21 +954,30 @@ export default function App() {
     // Workers that just transitioned working → idle (task shipped!)
     const prevMap = new Map(prev.map(w => [w.id, w]))
     const justShipped = activeWorkers.filter(w => prevMap.get(w.id)?.status === 'working' && w.status === 'idle')
+    // Clear any pending stagger timers from the previous run before scheduling new ones
+    justShippedTimersRef.current.forEach(t => clearTimeout(t))
+    justShippedTimersRef.current = []
+
     if (justShipped.length > 0 && prev.length > 0) {
       if (workerConfettiTimerRef.current) clearTimeout(workerConfettiTimerRef.current)
       if (completionToastTimerRef.current) clearTimeout(completionToastTimerRef.current)
       justShipped.forEach((worker, i) => {
         const color = ROLE_COLORS[worker.role] || ROLE_COLORS['Other']
-        setTimeout(() => {
+        const t = setTimeout(() => {
           setWorkerConfetti({ name: worker.name, color })
           setCompletionToast({ name: worker.name, color })
           workerConfettiTimerRef.current = setTimeout(() => setWorkerConfetti(null), 2500)
           completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3000)
         }, i * 2600)
+        justShippedTimersRef.current.push(t)
       })
     }
 
     prevActiveWorkersRef.current = activeWorkers
+    return () => {
+      justShippedTimersRef.current.forEach(t => clearTimeout(t))
+      justShippedTimersRef.current = []
+    }
   }, [activeWorkers])
 
   // ── Vibe Streak Counter + Confetti Burst ──
@@ -1050,10 +1062,11 @@ export default function App() {
           `${teamVibe.label} — Bloberto's Office`,
         ]
 
-    let idx = 0
+    let idx = titleIdxRef.current
     document.title = frames[idx]
     let timer = setInterval(() => {
       idx = (idx + 1) % frames.length
+      titleIdxRef.current = idx
       document.title = frames[idx]
     }, 8_000)
 
@@ -1090,7 +1103,7 @@ export default function App() {
   const isAfterHours = currentHour < 5 || currentHour >= 20
   const greeting =
     isAfterHours
-      ? (currentHour % 2 === 0 ? '🌃 Burning the midnight oil' : '🦉 Still at it')
+      ? '🌃 Burning the midnight oil'
       : currentHour < 12
       ? '☕ Good morning'
       : currentHour < 18
@@ -1321,9 +1334,12 @@ export default function App() {
                     if (activityFilter === 'system') return e.type === 'system'
                     return true
                   }).filter(e => workerFilter !== null ? e.worker === workerFilter : true)
+                  const DISPLAY_CAP = 20
                   return isFiltered
-                    ? `${filtered.length} of ${activityLog.length} events (filtered)`
-                    : `${activityLog.length} events`
+                    ? `${Math.min(filtered.length, DISPLAY_CAP)} of ${filtered.length} events (filtered)`
+                    : filtered.length > DISPLAY_CAP
+                      ? `Latest ${DISPLAY_CAP} of ${filtered.length} events`
+                      : `${filtered.length} events`
                 })()}
               </span>
             </div>
@@ -1393,7 +1409,7 @@ export default function App() {
           style={{ cursor: 'pointer' }}
           title="tap for another thought"
           onClick={() => { localStorage.setItem('footer-sparkle-seen', '1'); setQuoteBonus(p => p + 1) }}
-        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span>{quoteBonus > 0 && <span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span>} &nbsp;&middot;&nbsp;
+        ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span>{quoteBonus > 0 && <span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {Math.min(quoteBonus, BONUS_TAGLINES.length)}/{BONUS_TAGLINES.length}</span>} &nbsp;&middot;&nbsp;
         <span>{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}</span>
       </footer>
     </div>

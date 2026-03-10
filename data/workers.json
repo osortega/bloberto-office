@@ -2,12 +2,12 @@
   "workers": [
     {
       "name": "Luna",
-      "status": "working",
-      "task": "Creative review #82",
-      "progress": 10,
+      "status": "idle",
+      "task": "Creative review #82 — completed",
+      "progress": 100,
       "started_at": "2026-03-10T06:40:00Z",
-      "updated_at": "2026-03-10T06:40:00Z"
+      "updated_at": "2026-03-10T06:45:00Z"
     }
   ],
-  "updated_at": "2026-03-10T06:40:00Z"
+  "updated_at": "2026-03-10T06:45:00Z"
 }
