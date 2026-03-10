@@ -524,6 +524,14 @@ function AwaySign({ workerId, idleMinutes }) {
   )
 }
 
+const WORKER_WANDER_TOOLTIPS = {
+  carlos: ['☕ Checking server metrics', '📊 Reviewing the logs', '🔌 Debugging in his head'],
+  maya: ['💜 Studying the color palette', '✏️ Sketching on a napkin', '🎨 Rearranging the mood board'],
+  dave: ['🎧 Lost in a podcast', '⚙️ Thinking about pipelines', '🚀 Planning the next deploy'],
+  sofia: ['🔍 Mentally writing test cases', '📋 Reviewing edge cases', '🧪 Pondering coverage gaps'],
+  luna: ['🌙 Dreaming up the next feature', '✨ Staring at nothing productively', '📐 Mentally redesigning everything'],
+}
+
 const WORKER_IDLE_BUBBLES = {
   carlos: ['☕', '📊', '🔍'],
   maya: ['💜', '✏️', '🎨'],
@@ -1569,15 +1577,9 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {/* Idle workers wandering the lower floor — exclude those already at conference table */}
         {idleWorkers.filter(w => !meetingWorkers.includes(w)).map((w, i) => {
           const wIdx = (i % 4) + 1
-          const WORKER_WANDER_TOOLTIPS = {
-            carlos: ['☕ Checking server metrics', '📊 Reviewing the logs', '🔌 Debugging in his head'],
-            maya: ['💜 Studying the color palette', '✏️ Sketching on a napkin', '🎨 Rearranging the mood board'],
-            dave: ['🎧 Lost in a podcast', '⚙️ Thinking about pipelines', '🚀 Planning the next deploy'],
-            sofia: ['🔍 Mentally writing test cases', '📋 Reviewing edge cases', '🧪 Pondering coverage gaps'],
-            luna: ['🌙 Dreaming up the next feature', '✨ Staring at nothing productively', '📐 Mentally redesigning everything'],
-          }
           const workerTooltips = WORKER_WANDER_TOOLTIPS[w.id]
-          const tooltip = workerTooltips ? workerTooltips[i % workerTooltips.length] : {
+          const workerHash = Math.abs([...w.id].reduce((h, c) => h * 31 + c.charCodeAt(0), 0))
+          const tooltip = workerTooltips ? workerTooltips[workerHash % workerTooltips.length] : {
             1: '☕ Heading to the coffee corner',
             2: '💬 Lingering by the whiteboard',
             3: '🪟 Staring out the window',
