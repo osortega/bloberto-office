@@ -4,6 +4,7 @@ import Office from './Office.jsx'
 import { getTeamVibe } from './utils/vibe.js'
 import { ROLE_EMOJIS, STATUS_LABELS, STATUS_EMOJIS, ROLE_COLORS } from './utils/constants.js'
 import { getRelativeTime } from './utils/time.js'
+import { safeSave } from './utils/safeSave.js'
 
 class ErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false } }
@@ -632,7 +633,7 @@ function ShortcutToast() {
   const timerRef = useRef(null)
 
   const dismiss = useCallback((gotIt = false) => {
-    localStorage.setItem('bloberto-shortcuts-shown', '1')
+    safeSave('bloberto-shortcuts-shown', '1')
     clearTimeout(timerRef.current)
     if (gotIt) {
       setPhase('gotit')
@@ -737,6 +738,7 @@ export default function App() {
   const fadingTimersRef      = useRef({})   // { [id]: timeoutId }
   const newClearTimersRef    = useRef({})   // { [id]: timeoutId }
   const justShippedTimersRef = useRef([])   // outer stagger timer IDs
+  const completionToastClearTimersRef = useRef([])  // inner 3000ms clear-toast timers (one per worker)
   const titleIdxRef          = useRef(0)    // persists tab-title rotation across effect re-runs
   const titleStateRef        = useRef({ frames: ["😴 Bloberto's Office — All quiet"], workingCount: 0, errCount: 0 })
   const [fadingMap, setFadingMap] = useState({})
@@ -780,7 +782,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('bloberto-theme', theme)
+    safeSave('bloberto-theme', theme)
   }, [theme])
 
 
@@ -1027,6 +1029,10 @@ export default function App() {
     if (justShipped.length > 0 && prev.length > 0) {
       if (workerConfettiTimerRef.current) clearTimeout(workerConfettiTimerRef.current)
       if (completionToastTimerRef.current) clearTimeout(completionToastTimerRef.current)
+      // Clear all pending clear-toast timers from a previous batch so no dangling timer
+      // cuts the new toast short (the race: timer from worker N fires during worker N+1's toast)
+      completionToastClearTimersRef.current.forEach(t => clearTimeout(t))
+      completionToastClearTimersRef.current = []
       justShipped.forEach((worker, i) => {
         const color = ROLE_COLORS[worker.role] || ROLE_COLORS['Other']
         const t = setTimeout(() => {
@@ -1035,7 +1041,9 @@ export default function App() {
           const text = lines ? `${worker.name}: ${lines[Math.floor(Math.random() * lines.length)]}` : null
           setCompletionToast({ name: worker.name, color, ...(text && { text }) })
           workerConfettiTimerRef.current = setTimeout(() => setWorkerConfetti(null), 2500)
-          completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3000)
+          const ct = setTimeout(() => setCompletionToast(null), 3000)
+          completionToastTimerRef.current = ct
+          completionToastClearTimersRef.current.push(ct)
         }, i * 2600)
         justShippedTimersRef.current.push(t)
       })
@@ -1045,6 +1053,8 @@ export default function App() {
     return () => {
       justShippedTimersRef.current.forEach(t => clearTimeout(t))
       justShippedTimersRef.current = []
+      completionToastClearTimersRef.current.forEach(t => clearTimeout(t))
+      completionToastClearTimersRef.current = []
     }
   }, [activeWorkers])
 
@@ -1055,8 +1065,8 @@ export default function App() {
     // Only increment if the vibe key is the same AND this isn't the initial mount
     const isInitialMount = previousVibeKeyRef.current === null
     const newStreak = storedKey === teamVibe.key ? storedStreak + (isInitialMount ? 0 : 1) : 1
-    localStorage.setItem('bloberto-vibe-key', teamVibe.key)
-    localStorage.setItem('bloberto-vibe-streak', String(newStreak))
+    safeSave('bloberto-vibe-key', teamVibe.key)
+    safeSave('bloberto-vibe-streak', String(newStreak))
     setVibeStreak(newStreak)
 
     // Streak eulogy
@@ -1438,7 +1448,7 @@ export default function App() {
           key={`${teamVibe.key}-${quoteBonus}`}
           className="footer-tagline"
           title="tap for another thought"
-          onClick={() => { localStorage.setItem('footer-sparkle-seen', '1'); setSparkleUnseen(false); setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p) }}
+          onClick={() => { safeSave('footer-sparkle-seen', '1'); setSparkleUnseen(false); setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1) }}
         ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</button>{quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length && <span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {quoteBonus}/{BONUS_TAGLINES.length}</span>} &nbsp;&middot;&nbsp;
         <span>{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}</span>
       </footer>

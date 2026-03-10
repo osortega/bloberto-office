@@ -5086,5 +5086,132 @@
     ],
     "hire_proposals": [],
     "_previous_review": 86
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 88,
+    "timestamp": "2026-03-10T22:01:34Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Code review only — container environment",
+    "theme": "Same workers, two places at once -- the office needs a physics lesson",
+    "visual_observations": [
+      "WallClock commentary still silent on touch devices -- CLOCK_COMMENTS live in SVG <title> (Office.jsx:1112), aria-label at line 1108 has no comment appended. Touch users and mobile screen readers are still missing 'Time has no meaning during an incident.'",
+      "Coffee corner chat badge names idle workers who are simultaneously seated at the conference table -- when idleWorkers.length >= 2, meetingWorkers (Office.jsx:1210) sends them to the table AND coffee-corner--chatting (line 1518) puts their names in the chat badge. Maya and Sofia cannot be in two rooms at once.",
+      "Lone survivor label still reads at 0.45rem (Office.jsx:1573) -- worker-specific override lines ('backend won't fall today', 'bugs have nowhere to hide') remain physically illegible.",
+      "WorkerCard article div responds to keyboard Enter/Space to flip (App.jsx:309) but carries role='article' -- screen readers don't announce it as interactive, then the keypress triggers a surprise flip. The info button inside already handles the flip on click.",
+      "Whiteboard doodle still ignores vibeStreak (Office.jsx:1390) -- vibeStreak prop is wired into Office() and drives plantStage correctly but the wb-doodle pre is a flat vibe-only ternary. At streak 12 crushing looks identical to streak 1.",
+      "completionToast is still purely generic (App.jsx:1186) -- no WORKER_COMPLETION_LINES map exists anywhere. Every worker gets the same 'shipped it!' regardless of role or personality.",
+      "Quote counter vanishes silently at 8/8 (App.jsx:1432) -- quoteBonus < BONUS_TAGLINES.length is false at 8, counter disappears, no ceremony for finding all 8."
+    ],
+    "fixed_since_last_review": [
+      "VIBE_WEATHER double emoji -- FIXED. VIBE_WEATHER_LABELS (Office.jsx:118-124) no longer carries emoji prefixes; icons render separately as VIBE_WEATHER_ICONS.",
+      "WORKER_WANDER_TOOLTIPS hoisted to module scope -- FIXED. Now lives at Office.jsx:527, outside all render callbacks.",
+      "ProgressBar dead updatedAt prop -- FIXED. ProgressBar signature is now ({ progress, startedAt }) (App.jsx:194); call site (App.jsx:365) passes startedAt only.",
+      "After-hours greeting -- FIXED. App.jsx:1132-1140 now checks isAfterHours = currentHour < 5 || currentHour >= 20 and returns 'Burning the midnight oil'. The greeting and honorific now agree.",
+      "Active dispatch label now navigates -- FIXED. App.jsx:486-492 wraps the dispatch in a role='button' span with onClick scrollIntoView targeting .workers-grid.",
+      "isTouchDevice hoisted to module scope -- FIXED. App.jsx:681 evaluates window.matchMedia once at module load.",
+      "PROGRESS_MILESTONES hoisted to module scope -- FIXED. App.jsx:679, no longer allocated inside useEffect body.",
+      "aria-live removed from polling-paused button -- FIXED. App.jsx:1212-1220 no longer has aria-live on the button element."
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Coffee Corner Shows Workers Who Are Already at the Conference Table",
+        "description": "Office.jsx:1518 -- coffee-corner--chatting class fires when idleWorkers.length >= 2. Office.jsx:1210 -- meetingWorkers is idleWorkers.slice(0,3) when idleWorkers.length >= 2. Both conditions operate on the exact same worker set. Result: when Sofia and Maya are seated at the conference table (meetingWorkers renders their CharacterAvatar there at lines 997-1008), the coffee corner chat badge simultaneously reads '☕ Sofia & Maya chatting' (line 1532). Same workers, two places, same moment. Fix: change line 1532's idleWorkers.slice(0, 2) to idleWorkers.filter(w => !meetingWorkers.includes(w)).slice(0, 2). If no idle workers remain outside the meeting, drop the coffee-corner--chatting class as well by updating the line 1518 condition to use the filtered set. WHY: even in a cartoon office, workers can only be in one location. The current bug undermines every spatial storytelling moment the office has built.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "accessibility",
+        "title": "WorkerCard role='article' Silently Eats Keyboard Enter/Space",
+        "description": "App.jsx:309 -- the WorkerCard wrapper div has role='article' and an onKeyDown handler that calls setIsFlipped when Enter or Space is pressed. Screen readers announce the card as an article. Articles are not interactive elements -- ATs won't hint that the user should press Enter or Space, and when they do it silently flips the card with no announcement. The info button at App.jsx:319-325 already handles the flip for pointer users and is keyboard-focusable itself. Fix: remove the onKeyDown flip handler from the article div. Keyboard users can Tab to the info button and press Enter there -- that path is correct, accessible, and already works. Optionally add aria-label='View activity history' to the info button to make its purpose explicit. WHY: WCAG 4.1.2 requires interactive elements to have name, role, and value. An article that responds to keyboard input violates all three.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "storytelling",
+        "title": "completionToast Still Says 'shipped it!' for Every Worker",
+        "description": "App.jsx:1186 -- setCompletionToast at line 1026 passes only { name, color }. The render fallback is `[emoji] ${completionToast.name} shipped it!`. No per-worker completion lines exist anywhere in the codebase. This is the most visible celebration moment in the dashboard -- it fires alongside confetti -- and every worker, regardless of role or personality, says the same thing. Carlos ships backend migrations. Sofia closes bugs. Maya delivers UI. Dave merges PRs. Each deserves their own line. Add a WORKER_COMPLETION_LINES map: { carlos: 'Carlos locked in the backend', sofia: 'Sofia squashed another bug', maya: 'Maya shipped the pixels', dave: 'Dave pushed to prod', luna: 'Luna made it beautiful' }. At App.jsx:1026, pass text: WORKER_COMPLETION_LINES[worker.id] ?? `${worker.name} shipped it!`. Zero new infrastructure. WHY: the payoff moment is cheap when it says the same thing every time.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "accessibility",
+        "title": "WallClock CLOCK_COMMENTS Still Trapped in SVG title",
+        "description": "Office.jsx:1108 -- aria-label is 'Wall clock showing ${displayH}:${displayM}' with no comment appended. Office.jsx:1112 -- CLOCK_COMMENTS are in the SVG <title> element. SVG title is surfaced as a tooltip on desktop pointer devices but is not exposed by touch ATs on mobile and is not reliably read by screen readers without explicit user query. The fix is one string concat: change line 1108 to aria-label={`Wall clock showing ${displayH}:${displayM} -- ${CLOCK_COMMENTS[vibeKey] || CLOCK_COMMENTS['in-flow']}`}. The comment is then available to all ATs in the accessible name. Optionally remove the <title> element since aria-label supersedes it. WHY: 'Time has no meaning during an incident' is the most atmospheric line in the whole office. Mobile users have never read it. This is a one-word change that pays for itself.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "delight",
+        "title": "Whiteboard Doodle Ignores vibeStreak -- The Trophy Room Never Opens",
+        "description": "Office.jsx:1390 -- wb-doodle is a flat ternary keyed only on vibe. vibeStreak is received as a prop at Office.jsx:1164 and drives plantStage at lines 1177-1181 and the header streak badge, but never consulted for the doodle. At streak 1 and streak 12 on crushing, the whiteboard shows identical joy. The streak badge in the header escalates (crown at 3, fire at 5, trophy at 10) -- the whiteboard should too. Proposed: add a WHITEBOARD_STREAK_DOODLES map with threshold tiers per vibe using the same getDispatch pattern. crushing escalates from quiet to championship energy at streak 10+; on-fire's table-flip deepens; slow-day droops further. vibeStreak is already available as a prop -- the doodle just needs to read it. WHY: this is a completely free atmosphere upgrade. The data is already wired in.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "WorkerCard Activity History Double-Filters Already-Filtered Entries",
+        "description": "App.jsx:303-306 -- workerHistory is computed as activityEntries.filter(e => e.worker === worker.name).slice(-3).reverse(). The activityEntries prop is sourced from activityByWorker.get(w.name) (App.jsx:1323), which at line 952 is already filtered by worker name AND sliced to 3 entries. The .filter() and .slice(-3) in WorkerCard are therefore complete no-ops. Only .reverse() is meaningful. Fix: const workerHistory = [...activityEntries].reverse(). WHY: dead filtering code is a maintenance liability. A developer changing activityByWorker's slice depth would need to also update WorkerCard -- the coupling is invisible and the documentation value of the extra filter is zero since the data is already filtered upstream.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "visual",
+        "title": "Lone Survivor Label Still 0.45rem -- The Best Character Copy Is Still Invisible",
+        "description": "Office.jsx:1573 -- lone-survivor-label inline style sets fontSize: '0.45rem' (~7px). LONE_SURVIVOR_WORKER_OVERRIDES has lines like 'backend won't fall today' (carlos on-fire) and 'bugs have nowhere to hide' (sofia crushing). Nobody reads them. Minimum fix: raise to 0.65rem. Better fix: surface this copy inside the char-hover-card (lines 806-822) which already shows name, role, task, and time -- add a conditional line when isLoneSurvivor is true. Pass isLoneSurvivor as a prop to Character (it is computed at Office.jsx:1216 and already available in the DESKS.map scope at line 1572). WHY: the lone-survivor state is rare and dramatic. The copy was written to land. At 7px it does nothing.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "delight",
+        "title": "Idle Stat Dispatch Has No Navigation -- Half the Stats Bar Is Interactive, Half Isn't",
+        "description": "App.jsx:498 -- the Idle stat card's dispatch label is a plain <span> with no interaction. App.jsx:486-492 -- the Active dispatch is a role='button' span that scrollIntoView to .workers-grid on click. The inconsistency is confusing: users who discover the active dispatch click will try idle and nothing happens. Fix: wrap the idle dispatch the same way, scrolling to the first .char--wander element or .coffee-corner when idle workers exist. If no idle workers, disable gracefully (cursor: default, no role). WHY: interaction affordances must be consistent across parallel UI elements. If one stat dispatches, they all dispatch.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "workerConfetti Allocates 30 Fresh DOM Elements on Every Render",
+        "description": "App.jsx:1155-1161 -- the workerConfetti block uses Array.from({ length: 30 }, (_, i) => ...) inline in JSX. During confetti (2500ms visibility window), any parent state update creates 30 new span elements. The vibe confetti (App.jsx:1148-1151) correctly uses the module-level CONFETTI_PIECES constant (lines 34-36) to avoid this allocation. Fix: create a module-level WORKER_CONFETTI_PIECES array with 30 items and apply the color via a CSS custom property data attribute on the confetti layer rather than inline per-item style. WHY: during confetti, the React tree is re-rendering due to sync ticks and polling. 30 new DOM nodes per render for a 2.5-second animation is unnecessary allocation.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "plantToast and completionToast Have No Z-Coordination and Will Collide",
+        "description": "Office.jsx:1321 -- plantToast renders at position: fixed, bottom: '5.5rem', zIndex: 9999. App.jsx:1169 -- completionToast renders at position: fixed, bottom: '2rem', zIndex: 9999. When a worker ships AND the ficus grows at the same poll (both are milestone-triggered), both toasts fire within the same 3-second window. On a mobile viewport at 667px height, 3.5rem (~56px) separation is thin and they visually collide. They also live in different component trees (Office vs App) with no shared coordination. Fix: lift both toasts into App-level state via a shared toastQueue. Apply a 500ms stagger between them so they appear sequentially. WHY: the dashboard has invested real UX polish in its toast infrastructure. Two toasts appearing simultaneously at the same position cancels both.",
+        "effort": "medium",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "delight",
+        "title": "Finding All 8 Taglines Is Still a Silent Non-Event",
+        "description": "App.jsx:1431-1432 -- when quoteBonus reaches BONUS_TAGLINES.length (8), the increment guard holds, the counter disappears, and nothing else happens. The user has clicked the footer sparkle button 8 times, discovered every tagline, and the game ends without ceremony. Fix: add a ref guard in the onClick handler: if the previous value was 7, fire setCompletionToast({ text: 'All 8 taglines found. The canon is yours now.', type: 'info' }). Or replace the counter span with a permanent golden star mark at quoteBonus === 8. WHY: silence after discovery is the worst UX anti-pattern. The mechanic is charming. It deserves a landing.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "feature",
+        "title": "Workers Need a Commute -- The Door Fires But Nobody Walks In",
+        "description": "Office.jsx:1544-1550 -- the office door animates on doorEvent='arrive' (bounces, shows notify dot). App.jsx:969-977 -- setDoorEvent('arrive') fires when workers first appear. But the worker's Character simply fades in at their desk -- no spatial journey from door to desk. The door is bottom-center; desks are in two rows above. Proposal: on arrive, render the Character at a temporary door position (left: ~40%, top: ~88%) with a new variant='entering' that plays a @keyframes walk-to-desk animation translating to the target desk coordinates over 1.2s. After the animation, switch to the normal variant. The target desk position is already known from DESKS[i]. This requires an entering state in the diff effect (App.jsx:964-978) and a CSS animation. WHY: the door exists, the door event exists, the Character component exists. A visible commute from door to desk transforms the office from a status panel into a place with spatial memory and story.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 87
   }
 ]

@@ -214,6 +214,13 @@ const PING_REACTIONS = {
     'The bug was there before you wrote the code.',
     'Repro steps: steps 1 through 7. You are welcome.',
   ],
+  bloberto: [
+    'syncing team velocity',
+    'the roadmap says we are on track',
+    'ship it and iterate',
+    'every sprint tells a story',
+    'have you checked the velocity chart',
+  ],
 }
 
 
@@ -541,6 +548,14 @@ const WORKER_IDLE_BUBBLES = {
 }
 const DEFAULT_IDLE_BUBBLES = ['☕', '💬', '🪟', '🧘']
 const ERROR_BUBBLE_MESSAGES = ['💀', '⚠️ help?', 'it was fine locally', '🧨', 'send help', 'undefined is not a function']
+
+const WORKER_ERROR_BUBBLES = {
+  carlos: ['SIGKILL', 'db is lying to me', 'logs on fire', '500'],
+  maya: ['every border is wrong', 'the prototype lied', 'my components are crying'],
+  dave: ['git blame moment', 'npm ci again?', 'the build is sentient'],
+  sofia: ['the spec never said this', 'REGRESSION', '5 new bugs found', 'who merged this'],
+  luna: ['the deck is burning', 'every color is wrong', 'the brief changed again']
+}
 
 const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick, isPinged = false, pingReaction = null }) {
   const firstName = worker.name.split(' ')[0]
@@ -1151,14 +1166,6 @@ const FULL_IDLE_MESSAGES = {
   'after-hours': 'Nobody home',
 }
 
-const WORKER_ERROR_BUBBLES = {
-  carlos: ['SIGKILL', 'db is lying to me', 'logs on fire', '500'],
-  maya: ['every border is wrong', 'the prototype lied', 'my components are crying'],
-  dave: ['git blame moment', 'npm ci again?', 'the build is sentient'],
-  sofia: ['the spec never said this', 'REGRESSION', '5 new bugs found', 'who merged this'],
-  luna: ['the deck is burning', 'every color is wrong', 'the brief changed again']
-}
-
 const PLANT_STAGE_MESSAGES = {
   sprout:        '🌱 First leaves! The ficus is sprouting.',
   'small-plant': '🌿 Getting taller every day...',
@@ -1209,13 +1216,13 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     prevPlantStageRef.current = plantStage
   }, [plantStage])
 
-  const nonMgr        = workers.filter(w => w.id !== 'bloberto')
-  const workingWorkers = nonMgr.filter(w => w.status === 'working')
-  const workingIds     = new Set(workingWorkers.map(w => w.id))
-  const idleWorkers    = nonMgr.filter(w => w.status === 'idle' && !workingIds.has(w.id))
-  const meetingWorkers = idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : []
+  const nonMgr        = useMemo(() => workers.filter(w => w.id !== 'bloberto'), [workers])
+  const workingWorkers = useMemo(() => nonMgr.filter(w => w.status === 'working'), [nonMgr])
+  const workingIds     = useMemo(() => new Set(workingWorkers.map(w => w.id)), [workingWorkers])
+  const idleWorkers    = useMemo(() => nonMgr.filter(w => w.status === 'idle' && !workingIds.has(w.id)), [nonMgr, workingIds])
+  const meetingWorkers = useMemo(() => idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : [], [idleWorkers])
   const standupActive  = workingWorkers.length >= 3 && (vibe === 'crushing' || vibe === 'in-flow')
-  const standupWorkers = standupActive ? workingWorkers.slice(0, 4) : []
+  const standupWorkers = useMemo(() => standupActive ? workingWorkers.slice(0, 4) : [], [standupActive, workingWorkers])
   const hasAnyError    = nonMgr.some(w => w.status === 'error')
   const isFullSync     = nonMgr.length > 0 && idleWorkers.length === 0 && workingWorkers.length === nonMgr.length
   const isFullIdle     = nonMgr.length > 0 && workingWorkers.length === 0 && idleWorkers.length === nonMgr.length
@@ -1299,7 +1306,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
   // Roster members not currently active → ghost at empty desk
   const activeIds   = useMemo(() => new Set(workers.map(w => w.id || w.name?.toLowerCase().replace(/\s+/g, '-'))), [workers])
-  const ghostRoster = effectiveRoster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id))
+  const ghostRoster = useMemo(() => effectiveRoster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id)), [effectiveRoster, activeIds])
 
   // Assign working workers first, then idle workers, then ghosts, to desk slots
   const deskOccupants = useMemo(() => {
@@ -1556,7 +1563,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         </div>
 
         {/* Bloberto — always at manager desk, always visible */}
-        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} pingReaction={null} />
+        <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} onClick={handleCharClick} isPinged={pingedId === bloberto.id} pingReaction={pingedId === bloberto.id && pingReaction ? pingReaction : null} />
 
         {/* Active workers at desks (working) or as ghosts (roster-only) — skip idle (they wander) and standup workers (rendered at conference table) */}
         {DESKS.map((desk, i) => {
