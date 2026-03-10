@@ -1,4 +1,13 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-10T03:25:00Z"
+  "workers": [
+    {
+      "name": "Luna",
+      "status": "working",
+      "task": "Creative review #77 — visual audit and idea generation",
+      "progress": 0,
+      "started_at": "2026-03-10T03:30:00Z",
+      "updated_at": "2026-03-10T03:30:00Z"
+    }
+  ],
+  "updated_at": "2026-03-10T03:30:00Z"
 }
