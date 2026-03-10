@@ -1,14 +1,16 @@
 {
   "workers": [
     {
-      "name": "Carlos",
-      "status": "done",
-      "task": "Fix 6 HIGH bugs from Sofia QA #75",
-      "progress": 100,
-      "started_at": "2026-03-10T22:16:00Z",
-      "completed_at": "2026-03-10T22:20:00Z",
-      "updated_at": "2026-03-10T22:20:00Z"
+      "id": "luna",
+      "name": "Luna",
+      "role": "Creative Director",
+      "emoji": "🌙",
+      "status": "working",
+      "task": "Creative review #86",
+      "progress": 10,
+      "started_at": "2026-03-10T22:30:00Z",
+      "updated_at": "2026-03-10T22:30:00Z"
     }
   ],
-  "updated_at": "2026-03-10T22:20:00Z"
+  "updated_at": "2026-03-10T22:30:00Z"
 }
