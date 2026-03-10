@@ -196,6 +196,7 @@ function StatusBadge({ status }) {
 function ProgressBar({ progress, startedAt }) {
   const milestonesRef = useRef(new Set())
   const prevProgressRef = useRef(progress)
+  const flashTimerRef = useRef(null)
   const [flashClass, setFlashClass] = useState('')
 
   useEffect(() => {
@@ -204,13 +205,19 @@ function ProgressBar({ progress, startedAt }) {
     }
     prevProgressRef.current = progress
     const MILESTONES = [25, 50, 75, 100]
+    // First pass: collect ALL newly crossed milestones
+    let highest = null
     for (const m of MILESTONES) {
       if (progress >= m && !milestonesRef.current.has(m)) {
         milestonesRef.current.add(m)
-        setFlashClass(`progress-milestone-${m}`)
-        const t = setTimeout(() => setFlashClass(''), 600)
-        return () => clearTimeout(t)
+        highest = m
       }
+    }
+    // Second pass: show the highest one; cancel old timer only when setting a new flash
+    if (highest !== null) {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current)
+      setFlashClass(`progress-milestone-${highest}`)
+      flashTimerRef.current = setTimeout(() => setFlashClass(''), 600)
     }
   }, [progress])
 
@@ -1081,7 +1088,7 @@ export default function App() {
           document.title = '💤 Office is quiet — Bloberto Office'
         }
       } else {
-        idx = 0
+        idx = titleIdxRef.current
         document.title = frames[idx]
         timer = setInterval(() => {
           idx = (idx + 1) % frames.length

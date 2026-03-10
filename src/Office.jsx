@@ -1033,6 +1033,14 @@ function VibeShockwave({ vibeKey }) {
   )
 }
 
+const CLOCK_COMMENTS = {
+  'crushing':     'Peak hours. Nobody watches the clock except the clock.',
+  'on-fire':      'Time has no meaning during an incident.',
+  'slow-day':     'You have checked this three times in the last hour.',
+  'in-flow':      'Do not look. It breaks the flow.',
+  'after-hours':  'Still here? So am I. I am a clock. That is fine for me.',
+}
+
 function WallClock({ vibeKey }) {
   const [time, setTime] = useState(() => new Date())
 
@@ -1060,13 +1068,6 @@ function WallClock({ vibeKey }) {
   const displayH = h % 12 || 12
   const displayM = String(m).padStart(2, '0')
 
-  const CLOCK_COMMENTS = {
-    'crushing': 'Peak hours. Nobody watches the clock except the clock.',
-    'on-fire': 'Time has no meaning during an incident.',
-    'slow-day': 'You have checked this three times in the last hour.',
-    'in-flow': 'Do not look. It breaks the flow.',
-    'after-hours': 'Still here? So am I. I am a clock. That is fine for me.',
-  }
 
   return (
     <svg
@@ -1121,6 +1122,14 @@ const WORKER_ERROR_BUBBLES = {
   luna: ['the deck is burning', 'every color is wrong', 'the brief changed again']
 }
 
+const PLANT_STAGE_MESSAGES = {
+  sprout:        '🌱 First leaves! The ficus is sprouting.',
+  'small-plant': '🌿 Getting taller every day...',
+  leafy:         '🍀 The ficus is thriving!',
+  blooming:      '🌸 Full bloom! The office smells incredible.',
+  grief:         '🥀 The office ficus withered. The streak is gone.',
+}
+
 export default function Office({ workers = [], roster = [], isSyncing = false, activityEntries = [], onWorkerClick, vibeStreak = 0, doorEvent = null }) {
   const effectiveRoster = roster.length > 0 ? roster : DEFAULT_ROSTER
   const vibe = getTeamVibeKey(workers)
@@ -1141,14 +1150,6 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     : 'blooming'
   const plantStageEmoji = { seedling: '🌱', sprout: '🌱', 'small-plant': '🌿', leafy: '🌿', blooming: '🌸' }
   const plantStageLabel = plantStage.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ')
-
-  const PLANT_STAGE_MESSAGES = {
-    sprout:        '🌱 First leaves! The ficus is sprouting.',
-    'small-plant': '🌿 Getting taller every day...',
-    leafy:         '🍀 The ficus is thriving!',
-    blooming:      '🌸 Full bloom! The office smells incredible.',
-    grief:         '🥀 The office ficus withered. The streak is gone.',
-  }
 
   // Ficus milestone burst
   const prevPlantStageRef = useRef(plantStage)
