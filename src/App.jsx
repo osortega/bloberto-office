@@ -270,6 +270,14 @@ const WORKER_TAGLINES = {
   luna: 'Creative velocity is still velocity.'
 }
 
+const WORKER_COMPLETION_LINES = {
+  carlos: ['logs updated, task closed', 'merged and running', 'clean commit, no drama'],
+  maya: ['pixel-perfect and shipped', 'components delivered', 'design system updated'],
+  dave: ['pipeline cleared, stable', 'deployed — headphones back on', 'CI green across the board'],
+  sofia: ['tested, closed, documented', 'all edge cases covered', 'zero bugs escaped'],
+  luna: ['the brief is realized', 'creative review complete', 'vision shipped'],
+}
+
 const SOLO_SPOTLIGHT_MESSAGES = {
   carlos: { 'on-fire': '📊 One backend between the servers and chaos.', 'crushing': '🧱 The whole stack is one person right now.', default: '⚙️ Solo shift. The logs are his only company.' },
   sofia:  { 'on-fire': '🔍 Holding quality with both hands and no backup.', 'crushing': '🔍 Bugs beware — she\'s in full hunt mode, solo.', 'in-flow': '🧪 Deep in the zone, every edge case accounted for.', 'slow-day': '🔎 If there are bugs, she will find them. Alone.', default: '🔍 One set of eyes. Nothing gets past.' },
@@ -1023,7 +1031,9 @@ export default function App() {
         const color = ROLE_COLORS[worker.role] || ROLE_COLORS['Other']
         const t = setTimeout(() => {
           setWorkerConfetti({ name: worker.name, color })
-          setCompletionToast({ name: worker.name, color })
+          const lines = WORKER_COMPLETION_LINES[worker.id]
+          const text = lines ? `${worker.name}: ${lines[Math.floor(Math.random() * lines.length)]}` : null
+          setCompletionToast({ name: worker.name, color, ...(text && { text }) })
           workerConfettiTimerRef.current = setTimeout(() => setWorkerConfetti(null), 2500)
           completionToastTimerRef.current = setTimeout(() => setCompletionToast(null), 3000)
         }, i * 2600)

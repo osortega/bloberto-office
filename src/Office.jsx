@@ -716,14 +716,17 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   }
 
   const classes = ['char', `char--${variant}`]
+  let isDeepWork = false
   if (variant === 'idle' && wanderIdx) classes.push(`char--wander-${wanderIdx}`)
   if (variant === 'working' && worker.updated_at && Date.now() - new Date(worker.updated_at).getTime() > 45 * 60 * 1000) {
     classes.push('char--deep-work')
+    isDeepWork = true
   }
   if (isError) classes.push('char--glitch')
   if (isPinged) classes.push('char--pinged')
 
-  const tooltipText = tooltip && onClick ? `${tooltip} · click to inspect` : tooltip
+  const deepWorkSuffix = isDeepWork ? ' · 🎧 deep work' : ''
+  const tooltipText = tooltip && onClick ? `${tooltip}${deepWorkSuffix} · click to inspect` : tooltip ? `${tooltip}${deepWorkSuffix}` : null
   const extraProps = (tooltipText && variant !== 'ghost') ? { 'data-tooltip': tooltipText } : {}
 
   const handleClick = onClick ? (e) => {
@@ -814,6 +817,9 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
           <div>{STATUS_EMOJIS[worker.status]} {STATUS_LABELS[worker.status]}</div>
           {variant === 'working' && worker.startedAt && (
             <div className="hover-time">on task for {formatIdleDuration(worker.startedAt)}</div>
+          )}
+          {variant === 'working' && worker.updated_at && Date.now() - new Date(worker.updated_at).getTime() > 45 * 60 * 1000 && (
+            <div className="hover-deep-work">🎧 deep work</div>
           )}
           {variant === 'idle' && worker.updated_at && (
             <div className="hover-time">idle for {formatIdleDuration(worker.updated_at)}</div>
