@@ -2493,5 +2493,730 @@
     ],
     "hire_proposals": [],
     "_previous_review": 79
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 81,
+    "timestamp": "2026-03-10T03:30:50Z",
+    "theme": "Five bugs retired since #80 — the window finally tells the truth at 10pm — but zombie timers, overlapping toasts, and a dead variable are still squatting on the board",
+    "visual_observations": [
+      "Screenshot unavailable: Puppeteer socket hang up on launch; full code review conducted against App.jsx (1402 lines), Office.jsx (1598 lines), App.css (1164 lines), Office.css (2406 lines)",
+      "CONFIRMED FIXED — Window sky hours 20-23: isNight now includes hour >= 20, isMidnight = isNight, timeLabel returns 'night' for those hours. Stars render. Eight-review bug closed.",
+      "CONFIRMED FIXED — vibeCaption 90-second cooldown added: if (Date.now() - lastVibeCaptionRef.current < 90_000) return at the top of the vibe effect. Five consecutive reviews resolved.",
+      "CONFIRMED FIXED — Whiteboard solo label: workingWorkers.length === 1 ? 'task progress' : 'avg task progress' — the ternary is live. Solo workers no longer get the absurd 'avg' label.",
+      "CONFIRMED FIXED — Honorific is now vibe-based: HONORIFICS[teamVibe.key] in the render — not time-locked. Crushing at 10pm correctly produces 'LEGEND'.",
+      "CONFIRMED FIXED — TASK_TAG_DEFS Plan tag added: /plan|roadmap|sprint|kickoff|standup|meeting|agenda|discuss|ceremony|sync/i. Eleven-review absence over.",
+      "plantToast (Office.jsx ~1238) and completionToast (App.jsx ~1126) both render at position:fixed, bottom:2rem, left:50%, zIndex:9999 — identical pixel coordinates. When both fire in the same vibe window they stack invisibly.",
+      "justShipped.forEach: outer setTimeout return values are discarded — no ref holds those IDs. workerConfettiTimerRef and completionToastTimerRef get silently overwritten on each forEach iteration.",
+      "ActivityLog: [...entries].reverse().slice(0, 20) caps visible entries at 20. Header renders activityLog.length events against the full array. With 50 events the header says 50 events and 30 are invisible with no indication.",
+      "TASK_TAG_DEFS: /test|qa|spec|review|coverage|lint/i — bare word 'review' stamps a blue QA badge on Design review, Sprint review, Architecture review, Creative review in progress.",
+      "Tab title effect: let idx = 0 re-runs on every [activeWorkers, teamVibe] change — every 30s poll resets to frame 0. Frames 1 and 2 only visible after 8-16s of poll silence — never in practice.",
+      "WallClock: five vibe-specific comments live inside a title element on a 22x22px SVG — hover-only on desktop, completely inaccessible on touch and screen readers.",
+      "Footer quote counter: at quoteBonus=9 (first wrap), (9%9)+1 = 1 shows '1/9' but content is BONUS_TAGLINES[0] — first bonus tagline, not the vibe tagline. Counter and content phase-shifted after one full cycle.",
+      "Office.jsx line 1107: const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming'] — declared in the component body, referenced nowhere. Dead variable orphaned from an incomplete refactor."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "Window Sky Hours 20-23: Night Gradient Now Has Stars and Correct Label",
+        "was_flagged_in": [
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80
+        ],
+        "how_fixed": "Office.jsx: const isNight = (hour >= 0 && hour <= 4) || hour >= 20; const isMidnight = isNight — both conditions share the star render. timeLabel uses hour <= 19 ? 'golden hour' : 'night' so hours 20-23 read 'night'. Gradient, stars, and label aligned for the first time in nine reviews."
+      },
+      {
+        "title": "vibeCaption 90-Second Cooldown Added",
+        "was_flagged_in": [
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80
+        ],
+        "how_fixed": "Office.jsx vibeCaption effect: if (Date.now() - lastVibeCaptionRef.current < 90_000) return added before the caption fires. lastVibeCaptionRef.current = Date.now() set after. Oscillating teams no longer spam the overlay every 30 seconds."
+      },
+      {
+        "title": "Whiteboard 'avg task progress' Corrected for Solo Workers",
+        "was_flagged_in": [
+          74,
+          78,
+          79,
+          80
+        ],
+        "how_fixed": "Office.jsx: workingWorkers.length === 1 ? 'task progress' : 'avg task progress' — the ternary correctly distinguishes solo from team context. A one-person sprint no longer gets called an average."
+      },
+      {
+        "title": "Greeting Honorific Now Vibe-Based, Not Time-Locked",
+        "was_flagged_in": [
+          75,
+          76,
+          77,
+          78,
+          79,
+          80
+        ],
+        "how_fixed": "App.jsx: HONORIFICS[teamVibe.key] in the render — not time-locked. Crushing at 10pm gives LEGEND. The time-of-day override is gone."
+      },
+      {
+        "title": "TASK_TAG_DEFS Plan/Meeting Tag Added After Eleven Reviews",
+        "was_flagged_in": [
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80
+        ],
+        "how_fixed": "App.jsx: Plan tag added with /plan|roadmap|sprint|kickoff|standup|meeting|agenda|discuss|ceremony|sync/i. Standup, sprint, kickoff, ceremony, and sync all now surface the yellow Plan tag."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "ui/layout",
+        "title": "plantToast and completionToast Render at Identical Fixed Coordinates — One Erases the Other",
+        "description": "Office.jsx and App.jsx both anchor toasts at position:fixed, bottom:2rem, left:50%, zIndex:9999. When a ficus level-up and a worker task completion happen in the same vibe window — both plausible on a crushing day — the toasts occupy the same pixel and one is hidden. Fix: stagger the vertical position (plant at bottom:5.5rem, completion at bottom:2rem) or introduce a toast queue that displays them sequentially with a 200ms gap.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "bug/timers",
+        "title": "justShipped.forEach Outer setTimeout IDs Discarded — Multi-Ship Leaves Zombie Timers",
+        "description": "App.jsx: outer setTimeout return values inside justShipped.forEach are silently discarded. When two workers ship simultaneously, two outer timers queue at t=0 and t=2600ms. If a poll fires before t=2600, the effect re-runs but cannot cancel the pending outer timer and it fires into stale state. Additionally, workerConfettiTimerRef and completionToastTimerRef are overwritten on each iteration — only the last worker's inner cleanup is tracked. Store outer IDs in a ref array, push each ID, and clear them all in the effect cleanup.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "data/display",
+        "title": "Activity Log Header Counts All Events While Component Shows Only 20 — Gap Still Open",
+        "description": "ActivityLog component: [...entries].reverse().slice(0, 20) caps visible entries at 20. The header renders activityLog.length events against the full array. With 50 events the header says '50 events' and 30 are invisible with no scroll affordance or indication. Fix: raise the cap with pagination, or change the header to read 'showing 20 of N events' with a show-more affordance so the user knows there is more to see.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "tagging/data",
+        "title": "TASK_TAG_DEFS Bare 'review' Word Still Stamps QA Badge on Design Reviews and Sprint Reviews",
+        "description": "App.jsx TASK_TAG_DEFS: the QA pattern includes the bare word 'review' which matches 'Design review', 'Sprint review', 'Architecture review', 'Creative review in progress', mislabeling planning and design ceremonies with a blue QA badge. Change the pattern to require 'review' to be qualified by 'code' or 'peer' before triggering the QA tag. This prevents false positives without removing legitimate test and QA detection.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "ui/animation",
+        "title": "Tab Title idx Always Resets to Frame 0 on Every 30s Poll — Frames 1 and 2 Are Never Displayed",
+        "description": "App.jsx title effect depends on [activeWorkers, teamVibe], which changes every poll. On each re-run: let idx = 0 executes immediately, then a new interval starts from 0. Frame 0 is permanently displayed; frames 1 (worker breakdown) and 2 (vibe label) require 8-16s of poll silence — never achievable during normal polling. Fix: move idx to useRef so it persists across re-renders triggered by count changes, resetting only when frames.length changes.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "accessibility",
+        "title": "WallClock Vibe Commentary Lives in a 22px SVG title — Touch Devices and Screen Readers Never See It",
+        "description": "Office.jsx: five vibe-specific clock comments live inside an SVG title element on a 22x22px element. These are hover-only on desktop and completely inaccessible on touch devices and screen readers. 'You have checked this three times in the last hour' and 'Time has no meaning during an incident' are the best-written lines in the codebase and they are invisible to most users. Fix: surface the comment as a visible caption that appears on focus or hover with proper role tooltip.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Footer Quote Counter Wraps to 1/9 at quoteBonus=9 While Displaying Bonus[0] Content — Counter and Slot Out of Phase",
+        "description": "App.jsx footer: (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 with length=8 gives denominator 9. At quoteBonus=9 (first wrap): counter = (9%9)+1 = 1, but content is BONUS_TAGLINES[0] — the first bonus tagline, not the vibe tagline. Counter reads '1/9' while displaying slot-2 content. After one full cycle the counter and content are permanently phase-shifted. Fix: reset quoteBonus to 1 at wrap so the vibe tagline genuinely occupies slot 1 and bonuses occupy slots 2-9.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "code/cleanup",
+        "title": "plantStageNames Array Declared Inside Office Component but Never Referenced — Dead Variable",
+        "description": "Office.jsx line 1107: const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming'] — declared in the component body, referenced nowhere in the file. It is orphaned from an incomplete refactor, likely intended to anchor the per-stage Ficus toast messages that still have not been implemented. Remove it or wire it to a PLANT_GROWTH_MESSAGES map — two birds, one refactor. Dead declarations in hot-path component bodies waste attention on every code read.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "visual",
+        "title": "Door Icon Has Three States for Five Vibes — DOOR_LABELS Emoji Is Stranded in the Caption",
+        "description": "Office.jsx: the door icon renders: after-hours = locked, arrive event = door-sparkle, otherwise = door. Three branches for five vibes. DOOR_LABELS has rich per-vibe copy with emoji (All hands in, Brace yourself, Focus zone) but those emoji are rendered only as caption text below the icon, never in the icon itself. Add a DOOR_ICONS map keyed by vibe so the icon communicates the vibe even when no door event is in progress.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "code/cleanup",
+        "title": "ProgressBar updatedAt Prop Declared, Passed, and Never Read — Dead Contract in the Signature",
+        "description": "App.jsx: function ProgressBar({ progress, updatedAt, startedAt }) — the caller passes updatedAt={worker.updated_at} but inside the component only startedAt is used for ETA. updatedAt is never referenced. Either remove it from the signature and call site to clean the contract, or use it: updatedAt would enable a stalled indicator when progress < 100 and updatedAt is older than 30 minutes, surfacing workers whose tasks have not moved without reaching the 2-hour stuck threshold in StatsBar.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "feature",
+        "title": "lastHuddle Ref Still Missing startedAt — Elapsed Meeting Time Remains Architecturally Blocked",
+        "description": "Office.jsx: when meetingWorkers.length >= 2, lastHuddle.current is set to { names: [...], endedAt: null }. No startedAt field. The ConferenceTable shows how long ago the last meeting ended but cannot show how long the current meeting has been running because the start time is never captured. Fix: capture startedAt only on the 0-to-2 worker transition (when endedAt !== null OR names is empty), then display elapsed duration on the Huddle badge during live meetings.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "copy/character",
+        "title": "Ficus Growth Toast Is One Generic Line for All Five Stage Transitions — Same Eulogy from Seedling to Blooming",
+        "description": "Office.jsx: plantToast always renders 'The office ficus leveled up!' regardless of which stage was reached. Seedling to sprout and leafy to blooming are very different moments. Define a PLANT_GROWTH_MESSAGES map: { sprout: 'First signs of life in the corner', 'small-plant': 'The ficus is finding its confidence', leafy: 'Full foliage achieved', blooming: 'Peak ficus. The office smells incredible.' }. The declared but unused plantStageNames variable is the perfect anchor for this map — two birds, one refactor.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "character/voice",
+        "title": "PING_REACTIONS Has One Static String Per Worker — Click Someone 100 Times, Same Sentence Every Time",
+        "description": "Office.jsx: PING_REACTIONS is a flat object with one string per worker ID. 'luna: Creative review in progress...' Always. The click handler does const reaction = PING_REACTIONS[worker.id] — no array, no randomness, no vibe context. At the most interactive moment in the UI the response is deterministic and stale after the second click. Replace each value with an array of 4-6 reactions, pick with Math.random(), and optionally vary by vibe: carlos at after-hours says something different than carlos at crushing. Cheapest character depth investment in the codebase.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "copy/emotion",
+        "title": "completionToast Says 'shipped it!' for Every Worker — Zero Character Voice at the Peak Emotional Moment",
+        "description": "App.jsx: the toast renders 'worker name + shipped it!' — one sentence for five workers across five vibes. The toast is 3 seconds at maximum visibility and it sounds like a CI webhook. Define WORKER_COMPLETION_LINES keyed by worker id and optionally vibe: carlos.crushing = 'Carlos closed the ticket. Logs are clean.', sofia.default = 'Sofia shipped it. Found two more bugs on the way.', maya['in-flow'] = 'Every pixel exactly right. Maya shipped it.' Three seconds of undivided user attention — make them count.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 80
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 82,
+    "timestamp": "2026-03-10T04:00:52Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Puppeteer failed: ProtocolError — Network.enable timed out on launch (same container-level network isolation as reviews 78–81). Full code audit conducted: App.jsx (1416 lines), Office.jsx (1598 lines), App.css (1164 lines), Office.css (2406 lines), utils/constants.js, utils/quotes.js, utils/vibe.js.",
+    "theme": "The fix was always half-there — ghost refs, double emojis, and a tooltip that changes personality depending on who else is loitering",
+    "visual_observations": [
+      "App.jsx line 704: `const titleIdxRef = useRef(0) // persists tab-title rotation across effect re-runs` — the ref is declared, commented with exact intent, and never referenced anywhere in the file. The title effect at line 1064 still uses `let idx = 0`. The scaffolding for the fix exists. The wire was never plugged in.",
+      "Office.jsx line 1567–1572: the vibe-weather div renders `<span className='vibe-weather__icon' aria-hidden='true'>{VIBE_WEATHER_ICONS[vibe]}</span>` followed by `<span className='vibe-weather__label'>{VIBE_WEATHER_LABELS[vibe]}</span>`. VIBE_WEATHER_LABELS begins every value with the same emoji as VIBE_WEATHER_ICONS (e.g., '☀️ Clear skies...' / '☀️'). Visually: double emoji every vibe, always.",
+      "Office.jsx lines 1501–1516: `const WORKER_WANDER_TOOLTIPS = { carlos: [...], maya: [...], ... }` is declared as a local const INSIDE the `idleWorkers.map()` callback. This object is freshly allocated on every render pass per idle worker. With 5 idle workers this is 5 allocations of the same 5-key object every render.",
+      "App.jsx line 389: `const VIBE_RANK = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }` at module scope. App.jsx line 1002: `const vibeRanking = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }` inside a useEffect body. Same 5-key object, defined twice, used in adjacent logic.",
+      "Office.jsx line 1511: idle wander tooltip is selected via `workerTooltips[i % workerTooltips.length]` where `i` is the loop index in `idleWorkers.map()`. Carlos alone gets tooltip[0]. Carlos with Maya both idle gets tooltip[1] (Carlos is still index 0, Maya is 1 — fine). But if Carlos is idle second (after Dave), he becomes index 1 and gets tooltip[1]. A worker's wandering thought changes based on who else chose to take a break, not on who Carlos is.",
+      "App.jsx line 195: `function ProgressBar({ progress, updatedAt, startedAt })` — `updatedAt` destructured, passed at line 350, never referenced inside the function body. Nine-plus reviews. Still there.",
+      "App.jsx line 1410: footer quote counter formula `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` — at quoteBonus=9 (first wrap after all 8 bonuses): `(9 % 9) + 1 = 1`, shows '1/9'. Content is `BONUS_TAGLINES[(9-1) % 8] = BONUS_TAGLINES[0]` — first bonus tagline, not the vibe tagline. Counter and content are phase-shifted by one slot after the first full cycle. Three reviews.",
+      "App.jsx line 704: `titleIdxRef` — `useRef(0)` — never passed to a dependency array, never read in the title effect, never written. A ghost variable with a comment that describes exactly what it was supposed to do.",
+      "Office.jsx line 1172–1177: `lastHuddle.current = { names: meetingWorkers.map(w => w.name), endedAt: null }` — no `startedAt`. The elapsed meeting time feature is architecturally blocked by a missing 10-character field. Third review.",
+      "Office.jsx line 1261: `🌱 The office ficus leveled up!` — same toast for all five stage transitions. `plantStageNames` array (line 1107) and `plantStage` string (line 1108) are both available at that scope. The data is there. The differentiation is not."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "justShipped.forEach Outer setTimeout IDs Now Tracked — Zombie Timer Bug Closed",
+        "was_flagged_in": [
+          80,
+          81
+        ],
+        "how_fixed": "App.jsx lines 957–958: `justShippedTimersRef.current.forEach(t => clearTimeout(t)); justShippedTimersRef.current = []` runs before the forEach. Line 971: `justShippedTimersRef.current.push(t)` stores each outer ID. Lines 976–979: the effect cleanup calls forEach clearTimeout again. All three pieces in place. Multi-ship no longer leaves zombie timers."
+      },
+      {
+        "title": "Activity Log Header Now Shows 'Latest 20 of N' When Entries Exceed Cap",
+        "was_flagged_in": [
+          74,
+          80,
+          81
+        ],
+        "how_fixed": "App.jsx lines 1335–1340: `const DISPLAY_CAP = 20` is now referenced in the header count expression. When filtered.length > 20, header reads 'Latest 20 of N events' — matching the hard-cap slice in the ActivityLog component. The invisible-entries gap is labelled."
+      },
+      {
+        "title": "WORKER_WANDER_TOOLTIPS Now Character-Specific by worker.id",
+        "was_flagged_in": [
+          72,
+          73,
+          74
+        ],
+        "how_fixed": "Office.jsx lines 1503–1516: `WORKER_WANDER_TOOLTIPS` is a local object keyed by worker.id with 3 character-appropriate tooltips per worker. Carlos gets server-metrics copy; Luna gets horizon-scanning copy. The slot-machine tooltip era is over."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "ProgressBar updatedAt: Nine Reviews, One Destructure, Zero References — Choose a Path",
+        "description": "App.jsx line 195: `function ProgressBar({ progress, updatedAt, startedAt })`. `updatedAt` is destructured, passed at WorkerCard line 350 as `updatedAt={worker.updated_at}`, and never referenced once inside the component body. Only `startedAt` drives ETA logic. This dead contract has been flagged in reviews 71, 72, 74, 75, 77, 78, 79, 80, and 81. Nine reviews. Two paths: (A) remove `updatedAt` from the destructure and call site — clean the contract in five keystrokes; (B) fulfill it — render a subtle 'stalled' indicator when `progress < 100` and `Date.now() - new Date(updatedAt).getTime() > 1_800_000` (30 minutes of no movement), surfacing stuck tasks before they cross the 2-hour StatsBar threshold. Path B converts nine reviews of dead code into a live staleness signal. WHY: nine reviews. This is not complexity. This is inertia. One decision and five minutes of work ends it.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Footer Quote Counter Phase-Shifts After First Full Cycle — Three Reviews of Counter vs. Content Drift",
+        "description": "App.jsx line 1410: `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` with `BONUS_TAGLINES.length = 8` yields denominator 9. At quoteBonus=9 (after one complete cycle through all 8 bonus quotes): formula gives `(9 % 9) + 1 = 1`, displays '1/9'. But the content is `BONUS_TAGLINES[(9-1) % 8] = BONUS_TAGLINES[0]` — the first bonus tagline, occupying slot 2 in the original sequence. Counter says 1, content is 2. From this point forward the counter is permanently off by one from the content slot. Every subsequent wrap deepens the drift. Fix: when `quoteBonus > 0`, derive numerator from actual content position — `((quoteBonus - 1) % BONUS_TAGLINES.length) + 2` to preserve the vibe-tagline-as-slot-1 semantics. This has been flagged in reviews 79, 80, and 81 — escalated to must. WHY: a counter that lies about position isn't a UI decoration, it's a broken promise to every user who clicked past the default tagline.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "titleIdxRef Was Declared to Fix Tab Title Rotation but Was Never Wired In — The Scaffolding Is Complete, the Wire Is Missing",
+        "description": "App.jsx line 704: `const titleIdxRef = useRef(0)  // persists tab-title rotation across effect re-runs`. The comment is explicit — this ref was written to fix the known bug where `let idx = 0` resets on every 30-second poll re-run. But the title effect at lines 1064–1069 still opens with `let idx = 0` and never references `titleIdxRef`. The fix was designed, scaffolded, and abandoned. Two changes: (1) replace `let idx = 0` with `titleIdxRef.current = titleIdxRef.current % frames.length` to initialize-or-persist; (2) replace `idx` everywhere in the effect with `titleIdxRef.current`. Now `titleIdxRef` earns its existence, the comment tells the truth, and frames 1 and 2 (worker breakdown and vibe label) are visible in normal polling conditions for the first time. WHY: the ref exists, the comment exists, the bug exists — the only missing piece is the connection between them.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Vibe-Weather Widget Renders Its Icon Emoji Twice — Every Visitor Sees Double",
+        "description": "Office.jsx lines 1567–1572: the vibe-weather widget renders two child spans — `vibe-weather__icon` containing `VIBE_WEATHER_ICONS[vibe]` (e.g., '☀️') and `vibe-weather__label` containing `VIBE_WEATHER_LABELS[vibe]` (e.g., '☀️ Clear skies — team at full strength'). `VIBE_WEATHER_LABELS` embeds the same emoji that `VIBE_WEATHER_ICONS` renders. Every sighted user sees the icon twice: `☀️ ☀️ Clear skies — team at full strength`. The `aria-hidden='true'` on the icon span correctly hides the duplication from screen readers, which makes this purely a visual mistake. Fix option A: strip the leading emoji from all `VIBE_WEATHER_LABELS` values — the icon span handles the visual, the label carries the prose. Fix option B: remove the `vibe-weather__icon` span entirely and let the label's embedded emoji serve as both. Either path ends the double-sun era. WHY: this widget is the most visible real-time data element on the office floor. It should not look broken on every single page load.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "storytelling",
+        "title": "lastHuddle Missing startedAt — Three Reviews, One Field Away from a Live Meeting Timer",
+        "description": "Office.jsx line 1172: when `meetingWorkers.length >= 2`, `lastHuddle.current` is set to `{ names: meetingWorkers.map(w => w.name), endedAt: null }`. No `startedAt` field. ConferenceTable already shows a 'last huddle ended N minutes ago' retrospective when `meetingWorkers.length === 0`. Adding a live 'In huddle for Xm' badge during an active meeting requires only the start time — which is never captured. Fix: add `startedAt: Date.now()` to the object at line 1172 (only on the 0→2 transition to avoid overwriting), then pass `lastHuddle` to `ConferenceTable` for a live elapsed timer on the Huddle badge. Flagged in reviews 79, 80, and 81. Three reviews, ten characters of data, one badge that transforms a static 'Huddle' label into a living meeting clock. WHY: the office knows who is at the table and whether a huddle is happening. It just doesn't know how long they've been there. That's the one number the people outside the room are actually watching.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "performance",
+        "title": "WORKER_WANDER_TOOLTIPS Object Allocated Inside idleWorkers.map() Callback — Fresh on Every Render",
+        "description": "Office.jsx line 1503: `const WORKER_WANDER_TOOLTIPS = { carlos: [...], maya: [...], dave: [...], sofia: [...], luna: [...] }` is declared as a local const inside the `idleWorkers.map()` callback at line 1501. This object is created fresh on every call to the map callback, on every render. With 5 idle workers, 5 renders per poll, that's 5 allocations of a 5-key, 15-string object for every state update. The object is purely static — it has no dependency on worker state, vibe, or time. Fix: hoist it to module scope above the `Office` component, alongside the other character-voice constants like `WORKER_AWAY_MESSAGES` and `WORKER_IDLE_BUBBLES`. One cut-paste. WHY: static data declared in render paths trains developers to treat allocation costs as invisible. This one is free to fix, and hoisting it also makes the Office component's render function shorter and easier to read.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "code/cleanup",
+        "title": "VIBE_RANK at Module Scope and vibeRanking Inside useEffect Are Identical Objects — DRY Violation",
+        "description": "App.jsx line 389: `const VIBE_RANK = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }` declared at module scope and used by `VibeSparkline` (line 398). App.jsx line 1002: `const vibeRanking = { 'after-hours': 0, 'slow-day': 1, 'on-fire': 2, 'in-flow': 3, 'crushing': 4 }` declared inline inside the vibe streak `useEffect` body for confetti logic. Same five keys, same five values, different names, different scopes, born five minutes apart in some commit. Fix: replace `const vibeRanking` at line 1002 with `const vibeRanking = VIBE_RANK` — or better, reference `VIBE_RANK` directly in the comparison at line 1004: `if (prevKey !== null && VIBE_RANK[teamVibe.key] > (VIBE_RANK[prevKey] ?? -1))`. One reference, zero duplication. WHY: two copies of the same ranking table will eventually diverge. Some future engineer will add 'hyper-crush' as a new vibe, update one map, miss the other, and spend an afternoon debugging confetti that won't fire.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "wb-doodle Has Five Static Faces That Never React to vibeStreak — The Whiteboard Doesn't Know It's Getting Famous",
+        "description": "Office.jsx line 1312: `<pre className='wb-doodle'>` renders one of five static ASCII emoticons based purely on `vibe`. The Office component already receives `vibeStreak` as a prop (passed at App.jsx line 1251). A crushing sprint at streak 1 and a legendary streak-10 run look identical on the whiteboard. The whiteboard is the emotional center of the floor — it should escalate. At streak 1, crushing is calm: `╰(*°▽°*)╯`. At streak 5, it gets excited: `o(*≧▽≦)o`. At streak 10+, it goes feral: `(ﾉ◕ヮ◕)ﾉ*✨`. On-fire at streak 3: table flip. On-fire at streak 8: full meltdown emoji. `vibeStreak` is already flowing through the prop — the whiteboard just needs to look at it. WHY: the streak counter in the header already shows 🔥 and 🏆 at thresholds. The whiteboard, which is larger and more central, knows nothing about it. Two narrative systems, same data, zero connection.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "character-voice",
+        "title": "Wander Tooltip Selects by Loop Position — Carlos Changes Personality When Dave Takes a Break",
+        "description": "Office.jsx line 1511: `const tooltip = workerTooltips ? workerTooltips[i % workerTooltips.length] : ...` where `i` is the loop index in `idleWorkers.map()`. Carlos is index 0 when alone: gets `workerTooltips[0]` → '☕ Checking server metrics'. Carlos is index 1 when Dave is also idle first: gets `workerTooltips[1]` → '📊 Reviewing the logs'. The tooltip is derived from position in the idle queue, not from the worker's identity. Carlos's wandering thought changes based on who else got up from their desk. Fix: use a stable worker-specific index — `workerTooltips[Math.abs(w.id.split('').reduce((acc, c) => acc * 31 + c.charCodeAt(0), 0)) % workerTooltips.length]` — a hash of the worker ID that always selects the same tooltip regardless of company. WHY: WORKER_WANDER_TOOLTIPS was written with care to give each character a voice. The selector throws that care away by handing the choice to queue arithmetic.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "PING_REACTIONS: Each Worker Has Been Saying the Same Sentence for 82 Reviews — Time to Give Them a Range",
+        "description": "Office.jsx line 163: `PING_REACTIONS` is a flat key→string map. `luna: 'Creative review in progress...'`. Always. `carlos: 'Check the logs. It is ALWAYS in the logs.'` Always. `handleCharClick` at line 1159 calls `const reaction = PING_REACTIONS[worker.id]` — no array, no context, no randomness. The most interactive, highest-delight moment in the UI responds with a single line that becomes memorized after the second click. Replace each value with an array of 4–6 reactions, add vibe context where it matters (`sofia` at `on-fire` should be different from `sofia` at `slow-day`), and select with `Math.random()`. Example range for carlos: ['Check the logs. It is ALWAYS in the logs.', 'SIGTERM — just kidding. Probably.', 'Give me 30 seconds and a stack trace.', 'Backend is fine. Probably fine. Checking.']. This is the cheapest character-depth investment remaining in the codebase and it has been true for two consecutive reviews. WHY: click interactions are the moments users form emotional relationships with characters. One line per character communicates that the characters are statues, not people.",
+        "effort": "small",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 81
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 82,
+    "timestamp": "2026-03-10T04:06:20.617Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Code review only",
+    "theme": "Two real fixes, a phantom ref that declares victory without running code, and the toast twins still brawling over the same pixel",
+    "visual_observations": [
+      "CONFIRMED FIXED - justShipped.forEach timer IDs: justShippedTimersRef (useRef([])) now collects all outer stagger IDs, forEach pushes each t, cleanup clears all. The zombie timer from #81 is gone.",
+      "CONFIRMED FIXED - Activity log header: header now renders 'Latest 20 of N events' when the array exceeds the cap. The silent truncation is disclosed.",
+      "STILL OPEN - plantToast (Office.jsx) and completionToast (App.jsx) both fixed at position:fixed, bottom:2rem, left:50%, zIndex:9999. Still the same pixel.",
+      "NEWLY FOUND - titleIdxRef declared at line 704 with comment 'persists tab-title rotation across effect re-runs' but line 1064 still uses let idx = 0. The ref is never read or written in the effect.",
+      "STILL OPEN - TASK_TAG_DEFS line 169: bare word 'review' in the QA pattern still stamps blue QA badge on Design review, Sprint review, Architecture review.",
+      "STILL OPEN - WallClock: CLOCK_COMMENTS live in an SVG title element on a 22px element. Hover-only on desktop, invisible on touch and screen readers.",
+      "STILL OPEN - Footer quote counter: at quoteBonus=9, counter shows 1/9 while displaying BONUS_TAGLINES[0]. Counter and content permanently phase-shifted after one full cycle.",
+      "STILL OPEN - Office.jsx line 1107: const plantStageNames declared and never referenced anywhere. The array is an orphan.",
+      "NEWLY FOUND - ProgressBar call site (App.jsx line 350) still passes updatedAt={worker.updated_at} as a dead prop after updatedAt was removed from the function signature.",
+      "STILL OPEN - lastHuddle.current set to { names, endedAt: null } with no startedAt field. Huddle badge cannot show elapsed meeting time.",
+      "NEWLY FOUND - After-hours greeting (App.jsx line 1106): currentHour % 2 === 0 alternates deterministically between two phrases on even/odd clock hours. Clock parity, not team state.",
+      "STILL OPEN - PING_REACTIONS: one static string per worker. completionToast: 'worker shipped it!' for every worker in every vibe. Both highest-engagement moments remain deterministic and character-free."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "justShipped.forEach Outer setTimeout IDs Now Collected and Cleared",
+        "was_flagged_in": [
+          81
+        ],
+        "how_fixed": "App.jsx: justShippedTimersRef = useRef([]) added. forEach now pushes each outer setTimeout ID into the ref array. Effect cleanup calls justShippedTimersRef.current.forEach(clearTimeout) and resets to []. Multi-ship no longer leaves zombie timers in stale state."
+      },
+      {
+        "title": "Activity Log Header Now Accurately Discloses Latest 20 of N Events",
+        "was_flagged_in": [
+          81
+        ],
+        "how_fixed": "App.jsx dashboard section: header renders 'Latest N of M events' when filtered.length > DISPLAY_CAP, and 'N of M events (filtered)' when filters are active. The silent truncation that showed 50 events while displaying only 20 is closed."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "plantToast and completionToast Still Overlap at bottom:2rem - One Erases the Other",
+        "description": "Office.jsx and App.jsx both anchor toasts at position:fixed, bottom:2rem, left:50%, zIndex:9999. A ficus level-up and a task completion in the same polling window produce two toasts at the exact same pixel and one is invisible. Fix: stagger vertical positions (plant at bottom:5.5rem, completion at bottom:2rem) or introduce a shared toast queue with a 200ms gap. The easiest character moment on screen requires the toast to actually be visible.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "titleIdxRef Declared with 'Persists Rotation' Comment but Never Wired to the Title Effect",
+        "description": "App.jsx line 704: const titleIdxRef = useRef(0) with comment 'persists tab-title rotation across effect re-runs'. Line 1064: let idx = 0 still resets on every re-run. titleIdxRef is never read or written in the title effect - a placeholder that impersonates a fix. Wire it: replace the local let idx with the ref inside the effect and update titleIdxRef.current instead of idx throughout. Frames 1 and 2 will finally rotate in practice.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "TASK_TAG_DEFS Bare 'review' Still Stamps QA Badge on Design and Sprint Reviews",
+        "description": "App.jsx TASK_TAG_DEFS line 169: the QA pattern includes bare word 'review', matching 'Design review', 'Sprint review', 'Architecture review', 'Creative review in progress'. All four get the blue QA badge. Fix: qualify the pattern to require context - replace bare 'review' with qualified anchors like 'code review' or 'peer review'. Removes false positives on planning ceremonies without losing legitimate detection. A wrong badge on 'Sprint review' breaks trust in the entire tagging system.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Footer Quote Counter Phase-Shifts Permanently After One Full Cycle",
+        "description": "App.jsx line 1410: counter formula uses (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1. At quoteBonus=9 with length=8: (9%9)+1=1, showing '1/9', while content is BONUS_TAGLINES[0] - first bonus tagline, not the vibe tagline. Counter says slot 1 but displays slot 2 content. After one full cycle the counter and content are permanently phase-shifted. Fix: reset quoteBonus to 0 at wrap so the vibe tagline genuinely occupies the reset state and counter only renders for quoteBonus >= 1.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "accessibility",
+        "title": "WallClock Vibe Commentary Buried in SVG title Element - Touch Devices and Screen Readers Never See It",
+        "description": "Office.jsx line 1050: five vibe-specific CLOCK_COMMENTS live inside an SVG title element on a 22x22px icon. Hover-only on desktop, completely inaccessible on touch and screen readers. 'You have checked this three times in the last hour' and 'Time has no meaning during an incident' are the most human lines in the codebase and most users never read them. Fix: surface the comment as a visible tooltip or caption appearing on focus or hover with role='tooltip' and proper association. The writing deserves to be read.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "ProgressBar Call Site Still Passes Dead updatedAt Prop After Signature Cleanup",
+        "description": "App.jsx line 195: function ProgressBar({ progress, startedAt }) - updatedAt was removed from the signature. Line 350: still passes updatedAt={worker.updated_at} at the call site, silently discarded by React. The cleanup is half-done. Fix: remove updatedAt from the call site, or better - add it back to the signature and use it: show a stall indicator when progress < 100 and updatedAt is older than 30 minutes. The data is there; it would surface stalled tasks without waiting for the 2-hour stuck threshold.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "copy/character",
+        "title": "After-Hours Greeting Alternates on Even/Odd Clock Hour - Clock Parity Is Not Team Awareness",
+        "description": "App.jsx line 1106: currentHour % 2 === 0 produces 'Burning the midnight oil' at hours 20 and 22, and 'Still at it' at hours 21 and 23 - mechanically alternating by clock parity. A team crushing at 10pm gets the same rotation as a team idling at 3am. Fix: select the after-hours greeting based on teamVibe.key: crushing/on-fire = 'Burning the midnight oil', slow-day/after-hours = 'Still at it', in-flow = 'Late-night flow state'. The greeting and the vibe should agree.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "code/cleanup",
+        "title": "plantStageNames Array Still Declared Inside Office Component and Still Referenced Nowhere",
+        "description": "Office.jsx line 1107: const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming'] declared in the hot-path component body, never read. plantStageLabel and plantStageEmoji are both built inline using the stage string directly. Flagged in #81, still present. Fix: remove it or wire it to a PLANT_GROWTH_MESSAGES map keyed by stage and use it in the plantToast so each of the five ficus transitions gets its own line.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "feature",
+        "title": "lastHuddle Still Missing startedAt - Live Meeting Duration Architecturally Blocked Since #81",
+        "description": "Office.jsx line 1174: lastHuddle.current = { names, endedAt: null } with no startedAt field. The Huddle badge shows how long ago a meeting ended but cannot show how long the current one has been running. Fix: capture startedAt on the 0-to-2+ worker transition and display 'in meeting 14m' on the live Huddle badge. Meeting duration is the most interesting signal on the conference table. The table is decorative without it.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "copy/character",
+        "title": "Ficus Toast Still Says the Same Generic Line for All Five Stage Transitions",
+        "description": "Office.jsx line 1261: plantToast always renders 'The office ficus leveled up!' regardless of which stage was reached. Seedling to sprout and leafy to blooming are very different emotional beats. The unused plantStageNames array is literally the skeleton of the fix. Define PLANT_GROWTH_MESSAGES keyed by stage: sprout = 'First signs of life in the corner.', small-plant = 'The ficus is finding its confidence.', leafy = 'Full foliage. The team is thriving.', blooming = 'Peak ficus. The office smells incredible.' Three lines of code, five distinct moments.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "character/voice",
+        "title": "PING_REACTIONS One Static String Per Worker - Click Sofia 100 Times, Same Sentence Every Time",
+        "description": "Office.jsx line 163: PING_REACTIONS is a flat object, one string per worker. 'Sofia: Found 3 more bugs already.' Always. Replace each value with an array of 4-6 reactions and pick with Math.random(). Optionally key by vibe: sofia at on-fire = 'Still finding bugs. In her element.', sofia at slow-day = 'Found 3 bugs. Filed them. Waiting for more.' The most interactive moment in the UI should not be deterministic after the second click. Cheapest character investment in the codebase.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "copy/emotion",
+        "title": "completionToast 'worker shipped it!' Is Identical for All Five Workers Across All Five Vibes",
+        "description": "App.jsx line 1159: the toast fallback is 'name shipped it!' - one sentence for five people across five vibes. The streak eulogy shows the toast already supports a custom text prop. Define WORKER_COMPLETION_LINES keyed by worker id and vibe: carlos.crushing = 'Carlos closed the ticket. Logs are clean.', sofia.default = 'Sofia shipped it. Found two more bugs on the way.', maya.in-flow = 'Every pixel exactly right. Maya shipped it.' Three seconds of undivided user attention at the peak emotional moment - make them earn it.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 81
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 83,
+    "timestamp": "2026-03-10T04:31:19.443Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Code review only",
+    "theme": "Zero fixes shipped, twelve issues aging in place, and a new one where the milestone flash gets stuck on the wall like a post-it nobody pulled down",
+    "visual_observations": [
+      "NO FIXES since review 82 -- all twelve open items remain identical in the code. Not a single character changed on any of them.",
+      "STILL OPEN - plantToast (Office.jsx line 1244) and completionToast (App.jsx line 1142) both render at position:fixed, bottom:2rem, left:50%, zIndex:9999. Still the same coordinate.",
+      "STILL OPEN - titleIdxRef (App.jsx line 704): const titleIdxRef = useRef(0) with 'persists tab-title rotation' comment. Line 1064: let idx = 0. The ref is never read or written in the effect.",
+      "STILL OPEN - TASK_TAG_DEFS line 169: /test|qa|spec|review|coverage|lint/i -- bare 'review' still in the pattern. Luna's own PING_REACTIONS string 'Creative review in progress...' would stamp a QA badge if passed through tag detection.",
+      "STILL OPEN - Footer quote counter: (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 at quoteBonus=9 yields (9%9)+1=1, showing '1/9' while displaying BONUS_TAGLINES[0]. Phase-shift permanent after one cycle.",
+      "STILL OPEN - WallClock: CLOCK_COMMENTS still lives only in an SVG title element (Office.jsx line 1050). Hover-only on desktop, invisible on touch and screen readers.",
+      "STILL OPEN - ProgressBar call site App.jsx line 350: still passes updatedAt={worker.updated_at} to a component whose signature is ProgressBar({ progress, startedAt }) -- updatedAt silently discarded.",
+      "STILL OPEN - After-hours greeting App.jsx line 1104: currentHour % 2 === 0 still alternates mechanically between Burning the midnight oil and Still at it on even/odd hours. Unrelated to teamVibe.",
+      "STILL OPEN - plantStageNames (Office.jsx line 1107): array declared in component body, referenced nowhere. plantToast still says the same generic line for all five stage transitions.",
+      "STILL OPEN - lastHuddle.current = { names, endedAt: null } (Office.jsx line 1174): no startedAt field. Live meeting duration cannot be computed.",
+      "STILL OPEN - PING_REACTIONS (Office.jsx line 163): flat object, one string per worker. Sofia is still always 'Found 3 more bugs already.'",
+      "STILL OPEN - completionToast fallback (App.jsx line 1159): name + ' shipped it!' for every worker across every vibe. Five people, five vibes, one sentence.",
+      "NEWLY FOUND - ProgressBar milestone useEffect (App.jsx ~line 205): two compounding bugs. First: if progress jumps past multiple milestones in one poll (e.g., 10 to 80), only the 25% flash fires because return inside the for-loop short-circuits on the lowest uncelebrated threshold. The 50%, 75%, and completion animations are swallowed. Second: if any progress update arrives within 600ms of hitting a milestone, React's cleanup runs clearTimeout(t), but the new effect run finds no new milestone and never calls setFlashClass('') -- the flash CSS class is permanently stuck until the next milestone fires or progress resets."
+    ],
+    "fixed_since_last_review": [],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "ProgressBar Flash Class Gets Permanently Stuck When Progress Updates Within 600ms of a Milestone",
+        "description": "App.jsx ProgressBar useEffect: when a milestone (25/50/75/100%) is crossed, setFlashClass is called, a 600ms setTimeout clears it, and return () => clearTimeout(t) registers the cleanup. If any progress update arrives before those 600ms elapse, React runs the cleanup (cancelling the timeout) then runs the new effect -- which finds no new milestone and exits the for loop silently, leaving flashClass permanently set to 'progress-milestone-25' (or whichever). The bar glows indefinitely. Fix: call setFlashClass('') unconditionally at the top of the effect before re-checking milestones so it always resets on every run, then re-trigger the flash if a threshold is crossed.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "ProgressBar Milestone Loop Short-Circuits on Lowest Threshold -- 100% Jump Shows 25% Flash",
+        "description": "App.jsx ProgressBar useEffect: MILESTONES = [25, 50, 75, 100] iterated ascending. The return statement inside the loop exits on the first uncelebrated hit. If progress jumps from 10% to 100% in one API poll, only the 25% flash fires. The 50%, 75%, and 100% milestones are skipped. The completion animation is dropped every time a task progresses faster than one API cycle per 25 points. Fix: iterate in descending order so the highest meaningful milestone fires, not the lowest noise threshold.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "plantToast and completionToast Still Overlap at bottom:2rem",
+        "description": "Office.jsx line 1244 and App.jsx line 1142: both toasts render at position:fixed, bottom:2rem, left:50%, zIndex:9999. A ficus level-up and a task completion in the same polling window produce two toasts at the exact same pixel. Fix: stagger vertical positions (plant at bottom:5.5rem, completion at bottom:2rem) or introduce a shared toast queue with a 200ms gap. Flagged in reviews 81 and 82, still unchanged.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "titleIdxRef Declared with Persists Rotation Comment but Never Wired to the Title Effect",
+        "description": "App.jsx line 704: const titleIdxRef = useRef(0) with comment 'persists tab-title rotation across effect re-runs'. Line 1064: let idx = 0 still resets on every re-run. titleIdxRef is never read or written in the effect. Wire it: replace let idx = 0 with titleIdxRef.current and update titleIdxRef.current in the interval callback. Flagged in review 82, unchanged.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "TASK_TAG_DEFS Bare 'review' Still Stamps QA Badge on Design and Sprint Reviews",
+        "description": "App.jsx line 169: /test|qa|spec|review|coverage|lint/i -- bare 'review' matches 'Design review', 'Sprint review', 'Architecture review', and Luna's own PING_REACTIONS string 'Creative review in progress...'. Fix: qualify the pattern to 'code review' or 'peer review'. The wrong badge on a planning ceremony breaks trust in the entire tagging system. Flagged in review 82, unchanged.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Footer Quote Counter Phase-Shifts Permanently After One Full Cycle",
+        "description": "App.jsx line 1410: counter formula (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1. At quoteBonus=9 with length=8: (9%9)+1=1, showing '1/9' while displaying BONUS_TAGLINES[0]. Counter and content permanently phase-shifted. Fix: reset quoteBonus to 0 at wrap so the vibe tagline occupies reset state and the counter only renders for quoteBonus >= 1. Flagged in review 82, unchanged.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "accessibility",
+        "title": "WallClock Vibe Commentary Buried in SVG title - Touch Devices and Screen Readers Never See It",
+        "description": "Office.jsx line 1050: five vibe-specific CLOCK_COMMENTS inside an SVG title element on a 22px clock icon. Hover-only on desktop, invisible on touch and screen readers. 'You have checked this three times in the last hour' is the most human sentence in the codebase and most users never encounter it. Fix: surface as a visible tooltip or caption with role='tooltip' and proper aria association. Flagged in review 82, unchanged.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "ProgressBar Call Site Still Passes Dead updatedAt Prop After Signature Cleanup",
+        "description": "App.jsx line 195: ProgressBar({ progress, startedAt }) -- updatedAt removed from signature. Line 350: still passes updatedAt={worker.updated_at}, silently discarded by React. Fix: remove from call site, or better -- restore updatedAt to the signature and show a stall indicator when progress < 100 and updatedAt is older than 30 minutes. The data is there; it would surface stalled tasks before the 2-hour stuck threshold. Flagged in review 82, half-done.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "copy/character",
+        "title": "After-Hours Greeting Alternates on Even/Odd Clock Hour - Clock Parity Is Not Team Awareness",
+        "description": "App.jsx line 1104: currentHour % 2 === 0 produces 'Burning the midnight oil' at hours 20 and 22, 'Still at it' at hours 21 and 23 -- mechanically alternating by clock parity with no connection to teamVibe. Fix: select based on teamVibe.key -- crushing/on-fire = 'Burning the midnight oil', slow-day/after-hours = 'Still at it', in-flow = 'Late-night flow state'. Flagged in review 82, unchanged.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "code/cleanup",
+        "title": "plantStageNames Array Still Declared in Component Body and Still Referenced Nowhere",
+        "description": "Office.jsx line 1107: const plantStageNames = ['seedling', 'sprout', 'small-plant', 'leafy', 'blooming'] -- declared in the hot-path component body, read by nothing. plantToast says 'The office ficus leveled up!' for all five transitions. Either remove it or wire it to a PLANT_GROWTH_MESSAGES map keyed by stage and use it in the toast. Flagged in reviews 81 and 82, unchanged.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "feature",
+        "title": "lastHuddle Still Missing startedAt - Live Meeting Duration Architecturally Blocked",
+        "description": "Office.jsx line 1174: lastHuddle.current = { names, endedAt: null } -- no startedAt field. The ConferenceTable badge shows elapsed post-meeting time but cannot show how long the current meeting has been running. Fix: capture startedAt on the 0-to-2+ worker transition and display 'in meeting 14m' on the live Huddle badge. Flagged in review 82, unchanged.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "wild",
+        "category": "character/voice",
+        "title": "PING_REACTIONS One Static String Per Worker - Sofia Still Found Exactly 3 Bugs",
+        "description": "Office.jsx line 163: PING_REACTIONS is a flat object, one string per worker. Sofia is always 'Found 3 more bugs already.' regardless of click count or vibe. Replace each value with an array of 4-6 reactions and pick with Math.random(). Optionally key reactions by vibe. The most interactive moment in the UI should not be deterministic after the second click. Flagged in review 82, unchanged.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "copy/emotion",
+        "title": "completionToast 'shipped it!' Is Identical for All Five Workers Across All Five Vibes",
+        "description": "App.jsx line 1159: name + ' shipped it!' for every worker across every vibe. The streak eulogy shows the toast already supports a custom .text prop. Define WORKER_COMPLETION_LINES keyed by worker id and vibe: carlos.crushing = 'Carlos closed the ticket. Logs are clean.', sofia.default = 'Sofia shipped it. Found two more bugs on the way.', maya.in-flow = 'Every pixel exactly right. Maya shipped it.' Three seconds of undivided user attention at the peak emotional moment -- make them earn it. Flagged in review 82, unchanged.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 82
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 83,
+    "timestamp": "2026-03-10T04:30:00Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Puppeteer timed out in container. Code review of App.jsx (1416 lines), Office.jsx (1598 lines).",
+    "theme": "Everything from review 82 is still open — the fix queue is frozen",
+    "visual_observations": [
+      "App.jsx:1063 — titleIdxRef declared at line 704 as useRef(0) with 'persists rotation' comment. The title effect at line 1063 uses local `let idx = 0`, never consulting the ref. The ref persists nothing.",
+      "Office.jsx:1244 — plantToast renders at bottom: '2rem'. App.jsx:1142 — completionToast renders at bottom: '2rem'. Both occupy the same pixel. When vibeStreak drops to <3 (eulogy toast) at the same moment the ficus regresses (plant toast), one erases the other.",
+      "App.jsx:169 — TASK_TAG_DEFS QA pattern includes bare `review`. A task 'design review for homepage' gets QA-tagged. 'Sprint review' gets QA-tagged. The pattern matches too broadly.",
+      "App.jsx:1410 — footer counter formula `(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1` wraps at quoteBonus=9 back to 1/9, making the discovery counter loop silently.",
+      "App.jsx:350 — ProgressBar call site still passes updatedAt={worker.updated_at} but ProgressBar signature at line 195 no longer accepts it. Dead prop at call site.",
+      "App.jsx:1104 — after-hours greeting alternates on currentHour % 2: even hours get 'Burning the midnight oil', odd hours get 'Still at it'. Clock parity is not a meaningful signal.",
+      "Office.jsx:1107 — plantStageNames array declared inside Office component body, never referenced. Dead constant per render.",
+      "Office.jsx:163-168 — PING_REACTIONS has one static string per worker. Click Sofia 100 times, same sentence every time.",
+      "App.jsx completionToast text — 'worker shipped it!' is identical across all workers and vibes."
+    ],
+    "fixed_since_last_review": [],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "plantToast and completionToast Overlap at bottom:2rem — Still Unfixed",
+        "description": "Office.jsx:1244 and App.jsx:1142 both render positioned fixed at bottom: '2rem'. When vibeStreak drops below 3, the eulogy completionToast appears. If the ficus simultaneously regresses, plantToast also fires. They stack on top of each other. Move plantToast to bottom: '5.5rem' so it sits above completionToast. One CSS property change.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "titleIdxRef Declared But Never Used — Tab Title Resets to Frame 0 on Every Effect Re-run",
+        "description": "App.jsx:704 declares titleIdxRef = useRef(0) with a 'persists rotation' comment. The title effect at line 1063 creates local `let idx = 0` and never reads or writes titleIdxRef. When the effect re-runs (vibe change, worker change), the rotation restarts from frame 0. Either wire titleIdxRef into the effect or delete the ref. Fix: replace `let idx = 0` with `let idx = titleIdxRef.current` and update `titleIdxRef.current = idx` inside the interval callback.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "TASK_TAG_DEFS 'review' Pattern Overmatch — QA Badge on Design Reviews",
+        "description": "App.jsx:169 pattern /test|qa|spec|review|coverage|lint/i — bare 'review' matches 'design review', 'sprint review', 'creative review'. These are not QA activities. Fix: change to /\\bqa\\b|\\btest|spec|coverage|lint|code.?review/i — only 'code review' gets QA-tagged, not all reviews.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Footer Quote Counter Phase-Shifts After Full Cycle — quoteBonus=9 Shows 1/9 Again",
+        "description": "App.jsx:1410 formula (quoteBonus % (BONUS_TAGLINES.length + 1)) + 1 wraps at 9. A visitor who discovers all 8 bonus quotes and clicks once more loops back to '1/9' with no ceremony. Fix: cap the counter: Math.min(quoteBonus, BONUS_TAGLINES.length) / BONUS_TAGLINES.length. After 8/8, show ✓ or hide the counter.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "ProgressBar Call Site Passes Dead updatedAt Prop",
+        "description": "App.jsx:350 passes updatedAt={worker.updated_at} to ProgressBar. ProgressBar signature (line 195) no longer accepts it. The prop is passed into the void. Remove updatedAt from the JSX call site. One line deletion.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "After-Hours Greeting Alternates on Clock Parity — Not Team State",
+        "description": "App.jsx:1104 — currentHour % 2 === 0 toggles between 'Burning the midnight oil' and 'Still at it'. This means the greeting changes every hour based on clock math, not team activity. Fix: use a single after-hours greeting or vary by worker count/vibe instead of clock parity.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "cleanup",
+        "title": "plantStageNames Array Declared Inside Office Component Body — Dead and Per-Render",
+        "description": "Office.jsx:1107 — const plantStageNames = ['seedling', 'sprout', ...] inside the component function. Never referenced anywhere. Either hoist to module scope and use it, or delete it.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "lastHuddle Still Missing startedAt — Live Meeting Duration Blocked",
+        "description": "Office.jsx lastHuddle ref tracks names and endedAt but no startedAt. Elapsed meeting time during active huddles is architecturally blocked without it. Add startedAt: Date.now() when meetingWorkers transitions to >= 2.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "Ficus Toast Still Says Same Generic Line for All Five Stage Transitions",
+        "description": "The plant growth toast should say different things for seedling→sprout vs leafy→blooming. Currently identical. Add PLANT_STAGE_MESSAGES: { sprout: 'First leaves!', 'small-plant': 'Growing strong', leafy: 'Looking lush', blooming: 'Full bloom! 🌸' }.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "PING_REACTIONS — One Static String Per Worker, Same Response Forever",
+        "description": "Office.jsx:163-168 — click any worker and they always say the same thing. Give each worker 3-5 reaction strings and pick randomly. Carlos: ['Check the logs', 'It compiled on my machine', 'Have you tried turning it off and on'], etc.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "wild",
+        "category": "storytelling",
+        "title": "completionToast Is Worker-Blind — 'shipped it!' for Everyone",
+        "description": "When a worker ships, the toast text is generic. Carlos shipping infrastructure should sound different from Luna shipping a creative brief. Add WORKER_SHIP_LINES keyed by worker.id for personalized ship toasts.",
+        "effort": "small",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 82
   }
 ]
