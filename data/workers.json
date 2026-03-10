@@ -10,12 +10,12 @@
     },
     {
       "name": "Sofia",
-      "status": "working",
-      "task": "QA review #69 \u2014 live site + codebase analysis",
-      "progress": 0,
+      "status": "idle",
+      "task": "QA review #69 \u2014 2 HIGH, 3 MEDIUM, 3 LOW. Score: 3.0/5",
+      "progress": 100,
       "started_at": "2026-03-10T14:45:00Z",
-      "updated_at": "2026-03-10T14:45:00Z"
+      "updated_at": "2026-03-10T15:15:00Z"
     }
   ],
-  "updated_at": "2026-03-10T14:45:00Z"
+  "updated_at": "2026-03-10T15:15:00Z"
 }
