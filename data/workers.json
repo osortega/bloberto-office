@@ -1,14 +1,13 @@
 {
   "workers": [
     {
-      "id": "carlos",
-      "name": "Carlos",
+      "name": "Luna",
       "status": "working",
-      "task": "Bug fixes \u2014 WallClock drift, sparkleUnseen, React.memo bypass, honorific override",
+      "task": "Creative review #76 — visual audit and idea generation",
       "progress": 0,
-      "started_at": "2026-03-10T02:16:00Z",
-      "updated_at": "2026-03-10T02:16:00Z"
+      "started_at": "2026-03-10T02:30:00Z",
+      "updated_at": "2026-03-10T02:30:00Z"
     }
   ],
-  "updated_at": "2026-03-10T02:20:00Z"
+  "updated_at": "2026-03-10T02:30:00Z"
 }
