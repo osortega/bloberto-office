@@ -1001,8 +1001,13 @@ function WallClock({ vibeKey }) {
   const [time, setTime] = useState(() => new Date())
 
   useEffect(() => {
-    const id = setInterval(() => setTime(new Date()), 60000)
-    return () => clearInterval(id)
+    const msUntilNextMinute = 60000 - (Date.now() % 60000)
+    let id
+    const timeout = setTimeout(() => {
+      setTime(new Date())
+      id = setInterval(() => setTime(new Date()), 60000)
+    }, msUntilNextMinute)
+    return () => { clearTimeout(timeout); clearInterval(id) }
   }, [])
 
   const h = time.getHours()

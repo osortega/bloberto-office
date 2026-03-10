@@ -744,9 +744,6 @@ export default function App() {
     localStorage.setItem('bloberto-theme', theme)
   }, [theme])
 
-  useEffect(() => {
-    if (sparkleUnseen) localStorage.setItem('footer-sparkle-seen', '1')
-  }, [sparkleUnseen])
 
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
@@ -1387,7 +1384,7 @@ export default function App() {
           className="footer-tagline"
           style={{ cursor: 'pointer' }}
           title="tap for another thought"
-          onClick={() => setQuoteBonus(p => p + 1)}
+          onClick={() => { localStorage.setItem('footer-sparkle-seen', '1'); setQuoteBonus(p => p + 1) }}
         ><span className={`footer-sparkle${sparkleUnseen ? ' footer-sparkle--twinkle' : ''}`}>✦</span>&ldquo;{quoteBonus === 0 ? (FOOTER_TAGLINES[teamVibe.key] ?? 'if it compiles, ship it.') : BONUS_TAGLINES[(quoteBonus - 1) % BONUS_TAGLINES.length]}&rdquo;</span><span style={{ opacity: 0.55, fontSize: '0.7em', fontVariantNumeric: 'tabular-nums' }}> {(quoteBonus % (BONUS_TAGLINES.length + 1)) + 1}/{BONUS_TAGLINES.length + 1}</span> &nbsp;&middot;&nbsp;
         <span>{VIBE_VERSIONS[teamVibe.key] ?? 'v1.0.0-chaos'}</span>
       </footer>
