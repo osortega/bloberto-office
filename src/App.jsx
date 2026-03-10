@@ -202,9 +202,8 @@ function ProgressBar({ progress, startedAt }) {
       milestonesRef.current = new Set()
     }
     prevProgressRef.current = progress
-    const MILESTONES = [25, 50, 75, 100]
     const crossed = []
-    for (const m of MILESTONES) {
+    for (const m of PROGRESS_MILESTONES) {
       if (progress >= m && !milestonesRef.current.has(m)) {
         milestonesRef.current.add(m)
         crossed.push(m)
@@ -677,6 +676,10 @@ function ShortcutToast() {
 
 const HONORIFICS = { crushing: 'LEGEND 🔥', 'on-fire': 'captain 🚨', 'in-flow': 'boss', 'slow-day': 'chief... you still there? 😐', 'after-hours': 'night owl 🌙' }
 
+const PROGRESS_MILESTONES = [25, 50, 75, 100]
+
+const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
 export default function App() {
   const [allWorkers, setAllWorkers] = useState([])
   const [roster, setRoster] = useState([])
@@ -779,10 +782,14 @@ export default function App() {
     const currentIdx = TABS.indexOf(tab)
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault()
-      setTab(TABS[(currentIdx + 1) % TABS.length])
+      const next = TABS[(currentIdx + 1) % TABS.length]
+      setTab(next)
+      window.location.hash = next
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       e.preventDefault()
-      setTab(TABS[(currentIdx - 1 + TABS.length) % TABS.length])
+      const prev = TABS[(currentIdx - 1 + TABS.length) % TABS.length]
+      setTab(prev)
+      window.location.hash = prev
     }
   }
 
@@ -1206,10 +1213,9 @@ export default function App() {
             <button
               className="polling-paused-pill"
               title="Auto-refresh paused due to inactivity"
-              aria-live="polite"
               onClick={onResume}
             >
-              ⏸ Paused · {window.matchMedia('(pointer: coarse)').matches ? 'Tap to refresh' : 'Move mouse to refresh'}
+              ⏸ Paused · {isTouchDevice ? 'Tap to refresh' : 'Move mouse to refresh'}
             </button>
           )}
           <button

@@ -643,6 +643,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       if (!isHoveringRef.current) {
         const qs = VIBE_QUOTES[managerVibe] || VIBE_QUOTES['in-flow'];
         setBubble({ quote: qs[Math.floor(Math.random() * qs.length)], show: true });
+        if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => setBubble(b => ({ ...b, show: false })), 4000);
       }
     }, 3000);
@@ -892,8 +893,9 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
     return () => clearInterval(id)
   }, [meetingWorkers.length])
 
-  // How many chairs are visible per vibe
-  const visibleCount = vibe === 'crushing' ? 6 : vibe === 'in-flow' ? 4 : 1
+  // How many chairs are visible per vibe (at least enough for meeting + standup workers)
+  const baseCount = vibe === 'crushing' ? 6 : vibe === 'in-flow' ? 4 : 1
+  const visibleCount = Math.max(baseCount, meetingWorkers.length, standupWorkers.length)
 
   // Chair fill color per vibe
   const chairColor =
