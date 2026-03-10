@@ -1,158 +1,172 @@
 {
   "analyst": "Sofia",
-  "review_number": 72,
-  "timestamp": "2026-03-10T18:50:00Z",
+  "review_number": 73,
+  "timestamp": "2026-03-10T19:15:52Z",
   "scores": {
     "visual": 4,
     "ux": 3,
     "responsiveness": 3,
     "performance": 3,
-    "accessibility": 3,
-    "code_quality": 3,
+    "accessibility": 2,
+    "code_quality": 2,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": "3.5/5",
+  "overall_score": "3.3/5",
   "verified_fixes": [
-    "Standup dual-render (Carlos QA#70 fix) — VERIFIED ✅",
-    "ProgressBar inner setTimeout leak (Carlos QA#70 fix) — VERIFIED ✅",
-    "useTimeTick perf leak (Carlos QA#69 fix) — VERIFIED ✅",
-    "Idle dual-render conference+wander (Carlos QA#69 fix) — VERIFIED ✅"
+    "Hover cards on touch devices — VERIFIED ✅ (handleClick checks window.matchMedia('(hover: none)').matches and toggles pinnedCard state; card shows when hovered || pinnedCard)",
+    "Worker filter buttons overflow on mobile — VERIFIED ✅ (activity-filter-bar now has flex-wrap: wrap + gap: 6px in CSS)",
+    "Timer count reduced — PARTIAL ✅ (103 → 55 total setTimeout/setInterval calls; App.jsx: 23, Office.jsx: 32)"
   ],
   "carry_overs": [
-    "Bloberto hardcoded to never receive ping reactions — STRIKE 2 (Carlos)",
-    "activityLog.filter() called 3× inline per render — STRIKE 2 (Carlos)",
-    "Hover cards inaccessible on touch devices — STRIKE 2 (Maya)",
-    "WORKER_ERROR_BUBBLES temporal dead zone risk — STRIKE 2 (Carlos)",
-    "Footer quote cycling dead-end — STRIKE 2 (Dave)",
-    "Character name labels 0.44rem unreadable on mobile — STRIKE 2 (Maya)",
-    "App.jsx/Office.jsx monolith files — STRIKE 2 (Carlos)",
-    "103 timer instances with complex interdependencies — STRIKE 2 (Carlos)",
-    "completionToast/plantToast inline styles — STRIKE 2 (Maya)",
-    "Worker filter buttons overflow on mobile — STRIKE 2 (Maya)",
-    "Idle micro-bubble Date.now() expression in render — STRIKE 2 (Carlos)"
+    "Bloberto hardcoded to never receive ping reactions — STRIKE 3 (Carlos)",
+    "activityLog.filter() called 4× inline per render — STRIKE 3 (Carlos)",
+    "WORKER_ERROR_BUBBLES temporal dead zone risk — STRIKE 3 (Carlos)",
+    "Footer quote cycling dead-end — STRIKE 3 (Dave)",
+    "Character name labels 0.44rem unreadable on mobile — STRIKE 3 (Maya)",
+    "App.jsx/Office.jsx monolith files (1432/1660 lines) — STRIKE 3 (Carlos)",
+    "completionToast/plantToast inline styles — STRIKE 3 (Maya)",
+    "Idle micro-bubble Date.now() expression in render — STRIKE 3 (Carlos)",
+    "Vibe constants scattered across 3 files — STRIKE 2 (Carlos)",
+    "Dashboard solo worker card layout jump — STRIKE 2 (Maya)",
+    "No deep-linking to specific worker card — STRIKE 2 (Dave)",
+    "Vibe sparkline re-reads localStorage redundantly — STRIKE 2 (Carlos)"
   ],
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Bloberto hardcoded to never receive ping reactions",
-      "description": "pingReaction={null} is hardcoded on the Bloberto character component. The sonar ping animation (char--pinged, sonar-ping keyframe) is fully implemented in CSS but can never trigger on Bloberto because the prop is always null. This breaks the click-to-interact feature for the main character. Fix: wire pingReaction state to Bloberto the same way it's wired to workers.",
+      "title": "Bloberto hardcoded to never receive ping reactions — and now not even clickable",
+      "description": "Office.jsx line 1543: <Character worker={bloberto} ... pingReaction={null} /> — pingReaction is STILL hardcoded null. Worse: there is no onClick prop passed either, so clicking Bloberto does nothing at all. The handleCharClick in Office.jsx checks PING_REACTIONS[worker.id] which has entries for all 5 workers but not 'bloberto'. Fix both: (1) add onClick={handleCharClick} to the Bloberto Character, (2) add PING_REACTIONS.bloberto entries (a set of manager one-liners), (3) remove the hardcoded pingReaction={null} and wire it up the same way as workers.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assigned_to": "Carlos",
+      "carry_over_strike": 3
     },
     {
       "priority": "high",
       "category": "performance",
-      "title": "activityLog.filter() called 3× inline per render — not memoized",
-      "description": "The activity log section runs three separate .filter() passes on the full activityLog array inline in JSX every render. With a growing log (100+ entries), this is wasteful. Extract into a single useMemo that returns { filteredByType, filteredByWorker, combinedFiltered } and only recomputes when activityLog, activeFilter, or workerFilter changes.",
+      "title": "activityLog.filter() called 4× inline per render — still not memoized",
+      "description": "The activity log section runs 4 total filter passes on every render. Lines 1346-1352: activityLog.filter().filter() for the count display. Lines 1403-1412: activityLog.filter().filter() passed to ActivityLog as a prop. None are wrapped in useMemo. With a 50-entry log and 5 workers, this is 200+ comparisons per render cycle triggered by any state change. Extract into: const filteredActivityLog = useMemo(() => activityLog.filter(type).filter(worker), [activityLog, activityFilter, workerFilter]) and use that for both the count span and the ActivityLog entries prop.",
       "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "high",
-      "category": "ux",
-      "title": "Hover cards completely inaccessible on touch devices",
-      "description": "The char-hover-card and desk monitor tooltips rely entirely on :hover CSS which doesn't work on mobile. The CSS has a @media (hover: none) rule for vacant desk cards but not for worker hover cards. Touch users can't see worker details (task, progress, role). Need: onClick toggle for hover cards on touch devices, or use the existing click-to-inspect mechanism to show a persistent card.",
-      "effort": "medium",
-      "assigned_to": "Maya"
+      "assigned_to": "Carlos",
+      "carry_over_strike": 3
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "WORKER_ERROR_BUBBLES temporal dead zone risk",
-      "description": "WORKER_ERROR_BUBBLES is a const array defined around line 543 but referenced earlier in the component. JavaScript hoists const declarations but not their initialization — accessing before the declaration line throws a ReferenceError. Currently works by coincidence (the reference is inside a useEffect that runs after mount), but any refactor that moves it could cause a crash. Move all const arrays to the top of the file or to a constants module.",
+      "title": "WORKER_ERROR_BUBBLES temporal dead zone risk — Office.jsx forward reference",
+      "description": "const Character = memo(function Character({...}) {...}) is defined at Office.jsx line 537. const WORKER_ERROR_BUBBLES = {...} is defined at Office.jsx line 1138 — 600 lines AFTER Character. Character references WORKER_ERROR_BUBBLES inside a useEffect closure at line 595. Works today because closures run post-module-init. Will explode the moment someone moves Character to its own file (which they should — it's 280 lines). Move all const lookup tables (WORKER_ERROR_BUBBLES, WORKER_IDLE_BUBBLES, DEFAULT_IDLE_BUBBLES, ERROR_BUBBLE_MESSAGES, AWAY_MESSAGES, WORKER_AWAY_MESSAGES, PING_REACTIONS) to the top of the file or a dedicated constants module.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assigned_to": "Carlos",
+      "carry_over_strike": 3
     },
     {
       "priority": "high",
       "category": "ux",
-      "title": "Footer quote cycling silently stops at end of array",
-      "description": "The footer tagline cycles through TAGLINES array but when it reaches the end, it stays on the last item forever. No wrap-around, no visual indication. Fix: modulo the index (idx % TAGLINES.length) to cycle infinitely, or add a subtle 'refresh' button.",
+      "title": "Footer quote cycling silently dead-ends — modulo added for display, not for cycling",
+      "description": "App.jsx line 1425: setQuoteBonus(p => p < BONUS_TAGLINES.length ? p + 1 : p). When quoteBonus reaches 8 (BONUS_TAGLINES.length), it stops incrementing. The display uses % correctly so the last item keeps showing, but the counter badge disappears (the check is quoteBonus < BONUS_TAGLINES.length) and clicking does nothing. The user has no idea they've hit the wall. Fix: use modulo for the increment too — setQuoteBonus(p => (p + 1) % (BONUS_TAGLINES.length + 1)) or just remove the guard and let it cycle infinitely with % on display. The 'fix' this cycle added the display modulo but forgot the increment guard.",
       "effort": "small",
-      "assigned_to": "Dave"
+      "assigned_to": "Dave",
+      "carry_over_strike": 3
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Character name labels at 0.44rem unreadable on mobile",
-      "description": "At 480px viewport width, .char__name is set to 0.45rem (about 7px). This is below the minimum readable size for most users. Bump to at least 0.55rem on mobile, or hide names entirely and rely on hover/tap cards.",
+      "title": "Character name labels at 0.44rem still fail WCAG minimum text size",
+      "description": "Office.css line 1101: .char__name { font-size: 0.44rem } at max-width: 600px. Line 1163: font-size: 0.45rem at max-width: 480px. Both are approximately 7px — below WCAG 2.1 SC 1.4.4 minimum. Confirmed visible in mobile screenshot: names like 'Sofia', 'Carlos' are illegible pinhead text. WCAG minimum is 9px. Bump to at minimum 0.6rem (9.6px) at mobile breakpoints, or hide names entirely and rely on the hover/tap card (which now works on touch — good job on that fix, by the way).",
       "effort": "small",
-      "assigned_to": "Maya"
+      "assigned_to": "Maya",
+      "carry_over_strike": 3
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "App.jsx and Office.jsx are monolith files (1432 and 1660 lines)",
-      "description": "Both files exceed 1400 lines with deeply nested JSX. Extract: ActivityLog component, VibeDashboard component, WorkerCard component, ConferenceTable component. This is a refactor debt item — not blocking but making every future change harder.",
+      "title": "App.jsx and Office.jsx are still monolith files (1432 and 1660 lines)",
+      "description": "Nothing changed. Office.jsx grew to 1660 lines (up from ~1400 in review #72). The Character component alone is ~280 lines. Extract: Character → src/components/Character.jsx, WorkerCard → src/components/WorkerCard.jsx, ActivityLog+ActivityLogEntry → src/components/ActivityLog.jsx, StatsBar → src/components/StatsBar.jsx, ConferenceTable → src/components/ConferenceTable.jsx. Each new file adds context isolation that would also catch the TDZ issues during development.",
       "effort": "large",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "103 timer instances with complex interdependencies",
-      "description": "Counted 103 setTimeout/setInterval calls across the codebase. Many have cleanup in useEffect returns, but the interaction between timers (e.g., speech bubble timeout vs poll interval vs animation timers) creates subtle state races. Consider a centralized timer manager or at minimum document the timer dependency graph.",
-      "effort": "large",
-      "assigned_to": "Carlos"
+      "assigned_to": "Carlos",
+      "carry_over_strike": 3
     },
     {
       "priority": "medium",
       "category": "visual",
-      "title": "completionToast and plantToast use inline styles instead of CSS classes",
-      "description": "Toast notifications for worker completion and plant milestones use inline style objects in JSX instead of CSS classes. This makes them un-themeable and inconsistent with the rest of the app's CSS-driven theming. Extract to .completion-toast and .plant-toast CSS classes.",
+      "title": "completionToast and plantToast still use inline style objects",
+      "description": "Office.jsx lines 1307-1331 (plantToast) and App.jsx lines 1157-1181 (completionToast) both use multi-line inline style objects for fixed UI elements. These are rendered conditionally but never change structure — there is no reason they need inline styles. Extract to .plant-toast and .completion-toast CSS classes. The border-color can stay dynamic via CSS custom property (e.g., style={{ '--toast-color': completionToast.color }}). This has been called out twice. The inline styles prevent theming, tooling inspection, and make the JSX harder to read.",
       "effort": "small",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Worker filter buttons overflow on narrow mobile screens",
-      "description": "Activity log filter bar renders a button per worker inline. On 375px with 5+ workers, buttons overflow or wrap awkwardly. Add flex-wrap: wrap with proper gap, or switch to a <select> dropdown on mobile.",
-      "effort": "small",
-      "assigned_to": "Maya"
+      "assigned_to": "Maya",
+      "carry_over_strike": 3
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "Idle micro-bubble Date.now() expression in render is illegible",
-      "description": "Line ~786: complex inline expression using Date.now() with charCode hashing runs on every render. Extract to getIdleBubble(workerId, tick) utility function.",
+      "title": "Idle micro-bubble emoji picker is a one-liner nightmare",
+      "description": "Office.jsx line 786: {(WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor((Date.now() / 12000) + (worker.id ? [...worker.id].reduce((h, c) => h * 31 + c.charCodeAt(0), 0) : 0)) % (WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES).length]} — This runs on every render, allocates a spread array from worker.id string on every call, and is completely unreadable. Extract to: function getIdleBubble(workerId, nowMs) { const pool = WORKER_IDLE_BUBBLES[workerId] || DEFAULT_IDLE_BUBBLES; const seed = [...workerId].reduce((h, c) => h * 31 + c.charCodeAt(0), 0); return pool[Math.floor(nowMs / 12000 + seed) % pool.length]; } — called with worker.id and a tick value.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assigned_to": "Carlos",
+      "carry_over_strike": 3
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "NEW: WORKER_WANDER_TOOLTIPS object literal defined inside .map() callback",
+      "description": "Office.jsx lines 1572-1578: const WORKER_WANDER_TOOLTIPS = { carlos: [...], maya: [...], ... } is defined INSIDE the idleWorkers.map() callback. This entire 5-key object literal (with 3 strings per key = ~15 string allocations) is recreated on every render for every idle worker. If there are 3 idle workers, that's 3 full object allocations per render cycle. Move it to module scope alongside the other lookup tables (AWAY_MESSAGES, etc.).",
+      "effort": "small",
+      "assigned_to": "Carlos",
+      "carry_over_strike": 0
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "title": "NEW: window.matchMedia('(pointer: coarse)') called inline in JSX render",
+      "description": "App.jsx line 1212: the pollingPaused pill button renders {window.matchMedia('(pointer: coarse)').matches ? 'Tap to refresh' : 'Move mouse to refresh'}. This calls window.matchMedia() on every render cycle while polling is paused. While not catastrophic, it's an unnecessary DOM API call in render. Hoist to a module-level constant: const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches or use a useRef computed once on mount.",
+      "effort": "small",
+      "assigned_to": "Carlos",
+      "carry_over_strike": 0
+    },
+    {
+      "priority": "low",
+      "category": "performance",
+      "title": "activeWorkers.filter() called twice inline for the same working count",
+      "description": "App.jsx lines 1279-1280: activeWorkers.filter((w) => w.status === 'working').length appears TWICE in the same JSX block — once for the condition and once for the count display. Both are inline with no memoization. Assign to a variable: const workingCount = activeWorkers.filter(w => w.status === 'working').length (or reuse the value from StatsBar's already-computed counts) and reference it twice.",
+      "effort": "small",
+      "assigned_to": "Carlos",
+      "carry_over_strike": 0
     },
     {
       "priority": "low",
       "category": "code",
       "title": "Vibe constants scattered across 3 files",
-      "description": "VIBE_RANK, VIBE_COLORS, VIBE_HISTORY_KEY in App.jsx; BLOBERTO_TITLES, VIBE_WEATHER_LABELS in Office.jsx; VIBE_WHITEBOARD in constants.js. Consolidate to a single vibe constants file.",
+      "description": "VIBE_RANK, VIBE_COLORS, VIBE_HISTORY_KEY in App.jsx; BLOBERTO_TITLES, VIBE_WEATHER_LABELS, VIBE_WEATHER_ICONS in Office.jsx; VIBE_WHITEBOARD in constants.js. Five separate vibe-related lookup objects across three files. Consolidate to src/utils/vibe.js alongside the existing getTeamVibe/getTeamVibeKey functions. The scattered state makes it impossible to audit all vibe-related content in one place.",
       "effort": "medium",
-      "assigned_to": "Carlos"
+      "assigned_to": "Carlos",
+      "carry_over_strike": 2
     },
     {
       "priority": "low",
       "category": "visual",
       "title": "Dashboard solo worker card layout jump",
-      "description": "When transitioning from 2+ workers to 1, the solo card layout doesn't activate until fading workers complete (400ms delay), causing a visual jump from left-aligned to centered.",
+      "description": "When transitioning from 2+ workers to 1 active worker, the workers-grid--solo layout (centered, spotlight message) does not activate until fading workers finish their 400ms exit animation. During that 400ms, the solo card is left-aligned in the regular grid, then jumps to center. Add a CSS transition on the grid's justify-content or delay the solo layout detection until fadingMap is also empty (which it already checks: Object.keys(fadingMap).length === 0 on line 1286 — verify this condition is truly reactive).",
       "effort": "small",
-      "assigned_to": "Maya"
+      "assigned_to": "Maya",
+      "carry_over_strike": 2
     },
     {
       "priority": "low",
       "category": "feature",
       "title": "No deep-linking to specific worker card",
-      "description": "Tab deep-linking via hash works (#office, #dashboard) but can't link to a specific worker. The focusedWorker mechanism exists — extend it to support ?worker=sofia in URL.",
+      "description": "Tab deep-linking via hash works (#office, #dashboard) but you cannot link to a specific worker. The focusedWorker mechanism is already implemented and works (scrolls to card, adds .worker-card--focused class with 3s timeout). Extend it: on mount, check URL for ?worker=sofia and call setFocusedWorker(workerParam). On handleWorkerClick, optionally append ?worker={id} to the hash URL. This would make sharing a specific worker's status possible.",
       "effort": "medium",
-      "assigned_to": "Dave"
+      "assigned_to": "Dave",
+      "carry_over_strike": 2
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "Vibe sparkline re-reads localStorage redundantly",
-      "description": "On every vibe change, localStorage.getItem + JSON.parse runs even though the data is already in React state (vibeHistory). Use state as source of truth, only write to localStorage.",
+      "title": "Vibe sparkline re-reads localStorage on every vibe change",
+      "description": "App.jsx lines 1073-1080: on every vibe key change, localStorage.getItem(VIBE_HISTORY_KEY) + JSON.parse runs, even though the parsed result is immediately pushed to and stored in vibeHistory state. The state IS the source of truth — use it. Replace the localStorage read with: const history = [...vibeHistory, { key: teamVibe.key, ts: Date.now() }].slice(-VIBE_HISTORY_MAX); setVibeHistory(history); localStorage.setItem(VIBE_HISTORY_KEY, JSON.stringify(history)); No read needed.",
       "effort": "small",
-      "assigned_to": "Carlos"
+      "assigned_to": "Carlos",
+      "carry_over_strike": 2
     }
-  ],
-  "summary": "QA Review #72: No code changes since review #71 — all 16 suggestions carry over to strike 2. Carlos's QA#69-70 fixes (useTimeTick, idle dual-render, standup dual-render, ProgressBar leak) remain verified and solid. The top 5 HIGH items are unchanged: Bloberto ping exclusion, unmemoized activity filters, touch-inaccessible hover cards, TDZ risk, and footer cycling dead-end. All are small-effort fixes that would meaningfully improve the product. The codebase is feature-rich and genuinely fun (fun_factor: 5/5) but accumulating tech debt — the monolith files and timer complexity make every change riskier. Score holds at 3.5/5 until the HIGH carry-overs get addressed."
+  ]
 }

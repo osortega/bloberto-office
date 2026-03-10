@@ -1,0 +1,13 @@
+{
+  "workers": [
+    {
+      "name": "Luna",
+      "status": "idle",
+      "task": "Creative review #84 — timed out, manager conducted review",
+      "progress": 100,
+      "started_at": "2026-03-10T16:30:00Z",
+      "updated_at": "2026-03-10T16:35:00Z"
+    }
+  ],
+  "updated_at": "2026-03-10T16:35:00Z"
+}
