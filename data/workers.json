@@ -3,16 +3,16 @@
     {
       "id": "luna",
       "role": "Creative Director",
-      "status": "idle",
-      "task": "Creative review #107 — evaluating office and writing ideas",
-      "started_at": "2026-03-11T19:33:00Z",
-      "finished_at": "2026-03-11T20:03:00Z"
+      "status": "working",
+      "task": "Creative review #108 \u2014 site evaluation and feature ideation",
+      "started_at": "2026-03-11T21:55:00Z",
+      "finished_at": null
     },
     {
       "id": "carlos",
       "role": "Backend Engineer",
       "status": "idle",
-      "task": "QA #110 fixes — container exited without completing",
+      "task": "QA #110 fixes \u2014 container exited without completing",
       "started_at": "2026-03-11T21:00:00Z",
       "finished_at": "2026-03-11T21:15:00Z"
     },
@@ -20,7 +20,7 @@
       "id": "maya",
       "role": "Frontend Engineer",
       "status": "idle",
-      "task": "QA #110 fixes — container exited without completing",
+      "task": "QA #110 fixes \u2014 container exited without completing",
       "started_at": "2026-03-11T21:00:00Z",
       "finished_at": "2026-03-11T21:15:00Z"
     },
@@ -36,10 +36,10 @@
       "id": "sofia",
       "role": "QA & Product Analyst",
       "status": "working",
-      "task": "QA review #111 — Emergent World sim analysis",
+      "task": "QA review #111 \u2014 Emergent World sim analysis",
       "started_at": "2026-03-11T21:15:00Z",
       "finished_at": null
     }
   ],
-  "updated_at": "2026-03-11T21:15:00Z"
+  "updated_at": "2026-03-11T21:55:00Z"
 }
