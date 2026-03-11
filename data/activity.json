@@ -444,5 +444,11 @@
     "worker": "Carlos",
     "message": "\u2699\ufe0f Shipped 2 must items from Luna #106: Sprint Board word-frequency fallback + Bloberto Error Boundary personality screen",
     "timestamp": "2026-03-11T18:32:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "\ud83d\udd0d QA review #108 complete \u2014 4.0/5 overall, 3 HIGH items (TASK_TAG_DEFS bug, cache-busting perf, a11y gaps), 14 total suggestions",
+    "timestamp": "2026-03-11T19:25:00Z"
   }
 ]

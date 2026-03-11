@@ -18,13 +18,14 @@
       "name": "Sofia",
       "role": "QA & Product Analyst",
       "emoji": "\ud83d\udd0d",
-      "status": "working",
-      "task": "QA review #108 \u2014 live site + codebase analysis",
-      "progress": 15,
-      "updated_at": "2026-03-11T19:15:00Z",
+      "status": "idle",
+      "task": "QA review #108 complete \u2014 4.0/5, 14 suggestions (3 HIGH, 7 MED, 4 LOW)",
+      "progress": 0,
+      "updated_at": "2026-03-11T19:25:00Z",
       "startedAt": "2026-03-11T18:45:00Z",
-      "started_at": "2026-03-11T18:45:00Z"
+      "started_at": "2026-03-11T18:45:00Z",
+      "finished_at": "2026-03-11T19:25:00Z"
     }
   ],
-  "updated_at": "2026-03-11T19:15:00Z"
+  "updated_at": "2026-03-11T19:25:00Z"
 }
