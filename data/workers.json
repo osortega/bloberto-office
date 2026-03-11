@@ -1,48 +1,13 @@
-{
-  "workers": [
-    {
-      "id": "luna",
-      "role": "Creative Director",
-      "status": "working",
-      "task": "Creative review #104 \u2014 analyzing office & drafting ideas",
-      "started_at": "2026-03-11T16:00:00Z",
-      "finished_at": null,
-      "updated_at": "2026-03-11T12:35:00Z"
-    },
-    {
-      "id": "carlos",
-      "role": "Backend Engineer",
-      "status": "working",
-      "task": "Luna #103 \u2014 Sprint Tag Counter Board",
-      "started_at": "2026-03-11T15:00:00Z",
-      "finished_at": null
-    },
-    {
-      "id": "maya",
-      "role": "Frontend Engineer",
-      "status": "idle",
-      "task": "Fixed 3 QA #103 items: mobile dismiss, bubble overflow, copy button touch",
-      "started_at": "2026-03-11T15:46:00Z",
-      "finished_at": "2026-03-11T15:48:00Z",
-      "updated_at": "2026-03-11T15:48:00Z"
-    },
-    {
-      "id": "dave",
-      "role": "DevOps Engineer",
-      "status": "idle",
-      "task": null,
-      "started_at": "2026-03-11T04:30:00Z",
-      "finished_at": "2026-03-11T04:35:00Z"
-    },
-    {
-      "id": "sofia",
-      "role": "QA & Product Analyst",
-      "status": "working",
-      "task": "QA review #104 \u2014 30-min site analysis & code review",
-      "started_at": "2026-03-11T16:15:00Z",
-      "finished_at": null,
-      "updated_at": "2026-03-11T16:15:00Z"
-    }
-  ],
-  "updated_at": "2026-03-11T16:15:00Z"
-}
+[
+  {
+    "id": "luna",
+    "name": "Luna",
+    "role": "Creative Director",
+    "emoji": "🌙",
+    "status": "working",
+    "task": "🎨 Creative review #105",
+    "progress": 0,
+    "updated_at": "2026-03-11T17:10:00Z",
+    "startedAt": "2026-03-11T17:10:00Z"
+  }
+]
