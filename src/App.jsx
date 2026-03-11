@@ -36,6 +36,10 @@ const CONFETTI_PIECES = Array.from({ length: 30 }, (_, i) => (
   <span key={i} className="confetti-piece" style={{ '--i': i }} />
 ))
 
+const WORKER_CONFETTI_PIECES = Array.from({ length: 30 }, (_, i) => (
+  <span key={i} className="confetti-piece" style={{ '--i': i }} />
+))
+
 const STAT_DISPATCHES = {
   active: { 0: 'ghost town', 1: 'lone wolf', 2: 'dynamic duo', 3: 'skeleton crew', 4: 'full squad', 5: 'all hands' },
   error:  { 0: 'smooth sailing', 1: 'minor turbulence', 2: 'code red', 3: 'everything is fine 🔥' },
@@ -309,7 +313,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
     }
   }, [isFocused])
 
-  const workerHistory = activityEntries.filter(e => e.worker === worker.name).slice(-5).reverse()
+  const workerHistory = activityEntries.slice(-5).reverse()
 
   return (
     <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={-1} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`} data-worker-name={worker.name}>
@@ -1169,13 +1173,7 @@ export default function App() {
       )}
       {workerConfetti && (
         <div className="confetti-layer" aria-hidden="true">
-          {Array.from({ length: 30 }, (_, i) => (
-            <span
-              key={i}
-              className="confetti-piece"
-              style={{ '--i': i, ...(i < 18 ? { background: workerConfetti.color } : {}) }}
-            />
-          ))}
+          {WORKER_CONFETTI_PIECES}
         </div>
       )}
       {completionToast && (

@@ -871,7 +871,7 @@ function WindowElement({ vibe }) {
   }
 
   const isNight = (hour >= 0 && hour <= 4) || hour >= 20
-  const isMidnight = isNight
+  const isMidnight = hour >= 0 && hour <= 4
   const isDaytime = hour >= 9 && hour <= 16
   const isGoldenHour = hour >= 17 && hour <= 19
   const timeLabel = hour < 5 ? 'midnight' : hour <= 8 ? 'sunrise' : hour <= 16 ? 'daylight' : hour <= 19 ? 'golden hour' : 'night'
@@ -1018,7 +1018,6 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
           {meetingWorkers.map((w, i) => {
             const angle = CHAIR_ANGLES[i];
             const rad = (angle * Math.PI) / 180;
-            const cx = 52, cy = 52, orbitR = 38;
             const x = cx + orbitR * Math.sin(rad);
             const y = cy - orbitR * Math.cos(rad);
             return (
@@ -1036,7 +1035,6 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
           {standupWorkers.map((w, i) => {
             const angle = CHAIR_ANGLES[i];
             const rad = (angle * Math.PI) / 180;
-            const cx = 52, cy = 52, orbitR = 38;
             const x = cx + orbitR * Math.sin(rad);
             const y = cy - orbitR * Math.cos(rad);
             return (
@@ -1585,7 +1583,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                 pingReaction={pingedId === occ.worker.id && pingReaction ? pingReaction : null}
               />
               {isLoneSurvivor && !occ.ghost && (
-                <div className='lone-survivor-label' style={{ fontSize: '0.45rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>{LONE_SURVIVOR_WORKER_OVERRIDES[occ.worker.id]?.[vibe] ?? LONE_SURVIVOR_LABELS[vibe] ?? '🎯 solo run'}</div>
+                <div className='lone-survivor-label' style={{ fontSize: '0.6rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>{LONE_SURVIVOR_WORKER_OVERRIDES[occ.worker.id]?.[vibe] ?? LONE_SURVIVOR_LABELS[vibe] ?? '🎯 solo run'}</div>
               )}
             </div>
           )
