@@ -5213,5 +5213,329 @@
     ],
     "hire_proposals": [],
     "_previous_review": 87
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 89,
+    "timestamp": "2026-03-11T00:01:03Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Code review only — container environment",
+    "theme": "The desk still glows even after the team left for the conference room.",
+    "visual_observations": [
+      "WallClock aria-label now includes CLOCK_COMMENTS — FIXED and atmospheric.",
+      "WORKER_COMPLETION_LINES map at App.jsx:352-358 is live — per-worker toast text works. FIXED.",
+      "coffeeWorkers at Office.jsx:1225 filters meetingWorkerIds — no worker in two rooms. FIXED.",
+      "workerHistory in WorkerCard is now simply [...activityEntries].reverse() — dead filter gone. FIXED.",
+      "WorkerCard outer div onKeyDown removed. FIXED. But tabIndex={0} remains with no keyboard action — orphaned focus stop.",
+      "Standup workers: Character render loop suppresses them at desk (Office.jsx:1574). Desk div loop does NOT — desk--active, lamp glow, and desk-keystrokes animate for workers who are at the conference table.",
+      "Meeting workers (idleWorkers in deskOccupants with idle:true) show WORKER_AWAY_DESK_LABELS: Maya in a meeting reads '\\u21aa sketching', Carlos reads '\\u21aa in the logs'. No meeting context.",
+      "quoteBonus onClick now wraps: p >= BONUS_TAGLINES.length ? 1 : p + 1. Counter guard still hides at 8. Finding all 8 is still a non-event — now loops invisibly instead of freezing.",
+      "Clicking Bloberto (Office.jsx:1556) calls onWorkerClick — App.jsx handleWorkerClick sets focusedWorker='bloberto', switches tab, starts 3s timer. No WorkerCard for Bloberto exists. Timer clears with no visual result.",
+      "Lone-survivor-label still at fontSize 0.45rem (Office.jsx:1588). Item from reviews 87 and 88 remains open."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "Coffee Corner Workers Shown At Two Places At Once",
+        "was_flagged_in": [
+          88
+        ],
+        "how_fixed": "Office.jsx:1225 — coffeeWorkers is now idleWorkers.filter(w => !meetingWorkerIds.has(w.id)). Meeting workers excluded from coffee-corner--chatting badge."
+      },
+      {
+        "title": "WorkerCard role=article Silently Eats Keyboard Enter/Space",
+        "was_flagged_in": [
+          88
+        ],
+        "how_fixed": "App.jsx:315 — onKeyDown flip handler removed from the outer article div. Info button is the sole keyboard flip path."
+      },
+      {
+        "title": "completionToast Still Says shipped it! for Every Worker",
+        "was_flagged_in": [
+          88
+        ],
+        "how_fixed": "App.jsx:352-358 — WORKER_COMPLETION_LINES map added and consumed at App.jsx:1026. Per-worker toast copy is live."
+      },
+      {
+        "title": "WallClock CLOCK_COMMENTS Trapped in SVG title Only",
+        "was_flagged_in": [
+          88
+        ],
+        "how_fixed": "Office.jsx:1108 — aria-label now includes the comment string. Touch ATs and screen readers receive the atmospheric line."
+      },
+      {
+        "title": "WorkerCard Activity History Double-Filters Already-Filtered Entries",
+        "was_flagged_in": [
+          88
+        ],
+        "how_fixed": "App.jsx:307 — const workerHistory = [...activityEntries].reverse(). Dead .filter() and .slice(-3) removed."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "Standup Desk Glows and Animates for Workers Who Are at the Conference Table",
+        "description": "Office.jsx has two separate DESKS.map loops — one renders desk divs (line 1440+), one renders Character components (line 1570+). The Character loop correctly suppresses standup workers at line 1574: if (standupWorkers.includes(occ.worker)) return null. The desk div loop has no matching guard. standupWorkers are workingWorkers (status==='working'), so isWorking=true for their desk entries. Result: desk--active class fires, the role-colored lamp glows, and the 'tap / clack / click' keystrokes animation runs for desks whose Characters are physically at the conference table. Fix: in the desk div loop, check if the occupant is a standup worker and apply a new desk--standup class (or reuse desk--vacant styling) that extinguishes the lamp and stops the keystrokes. One line: const isStandup = occ && standupWorkers.includes(occ.worker). WHY: a glowing empty desk during standup is a ghost story, not a standup. The office spatial model breaks.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "accessibility",
+        "title": "WorkerCard Outer Div Is a tabIndex={0} Orphan With No Keyboard Action",
+        "description": "App.jsx:315 — after review 88 removed the onKeyDown flip handler from the outer article div, the div retains tabIndex={0}. Keyboard users pressing Tab land on this element, hear it announced as an article, then pressing any key does nothing useful. The info button inside at line 325 is separately keyboard-focusable and correctly flips the card. An element in the natural tab order with no action violates WCAG 2.4.3. Fix: change tabIndex={0} to tabIndex={-1}. The isFocused scrollIntoView at line 295 uses cardRef.current.scrollIntoView directly and does not depend on the element being in the natural tab order — it works equally well with tabIndex={-1}. WHY: this defect was introduced by the correct fix in review 88. The outer div needs to be focusable for programmatic scroll, but it should not absorb a tab stop it cannot use.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Clicking Bloberto Ghost-Navigates to Dashboard and Wastes a 3-Second Focus Timer",
+        "description": "Office.jsx:1556 passes onClick={handleCharClick} to Bloberto's Character with no guard. handleCharClick calls onWorkerClick(worker) for all workers including Bloberto. App.jsx handleWorkerClick (line 803) sets focusedWorker='bloberto', switches the tab to dashboard, and starts a 3-second cleanup timer. But Bloberto is sourced from DEFAULT_BLOBERTO — he is not in allWorkers, not in activeWorkers, and no WorkerCard in the grid has id='bloberto'. The focusedWorker state resolves against every WorkerCard's isFocused prop and matches nothing. After 3 seconds the state silently resets. Net result: clicking Bloberto causes a jarring tab switch to the dashboard with no visible focus destination. Fix: add a guard in handleCharClick or in App.jsx handleWorkerClick — skip the navigate+focus flow when worker.id === 'bloberto'. Bloberto already has full ping-reaction speech bubbles. He has his own interaction model and does not need the card-focus path. WHY: every click must produce a visible result.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "delight",
+        "title": "quoteBonus Now Loops Silently — The Discovery Game Lost Its Ending Without Gaining a Reset",
+        "description": "Review 88 flagged that quoteBonus stopped at 8 with no ceremony. The fix at App.jsx:1448 wraps instead: p >= BONUS_TAGLINES.length ? 1 : p + 1. The behavior is now different but equally unsatisfying: finding all 8 taglines causes the counter to disappear for one render (quoteBonus === 8, guard hides it), then the next click resets to 1 with no announcement. The user who found all 8 gets neither an ending celebration nor any signal that the cycle restarted. The fix trades a frozen silence for an invisible loop. What is needed: when p === BONUS_TAGLINES.length - 1 transitions to BONUS_TAGLINES.length, fire a toast: 'All 8 taglines found. The canon is yours.' Then either stay at 8 permanently with a golden ✦ mark, or wrap with a 'Starting over...' toast so the restart is visible. The BONUS_TAGLINES system is charming. It has always had a landing problem. This iteration changed the symptom without treating the cause. WHY: the payoff moment defines whether a hidden mechanic feels like a discovery or a glitch.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "Meeting Workers Show Personal Away Labels Instead of 'In Meeting' at Their Desk",
+        "description": "When meetingWorkers.length >= 2, those workers appear at the conference table. But in deskOccupants, ALL idleWorkers (including meetingWorkers) are assigned idle:true. The desk nameplate renders WORKER_AWAY_DESK_LABELS[worker.id]: Carlos shows '\\u21aa in the logs', Maya shows '\\u21aa sketching'. These labels describe solo exploration — not a meeting. Fix: add a meetingWorkerIds check in the desk nameplate render. If meetingWorkerIds.has(occ.worker.id), show a per-worker meeting label. A new WORKER_MEETING_DESK_LABELS map makes it personal: carlos: '\\u21aa arguing requirements', maya: '\\u21aa critiquing the deck', dave: '\\u21aa on mute probably', sofia: '\\u21aa taking notes', luna: '\\u21aa running the agenda'. WHY: review 88 fixed the double-presence bug. This follow-on closes the storytelling gap. The desk should reflect where the person actually went.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "delight",
+        "title": "Bloberto Never Acknowledges When Workers Ship — The Manager Is Always Ambient, Never Personal",
+        "description": "When a worker transitions working→idle (task shipped), App.jsx fires confetti, a per-worker completion toast, and workerConfetti. Bloberto's speech bubble runs VIBE_QUOTES on an ambient 45-second interval. These two systems never connect — the manager never reacts to a worker shipping. The plumbing is close: App.jsx knows justShipped (line 1004). A new prop shippedWorkerId passed to Office would let Bloberto fire a worker-specific bubble on completion. Add a BLOBERTO_COMPLETION_REACTIONS map: { carlos: 'Backend locked. Clean.', sofia: 'Zero defects. As expected.', maya: 'The pixels have landed.', dave: 'Pipeline green.', luna: 'Beautiful work.' }. In Office, when shippedWorkerId changes, inject the matching line into Bloberto's bubble for 3s. Zero new infrastructure — two existing systems connected by one prop. WHY: a manager who notices when people ship is a better manager. The character already has the infrastructure.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Activity Log Filter Predicate Is Written Twice — Count Label and Visible Log Will Drift",
+        "description": "App.jsx has the filter predicate for the activity log written in two separate places in the same render: once for the count label at line 1355 and again for the ActivityLog component at lines 1424-1432. Both test identical activityFilter and workerFilter conditions. They agree now, but adding a new filter type to one block and missing the other causes the count label and visible entries to silently diverge. Fix: hoist to a useMemo — const filteredActivity = useMemo(() => activityLog.filter(...), [activityLog, activityFilter, workerFilter]). Pass filteredActivity to ActivityLog and derive the count from filteredActivity.length. Single source of truth. WHY: duplicated predicate logic is a maintenance trap — future filter additions will require changes in two places with no compile-time reminder.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "wild",
+        "category": "feature",
+        "title": "The Ficus Shadow Should Grow With the Streak — Visual Proof the Plant Has History",
+        "description": "The ficus grows through 5 stages (Office.jsx:1640) driven by vibeStreak. The stages change the CSS class and the plant morphs visually. But the environment around the ficus is completely static — the wall, the floor, the ambient light are identical at seedling and blooming. Proposal: add a CSS custom property --ficus-glow that scales with vibeStreak using the existing data-streak-tier pattern from the header badge (legendary/hot/steady tiers already exist). At streak 1: no shadow. At streak 5: warm amber drop-shadow bleeds onto the desk beside it. At streak 10+: a deep golden glow radiates outward onto the floor and adjacent wall, making the corner visibly warm. When the streak breaks and plantStage enters 'grief', the glow inverts to a cold desaturated blue for the 3.5s toast duration before fading. No new DOM nodes required — one CSS property, one data attribute, one @keyframes for the grief pulse. WHY: the ficus is the team's memory made visible. Its shadow should prove it has been standing in that corner for a long time. The streak badge already tells you the number. The ficus should show you what that number feels like.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 88
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 89,
+    "timestamp": "2026-03-11T00:00:00Z",
+    "theme": "Five spatial bugs fixed, two identity bugs introduced — the lone survivor is not alone",
+    "visual_observations": [
+      "Coffee corner spatial overlap is GONE — coffeeWorkers is properly filtered by meetingWorkerIds. Maya and Sofia can no longer be at the conference table and in the coffee chat badge at the same time.",
+      "completionToast now has personality — WORKER_COMPLETION_LINES landed. 'Luna made it beautiful' fires on shipping. The payoff moment finally knows who shipped.",
+      "WallClock now speaks to ATs — aria-label at Office.jsx:1129 includes the CLOCK_COMMENTS string. 'Time has no meaning during an incident' is no longer trapped in an SVG title.",
+      "WorkerCard silent keyboard flip removed — onKeyDown on the article wrapper is gone. Info button at App.jsx:327 carries aria-label='View activity history for ${worker.name}'. The card is no longer a mystery box for keyboard users.",
+      "isLoneSurvivor fires when error workers are present on screen — Office.jsx:1231 checks `idleWorkers.length === 0` but error workers are not in idleWorkers. Carlos working + Sofia in error = Carlos gets the lone survivor label while Sofia's panic screen flickers next to him.",
+      "SOLO_SPOTLIGHT renders for error-status workers — App.jsx:1322 shows the spotlight when activeWorkers.length === 1 and activeWorkers includes error workers. 'One backend between the servers and chaos' for a worker actively on fire is not the intended read.",
+      "wb-task-count label at Office.jsx:1396 uses fontSize: '0.4rem' (6.4px) — smaller than the lone survivor label nobody reads. The task count and 'active · total' copy is sub-pixel on most screens.",
+      "Quote bonus now wraps silently to 1/8 instead of stopping at 8 — App.jsx:1448 changed from staying at 8 to resetting: `p >= BONUS_TAGLINES.length ? 1 : p + 1`. The 8th tagline appears briefly with no counter (condition `quoteBonus < BONUS_TAGLINES.length` is false at 8), then silently resets. The discovery still has no landing."
+    ],
+    "fixed_since_last_review": [
+      "Coffee corner shows workers already at conference table — FIXED. coffeeWorkers (Office.jsx:1225) is computed from idleWorkers filtered by meetingWorkerIds Set. The coffee-corner--chatting class and chat badge now use coffeeWorkers exclusively.",
+      "WorkerCard activity history double-filters — FIXED. App.jsx:313 is now `const workerHistory = [...activityEntries].reverse()`. The redundant .filter() and .slice(-3) that duplicated upstream work are gone.",
+      "completionToast says 'shipped it!' for every worker — FIXED. WORKER_COMPLETION_LINES map at App.jsx:274 covers all five workers. App.jsx:1037 resolves per-worker text before falling back.",
+      "WallClock CLOCK_COMMENTS trapped in SVG title — FIXED. Office.jsx:1129 aria-label now appends the vibe-keyed clock comment. Touch ATs and mobile screen readers can read it.",
+      "WorkerCard role='article' silently eats keyboard Enter/Space — FIXED. onKeyDown flip handler removed from the article wrapper. Info button has aria-label='View activity history for {name}'."
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "isLoneSurvivor Fires When Error Workers Are Visible on Screen",
+        "description": "Office.jsx:1231 — `const isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0`. Error workers are not in idleWorkers (idleWorkers filters for status='idle' only). When Carlos is working and Sofia is in error, `workingWorkers.length === 1` is true, `idleWorkers.length === 0` is true, and Carlos gets the lone survivor label — while Sofia's panic screen glows red one desk over. The label fires on every desk in DESKS.map when isLoneSurvivor is true (line 1587), so any working worker claims the lone survivor crown even with error colleagues present. Fix: add an error guard — `const isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0 && nonMgr.filter(w => w.status === 'error').length === 0`. WHY: the narrative of the lone survivor label is 'the last one standing, holding the line alone'. That story collapses the moment an error worker is visible on the same screen.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "SOLO_SPOTLIGHT Renders for Error-Status Workers",
+        "description": "App.jsx:1322 — the solo spotlight layout fires when `activeWorkers.length === 1` and `Object.keys(fadingMap).length === 0`. activeWorkers includes error-status workers (App.jsx:950: `w.status === 'working' || w.status === 'idle' || w.status === 'error'`). When Sofia is the only active worker and her status is 'error', getSoloSpotlightMsg (App.jsx:290) returns lines like 'Holding quality with both hands and no backup.' — for a worker whose screen is flashing PANIC. The tone is entirely wrong and reads as a bug to any user who sees it. Fix: change the solo spotlight condition to `activeWorkers.length === 1 && activeWorkers[0].status !== 'error'`. When the sole worker is in error, fall through to the normal grid (or show an error-specific solo message). WHY: the solo spotlight is one of the most visually prominent states in the dashboard. Showing it for an erroring worker communicates the opposite of what it should.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Wandering Workers Filter Uses .includes() Object Reference Instead of meetingWorkerIds Set",
+        "description": "Office.jsx:1595 — `idleWorkers.filter(w => !meetingWorkers.includes(w))` uses Array.prototype.includes with object reference equality. meetingWorkers is `idleWorkers.slice(0, Math.min(...))` (line 1223), so the references do match and this works correctly today. But it is fragile: if idleWorkers is ever reconstructed (e.g. shallow-cloned in a future refactor, or the filter chain changes), .includes() will silently fail to exclude meeting workers and they will wander the floor while simultaneously seated at the conference table — exactly the bug that was just fixed for the coffee corner. coffeeWorkers (line 1225) already solves this correctly with the meetingWorkerIds Set. Fix: replace line 1595 with `coffeeWorkers.map(...)` since wandering workers are the same set as coffee corner workers (idle, non-meeting). This also removes a redundant O(n²) filter. WHY: the coffee corner fix introduced meetingWorkerIds precisely to solve this class of bug. The wandering workers section was not updated to use it.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "delight",
+        "title": "Quote Bonus Wraps Silently to 1/8 — The Discovery Still Has No Landing",
+        "description": "App.jsx:1448 — `setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1)`. Since #88, the guard changed from holding at 8 to resetting to 1. The result: at quoteBonus=7 the counter reads '7/8', user clicks, quoteBonus=8, counter disappears (condition `quoteBonus < BONUS_TAGLINES.length` is false), user clicks again, quoteBonus=1, counter shows '1/8'. The complete collection resets with zero acknowledgment and the user may not even realize all 8 were found. Fix: add a `localStorage.getItem('bloberto-all-taglines-found')` guard. On first completion (p === BONUS_TAGLINES.length - 1), fire setCompletionToast({ text: '✦ All 8 taglines found. The canon is yours now.', type: 'info' }) and set the localStorage key. Replace the counter span with a permanent golden ✦ mark once the key is set. WHY: the game ending is the most important moment. It should land exactly once, with ceremony.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "wb-task-count Label Is 0.4rem — Smaller Than the Label Nobody Already Reads",
+        "description": "Office.jsx:1396 — `<span className='wb-task-count' style={{ fontSize: '0.4rem', ... }}>`. At 0.4rem (~6.4px) this is smaller than the lone survivor label at 0.45rem that has been flagged two reviews running. The text reads '{workingWorkers.length} active · {nonMgr.length} total' — live team size information rendered at sub-pixel scale on any display above 96dpi. It exists inside the whiteboard where space is tight, but 0.4rem is below any legibility threshold. Fix: raise to 0.6rem or move the count into the whiteboard's aria-label (which already carries avgProgress) and remove the visible element. If the copy must stay visible, consider placing it as a tooltip on the whiteboard rather than a permanent label at 6px. WHY: two illegible labels in the same component is a pattern, not a coincidence. The minimum readable font size for incidental copy is 10px (0.625rem).",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "workerConfetti Still Allocates 30 New DOM Nodes per Render",
+        "description": "App.jsx:1172 — `Array.from({ length: 30 }, (_, i) => (...))` inline in JSX. During the 2500ms confetti window, any state update (sync tick, polling) creates 30 new span elements from scratch. The vibe confetti at App.jsx:35-37 correctly uses the module-level `CONFETTI_PIECES` constant — the fix pattern already exists in the same file. Fix: create `const WORKER_CONFETTI_PIECES = Array.from({ length: 30 }, (_, i) => <span key={i} className='confetti-piece' style={{ '--i': i }} />)` at module scope. Apply the worker color via a CSS custom property on the confetti-layer div (`style={{ '--worker-color': workerConfetti.color }}`) and target it with `.confetti-layer span:nth-child(-n+18) { background: var(--worker-color); }`. WHY: the fix is a copy-paste of the existing CONFETTI_PIECES pattern. There is no reason worker confetti should allocate while vibe confetti does not.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "plantToast and completionToast Still Uncoordinated — Collision Risk on Mobile",
+        "description": "Office.jsx:1337 — plantToast renders `bottom: '5.5rem', zIndex: 9999`. App.jsx:1186 — completionToast renders `bottom: '2rem', zIndex: 9999`. Both components are in separate trees with no shared state. When a worker ships at the same poll that the ficus levels up, both toasts fire within a 3-second window. On a 667px viewport, 3.5rem separation is approximately 56px — the toasts visually collide and both become hard to read. Both use the same zIndex so neither reliably renders on top. Fix: lift both toasts into a single App-level `toastQueue` array. Pop and display one at a time with a 400ms gap between them. Pass `onShowPlantToast` as a prop to Office (or use a callback ref) so it enqueues rather than displays directly. WHY: the dashboard has invested real craft in toast animation. Two toasts simultaneously at the same stacking context cancels both.",
+        "effort": "medium",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "wild",
+        "category": "feature",
+        "title": "vibeStreak Milestones Should Pulse the Entire Office Floor",
+        "description": "The streak badge in the header escalates from plain number → crown (3) → fire (5) → trophy (10). The office floor reacts to none of it. At streak 3, the ficus is a 'sprout' (Office.jsx:1191) and the badge gets a crown — but the desks, whiteboard, and ambient particles are unchanged. At streak 10, the ficus is 'leafy' and there's a trophy badge — still no spatial acknowledgment from the office. Proposal: on vibeStreak milestone transitions (3, 5, 10), trigger a CSS data attribute `data-streak-milestone` on the office-floor div for 1.5s. CSS can then animate a ring pulse on office-floor::before, briefly intensify the ambient particles (increase count via CSS counter), and flash the whiteboard border. This is pure CSS — no new state beyond the existing vibeStreak prop and a `usePrevious` comparison to detect the threshold crossing. WHY: the streak system has real escalation logic. The office floor is the most spatially expressive element in the dashboard. Connecting them turns a badge update into a felt event.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 88
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 90,
+    "timestamp": "2026-03-11T00:35:46Z",
+    "screenshot_taken": false,
+    "screenshot_note": "Container crashed mid-review — Bloberto conducted code review from the diff",
+    "theme": "Five fixes landed since #89 but the keyboard regression was a fix-that-broke and WORKER_COMPLETION_LINES lost its character voice in a simplification pass",
+    "visual_observations": [
+      "WORKER_COMPLETION_LINES (App.jsx:275-280) simplified from arrays of 3 character-voice strings to single generic sentences: 'Carlos locked in the backend', 'Sofia squashed another bug', etc. The original lines had personality ('logs updated, task closed', 'merged and running', 'clean commit, no drama'). The new ones read like changelog entries.",
+      "WorkerCard (App.jsx:315) removed onKeyDown for Enter/Space (review 89 confirmed). tabIndex={0} remains — keyboard users tab to the card, hear it announced, can't interact. The ℹ️ button at line 328 is the only keyboard flip path now.",
+      "WallClock aria-label (Office.jsx:1129) now includes CLOCK_COMMENTS text. Touch/screen-reader users can access the vibe commentary. The SVG <title> element at line 1133 still exists with the same content — screen readers may announce both.",
+      "coffeeWorkers memo (Office.jsx:1223-1224) correctly filters out meetingWorkerIds. Coffee corner no longer shows workers who are at the conference table.",
+      "workerHistory (App.jsx:312) changed from .filter(e => e.worker === worker.name).slice(-3).reverse() to [...activityEntries].reverse(). This means EVERY worker card's back now shows ALL activity entries, not just that worker's history. The card back title still says the worker's name but the entries are for everyone.",
+      "WorkerCard aria-label at line 315 changed from 'Show activity history' to 'View activity history' on the info button — cosmetic.",
+      "completionToast text (App.jsx:1037-1038) changed: lines is now a string, text = lines ?? (worker.name + ' shipped it!'). The ?? works but the previous random-pick from an array gave variety. Now it's deterministic — same toast every time Carlos ships."
+    ],
+    "fixed_since_last_review": [
+      {
+        "title": "Coffee Corner Workers No Longer Double-Placed at Meeting and Coffee",
+        "was_flagged_in": [
+          88,
+          89
+        ],
+        "how_fixed": "Office.jsx:1223-1224 — coffeeWorkers = idleWorkers.filter(w => !meetingWorkerIds.has(w.id)). Meeting workers excluded from coffee corner."
+      },
+      {
+        "title": "WallClock CLOCK_COMMENTS Now in aria-label for Accessibility",
+        "was_flagged_in": [
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89
+        ],
+        "how_fixed": "Office.jsx:1129 — aria-label includes CLOCK_COMMENTS[vibeKey]. Eight-review accessibility saga resolved."
+      },
+      {
+        "title": "WorkerCard onKeyDown Handler Removed From Outer Article Div",
+        "was_flagged_in": [
+          88
+        ],
+        "how_fixed": "App.jsx:315 — onKeyDown removed. Info button is now the sole keyboard interaction point."
+      }
+    ],
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "bug",
+        "title": "workerHistory Shows ALL Workers' Activity on Every Card Back — Filter Removal Was Too Aggressive",
+        "description": "App.jsx:312 — workerHistory was changed from .filter(e => e.worker === worker.name).slice(-3).reverse() to [...activityEntries].reverse(). The old code filtered to show only the current worker's last 3 activities. Now every card back shows the same global activity list. Click Carlos's ℹ️ button — you see Maya's and Sofia's entries too. The card back header still says the worker's name, creating a lie. Fix: restore the worker filter: const workerHistory = activityEntries.filter(e => e.worker === worker.name).slice(-5).reverse(). Drop the slice(-3) to show a bit more history. WHY: the card back is the one place users go to understand a specific worker's recent output. Making it global defeats the entire purpose of having per-worker cards.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "accessibility",
+        "title": "WorkerCard tabIndex={0} Orphan — Keyboard Focus Stop With No Action",
+        "description": "App.jsx:315 — the outer div retains tabIndex={0} after the onKeyDown handler was removed. Keyboard users Tab to this element, hear 'article, Carlos, Backend Engineer, working', and cannot do anything. The ℹ️ button inside is separately focusable at tabIndex={0}. Fix: change to tabIndex={-1} on the outer div. The programmatic scrollIntoView at line 298 uses cardRef.current.scrollIntoView() directly and works with tabIndex={-1}. WHY: a focusable element with no keyboard action is a WCAG 2.4.3 violation and a frustrating dead-end for keyboard users.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "character",
+        "title": "WORKER_COMPLETION_LINES Lost Character Voice in Simplification — Restore Array Variety",
+        "description": "App.jsx:275-280 — WORKER_COMPLETION_LINES was changed from arrays of 3 character-specific lines to single generic strings. The old versions ('logs updated, task closed', 'merged and running', 'clean commit, no drama' for Carlos) had personality and variety. The new ones ('Carlos locked in the backend') are bland changelog entries that fire identically every time. Fix: restore the array format with 3 lines per worker and pick randomly at App.jsx:1037. The random selection code (Math.floor(Math.random() * lines.length)) was deleted — add it back. WHY: the completion toast fires at peak emotional attention. Deterministic bland copy wastes the moment.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "accessibility",
+        "title": "WallClock SVG Has Both aria-label and <title> With Same Content — Double Announcement Risk",
+        "description": "Office.jsx:1129-1133 — the SVG has role='img' with aria-label='Wall clock showing 2:34 — comment...' AND a <title> element with the same time string plus comment. Screen readers that support both aria-label and SVG title will announce the content twice. Fix: remove the <title> element entirely — aria-label takes precedence for role='img' per the accessible name computation algorithm. The <title> was the original delivery mechanism and is now redundant. WHY: double-announcement is distracting and makes the clock seem broken to screen reader users.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "bug",
+        "title": "Standup Desk Glows and Animates for Workers at Conference Table — Still Open From Review 89",
+        "description": "Office.jsx desk div loop renders desk--active class for standup workers whose Characters are at the conference table. The lamp glows and keystrokes animate at empty desks. Flagged in review 89, still open. Fix: check standupWorkers.includes(occ.worker) in the desk div loop and suppress desk--active styling.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "bug",
+        "title": "Clicking Bloberto Ghost-Navigates to Dashboard — Still Open From Review 89",
+        "description": "Office.jsx:1556 — clicking Bloberto triggers handleWorkerClick which navigates to dashboard and sets focusedWorker='bloberto'. No WorkerCard exists for Bloberto. Focus resolves to nothing. 3-second timer silently resets. Guard needed in handleWorkerClick for worker.id === 'bloberto'.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "quoteBonus Loop Is Silent — Still Open From Review 89",
+        "description": "Finding all 8 bonus taglines is a non-event. Counter hides, quotes loop. A micro-celebration (confetti, toast) would acknowledge the achievement. The infrastructure exists.",
+        "effort": "small",
+        "assigned_to": "luna"
+      }
+    ],
+    "hire_proposals": [],
+    "_previous_review": 89
   }
 ]

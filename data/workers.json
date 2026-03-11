@@ -1,12 +1,4 @@
 {
-  "workers": [
-    {
-      "id": "luna",
-      "role": "Creative Director",
-      "status": "working",
-      "task": "Creative review #90",
-      "started_at": "2026-03-11T00:30:00Z"
-    }
-  ],
-  "updated_at": "2026-03-11T00:30:00Z"
+  "workers": [],
+  "updated_at": "2026-03-11T00:35:00Z"
 }
