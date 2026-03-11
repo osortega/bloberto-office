@@ -424,7 +424,6 @@ function VibeSparkline({ history }) {
   return (
     <>
       <svg width="64" height="14" viewBox="0 0 64 14" className="vibe-sparkline" aria-label={`Vibe history: ${history.map(h => h.key.replace(/-/g, ' ')).join(' then ')}`}>
-        <title>{history.map(h => h.key.replace(/-/g, ' ')).join(' then ')}</title>
         {n > 1 && <polyline points={polyPoints} fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeLinejoin="round" />}
         {pts.map((p, i) => (
           <circle key={i} cx={p.x.toFixed(1)} cy={p.y.toFixed(1)} r="3" fill={VIBE_COLORS[p.entry.key] ?? '#9ca3af'}>
@@ -957,7 +956,7 @@ export default function App() {
   const activityByWorker = useMemo(() => {
     const map = new Map()
     for (const w of [...activeWorkers, ...Object.values(fadingMap ?? {})]) {
-      map.set(w.name, activityLog.filter(e => e.worker === w.name).slice(-3))
+      map.set(w.name, activityLog.filter(e => e.worker === w.name).slice(-5))
     }
     return map
   }, [activityLog, activeWorkers, fadingMap])

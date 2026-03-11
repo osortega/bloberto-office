@@ -1018,9 +1018,9 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
           {meetingWorkers.map((w, i) => {
             const angle = CHAIR_ANGLES[i];
             const rad = (angle * Math.PI) / 180;
-            const cx = 52, orbitR = 38;
+            const cx = 52, cy = 52, orbitR = 38;
             const x = cx + orbitR * Math.sin(rad);
-            const y = cx - orbitR * Math.cos(rad);
+            const y = cy - orbitR * Math.cos(rad);
             return (
               <div key={w.id} className="char--seated" style={{ left: x + 'px', top: y + 'px' }}>
                 <CharacterAvatar workerId={w.id} role={w.role} name={w.name} size={16} emoji={w.emoji} />
@@ -1036,9 +1036,9 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
           {standupWorkers.map((w, i) => {
             const angle = CHAIR_ANGLES[i];
             const rad = (angle * Math.PI) / 180;
-            const cx = 52, orbitR = 38;
+            const cx = 52, cy = 52, orbitR = 38;
             const x = cx + orbitR * Math.sin(rad);
-            const y = cx - orbitR * Math.cos(rad);
+            const y = cy - orbitR * Math.cos(rad);
             return (
               <div key={w.id} className="char--seated" style={{ left: x + 'px', top: y + 'px' }}>
                 <CharacterAvatar workerId={w.id} role={w.role} name={w.name} size={16} emoji={w.emoji} />
@@ -1128,7 +1128,7 @@ function WallClock({ vibeKey }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-label={`Wall clock showing ${displayH}:${displayM} — ${CLOCK_COMMENTS[vibeKey] || CLOCK_COMMENTS['in-flow']}`}
       role="img"
-      style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'auto' }}
+      style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'none' }}
     >
       {/* Clock face */}
       <circle cx="11" cy="11" r="9" fill={faceFill} stroke="var(--border)" strokeWidth="1" />
@@ -1227,7 +1227,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const hasAnyError    = nonMgr.some(w => w.status === 'error')
   const isFullSync     = nonMgr.length > 0 && idleWorkers.length === 0 && workingWorkers.length === nonMgr.length
   const isFullIdle     = nonMgr.length > 0 && workingWorkers.length === 0 && idleWorkers.length === nonMgr.length
-  const isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0
+  const isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0 && nonMgr.filter(w => w.status === 'error').length === 0
 
   const avgProgress = Math.round(
     workingWorkers.reduce((s, w) => s + (w.progress || 0), 0) / Math.max(workingWorkers.length, 1)
@@ -1256,7 +1256,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
       clearTimeout(pingReactionTimerRef.current)
       pingReactionTimerRef.current = setTimeout(() => setPingReaction(null), 3000)
     }
-    if (onWorkerClick) onWorkerClick(worker)
+    if (onWorkerClick && worker.id !== 'bloberto') onWorkerClick(worker)
   }
 
   useEffect(() => {
@@ -1392,7 +1392,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               <span className="wb-progress-label">{workingWorkers.length === 1 ? 'task progress' : 'avg task progress'}</span>
             </>
           )}
-          <span className="wb-task-count" style={{ fontSize: '0.4rem', color: 'inherit', opacity: 0.7, whiteSpace: 'nowrap' }}>
+          <span className="wb-task-count" style={{ fontSize: '0.6rem', color: 'inherit', opacity: 0.7, whiteSpace: 'nowrap' }}>
             {workingWorkers.length} active · {nonMgr.length} total
           </span>
           <div className="wb-history-dots" aria-hidden="true">
@@ -1592,7 +1592,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         })}
 
         {/* Idle workers wandering the lower floor — exclude those already at conference table */}
-        {idleWorkers.filter(w => !meetingWorkers.includes(w)).map((w, i) => {
+        {idleWorkers.filter(w => !meetingWorkerIds.has(w.id)).map((w, i) => {
           const wIdx = (i % 4) + 1
           const workerTooltips = WORKER_WANDER_TOOLTIPS[w.id]
           const workerHash = Math.abs([...w.id].reduce((h, c) => h * 31 + c.charCodeAt(0), 0))
