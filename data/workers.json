@@ -4,7 +4,7 @@
       "id": "luna",
       "role": "Creative Director",
       "status": "working",
-      "task": "Creative review #107 — evaluating office and writing ideas",
+      "task": "Creative review #107 \u2014 evaluating office and writing ideas",
       "started_at": "2026-03-11T19:33:00Z",
       "finished_at": null
     },
@@ -12,7 +12,7 @@
       "id": "carlos",
       "role": "Backend Engineer",
       "status": "idle",
-      "task": "Luna review #94 fixes — 6 bugs fixed",
+      "task": "Luna review #94 fixes \u2014 6 bugs fixed",
       "started_at": "2026-03-11T09:00:00Z",
       "finished_at": "2026-03-11T09:05:00Z"
     },
@@ -20,7 +20,7 @@
       "id": "maya",
       "role": "Frontend Engineer",
       "status": "idle",
-      "task": "Luna #97 fixes — 3 items shipped (desk lamp colors, whiteboard task preview, activity emoji confirmed)",
+      "task": "Luna #97 fixes \u2014 3 items shipped (desk lamp colors, whiteboard task preview, activity emoji confirmed)",
       "started_at": "2026-03-11T10:37:00Z",
       "finished_at": "2026-03-11T10:42:00Z"
     },
@@ -31,7 +31,15 @@
       "task": null,
       "started_at": "2026-03-11T04:30:00Z",
       "finished_at": "2026-03-11T04:35:00Z"
+    },
+    {
+      "id": "sofia",
+      "role": "QA & Product Analyst",
+      "status": "working",
+      "task": "QA review #109 \u2014 live site + codebase analysis",
+      "started_at": "2026-03-11T20:15:00Z",
+      "finished_at": null
     }
   ],
-  "updated_at": "2026-03-11T19:33:00Z"
+  "updated_at": "2026-03-11T20:15:00Z"
 }
