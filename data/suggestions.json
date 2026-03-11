@@ -1,160 +1,128 @@
 {
   "analyst": "Sofia",
-  "reviewNumber": 105,
-  "timestamp": "2026-03-11T16:45:00Z",
+  "review_number": 107,
+  "timestamp": "2026-03-11T18:15:00Z",
   "scores": {
     "visual": 4,
     "ux": 4,
-    "responsiveness": 4,
+    "responsiveness": 3,
     "performance": 3,
     "accessibility": 3,
     "code_quality": 2,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.6,
-  "notes": "Puppeteer failed both attempts (ProtocolError/ECONNRESET) -- visual review conducted via source-code inspection and prior screenshots. No file sizes changed since review #104. Both monoliths are exactly where we left them. Zero fixes shipped this cycle.",
+  "overall_score": 3.5,
+  "screenshot_notes": {
+    "desktop": "Office scene renders cleanly at 1280x800. Thought bubble active ('Wait you shipped at THIS hour?! Legends. 🏆'). All characters present: Luna, Sofia, Carlos, Maya, Dave + Bloberto. Sprint board top-right shows QA×1. Coffee Triple Shot zone visible. Vibe: Crushing It. Wall clock rendering in scene.",
+    "mobile": "375x812 shows compressed but functional office. Thought bubble ('I knew all along this team was special.') slightly overlaps characters. Header row intact. Tab bar visible. Bottom scroll reveals footer. Characters readable but small."
+  },
+  "carry_over_verification": {
+    "thought_bubble_raf_leak": {
+      "strike_prev": 8,
+      "status": "FIXED",
+      "strike_new": 0,
+      "evidence": "Lines 1492-1497: cleanup function now calls cancelAnimationFrame(thoughtRaf1Ref.current) AND cancelAnimationFrame(thoughtRaf2Ref.current), plus clearTimeout on both schedule and hide refs. Double rAF pattern retained but properly cancelled. Fix verified."
+    },
+    "post_huddle_timestamp_freeze": {
+      "strike_prev": 3,
+      "status": "FIXED",
+      "strike_new": 0,
+      "evidence": "Lines 1025-1035: ConferenceTable now has two complementary setTick intervals — one fires every 30s during active huddle (meetingWorkers.length >= 2), one fires every 30s post-huddle (length < 2). This ensures getRelativeTime(h.endedAt) is recalculated every 30s in both states. Fix verified — timestamp will no longer freeze after huddle ends."
+    },
+    "office_jsx_monolith": {
+      "strike_prev": 13,
+      "status": "NOT FIXED — GREW",
+      "strike_new": 14,
+      "evidence": "Office.jsx is now 1953 lines, up from 1944 in review #106. File is actively growing. Still zero component extraction. No components/ directory exists. Only CharacterAvatar and Character are memo-wrapped sub-components; ConferenceTable, WallClock, AwaySign, WindowElement, VibeShockwave all still embedded in the same 1953-line file."
+    },
+    "app_jsx_monolith": {
+      "strike_prev": 1,
+      "status": "NOT FIXED",
+      "strike_new": 2,
+      "evidence": "App.jsx is still exactly 1590 lines. Zero extraction. WorkerCard, StatsBar, ActivityLog, VibeSparkline, DeltaBadge, ProgressBar, LoadingSkeleton, EmptyState, StatusBadge all defined inline. No separate component files created."
+    }
+  },
   "suggestions": [
     {
       "priority": "critical",
-      "category": "code",
-      "title": "Office.jsx monolith at 1944 lines -- STRIKE 13",
-      "description": "1944 lines. Same as review #104. Same as review #103. The file did not move. CharacterAvatar, Character, WindowElement, ConferenceTable, WallClock, VibeShockwave, AwaySign -- all still embedded. The main Office export starts at line 1296 and runs to 1944. Combined with Office.css (2857 lines), the total undivided surface area is 4801 lines. Thirteen reviews. The low-hanging fruit has been documented in detail: extract CharacterAvatar (~250 lines SVG), ConferenceTable (~165 lines), WallClock (~65 lines) into src/components/office/. That is 480+ lines removed with zero behavior change. These three are stateless or nearly so -- CharacterAvatar is pure render, WallClock has one useEffect, ConferenceTable receives all its data as props. One PR. This is not a large refactor. It is three file moves and three import statements.",
+      "category": "code_quality",
+      "title": "Office.jsx monolith now 1953 lines — still growing (STRIKE 14)",
+      "description": "Office.jsx grew by 9 lines since review #106 (1944 → 1953). This has been flagged for 14 consecutive reviews with zero action. Minimum viable extraction: move CharacterAvatar+Character into src/components/Character.jsx (already memo-wrapped, cleanest split), ConferenceTable into src/components/ConferenceTable.jsx, WallClock into src/components/WallClock.jsx. Each is self-contained. This would drop the core file below ~1400 lines immediately.",
       "effort": "medium",
-      "assigned_to": "maya",
-      "strike": 13
+      "strike": 14
     },
     {
       "priority": "critical",
-      "category": "code",
-      "title": "App.jsx is still a second monolith at 1590 lines -- STRIKE 1",
-      "description": "1590 lines. No change from review #104. The file still houses ActivityLogEntry, ActivityLog, getRoleEmoji, getTaskTags, StatusBadge, ProgressBar, formatDuration, getSoloSpotlightMsg, WorkerCard, VibeSparkline, DeltaBadge, StatsBar, EmptyState, LoadingSkeleton, ShortcutToast -- 15 extractable components alongside the main App function. Lowest-effort extraction: ActivityLog.jsx (lines 171-235, ~65 lines), EmptyState.jsx (lines 644-651, 8 lines), LoadingSkeleton.jsx (lines 654-679, 26 lines), VibeSparkline.jsx (lines 497-528, ~32 lines), StatsBar.jsx (lines 539-641, ~103 lines). These five files alone are ~234 lines that need zero logic changes to move. None of them share local state with App. The codebase has two monoliths and the PR queue has had zero structural changes for two consecutive reviews.",
+      "category": "code_quality",
+      "title": "App.jsx monolith at 1590 lines — unchanged (STRIKE 2)",
+      "description": "App.jsx has not changed in size since review #106. Contains 12+ component definitions inline (WorkerCard, StatsBar, ActivityLog, VibeSparkline, DeltaBadge, ProgressBar, LoadingSkeleton, EmptyState, StatusBadge, ActivityLogEntry, ErrorBoundary, TabBar). WorkerCard alone is ~110 lines and is already React.memo-wrapped — trivial to extract. At minimum: extract WorkerCard and ActivityLog into separate files this sprint.",
       "effort": "medium",
-      "assigned_to": "maya",
+      "strike": 2
+    },
+    {
+      "priority": "high",
+      "category": "performance",
+      "title": "ConferenceTable has two redundant setTick useEffects where one would do",
+      "description": "Lines 1026-1035: two useEffect hooks share a single useState tick to force re-renders every 30s. Effect 1 runs when meetingWorkers.length >= 2, Effect 2 when < 2. This is clever but needlessly complex — a single unconditional setInterval would achieve the same result with no branching logic. Also introduces a subtle race: when meetingWorkers.length transitions, both effects re-evaluate in the same render cycle, briefly creating two concurrent intervals before cleanup. Consolidate into one effect with no guard condition.",
+      "effort": "small",
       "strike": 1
     },
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Thought bubble double requestAnimationFrame -- uncancellable -- STRIKE 8",
-      "description": "Lines 1473-1474: requestAnimationFrame(() => { requestAnimationFrame(() => setThoughtBubble(b => ({ ...b, show: true }))) }) -- neither rAF handle is stored. The cleanup cancels thoughtScheduleRef.current and thoughtHideRef.current (both setTimeouts only). If Character unmounts between the two rAF ticks -- which happens when a worker goes offline or the roster changes -- React will attempt a state update on an unmounted component. Eight reviews. The fix is four lines: const r1 = requestAnimationFrame(() => { const r2 = requestAnimationFrame(() => setThoughtBubble(b => ({ ...b, show: true }))); thoughtRaf2Ref.current = r2; }); thoughtRaf1Ref.current = r1; -- then cancel both in the cleanup. Two new refs, four extra lines. This has been the exact same fix for eight reviews.",
+      "category": "performance",
+      "title": "125 @keyframes in Office.css with no will-change declarations on animated elements",
+      "description": "Office.css defines 125 @keyframes (counted) across 2857 lines. None of the animated elements use will-change: transform or contain: layout to hint the GPU compositor. Given ~15+ simultaneously running CSS animations (ambient particles, thought bubble, shockwave, coffee steam, clock frantic-tick, badge-pop, door-swing, etc.), the browser must recalculate layout on each frame without compositor promotion. Add will-change: transform to .ambient-particle, .vibe-shockwave, .thought-bubble, .coffee-steam, .office-wall-clock g elements.",
       "effort": "small",
-      "assigned_to": "carlos",
-      "strike": 8
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "Post-huddle 'Last: [names]' timestamp freezes after meeting ends -- STRIKE 3",
-      "description": "ConferenceTable line 1027: if (meetingWorkers.length < 2) return -- the setTick interval is gated exclusively on meetingWorkers.length >= 2. When a meeting ends and meetingWorkers drops to 0, the effect re-runs, hits the early return, sets up no new interval. The getRelativeTime(h.endedAt) value in the 'Last: Alice, Bob . 3 minutes ago' label then freezes until some external re-render refreshes it. It will show '0 minutes ago' for as long as the component stays mounted with no meeting. Fix: add a second effect with inverse guard: useEffect(() => { if (meetingWorkers.length >= 2) return; const id = setInterval(() => setTick(t => t + 1), 30_000); return () => clearInterval(id); }, [meetingWorkers.length]). Runs only when no active meeting. Two effects, symmetric logic, no shared state.",
-      "effort": "small",
-      "assigned_to": "carlos",
-      "strike": 3
+      "strike": 1
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "2 IIFE patterns remain in JSX render -- STRIKE 3",
-      "description": "Lines 1126 and 1133 of Office.jsx. Line 1126: Huddle{(() => { const startedAt = lastHuddle?.current?.startedAt; ... return <span>...</span> })()} -- computes meeting duration inline in JSX. Line 1133: huddle topic IIFE -- reverses activityEntries, finds a matching entry, returns a JSX div or null. Both create anonymous closures on every render and confuse the React DevTools profiler. Fix: extract both to const variables before the return statement -- const huddleDurationLabel = ... and const huddleTopicEntry = [...]. Pre-computed values, no closures. This is a 5-minute refactor.",
+      "category": "responsiveness",
+      "title": "Thought bubble overlaps character grid on mobile (375px)",
+      "description": "On mobile at 375x812, the Bloberto thought bubble ('I knew all along this team was special.') renders with absolute positioning that causes it to overlap the character row below Bloberto's desk card. The bubble is ~200px wide but the mobile container compresses character spacing. Needs a max-width and repositioning at <= 480px breakpoint, or a translateX clamp to keep it within the office boundary.",
       "effort": "small",
-      "assigned_to": "maya",
-      "strike": 3
+      "strike": 1
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "plantToast has 16 inline style properties -- STRIKE 3",
-      "description": "Office.jsx lines 1523-1543: the ficus milestone toast renders with 16 inline style properties: position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation. The only dynamic value is border color (green vs grief red). Fix: add .plant-toast to Office.css with all 15 static properties. Apply the single dynamic border color via a CSS variable: style={{ '--plant-toast-border': plantToast === 'grief' ? '#ef4444' : '#22c55e' }} -- one property, not sixteen. This approach is already used in the codebase for role colors and progress values.",
+      "category": "accessibility",
+      "title": "Interactive Character elements missing explicit role='button' declaration",
+      "description": "Character components (memo-wrapped at line 653) receive tabIndex=0 and onKeyDown handlers (Enter/Space) when onClick is provided, making them keyboard-accessible. However, the root div has no role='button' attribute — screen readers cannot identify these as interactive without it. The aria-label is present but without role='button', the interactive affordance is invisible to AT. Add role='button' conditionally when onClick is defined.",
       "effort": "small",
-      "assigned_to": "maya",
-      "strike": 3
+      "strike": 1
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "completionToast in App.jsx has 15 inline style properties -- NEW",
-      "description": "App.jsx lines 1304-1322: the worker completion toast has the exact same inline style sprawl as plantToast -- 15 properties: position, bottom, left, transform, background, border, borderRadius, padding, fontSize, fontWeight, color, boxShadow, zIndex, whiteSpace, pointerEvents, animation. Dynamic values: border color and boxShadow both depend on completionToast.type and completionToast.color. Fix: same approach as plantToast -- create .completion-toast in App.css with all static properties, use CSS variables --toast-border-color and --toast-shadow-color for the two dynamic values. Both toasts share an identical static skeleton and should converge to a shared .vibe-toast class. Having the same 15-property inline object in two components is a copy-paste amplifier.",
+      "category": "code_quality",
+      "title": "No src/components/ directory — all components remain co-located in 2 monolith files",
+      "description": "After 14 reviews flagging the monolith problem, there is still no src/components/ directory. Utils were extracted to src/utils/ (constants.js, quotes.js, vibe.js, time.js, safeSave.js) which is great — but the same discipline has never been applied to components. Creating src/components/ is a one-command operation. The utils extraction proves the team knows how to do it. This is purely a prioritization failure.",
       "effort": "small",
-      "assigned_to": "maya",
-      "strike": 0
+      "strike": 1
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "lone-survivor-label has a class but 7 inline style properties override it -- NEW",
-      "description": "Office.jsx line 1853: <div className='lone-survivor-label' style={{ fontSize: '0.6rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>. The CSS class .lone-survivor-label in Office.css (line 2730) only contains pointer-events, text-shadow, and the animation keyframes -- none of the structural positioning or text properties. All 7 inline properties are static. Also: inline opacity: 0.6 fights the @keyframes lone-pulse animation which already animates between 0.6 and 0.9 opacity. Remove the inline opacity entirely and let the animation handle it. Move all 7 properties into the CSS rule.",
+      "category": "ux",
+      "title": "Mobile header button bar overflows on narrow screens",
+      "description": "At 375px, the header shows 'Good evening, LEGEND 🔥 · Wednesday, Mar 11' + '🔥 Crushing It' button + notification icon + sun icon in a single row. The greeting text is bold/underlined and takes significant space. On very narrow devices (320px) this will overflow. The greeting truncates but the button cluster could wrap. Consider hiding the greeting text below 400px or switching to an icon-only status pill.",
       "effort": "small",
-      "assigned_to": "maya",
-      "strike": 0
+      "strike": 1
     },
     {
-      "priority": "medium",
-      "category": "code",
-      "title": "WallClock renders inline position styles despite .office-wall-clock CSS class -- NEW",
-      "description": "Office.jsx line 1251: the WallClock SVG has style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'none' }} inline. The CSS rule .office-wall-clock at line 147 of Office.css contains only opacity and filter. All 5 properties -- position, left, top, zIndex, pointerEvents -- are static and belong in .office-wall-clock CSS. Fix: add them to the CSS rule, remove the style prop. Two minutes. The pattern of component-owns-its-position via CSS is used correctly for .conference-table, .office-door, .coffee-corner -- WallClock is the outlier.",
-      "effort": "small",
-      "assigned_to": "maya",
-      "strike": 0
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "LoadingSkeleton has 9 inline styles -- all static -- NEW",
-      "description": "App.jsx lines 662-671: LoadingSkeleton renders three skeleton cards, each with multiple divs carrying inline width, height, borderRadius, flex, paddingLeft, flexDirection, and gap properties. Every single value is static -- none depend on props or state. Fix: add CSS classes .skeleton--avatar (width: 44px; height: 44px; border-radius: 10px), .skeleton--name-group (flex: 1; padding-left: 0.75rem; display: flex; flex-direction: column; gap: 8px), .skeleton--name (width: 55%; height: 14px), .skeleton--role (width: 38%; height: 11px), .skeleton--badge (width: 72px; height: 22px; border-radius: 20px), .skeleton--task (width: 100%; height: 46px), .skeleton--progress-bar (width: 100%; height: 8px; border-radius: 99px). The .skeleton base class already exists -- these modifiers follow the established BEM pattern.",
-      "effort": "small",
-      "assigned_to": "maya",
-      "strike": 0
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "ConferenceTable has 2 orphaned inline style objects -- STRIKE 2",
-      "description": "Line 1117: <div style={{ opacity: 0.65, fontSize: '0.6rem', textAlign: 'center', marginTop: '2px' }}> for the Last huddle label -- 4 static properties, no class name. Line 1130: <span style={{ opacity: 0.8, marginLeft: '4px', fontVariantNumeric: 'tabular-nums' }}> for the meeting duration counter -- 3 static properties, no class name. Fix: add .conf-last-huddle and .conf-meeting-duration classes to Office.css and replace both inline objects with className attributes.",
-      "effort": "small",
-      "assigned_to": "maya",
-      "strike": 2
-    },
-    {
-      "priority": "medium",
+      "priority": "low",
       "category": "visual",
-      "title": ".desk__nameplate--away uses 0.28rem font-size -- that is 4.5px -- STRIKE 2",
-      "description": "Office.css line 711: .desk__nameplate--away { opacity: 0.3; font-style: italic; font-size: 0.28rem; ... }. At 16px base, 0.28rem = 4.48px. Below the threshold of legibility at any normal viewing distance. The base nameplate rule uses font-size: 0.6rem (9.6px), already tiny. The away variant at 53% of that is actively unreadable. Opacity 0.3 already conveys 'faded away' -- the sub-pixel font size adds nothing except illegibility. Fix: set font-size: 0.5rem minimum.",
+      "title": "Coffee corner 'TRIPLE SHOT' label slightly clipped at right edge of office viewport",
+      "description": "On desktop 1280x800, the 'COFFEE TRIPLE SHOT' label in the top-right corner of the office scene is partially clipped by the right edge of the office-viewport container. The coffee mug SVG renders fully but the text label appears to extend beyond the boundary. Check .coffee-corner positioning and consider adding overflow: visible or padding-right to the office viewport.",
       "effort": "small",
-      "assigned_to": "maya",
-      "strike": 2
+      "strike": 1
     },
     {
       "priority": "low",
-      "category": "accessibility",
-      "title": "Office ficus aria-hidden hides vibeStreak from screen readers -- STRIKE 2",
-      "description": "Office.jsx line 1894: aria-hidden='true' on the ficus plant wrapper div. The div carries title='Streak: ${vibeStreak} . ${plantStageLabel} ${plantStageEmoji}' -- meaningful team health data. The title attribute is not announced by screen readers on non-interactive aria-hidden elements. The entire ficus subtree is invisible to assistive technology. Fix: remove aria-hidden='true', add role='img' and aria-label={`Vibe streak: ${vibeStreak} -- ${plantStageLabel}`} on the wrapper. The three inner divs (ficus-pot, ficus-stem, ficus-foliage) can keep aria-hidden='true'. Or: keep aria-hidden on the wrapper and add a visually-hidden sibling: <span className='sr-only'>Vibe streak: {vibeStreak} -- {plantStageLabel}</span>.",
+      "category": "features",
+      "title": "Plant growth system has no reset mechanism visible in UI",
+      "description": "The plant stage system (seedling → sprout → small-plant → leafy → blooming) is driven by vibeStreak prop. When streak resets to 0 (back to seedling), the milestone toast fires only when going UP (lines 1327-1332). There's no toast or notification for streak reset events (line 1334 handles it silently). Users who lose their streak get no feedback. Consider adding a brief 'Oh no, the ficus wilted 🥀' toast on downgrade.",
       "effort": "small",
-      "assigned_to": "maya",
-      "strike": 2
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "Office.css is 2857 lines -- CSS monolith did not shrink -- STRIKE 2",
-      "description": "2857 lines. Same as review #104. No new styles added this cycle, but none extracted either. The file contains rules for WallClock, VibeShockwave, AwaySign, ConferenceTable, ficus, plantToast, sprint board, door events, ambient particles, vibe weather -- all stitched together with comments as the only navigation. When Office.jsx is finally extracted, this file will need simultaneous surgery or the extracted components will have no CSS. Fix: extract Office.animations.css (shockwave, particles, wander, error-pulse animations) as a first isolated pass. Cleanly separable from structural layout, accounts for roughly 400 lines, importable without breaking anything.",
-      "effort": "medium",
-      "assigned_to": "maya",
-      "strike": 2
-    },
-    {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "worker-card__back-time has a class but inline styles do the actual work -- NEW",
-      "description": "App.jsx line 475: <span className='worker-card__back-time' style={{ opacity: 0.5, fontSize: '0.7rem', marginLeft: '0.35rem' }}>. The className exists but there is no .worker-card__back-time rule in App.css -- the class is decorative, the inline styles do all the work. Fix: add .worker-card__back-time { opacity: 0.5; font-size: 0.7rem; margin-left: 0.35rem; } to App.css and remove the style prop. Classes without backing CSS rules are not documentation, they are litter.",
-      "effort": "small",
-      "assigned_to": "maya",
-      "strike": 0
+      "strike": 1
     }
-  ],
-  "verified_fixes": [],
-  "praise": [
-    "The vibe-specific desk screensavers (Office.jsx lines 111-178) are a genuinely nice detail -- each character has a personality-appropriate idle animation: Carlos gets a bouncing debug dot, Luna gets a floating crescent moon, Sofia gets a pulsing test orb. Coherent characterizations that reinforce the personas without any text.",
-    "The WallClock slow-day sluggish transition (line 1266: transition: isSlowDay ? 'transform 2s ease' : 'none') lands well -- the minute hand moves sluggishly on slow days. Expressive clock behavior is the kind of ambient detail that makes the space feel alive.",
-    "The VIBE_HISTORY_KEY persistence pattern in App.jsx (safeRead/safeSave with JSON.parse/stringify wrapped in try/catch) is correct: corrupted localStorage is handled gracefully, the history is capped at VIBE_HISTORY_MAX, and synthetic log entries are preserved across fetches."
   ]
 }
