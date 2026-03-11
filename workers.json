@@ -1,37 +1,24 @@
 {
-  "workers": [
-    {
-      "id": "luna",
-      "role": "Creative Director",
-      "status": "idle",
-      "task": "Creative review #97 complete — 7 ideas",
-      "started_at": "2026-03-11T10:30:00Z",
-      "finished_at": "2026-03-11T10:36:00Z"
+  "workers": {
+    "luna": {
+      "status": "working",
+      "task": "Creative review - civilization simulation engine",
+      "started": "2026-03-11T20:50:00Z"
     },
-    {
-      "id": "carlos",
-      "role": "Backend Engineer",
-      "status": "idle",
-      "task": "Luna review #94 fixes — 6 bugs fixed",
-      "started_at": "2026-03-11T09:00:00Z",
-      "finished_at": "2026-03-11T09:05:00Z"
+    "dave": {
+      "status": "working",
+      "task": "Deploy Emergent World to GitHub Pages (gh-pages branch update)",
+      "started": "2026-03-11T21:45:00Z"
     },
-    {
-      "id": "maya",
-      "role": "Frontend Engineer",
-      "status": "idle",
-      "task": "Luna #97 fixes — 3 items shipped (desk lamp colors, whiteboard task preview, activity emoji confirmed)",
-      "started_at": "2026-03-11T10:37:00Z",
-      "finished_at": "2026-03-11T10:42:00Z"
+    "maya": {
+      "status": "working",
+      "task": "Fix DOM rebuild-per-tick, add pause-on-death toggle, debounce speed slider",
+      "started": "2026-03-11T21:45:00Z"
     },
-    {
-      "id": "dave",
-      "role": "DevOps Engineer",
-      "status": "idle",
-      "task": null,
-      "started_at": "2026-03-11T04:30:00Z",
-      "finished_at": "2026-03-11T04:35:00Z"
+    "carlos": {
+      "status": "working",
+      "task": "Fix dead citizen memory leak - prune _citizens array, add ring buffer for dead",
+      "started": "2026-03-11T21:45:00Z"
     }
-  ],
-  "updated_at": "2026-03-11T10:42:00Z"
+  }
 }

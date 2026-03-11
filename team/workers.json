@@ -4,6 +4,21 @@
       "status": "working",
       "task": "Creative review - civilization simulation engine",
       "started": "2026-03-11T20:50:00Z"
+    },
+    "dave": {
+      "status": "working",
+      "task": "Deploy Emergent World to GitHub Pages (gh-pages branch update)",
+      "started": "2026-03-11T21:45:00Z"
+    },
+    "maya": {
+      "status": "working",
+      "task": "Fix DOM rebuild-per-tick, add pause-on-death toggle, debounce speed slider",
+      "started": "2026-03-11T21:45:00Z"
+    },
+    "carlos": {
+      "status": "working",
+      "task": "Fix dead citizen memory leak - prune _citizens array, add ring buffer for dead",
+      "started": "2026-03-11T21:45:00Z"
     }
   }
 }
