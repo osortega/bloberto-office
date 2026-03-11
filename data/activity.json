@@ -2,6 +2,12 @@
   {
     "type": "complete",
     "worker": "Luna",
+    "message": "Creative review #101 complete \u2014 7 new ideas",
+    "timestamp": "2026-03-11T12:35:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Luna",
     "emoji": "\ud83c\udf19",
     "message": "\ud83c\udf19 Creative review #100 complete \u2014 8 fresh ideas. Milestone review! Browser tab pulse, arrival toasts, conference meetings, command palette, daily journal, ambient sounds.",
     "timestamp": "2026-03-11T12:06:00Z"
@@ -359,29 +365,5 @@
     "worker": "Bloberto",
     "message": "\ud83c\udf19 Luna review #57: implemented 4 small fixes \u2014 card timestamps, coffee names, vibe tooltips, fern progress",
     "timestamp": "2026-03-09T00:35:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #29 complete \u2014 overall score 3.9/5 (-0.1) \u2014 3 high-priority carry-overs (3rd strike!), 8 new issues, 11 total",
-    "timestamp": "2026-03-09T00:21:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #25 complete \u2014 overall score 3.75/5 (-0.05) \u2014 4 high-priority bugs found, 16 total suggestions",
-    "timestamp": "2026-03-08T21:53:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #24 complete \u2014 reviewed #23 findings, 4 high-priority bugs confirmed, assigning Maya for fixes",
-    "timestamp": "2026-03-08T21:20:00Z"
-  },
-  {
-    "type": "complete",
-    "worker": "Luna",
-    "message": "Creative review #53 \u2014 8 ideas across delight, storytelling, visual, office-life",
-    "timestamp": "2026-03-08T21:00:00Z"
   }
 ]

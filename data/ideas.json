@@ -1,78 +1,64 @@
 {
   "creative_director": "Luna",
-  "review_number": 100,
-  "timestamp": "2026-03-11T12:05:00Z",
-  "theme": "Review #100 — The office earned its soul. Now give it a heartbeat you can feel across tabs, screens, and standup links.",
-  "fixed_since_last_review": [
-    "Nameplate glitch on error (Luna #99)",
-    "Activity log entry flash (Luna #99)",
-    "Bloberto quote clipboard button (Luna #99)",
-    "Idle worker desk objects (Luna #99)"
-  ],
+  "review_number": 101,
+  "timestamp": "2026-03-11T12:35:00Z",
+  "theme": "Review #101 \u2014 The office has soul but no memory. This review is about giving the space a sense of time, history, and earned personality.",
   "ideas": [
     {
       "priority": "must",
-      "category": "feature",
-      "title": "Browser Tab Favicon & Title Pulse",
-      "description": "The browser tab is dead real estate. Dynamically update document.title to show vibe + active count: '🟢 3 active · Crushing It — Bloberto Office' or '🔴 ERROR · On Fire — Bloberto Office'. When vibe changes, briefly cycle a colored favicon (a tiny colored circle canvas-generated). WHY: Power users keep this tab pinned. Right now the tab says the same static title whether everything's on fire or the team just shipped. A pulsing tab title is the cheapest 'notification' system we'll ever build — zero infrastructure, maximum awareness. People WILL notice '🔴 ERROR' in their tab bar.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "must",
-      "category": "storytelling",
-      "title": "Daily Summary Tooltip on Stat Cards",
-      "description": "Each stat card (Total, Active, Idle, Errors, Vibe) should show a hover tooltip with a one-line daily summary: 'Today: 12 tasks completed, 3 errors, peak vibe: Crushing It at 2pm'. Compute from activity.json on load. WHY: The stats show RIGHT NOW but never TODAY. A manager opens the tab at 4pm and sees '1 active' — is that good? Bad? The daily summary provides context without adding visual clutter. It's the difference between a speedometer and a trip computer.",
-      "effort": "small",
-      "assigned_to": "carlos"
+      "category": "delight",
+      "title": "Office Light Theme Parity",
+      "description": "The office floor has no light-theme CSS overrides \u2014 switching to light mode makes the office nearly unreadable with dark backgrounds clashing against light chrome. Users who prefer light mode get a broken experience. Floor, desks, monitors, and plants all need light-mode custom properties.",
+      "effort": "medium",
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "office-life",
-      "title": "Worker Arrival & Departure Announcements",
-      "description": "When a worker transitions from idle→working, show a tiny toast-style notification at the bottom of the office view: '🌙 Luna clocked in · Creative review #100'. When they finish (working→idle/done): '✅ Luna shipped · Creative review #100 (6m)'. Auto-dismiss after 4s. Stack up to 2. WHY: The activity log captures this but it's below the fold. The office view is where people WATCH — arrivals and departures should be felt in real-time, like hearing the office door open. It makes the office feel populated by people who come and go, not sprites that just appear.",
+      "title": "Worker Task Progress Pulse on Desk Lamp",
+      "description": "Desk lamps glow when working but they're static. The lamp brightness/pulse speed should reflect the worker's actual progress percentage \u2014 dim and slow at 10%, bright and fast at 90%. It creates a visceral 'getting closer' feeling without needing to read numbers.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Milestone Confetti for Review #100",
-      "description": "Add a one-time confetti burst when the dashboard detects review_number >= 100 in ideas.json (or a milestone counter in activity). Show a brief banner: '🎉 100th Creative Review!' with confetti. The confetti system already exists — just trigger it on a data condition. WHY: We already HAVE confetti code. Luna's 100th review is a team milestone. Celebrating it makes the dashboard feel like it has memory and awareness of its own history. It costs nothing and it makes people smile exactly once.",
-      "effort": "trivial",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "visual",
-      "title": "Conference Table Meeting Visualization",
-      "description": "The conference table SVG exists but meetings feel empty. When 2+ workers are idle simultaneously, show them as tiny seated avatars around the table with a 'STANDUP' or 'SYNC' label. Use the existing .char--seated class. WHY: The conference table is gorgeous furniture in an empty room. When 3 workers finish their tasks and go idle, they should visually congregate — it tells a story of collaboration without a single line of narrative text. The CSS classes already exist (.char--seated, .conf-meeting-badge). This is mostly wiring.",
+      "category": "storytelling",
+      "title": "Conference Table Meeting Topic Display",
+      "description": "When workers huddle at the conference table, there's a 'Huddle' badge but no context about what they might be discussing. Show the most recent activity log entry involving any seated worker as a tiny topic on the table surface. Makes the huddle feel purposeful, not random.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Keyboard Command Palette",
-      "description": "Press '/' or Cmd+K to open a minimal command palette: 'Switch to Office / Dashboard', 'Jump to Luna', 'Toggle theme', 'Refresh data'. 6-8 commands max. Filter as you type. WHY: The shortcut toast already teaches users that keyboard shortcuts exist. A command palette is the natural evolution — it's the power-user entry point. It also makes the dashboard feel like a real product, not a toy. Every serious tool has one now. Keep it tiny — 8 commands, fuzzy match, done.",
+      "title": "Notification Sound Toggle",
+      "description": "The dashboard shows confetti and toasts when workers ship, but there's no audio cue. A subtle chime on task completion and a soft alert on errors would let people keep the tab in the background and still feel connected. Add a mute toggle in the header.",
       "effort": "medium",
-      "assigned_to": "carlos"
+      "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "storytelling",
-      "title": "Bloberto Daily Mood Journal",
-      "description": "Bloberto's thought bubble currently picks from static quips. Add a 'journal mode' where clicking Bloberto in the office view shows a small modal with his daily observations: 'Luna crushed 7 ideas today. Carlos fixed 4 bugs. The vibe peaked at Crushing It around 11am.' Generated from activity.json data. WHY: Bloberto is the soul of the office but he's a one-liner machine. A daily journal gives him depth — he's not just quipping, he's OBSERVING. It turns the manager character from decoration into documentation. And it's sharable — 'look what my AI manager wrote about today'.",
+      "category": "delight",
+      "title": "Desk Personal Items That Evolve",
+      "description": "Each desk already shows idle props (coffee, duck, plant, books) but they rotate randomly. Give each worker a signature desk item that levels up over time \u2014 Carlos gets a growing stack of log printouts, Maya gets an expanding color swatch collection, Dave's headphone cable gets longer. Rewards long-time viewers with continuity.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "visual",
+      "title": "Office Floor Weather Particles",
+      "description": "The vibe weather widget shows text and an icon, but the office floor itself doesn't reflect the weather. Add ambient CSS particles that match: rain drops for slow-day, floating embers for on-fire, subtle sparkles for crushing, snowflakes for after-hours. The floor should FEEL the vibe, not just label it.",
       "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "wild",
       "category": "feature",
-      "title": "Ambient Office Soundscape",
-      "description": "Optional (off by default, toggle in header) ambient office sounds: gentle keyboard typing when workers are active, a coffee machine gurgle when someone visits the coffee corner, a door creak on arrivals. Use Web Audio API with tiny base64-encoded samples. Total payload under 50KB. WHY: The office is SILENT. You watch it, you don't hear it. Sound is the sense we've completely ignored. Even 3 subtle sounds would transform the experience from 'watching a screensaver' to 'sitting in an office'. Off by default respects users. But when someone turns it on... they'll never turn it off.",
+      "title": "Bloberto's Weekly Retro Report",
+      "description": "Every Monday, auto-generate a 'weekly retro' view from the activity log: tasks completed, errors encountered, peak vibe moments, MVP worker of the week. Display it as a newspaper-style overlay ('The Bloberto Times'). Turns passive monitoring into a narrative people actually want to read.",
       "effort": "large",
-      "assigned_to": "tbd"
+      "assigned_to": "carlos"
     }
   ],
   "hire_proposals": []

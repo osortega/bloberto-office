@@ -28,6 +28,8 @@ const GITHUB_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/workers.json'
 const ACTIVITY_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/activity.json'
+const IDEAS_API_URL =
+  'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/ideas.json'
 const POLL_INTERVAL_ACTIVE = 30_000
 const POLL_INTERVAL_HIDDEN = 60_000
 
@@ -66,6 +68,76 @@ async function fetchActivityFromGitHub(signal) {
   const res = await fetch(ACTIVITY_API_URL + '?t=' + Date.now(), { signal })
   if (!res.ok) throw new Error(`Fetch error ${res.status}`)
   return res.json()
+}
+
+async function fetchIdeasFromGitHub(signal) {
+  const res = await fetch(IDEAS_API_URL + '?t=' + Date.now(), { signal })
+  if (!res.ok) throw new Error(`Fetch error ${res.status}`)
+  return res.json()
+}
+
+/**
+ * Returns the vibe indicator emoji for the browser tab title.
+ * @param {string} vibeKey - Current team vibe key.
+ * @param {boolean} hasErrors - Whether any workers are in error state.
+ * @returns {string} Emoji indicator for the tab title.
+ */
+function getVibeTabEmoji(vibeKey, hasErrors) {
+  if (hasErrors || vibeKey === 'on-fire') return '🔴'
+  if (vibeKey === 'crushing' || vibeKey === 'in-flow') return '🟢'
+  if (vibeKey === 'slow-day') return '🟡'
+  return '🌙'
+}
+
+/**
+ * Builds the browser tab title string based on current vibe and worker counts.
+ * @param {string} vibeKey - Current team vibe key.
+ * @param {string} vibeLabel - Human-readable vibe label.
+ * @param {number} activeCount - Number of actively working workers.
+ * @param {number} errorCount - Number of workers in error state.
+ * @returns {string} The formatted document title.
+ */
+function buildTabTitle(vibeKey, vibeLabel, activeCount, errorCount) {
+  const hasErrors = errorCount > 0
+  const emoji = getVibeTabEmoji(vibeKey, hasErrors)
+  if (hasErrors) return `${emoji} ERROR · ${vibeLabel} — Bloberto Office`
+  return `${emoji} ${activeCount} active · ${vibeLabel} — Bloberto Office`
+}
+
+/**
+ * Computes a human-readable daily summary from the activity log entries.
+ * @param {Array} activityLog - Activity log entries with { type, timestamp }.
+ * @param {Array} vibeHistory - Vibe history entries with { key, ts }.
+ * @returns {string} Daily summary suitable for a tooltip.
+ */
+function computeDailySummary(activityLog, vibeHistory) {
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const todayTs = todayStart.getTime()
+  const todayEntries = activityLog.filter(e => new Date(e.timestamp).getTime() >= todayTs)
+  const completions = todayEntries.filter(e => e.type === 'complete').length
+  const errors = todayEntries.filter(e => e.type === 'error').length
+  const hires = todayEntries.filter(e => e.type === 'hire').length
+
+  const VIBE_LABELS_MAP = {
+    'after-hours': 'After Hours', 'slow-day': 'Slow Day',
+    'on-fire': 'On Fire', 'in-flow': 'In Flow', 'crushing': 'Crushing It',
+  }
+  let peakVibeKey = null
+  let peakRank = -1
+  for (const h of vibeHistory) {
+    const rank = VIBE_RANK[h.key] ?? 0
+    if (rank > peakRank) { peakRank = rank; peakVibeKey = h.key }
+  }
+
+  const parts = []
+  if (completions > 0) parts.push(`${completions} task${completions !== 1 ? 's' : ''} completed`)
+  if (errors > 0) parts.push(`${errors} error${errors !== 1 ? 's' : ''}`)
+  if (hires > 0) parts.push(`${hires} hire${hires !== 1 ? 's' : ''}`)
+
+  const base = parts.length > 0 ? `Today: ${parts.join(', ')}` : 'Today: no events yet'
+  const peakLabel = peakVibeKey ? (VIBE_LABELS_MAP[peakVibeKey] ?? peakVibeKey) : null
+  return peakLabel ? `${base} · peak vibe: ${peakLabel}` : base
 }
 
 function formatFullDateTime(timestamp) {
@@ -464,7 +536,7 @@ function DeltaBadge({ delta }) {
   )
 }
 
-function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPaused, onResume }) {
+function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPaused, onResume, activityLog }) {
   const tick = useTimeTick(60_000)
   const total = workers.length
   const active = workers.filter((w) => w.status === 'working').length
@@ -484,17 +556,22 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
     prevCountsRef.current = { active, idle, error: errorCount }
   }, [active, idle, errorCount])
 
+  const dailySummary = useMemo(
+    () => computeDailySummary(activityLog ?? [], vibeHistory ?? []),
+    [activityLog, vibeHistory]
+  )
+
   const syncLabel = lastSynced
     ? lastSynced.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     : 'never'
 
   return (
     <div className="stats-bar" data-vibe={vibe.key}>
-      <div className="stat-card total">
+      <div className="stat-card total" title={dailySummary}>
         <span className="stat-label">👥 On the Clock</span>
         <span className="stat-value">{total}</span>
       </div>
-      <div className="stat-card active">
+      <div className="stat-card active" title={dailySummary}>
         <span className="stat-label">⚡ Active</span>
         <span className="stat-value">{active}</span>
         <span
@@ -508,7 +585,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
         >{getDispatch(STAT_DISPATCHES.active, active)}</span>
         <DeltaBadge delta={activeDelta} />
       </div>
-      <div className="stat-card idle">
+      <div className="stat-card idle" title={dailySummary}>
         <span className="stat-label">😴 Idle</span>
         <span className="stat-value">{idle}</span>
         <span className="stat-dispatch">{getDispatch(STAT_DISPATCHES.idle, idle)}</span>
@@ -517,7 +594,7 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
       <div
         className={`stat-card sync-status${pollingPaused ? ' sync-status--paused' : ''}`}
         onClick={pollingPaused ? onResume : undefined}
-        title={pollingPaused ? 'Click to resume auto-refresh' : undefined}
+        title={pollingPaused ? 'Click to resume auto-refresh' : dailySummary}
         role={pollingPaused ? 'button' : undefined}
         tabIndex={pollingPaused ? 0 : undefined}
         onKeyDown={pollingPaused ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onResume() } } : undefined}
@@ -528,15 +605,16 @@ function StatsBar({ workers, vibe, lastSynced, isLive, vibeHistory, pollingPause
         </span>
         <span className="stat-value sync-time">{syncLabel}</span>
       </div>
-      <div className={`stat-card vibe vibe--${vibe.key}`}>
+      <div className={`stat-card vibe vibe--${vibe.key}`} title={dailySummary}>
         <span className="stat-label">✨ Team Vibe</span>
         <span className="stat-value vibe-value">{vibe.label}</span>
         <VibeSparkline history={vibeHistory} />
       </div>
-      {errorCount > 0 && <div className='stat-card stat-card--error'><div className='stat-label'>❌ Errors</div><div className='stat-value'>{errorCount}</div><span className='stat-dispatch'>{getDispatch(STAT_DISPATCHES.error, errorCount)}</span></div>}
+      {errorCount > 0 && <div className='stat-card stat-card--error' title={dailySummary}><div className='stat-label'>❌ Errors</div><div className='stat-value'>{errorCount}</div><span className='stat-dispatch'>{getDispatch(STAT_DISPATCHES.error, errorCount)}</span></div>}
       {stuckWorkers.length > 0 && (
         <div
           className="stat-card stat-card--stuck"
+          title={dailySummary}
           onClick={() => {
             const name = stuckWorkers[0].name
             document.querySelector(`[data-worker-name="${name}"]`)?.scrollIntoView({ behavior: 'smooth' })
@@ -726,6 +804,7 @@ export default function App() {
   const [workerConfetti, setWorkerConfetti] = useState(null) // { name, color }
   const [completionToast, setCompletionToast] = useState(null) // { name, color }
   const confettiTimerRef = useRef(null)
+  const milestoneConfettiFiredRef = useRef(false)
   const workerConfettiTimerRef = useRef(null)
   const completionToastTimerRef = useRef(null)
   const [vibeHistory, setVibeHistory] = useState([])
@@ -1145,6 +1224,26 @@ export default function App() {
     if (!link.parentNode) document.head.appendChild(link)
   }, [activeWorkers, fetchError])
 
+  // ── Milestone confetti: fires once per session when review #100+ detected in ideas.json ──
+  useEffect(() => {
+    if (milestoneConfettiFiredRef.current) return
+    const controller = new AbortController()
+    fetchIdeasFromGitHub(controller.signal)
+      .then(data => {
+        if (controller.signal.aborted) return
+        if (typeof data?.review_number === 'number' && data.review_number >= 100) {
+          milestoneConfettiFiredRef.current = true
+          if (confettiTimerRef.current) clearTimeout(confettiTimerRef.current)
+          setConfettiActive(true)
+          confettiTimerRef.current = setTimeout(() => setConfettiActive(false), 3000)
+        }
+      })
+      .catch(err => {
+        if (!controller.signal.aborted) console.error('[Bloberto] ideas.json milestone fetch failed:', err)
+      })
+    return () => controller.abort()
+  }, [])
+
   // ── Tab title: update titleStateRef so the consolidated visibilitychange handler stays current ──
   useEffect(() => {
     const workingCount = activeWorkers.filter(w => w.status === 'working').length
@@ -1152,12 +1251,16 @@ export default function App() {
     const errCount = activeWorkers.filter(w => w.status === 'error').length
     const total = activeWorkers.length
 
+    const primaryTitle = total === 0
+      ? '🌙 All quiet — Bloberto Office'
+      : buildTabTitle(teamVibe.key, teamVibe.label, workingCount, errCount)
+
     const frames = total === 0
-      ? ["😴 Bloberto's Office — All quiet"]
+      ? [primaryTitle]
       : [
-          `(${workingCount}/${total}) Bloberto's Office — ${teamVibe.label}`,
+          primaryTitle,
           `🟢 ${workingCount} working · ❌ ${errCount} errors · 😴 ${idleCount} idle`,
-          `${teamVibe.label} — Bloberto's Office`,
+          `${teamVibe.label} — Bloberto Office`,
         ]
 
     titleStateRef.current = { frames, workingCount, errCount, idleCount }
@@ -1310,7 +1413,7 @@ export default function App() {
           <Office workers={activeWorkers} roster={roster} isSyncing={isSyncing} activityEntries={activityLog} onWorkerClick={handleWorkerClick} doorEvent={doorEvent} vibeStreak={vibeStreak} />
         </div>
         <div role="tabpanel" id="tabpanel-dashboard" aria-labelledby="tab-dashboard" hidden={tab !== 'dashboard'}>
-            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={onResume} />
+            <StatsBar workers={activeWorkers} vibe={teamVibe} lastSynced={lastSynced} isLive={isLive} vibeHistory={vibeHistory} pollingPaused={pollingPaused} onResume={onResume} activityLog={activityLog} />
 
             <div className="section-header">
               <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>
