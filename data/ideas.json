@@ -422,5 +422,66 @@
       }
     ],
     "hire_proposals": []
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 108,
+    "timestamp": "2026-03-11T21:55:00Z",
+    "theme": "The office has its furniture \u2014 now it needs its weather, its memory, and its edges polished. This review targets the surfaces hiding in plain sight.",
+    "screenshots": {
+      "desktop": "screenshot-luna-108-desktop.png",
+      "mobile": "screenshot-luna-108-mobile.png"
+    },
+    "ideas": [
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Night Window Starfield Animation",
+        "description": "The NIGHT window panel (top-right, visible in screenshot-luna-108-desktop) is a static purple rectangle. It already has vibe-aware labels and sits in prime real estate. Add 5-8 CSS-only star dots (tiny white circles, 1-2px) with staggered twinkle animations (opacity oscillating 0.3-1.0 over 2-4s, randomized delays via --i). When the vibe is 'on-fire', one star becomes a shooting star (a 0.8s CSS translate + fade). All pure CSS on the existing .night-window element. WHY: the night window is one of the most atmospheric set pieces but it's a flat color slab. Stars make it a real window.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "feature",
+        "title": "Weather Widget Click-to-Expand Forecast",
+        "description": "The weather string at the bottom-right ('Partly cloudy \u2014 steady progress') is generated from vibe state but displayed as a single static line. It's charming but throwaway. On click, expand it into a 3-line mini-forecast panel showing the 'weather' for the last 3 vibe states: '\u2600\ufe0f Crushing It (2h ago) \u2192 \u26c5 In Flow (45m ago) \u2192 \ud83c\udf19 Slow Day (now)'. Data source: vibeHistory already in state. Collapse on second click. Style: same font size, slightly wider, 0.2s height transition. WHY: the weather metaphor is one of the cleverest narrative devices in the app but it only shows the present. A forecast-style history makes the metaphor complete.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Mobile Desk Stacking Fix \u2014 Overlapping Nameplates",
+        "description": "In screenshot-luna-108-mobile (375px), Luna and Sofia's desks overlap significantly \u2014 nameplates collide, monitors are partially hidden, and the bottom desk row is barely readable. The DESKS array uses percentage-based positioning that doesn't account for the compressed viewport. Fix: add a @media (max-width: 480px) override in Office.css that increases vertical spacing between desk rows by 8-10%, reduces desk scale to 0.85, and shifts the bottom row down. The character avatars should also get a slight size reduction (--char-scale: 0.8). WHY: mobile is where people check the office on their phones. Right now it's a pile of overlapping elements that defeats the spatial metaphor entirely.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "Bloberto's Mood Ring Border \u2014 HQ Border Reflects Vibe History Trend",
+        "description": "Bloberto's HQ has a static glowing purple border. But Bloberto is the manager \u2014 his border should tell the story of the team's trajectory. If the last 3 vibe entries in vibeHistory are ascending (slow \u2192 in-flow \u2192 crushing), pulse the border with a gold gradient. If descending, shift to a cool blue. If flat, keep the current purple. The computation is a 5-line comparison of VIBE_RANK values for the last 3 entries. The border color change uses CSS custom property --hq-trend-color set via inline style. WHY: Bloberto's HQ is the emotional center of the office. A trend-aware border makes it the team's barometer without adding any UI chrome.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "could",
+        "category": "delight",
+        "title": "Ficus Seasonal Variants \u2014 Visual Personality by Day of Week",
+        "description": "The ficus grows through 5 stages but always looks the same for a given stage regardless of when you visit. Add a seasonal CSS modifier: on Fridays, the ficus gets a tiny party hat (SVG overlay, 8px). On Mondays, the pot has a tiny coffee stain ring. Weekend visits show a small 'zzz' floating above it. The modifier is derived from new Date().getDay() \u2014 zero state, zero props, pure CSS class toggle based on day. WHY: the ficus is already the office pet. Giving it day-of-week personality makes every visit feel slightly different and rewards repeat viewers.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "could",
+        "category": "feature",
+        "title": "Keyboard Shortcut Overlay Enhancement \u2014 Show Active Filters",
+        "description": "The shortcuts bar at the bottom shows '1 Office \u00b7 2 Dashboard \u00b7 R Refresh \u00b7 Esc Clear'. But when a worker filter or tag filter is active, there's no indication in the shortcut bar. Append the active filter state: '\u00b7 Filtering: Carlos' or '\u00b7 Tag: Bug'. This uses the existing workerFilter and activityFilter state, rendered conditionally in the shortcuts strip. Pressing Esc already clears filters. WHY: users who keyboard-navigate are power users. They deserve to see their active filter state without looking up at the filter bar.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      }
+    ],
+    "hire_proposals": []
   }
 ]
