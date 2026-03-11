@@ -14,7 +14,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontSize: '1.1rem', color: '#f87171' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontSize: '1.1rem', color: 'var(--text-error, #f87171)' }}>
           Something went wrong — click Retry, or refresh if it persists.
           <button onClick={this.resetError} style={{ marginLeft: '1rem', cursor: 'pointer' }}>Retry</button>
         </div>
@@ -393,7 +393,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
   const workerHistory = activityEntries.slice(-5).reverse()
 
   return (
-    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={-1} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`} data-worker-name={worker.name}>
+    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`} data-worker-name={worker.name}>
       <div className="worker-card__inner">
         <div className="worker-card__front" aria-hidden={isFlipped || undefined} tabIndex={isFlipped ? -1 : undefined}>
           <div className="worker-header">
