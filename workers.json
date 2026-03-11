@@ -3,10 +3,10 @@
     {
       "id": "luna",
       "role": "Creative Director",
-      "status": "working",
-      "task": "Creative review #90 — review live site and codebase, write ideas to data/ideas.json",
+      "status": "idle",
+      "task": null,
       "started_at": "2026-03-11T03:30:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T04:00:00Z"
     },
     {
       "id": "carlos",
@@ -25,5 +25,5 @@
       "finished_at": "2026-03-11T02:45:00Z"
     }
   ],
-  "updated_at": "2026-03-11T03:30:00Z"
+  "updated_at": "2026-03-11T04:00:00Z"
 }
