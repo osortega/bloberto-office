@@ -1,64 +1,77 @@
 {
   "creative_director": "Luna",
-  "review_number": 99,
-  "timestamp": "2026-03-11T11:36:17Z",
-  "theme": "The office has personality — now give every pixel a memory, a quirk, and a reason to be watched.",
-  "fixed_since_last_review": [],
+  "review_number": 100,
+  "timestamp": "2026-03-11T12:05:00Z",
+  "theme": "Review #100 — The office earned its soul. Now give it a heartbeat you can feel across tabs, screens, and standup links.",
+  "fixed_since_last_review": [
+    "Nameplate glitch on error (Luna #99)",
+    "Activity log entry flash (Luna #99)",
+    "Bloberto quote clipboard button (Luna #99)",
+    "Idle worker desk objects (Luna #99)"
+  ],
   "ideas": [
     {
       "priority": "must",
-      "category": "visual",
-      "title": "Worker Nameplate Glitch on Error",
-      "description": "Each desk has an implied nameplate — when that worker enters error state, apply a CSS flicker animation to it (rapid opacity flicker, tiny horizontal jitter, red tint) like a broken fluorescent office sign. Two keyframes, one class applied when status === 'error'. WHY: right now the error screen SVG already goes red and flashing but the *desk identity* — the nameplate, the label — stays crisp and normal. A flickering nameplate makes the desk itself look like it's having a crisis, not just the monitor. It's the visual punchline you notice at 3am across the room.",
-      "effort": "trivial",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "delight",
-      "title": "Activity Log Entry Flash",
-      "description": "When a new activity entry arrives and prepends to the log, it currently just silently appears. Give it a brief 400ms color-flash on mount: green for 'complete', red for 'error', blue for 'system', bright teal for 'hire' — then fades to normal. A single CSS animation class added on insert and removed after the duration. WHY: the activity log is the heartbeat of the dashboard but it whispers. A new error entry should flare red and demand a glance. A hire entry should briefly shine. The data already has `entry.type` — this is purely a visual upgrade that makes the log feel alive instead of archival.",
+      "category": "feature",
+      "title": "Browser Tab Favicon & Title Pulse",
+      "description": "The browser tab is dead real estate. Dynamically update document.title to show vibe + active count: '🟢 3 active · Crushing It — Bloberto Office' or '🔴 ERROR · On Fire — Bloberto Office'. When vibe changes, briefly cycle a colored favicon (a tiny colored circle canvas-generated). WHY: Power users keep this tab pinned. Right now the tab says the same static title whether everything's on fire or the team just shipped. A pulsing tab title is the cheapest 'notification' system we'll ever build — zero infrastructure, maximum awareness. People WILL notice '🔴 ERROR' in their tab bar.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
-      "priority": "should",
-      "category": "feature",
-      "title": "Bloberto Quote Clipboard Button",
-      "description": "When Bloberto's speech bubble is showing a particularly great line, users already screenshot it and paste it in Slack. Give them a '📋' micro-button that appears on hover of the speech bubble and copies the current quote to clipboard, then flashes a tiny '✓ copied' confirmation for 1.5s. WHY: the quotes are the most shareable thing in the product and we make people do OCR on a screenshot to get them. One button, a navigator.clipboard.writeText call, and a tiny state toggle. The personality escapes the browser. That's marketing we don't have to write.",
-      "effort": "trivial",
-      "assigned_to": "luna"
+      "priority": "must",
+      "category": "storytelling",
+      "title": "Daily Summary Tooltip on Stat Cards",
+      "description": "Each stat card (Total, Active, Idle, Errors, Vibe) should show a hover tooltip with a one-line daily summary: 'Today: 12 tasks completed, 3 errors, peak vibe: Crushing It at 2pm'. Compute from activity.json on load. WHY: The stats show RIGHT NOW but never TODAY. A manager opens the tab at 4pm and sees '1 active' — is that good? Bad? The daily summary provides context without adding visual clutter. It's the difference between a speedometer and a trip computer.",
+      "effort": "small",
+      "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "office-life",
-      "title": "End-of-Day Countdown in Footer",
-      "description": "Add a subtle 'EOD in 2h 14m' line in the office footer, counting down to a configurable end-of-business time (default 18:00 in local timezone). After EOD, flip to 'After Hours 🌙' until the next morning. WHY: offices run on invisible clock-pressure. The Bloberto dashboard already nails vibe-weather — but there's no temporal tension. A quiet EOD countdown makes you feel like this is a real team working toward a real deadline. It also contextualises stuck workers: Carlos stuck at 5:47pm hits completely differently than Carlos stuck at 9am.",
+      "title": "Worker Arrival & Departure Announcements",
+      "description": "When a worker transitions from idle→working, show a tiny toast-style notification at the bottom of the office view: '🌙 Luna clocked in · Creative review #100'. When they finish (working→idle/done): '✅ Luna shipped · Creative review #100 (6m)'. Auto-dismiss after 4s. Stack up to 2. WHY: The activity log captures this but it's below the fold. The office view is where people WATCH — arrivals and departures should be felt in real-time, like hearing the office door open. It makes the office feel populated by people who come and go, not sprites that just appear.",
       "effort": "small",
-      "assigned_to": "dave"
+      "assigned_to": "maya"
     },
     {
-      "priority": "could",
-      "category": "storytelling",
-      "title": "Idle Worker Desk Object",
-      "description": "Workers who are idle show their character standing at a desk — but the desk is completely empty. When a worker transitions to idle, randomly assign them one of four SVG micro-props rendered above their desk: ☕ a steaming coffee cup, 🦆 a rubber duck, 🪴 a small plant, or 📚 a teetering stack of books. Reassign on each new idle transition. The prop fades in slowly (0.6s) and fades out when they start working again. WHY: idle desks feel abandoned right now. A rubber duck says 'Dave is thinking'. A coffee cup says 'Maya is on break, not fired'. Small objects make desks feel inhabited between tasks — the office reads as a place people live in, not a status board.",
+      "priority": "should",
+      "category": "delight",
+      "title": "Milestone Confetti for Review #100",
+      "description": "Add a one-time confetti burst when the dashboard detects review_number >= 100 in ideas.json (or a milestone counter in activity). Show a brief banner: '🎉 100th Creative Review!' with confetti. The confetti system already exists — just trigger it on a data condition. WHY: We already HAVE confetti code. Luna's 100th review is a team milestone. Celebrating it makes the dashboard feel like it has memory and awareness of its own history. It costs nothing and it makes people smile exactly once.",
+      "effort": "trivial",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Conference Table Meeting Visualization",
+      "description": "The conference table SVG exists but meetings feel empty. When 2+ workers are idle simultaneously, show them as tiny seated avatars around the table with a 'STANDUP' or 'SYNC' label. Use the existing .char--seated class. WHY: The conference table is gorgeous furniture in an empty room. When 3 workers finish their tasks and go idle, they should visually congregate — it tells a story of collaboration without a single line of narrative text. The CSS classes already exist (.char--seated, .conf-meeting-badge). This is mostly wiring.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "delight",
-      "title": "Stat Dispatch Flip Transition",
-      "description": "The STAT_DISPATCHES map in App.jsx produces clever phrases like 'skeleton crew', 'code red', 'everybody scattered' for the stats panel. When the active/error/idle counts change and a new phrase replaces the old one, the transition is instant — one text just replaces another with zero ceremony. Add a split-flap (departures board) animation: the old phrase flips up and the new one flips down over ~300ms using a CSS 3D rotateX keyframe. WHY: the dispatch phrases are the wittiest copy in the dashboard but they're invisible when they change. The transition IS the punchline — 'smooth sailing' flipping to 'code red' should feel like a board game moment. It's a tiny animation on a tiny element and it will be the most screenshot thing we ever ship.",
-      "effort": "small",
+      "category": "feature",
+      "title": "Keyboard Command Palette",
+      "description": "Press '/' or Cmd+K to open a minimal command palette: 'Switch to Office / Dashboard', 'Jump to Luna', 'Toggle theme', 'Refresh data'. 6-8 commands max. Filter as you type. WHY: The shortcut toast already teaches users that keyboard shortcuts exist. A command palette is the natural evolution — it's the power-user entry point. It also makes the dashboard feel like a real product, not a toy. Every serious tool has one now. Keep it tiny — 8 commands, fuzzy match, done.",
+      "effort": "medium",
       "assigned_to": "carlos"
     },
     {
-      "priority": "wild",
-      "category": "team",
-      "title": "Team Momentum Score",
-      "description": "Compute a live 'momentum score' (0–100) from a weighted formula: +15 per active worker, +20 per completed task this session, -25 per error, -10 per stuck worker, +5 per active worker above the team average progress. Display it as a bold score with a label tier: 0-20 'Stalled', 21-40 'Warming Up', 41-60 'In Motion', 61-80 'On a Roll', 81-100 'Unstoppable 🚀'. Render it in the dashboard header as a single glanceable metric. WHY: the dashboard shows five individual worker cards but no single number for 'how is the team doing right now?' A momentum score turns five data streams into one gut-check. It's the thing a manager glances at when they open the tab. And 'Unstoppable 🚀' gives the team something to brag about in standups.",
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Bloberto Daily Mood Journal",
+      "description": "Bloberto's thought bubble currently picks from static quips. Add a 'journal mode' where clicking Bloberto in the office view shows a small modal with his daily observations: 'Luna crushed 7 ideas today. Carlos fixed 4 bugs. The vibe peaked at Crushing It around 11am.' Generated from activity.json data. WHY: Bloberto is the soul of the office but he's a one-liner machine. A daily journal gives him depth — he's not just quipping, he's OBSERVING. It turns the manager character from decoration into documentation. And it's sharable — 'look what my AI manager wrote about today'.",
       "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "wild",
+      "category": "feature",
+      "title": "Ambient Office Soundscape",
+      "description": "Optional (off by default, toggle in header) ambient office sounds: gentle keyboard typing when workers are active, a coffee machine gurgle when someone visits the coffee corner, a door creak on arrivals. Use Web Audio API with tiny base64-encoded samples. Total payload under 50KB. WHY: The office is SILENT. You watch it, you don't hear it. Sound is the sense we've completely ignored. Even 3 subtle sounds would transform the experience from 'watching a screensaver' to 'sitting in an office'. Off by default respects users. But when someone turns it on... they'll never turn it off.",
+      "effort": "large",
       "assigned_to": "tbd"
     }
   ],
