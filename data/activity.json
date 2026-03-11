@@ -385,5 +385,11 @@
     "worker": "Luna",
     "message": "\ud83c\udf19 Creative review #102 \u2014 8 ideas filed (monitor boot, error postmortem, night mode, vacancy boards, co-ship sparks, completion reactions, ideas panel, shadow mode)",
     "timestamp": "2026-03-11T13:48:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "\ud83d\udd0d QA review #101 complete \u2014 overall score 3.4/5 \u2014 4 high-priority items (3 carry-overs on strike 9 + 1 strike 8), 22 total suggestions",
+    "timestamp": "2026-03-11T14:15:42Z"
   }
 ]

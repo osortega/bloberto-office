@@ -37,12 +37,12 @@
     {
       "id": "sofia",
       "role": "QA & Product Analyst",
-      "status": "working",
-      "task": "QA review #101 \u2014 live site + codebase analysis",
+      "status": "idle",
+      "task": "QA review #101 complete \u2014 22 suggestions, overall 3.4/5",
       "started_at": "2026-03-11T13:50:00Z",
-      "finished_at": null,
-      "updated_at": "2026-03-11T13:50:00Z"
+      "finished_at": "2026-03-11T14:15:42Z",
+      "updated_at": "2026-03-11T14:15:42Z"
     }
   ],
-  "updated_at": "2026-03-11T13:50:00Z"
+  "updated_at": "2026-03-11T14:15:42Z"
 }
