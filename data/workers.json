@@ -4,15 +4,27 @@
       "id": "luna",
       "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19",
+      "emoji": "🌙",
       "status": "idle",
-      "task": "Creative review #106 complete \u2014 7 ideas, 2 carry-forwards",
+      "task": "Creative review #106 complete — 7 ideas, 2 carry-forwards",
       "progress": 0,
       "updated_at": "2026-03-11T17:10:00Z",
       "startedAt": "2026-03-11T17:10:00Z",
       "started_at": "2026-03-11T18:23:00Z",
       "finished_at": "2026-03-11T18:28:00Z"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA & Product Analyst",
+      "emoji": "🔍",
+      "status": "working",
+      "task": "QA review #108 — live site + codebase analysis",
+      "progress": 10,
+      "updated_at": "2026-03-11T18:45:00Z",
+      "startedAt": "2026-03-11T18:45:00Z",
+      "started_at": "2026-03-11T18:45:00Z"
     }
   ],
-  "updated_at": "2026-03-11T18:32:00Z"
+  "updated_at": "2026-03-11T18:45:00Z"
 }
