@@ -349,6 +349,20 @@
   50% { opacity: 0.35; }
 }
 
+/* ── Idle screensaver screen (Luna #98) ── */
+.desk-monitor-screen--screensaver {
+  opacity: 0.72;
+}
+@keyframes screensaver-dot-x {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(26px); }
+  100% { transform: translateX(0); }
+}
+@keyframes screensaver-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ── Coffee corner (top right) ── */
 .coffee-corner {
   position: absolute;
@@ -564,6 +578,17 @@
 .desk--error {
   background-color: var(--error-tint) !important;
   border-color: rgba(239, 68, 68, 0.4) !important;
+  /* Icy blue halo — cools to azure after errors */
+  animation: desk-ice-ring 2.2s ease-in-out infinite;
+}
+
+@keyframes desk-ice-ring {
+  0%, 100% {
+    box-shadow: 0 0 0 1.5px rgba(147, 197, 253, 0.42), 0 0 9px rgba(125, 211, 252, 0.20);
+  }
+  50% {
+    box-shadow: 0 0 0 2.5px rgba(147, 197, 253, 0.68), 0 0 16px rgba(125, 211, 252, 0.36);
+  }
 }
 
 /* ── Desk nameplates ── */
@@ -781,6 +806,62 @@
   transform: translateX(-50%);
   border: 5px solid transparent;
   border-top-color: rgba(10, 10, 28, 0.92);
+}
+
+/* ── Bloberto thought bubble — comic style (Luna #98) ── */
+.bloberto-thought-bubble {
+  position: absolute;
+  left: 27%;
+  top: 1.5%;
+  background: rgba(249, 248, 255, 0.96);
+  color: #2e1065;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 5px 11px 5px 10px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(139, 92, 246, 0.38);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18), 0 0 8px rgba(139, 92, 246, 0.1);
+  white-space: nowrap;
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.92) translateY(2px);
+  transition: opacity 0.32s ease, transform 0.32s ease;
+}
+.bloberto-thought-bubble--visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+/* Three thought-bubble circles pointing toward Bloberto (bottom-right) */
+.bloberto-thought-bubble::before,
+.bloberto-thought-bubble::after {
+  content: '';
+  position: absolute;
+  background: rgba(249, 248, 255, 0.96);
+  border: 1.5px solid rgba(139, 92, 246, 0.38);
+  border-radius: 50%;
+}
+.bloberto-thought-bubble::before {
+  width: 7px;
+  height: 7px;
+  bottom: -10px;
+  right: 22%;
+}
+.bloberto-thought-bubble::after {
+  width: 4px;
+  height: 4px;
+  bottom: -17px;
+  right: 18%;
+}
+@keyframes thought-bubble-dot {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%       { opacity: 0.8;  transform: scale(1.15); }
+}
+.bloberto-thought-bubble--visible::before {
+  animation: thought-bubble-dot 1.8s ease-in-out infinite;
+}
+.bloberto-thought-bubble--visible::after {
+  animation: thought-bubble-dot 1.8s ease-in-out 0.4s infinite;
 }
 
 /* ── Working — enters from door, then bobs (typing) ── */
@@ -1551,6 +1632,10 @@
   .desk-away-sign { animation: none; opacity: 1; }
   .desk--error { animation: none; border: 2px solid #f87171; }
   .desk--active { animation: none; }
+  @keyframes desk-glow-ring { from {} to {} }
+  @keyframes desk-ice-ring  { from {} to {} }
+  @keyframes thought-bubble-dot { from {} to {} }
+  .bloberto-thought-bubble { transition: opacity 0.15s ease; }
   .desk--stale .desk-character { animation: none; }
   .char--coffee-break { animation: none; left: 92%; top: 8%; }
   .coffee-corner--visited::after { animation: none; opacity: 0.5; }
@@ -1727,14 +1812,23 @@
   50% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.5); }
 }
 
-/* ── Active desk pulsing glow (Luna #26) ── */
-@keyframes desk-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.25); }
-  50% { box-shadow: 0 0 12px 4px rgba(168, 85, 247, 0.12); }
+/* ── Active desk glow streak ring (Luna #98) ── */
+/* Warm amber/role-color halo that pulses gently on active desks */
+@keyframes desk-glow-ring {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1.5px color-mix(in srgb, var(--role-color, #fbbf24) 38%, transparent),
+      0 0 8px  color-mix(in srgb, var(--role-color, #fbbf24) 22%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2.5px color-mix(in srgb, var(--role-color, #fbbf24) 68%, transparent),
+      0 0 18px color-mix(in srgb, var(--role-color, #fbbf24) 36%, transparent);
+  }
 }
 
 .desk--active {
-  animation: desk-pulse 3s ease-in-out infinite;
+  animation: desk-glow-ring 2.8s ease-in-out infinite;
   border-radius: 8px;
 }
 

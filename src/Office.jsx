@@ -107,6 +107,91 @@ const DESK_SCREEN_SVG = {
   ),
 }
 
+// Idle screensaver SVGs — clearly distinct from working screens (Luna #98)
+const DESK_SCREENSAVER_SVG = {
+  carlos: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#02020c" />
+      {/* Bouncing debug dot */}
+      <circle r="2.5" fill="#0d9488" opacity="0.85">
+        <animate attributeName="cx" values="5;33;5" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" />
+        <animate attributeName="cy" values="14;4;14" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" />
+      </circle>
+      <text x="2" y="17" fontSize="3.5" fill="#0d9488" fontFamily="monospace" opacity="0.4">zZz</text>
+    </svg>
+  ),
+  maya: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#02020c" />
+      {/* Spinning color swatch */}
+      <g style={{ transformOrigin: '19px 9px' }}>
+        <animateTransform attributeName="transform" type="rotate" values="0 19 9;360 19 9" dur="4s" repeatCount="indefinite" />
+        <rect x="15" y="5" width="8" height="8" rx="2" fill="none" stroke="#a855f7" strokeWidth="1.2" />
+        <rect x="17" y="7" width="4" height="4" rx="1" fill="#c084fc" opacity="0.7" />
+      </g>
+      <circle cx="8" cy="14" r="1" fill="#ec4899" opacity="0.5">
+        <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="30" cy="4" r="1" fill="#a855f7" opacity="0.4">
+        <animate attributeName="opacity" values="0.1;0.5;0.1" dur="2.4s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  ),
+  dave: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#02020c" />
+      {/* Starfield */}
+      <circle cx="5"  cy="3"  r="0.8" fill="#fff" opacity="0.6"><animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.7s" repeatCount="indefinite" /></circle>
+      <circle cx="14" cy="12" r="0.8" fill="#fff" opacity="0.5"><animate attributeName="opacity" values="0.2;0.7;0.2" dur="2.1s" repeatCount="indefinite" /></circle>
+      <circle cx="22" cy="5"  r="0.8" fill="#fff" opacity="0.7"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="1.4s" repeatCount="indefinite" /></circle>
+      <circle cx="30" cy="14" r="0.8" fill="#fff" opacity="0.5"><animate attributeName="opacity" values="0.1;0.6;0.1" dur="1.9s" repeatCount="indefinite" /></circle>
+      <circle cx="35" cy="7"  r="0.8" fill="#fff" opacity="0.6"><animate attributeName="opacity" values="0.4;0.9;0.4" dur="2.3s" repeatCount="indefinite" /></circle>
+      <text x="19" y="11" textAnchor="middle" fontSize="3.5" fill="#f97316" fontFamily="monospace" opacity="0.35">zZz</text>
+    </svg>
+  ),
+  sofia: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#02020c" />
+      {/* Pulsing test orb */}
+      <circle cx="19" cy="9" r="4" fill="none" stroke="#22c55e" strokeWidth="1" opacity="0.5">
+        <animate attributeName="r" values="4;6.5;4" dur="2.2s" repeatCount="indefinite" />
+        <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.2s" repeatCount="indefinite" />
+      </circle>
+      <circle cx="19" cy="9" r="2" fill="#22c55e" opacity="0.6">
+        <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.2s" repeatCount="indefinite" />
+      </circle>
+      <text x="2" y="17" fontSize="3.5" fill="#22c55e" fontFamily="monospace" opacity="0.35">idle</text>
+    </svg>
+  ),
+  luna: (
+    <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="38" height="18" fill="#02020c" />
+      {/* Floating crescent */}
+      <g>
+        <animate attributeName="transform" type="translate" values="0,0;0,-3;0,0" dur="3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" />
+        <circle cx="19" cy="10" r="4.5" fill="#4a3a8a" />
+        <circle cx="21.5" cy="8.5" r="3.5" fill="#02020c" />
+      </g>
+      <circle cx="7"  cy="4"  r="0.7" fill="#c4b5fd" opacity="0.5"><animate attributeName="opacity" values="0.5;0.1;0.5" dur="2.1s" repeatCount="indefinite" /></circle>
+      <circle cx="32" cy="14" r="0.7" fill="#c4b5fd" opacity="0.4"><animate attributeName="opacity" values="0.1;0.5;0.1" dur="1.8s" repeatCount="indefinite" /></circle>
+    </svg>
+  ),
+}
+
+// Generic screensaver fallback for unknown workers
+const SCREENSAVER_FALLBACK_SVG = (
+  <svg width="100%" height="100%" viewBox="0 0 38 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect width="38" height="18" fill="#02020c" />
+    <circle r="2.5" fill="#6366f1" opacity="0.8">
+      <animate attributeName="cx" values="5;33;5" dur="3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" />
+      <animate attributeName="cy" values="14;4;14" dur="3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.5;1" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" />
+    </circle>
+    <circle cx="19" cy="9" r="0.8" fill="#818cf8" opacity="0.3">
+      <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite" />
+    </circle>
+  </svg>
+)
+
 const BLOBERTO_TITLES = {
   crushing:      'CVO',
   'on-fire':     'CFO',
@@ -1237,6 +1322,19 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const [pingReaction, setPingReaction] = useState(null)
   const [vibeCaption, setVibeCaption] = useState(null)
   const [wbTaskIndex, setWbTaskIndex] = useState(0)
+  // Bloberto thought bubble state (Luna #98)
+  const [thoughtBubble, setThoughtBubble] = useState({ text: null, show: false })
+  const thoughtScheduleRef = useRef(null)
+  const thoughtHideRef     = useRef(null)
+  // Keep a ref to current team-state getter so the timer always sees latest state
+  const thoughtQuipRef = useRef(null)
+  thoughtQuipRef.current = () => {
+    const errorCount = nonMgr.filter(w => w.status === 'error').length
+    if (isFullSync && nonMgr.length > 1) return 'Full squad! Let\'s go 🚀'
+    if (errorCount >= 2) return 'This is fine 🔥'
+    if (isFullIdle) return 'Anyone alive? 👀'
+    return 'Busy day... 💭'
+  }
   const isFirstVibe = useRef(true)
   const lastVibeCaptionRef = useRef(0)
   const pingTimerRef = useRef(null)
@@ -1304,6 +1402,30 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     const t = setTimeout(() => setVibeCaption(null), 2800);
     return () => { clearTimeout(t); };
   }, [vibe])
+
+  // Bloberto thought bubble — show reactive quip every 15-20s (Luna #98)
+  useEffect(() => {
+    const showBubble = () => {
+      const text = thoughtQuipRef.current()
+      setThoughtBubble({ text, show: false })
+      // small RAF delay so the element mounts before CSS transition fires
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setThoughtBubble(b => ({ ...b, show: true })))
+      })
+      thoughtHideRef.current = setTimeout(() => {
+        setThoughtBubble(b => ({ ...b, show: false }))
+        // schedule next bubble after fade-out
+        const nextDelay = 15000 + Math.random() * 5000
+        thoughtScheduleRef.current = setTimeout(showBubble, nextDelay)
+      }, 5000)
+    }
+    // First appearance after 10-14s
+    thoughtScheduleRef.current = setTimeout(showBubble, 10000 + Math.random() * 4000)
+    return () => {
+      clearTimeout(thoughtScheduleRef.current)
+      clearTimeout(thoughtHideRef.current)
+    }
+  }, []) // runs once on mount; quip is always current via thoughtQuipRef
 
   // Roster members not currently active → ghost at empty desk
   const activeIds   = useMemo(() => new Set(workers.map(w => w.id || w.name?.toLowerCase().replace(/\s+/g, '-'))), [workers])
@@ -1509,6 +1631,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                       )}
                     </div>
                   )}
+                  {isIdle && !occ.ghost && (
+                    <div className="desk-monitor-screen desk-monitor-screen--screensaver">
+                      {DESK_SCREENSAVER_SVG[occ.worker.id] || SCREENSAVER_FALLBACK_SVG}
+                    </div>
+                  )}
                   {!occ.ghost && !occ.idle && (
                     <div
                       className={`desk__nameplate${isWorking ? ' desk__nameplate--active' : ''}${hasError ? ' desk__nameplate--error' : ''}`}
@@ -1576,6 +1703,13 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
 
         {/* Bloberto — always at manager desk, always visible */}
         <Character worker={bloberto} left={46} top={4} variant="manager" managerVibe={vibe} vibeKey={vibe} isSyncing={isSyncing} onClick={handleCharClick} isPinged={pingedId === bloberto.id} pingReaction={pingedId === bloberto.id && pingReaction ? pingReaction : null} />
+
+        {/* Bloberto thought bubble — reactive comic quip (Luna #98) */}
+        {thoughtBubble.text && (
+          <div className={`bloberto-thought-bubble${thoughtBubble.show ? ' bloberto-thought-bubble--visible' : ''}`} aria-hidden="true">
+            {thoughtBubble.text}
+          </div>
+        )}
 
         {/* Active workers at desks (working) or as ghosts (roster-only) — skip idle (they wander) and standup workers (rendered at conference table) */}
         {DESKS.map((desk, i) => {

@@ -1,65 +1,65 @@
 {
   "creative_director": "Luna",
   "review_number": 98,
-  "timestamp": "2026-03-11T11:00:00Z",
-  "theme": "Ambient Personality & Long-Term Memory",
+  "timestamp": "2026-03-11T11:01:04Z",
+  "theme": "The office breathes — now make it flinch, glow, and feel the heat.",
   "fixed_since_last_review": [],
   "ideas": [
     {
+      "priority": "must",
+      "category": "storytelling",
+      "title": "Bloberto Error Awareness",
+      "description": "When any worker enters error state, Bloberto's speech bubble should snap to a worker-specific crisis line — 'Carlos is on fire. Not the good kind.' / 'Sofia found a bug. Many bugs.' / 'Dave deployed something. I heard a noise.' Right now Bloberto drifts through 'Can we circle back on that PR?' while his entire team is PANICKING. That disconnect is wild. The PING_REACTIONS array already has per-worker personality — it just needs to hook into error state detection. WHY: Bloberto is the centrepiece of the office, his obliviousness to crises makes him seem broken, not funny. Reactive dialogue makes him feel like an actual (terrible) manager.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
       "priority": "should",
-      "category": "office-life",
-      "title": "Worker Desk Glow Streak Ring",
-      "description": "Each desk gets a subtle colored halo that intensifies on consecutive completions (warm amber) and cools to icy blue after errors. WHY: performance is currently only readable by checking stats — a persistent ambient glow lets you feel team momentum without scanning numbers.",
+      "category": "visual",
+      "title": "Desk Progress Ring",
+      "description": "In the office view, worker characters show no task progress — you must switch to Dashboard to see the progress bar. Add a thin SVG arc ring around each working character's avatar that fills clockwise from 0→100% as their progress advances. A soft neutral circle for idle/done. WHY: the office tab is the 'at a glance' view — it should give real signal without a tab switch. Progress rings are universally readable at tiny sizes. The data is already there: worker.progress is passed into the Office component but never rendered in the floor view.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "office-life",
-      "title": "Idle Worker Screensaver Doodles",
-      "description": "When a worker's status is idle, their desk screen switches from the work SVG to a tiny animated screensaver (flying toasters, bouncing shapes, starfield). WHY: idle and active states look too similar right now; a distinct screensaver makes it instantly obvious who's waiting for work.",
-      "effort": "small",
-      "assigned_to": "dave"
+      "category": "visual",
+      "title": "Stuck Desk Amber Halo",
+      "description": "The code already flags workers as 'stuck' when they've been working >2 hours (data-tier='stuck' in the dashboard). But in the office floor view, a stuck worker's desk looks identical to any other active desk. Add a soft amber pulsing border-glow to the desk element when the corresponding worker is stuck. One CSS class, one data attribute. WHY: if someone watches the office tab in a background browser tab — which is the entire point of this dashboard — they get zero warning that Carlos has been stuck for 4 hours. A slow amber throb on his desk says 'something's off' without breaking the visual calm.",
+      "effort": "trivial",
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "mascot",
-      "title": "Bloberto Thought Bubble Quips",
-      "description": "Bloberto occasionally displays a small thought bubble with a reactive one-liner about the current team state (e.g., '3 errors… fine.' or 'Full squad! 🎉'). Triggered by state changes, shown briefly then fades. WHY: Bloberto is the visual anchor of the whole dashboard but currently static — giving him inner monologue makes the mascot earn his desk space.",
-      "effort": "medium",
+      "category": "delight",
+      "title": "Vibe Playlist Name",
+      "description": "The footer already shows rotating vibe taglines ('productivity charts are going vertical') and a vibe version string ('v2.71-in-flow'). Add an imaginary playlist name that changes per vibe: Crushing = '🎵 Shipping Season Bops', On Fire = '🎵 This Is Fine (Lofi Remix)', In Flow = '🎵 Deep Work Zone Vol. 3', Slow Day = '🎵 Elevator Waiting Room Jazz', After Hours = '🎵 3am Terminal Focus'. Zero audio, zero API. WHY: the office already has vibe weather text, door labels, floor glow, and greeting tone per vibe. A playlist name completes the sensory world in a single line. It's the kind of thing people screenshot and send to their team.",
+      "effort": "trivial",
       "assigned_to": "luna"
     },
     {
       "priority": "could",
-      "category": "office-life",
-      "title": "Desk Plants That Grow and Wilt",
-      "description": "Each worker gets a tiny potted plant on their desk. It grows greener and taller as their success rate climbs over the session and slowly wilts if they rack up errors. WHY: long-term performance needs a visual memory — plants encode history in a warm, non-judgmental way that fits the office vibe better than graphs or numbers.",
-      "effort": "medium",
-      "assigned_to": "sofia"
-    },
-    {
-      "priority": "could",
-      "category": "ambient",
-      "title": "Corner Vibe Lava Lamp",
-      "description": "A decorative lava lamp in the office corner that changes blob rise-speed and color temperature based on the current team vibe key. Chill vibe = slow purple blobs; chaotic vibe = fast red blobs. WHY: the vibe system already drives whiteboard quotes but has no physical presence in the room — a lava lamp is ambient data viz that doesn't demand attention.",
+      "category": "delight",
+      "title": "Per-Desk Completion Burst",
+      "description": "When a worker finishes (working→idle), global confetti fires from the top of the viewport — celebratory but anonymous. Add a short SVG particle burst that erupts from that specific worker's desk coordinates in the office floor. Use their role color. Duration ~800ms. The desk positions are already known in the DESKS array (left/top percentages). WHY: generic confetti says 'something happened', a burst from Maya's desk says 'MAYA shipped that, right there.' The office becomes a place where achievements happen at specific locations — not just a pretty background to the real dashboard.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "office-life",
-      "title": "Conference Table Coffee Cup Pipeline Gauge",
-      "description": "A row of coffee cups sits on the conference table. Cups fill as tasks queue up and empty as workers complete them. A stack of empty cups = team is crushing it; cups overflowing = backlog warning. WHY: pipeline pressure is invisible in the current UI — coffee cups are a playful, legible metaphor that fits the office theme perfectly.",
-      "effort": "medium",
+      "category": "feature",
+      "title": "Ping Button on Worker Cards",
+      "description": "The PING_REACTIONS system has brilliant per-worker one-liners ('Check the logs. It is ALWAYS in the logs.') but is only discoverable by hovering the tiny office character. Dashboard worker cards have zero access to this personality. Add a small '📣' icon button to each worker card (beside the existing ℹ️ history button) that fires a toast with their random one-liner. WHY: the Dashboard tab is where most monitoring time is spent, yet it's entirely utilitarian. The best writing in the product is hidden behind an office hover. One button surfaces it.",
+      "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "office-life",
-      "title": "End-of-Shift Countdown Wall Clock",
-      "description": "A wall clock shows a stylized countdown to a configurable 'end of shift' time. As it ticks down, the clock face color shifts from calm green to urgent orange-red. Workers subtly start gathering their things in the final minutes. WHY: the dashboard exists outside time — there's no sense of urgency or rhythm. A countdown clock gives the whole office a shared heartbeat and makes long sessions feel alive.",
-      "effort": "large",
-      "assigned_to": "luna"
+      "category": "storytelling",
+      "title": "Bloberto Hot Seat Meltdown",
+      "description": "When ALL active workers are simultaneously in error state, trigger a 'hot seat' mode: Bloberto's speech bubble fires escalating panic lines 600ms apart ('this is fine' → 'IS it fine?' → 'it is NOT fine' → '🧯'), his desk trophy visually tips with a CSS transform, his candle glow shifts red, and the office border pulses error-red. Auto-recovers after 8 seconds or when error count drops. WHY: the on-fire vibe already adds global heat shimmer, but nothing commemorates the specific moment of total team collapse. Bloberto visibly breaking down is the most shareable, screenshot-able moment the product could have — it's the 'everything is fine 🔥' dog meme, live in your browser tab.",
+      "effort": "medium",
+      "assigned_to": "tbd"
     }
   ],
   "hire_proposals": []
