@@ -1468,6 +1468,7 @@
 .wb-history-dot[data-vibe='in-flow']     { background: #2dd4bf; }
 .wb-history-dot[data-vibe='slow-day']    { background: #9ca3af; }
 .wb-history-dot[data-vibe='after-hours'] { background: #6366f1; }
+.wb-task-preview { font-size: 0.35rem; color: var(--text-muted); opacity: 0.6; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%; text-align: center; }
 
 .wb-doodle {
   margin: 4px 0 0;
@@ -2009,7 +2010,7 @@
 }
 
 /* ── Desk Lamp States ── */
-.desk-lamp--working circle { fill: #fbbf24; filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7)); }
+.desk-lamp--working circle { fill: color-mix(in srgb, var(--role-color, #fbbf24) 60%, #fbbf24); filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.7)); }
 .desk-lamp--working { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4)); }
 .desk-lamp--idle circle { fill: #d97706; animation: lamp-idle-flicker 4s ease-in-out infinite; }
 @keyframes lamp-idle-flicker { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }

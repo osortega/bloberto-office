@@ -1236,6 +1236,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const [pingedId, setPingedId] = useState(null)
   const [pingReaction, setPingReaction] = useState(null)
   const [vibeCaption, setVibeCaption] = useState(null)
+  const [wbTaskIndex, setWbTaskIndex] = useState(0)
   const isFirstVibe = useRef(true)
   const lastVibeCaptionRef = useRef(0)
   const pingTimerRef = useRef(null)
@@ -1307,6 +1308,12 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   // Roster members not currently active → ghost at empty desk
   const activeIds   = useMemo(() => new Set(workers.map(w => w.id || w.name?.toLowerCase().replace(/\s+/g, '-'))), [workers])
   const ghostRoster = useMemo(() => effectiveRoster.filter(w => w.id !== 'bloberto' && !activeIds.has(w.id)), [effectiveRoster, activeIds])
+
+  useEffect(() => {
+    if (workingWorkers.length <= 1) return;
+    const id = setInterval(() => setWbTaskIndex(i => (i + 1) % workingWorkers.length), 8000);
+    return () => clearInterval(id);
+  }, [workingWorkers.length])
 
   // Assign working workers first, then idle workers, then ghosts, to desk slots
   const deskOccupants = useMemo(() => {
@@ -1390,6 +1397,12 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               <span className="wb-progress-pct">{avgProgress}%</span>
               <span className="wb-progress-label">{workingWorkers.length === 1 ? 'task progress' : 'avg task progress'}</span>
             </>
+          )}
+          {workingWorkers.length > 0 && workingWorkers[wbTaskIndex % workingWorkers.length]?.task && (
+            <span className="wb-task-preview">
+              {workingWorkers[wbTaskIndex % workingWorkers.length].task.slice(0, 30)}
+              {workingWorkers[wbTaskIndex % workingWorkers.length].task.length > 30 ? '…' : ''}
+            </span>
           )}
           <span className="wb-task-count" style={{ fontSize: '0.6rem', color: 'inherit', opacity: 0.7, whiteSpace: 'nowrap' }}>
             {workingWorkers.length} active · {nonMgr.length} total
