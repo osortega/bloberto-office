@@ -3,7 +3,10 @@
   "review_number": 96,
   "timestamp": "2026-03-11T10:05:00Z",
   "theme": "Polish the edges. Review-95 items still open. New focus: accessibility, mobile delight, ambient storytelling.",
-  "fixed_since_last_review": [],
+  "fixed_since_last_review": [
+    "night-sky-stars-h22-23",
+    "luna-activity-log-entries"
+  ],
   "ideas": [
     {
       "priority": "should",
