@@ -1,112 +1,129 @@
 {
   "analyst": "Sofia",
-  "review_number": 87,
-  "timestamp": "2026-03-11T08:15:00Z",
-  "screenshots": {
-    "desktop": "screenshot-sofia-desktop-87.png",
-    "mobile": "screenshot-sofia-mobile-87.png"
-  },
+  "review_number": 88,
+  "timestamp": "2026-03-11T08:45:00Z",
   "scores": {
-    "visual": 5,
-    "ux": 4,
-    "responsiveness": 4,
+    "visual": 4,
+    "ux": 3,
+    "responsiveness": 3,
     "performance": 4,
     "accessibility": 3,
-    "code_quality": 4,
+    "code_quality": 3,
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 4.1,
+  "overall_score": 3.6,
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
       "title": "R-key refresh does not clear paused polling state",
-      "description": "The keyboard shortcut handler for 'r'/'R' calls `syncFromGitHub()` directly instead of `onResume()`. When the user is in the paused-due-to-inactivity state and presses R to refresh, the data fetches correctly but `pollingPaused` stays true, `lastActivity.current` is not reset, and the ⏸ Paused banner remains visible indefinitely. Fix: replace `syncFromGitHub()` with `onResume()` in the keydown handler branch for R/r.",
+      "description": "App.jsx line 896: the keyboard shortcut calls syncFromGitHub() directly instead of onResume(). onResume() sets pollingPaused to false AND updates lastActivity.current — syncFromGitHub() does neither. So pressing R while paused triggers one data fetch, but the PAUSED banner stays visible and the 15s inactivity check re-parks polling immediately. Fix: replace `syncFromGitHub()` with `onResume()` in the keydown handler.",
       "effort": "small",
-      "assign_to": "Carlos"
+      "strike": 2
     },
     {
       "priority": "high",
       "category": "bug",
       "title": "Workers transitioning to 'done' status disappear silently with no celebration",
-      "description": "The `justShipped` detection only catches `working → idle` transitions. A worker whose status goes directly to 'done' is filtered out of `activeWorkers` (which only includes working/idle/error), triggering the plain fade-out animation with zero confetti or completion toast. STATUS_LABELS and STATUS_EMOJIS both define 'done', meaning it was designed to be shown, but no render path ever displays it. Either extend `activeWorkers` to include 'done' workers temporarily, or detect `working→done` the same way `working→idle` is detected and fire the celebration.",
-      "effort": "medium",
-      "assign_to": "Carlos"
+      "description": "activeWorkers filters on status === 'working' | 'idle' | 'error' (App.jsx line 964). Workers that go directly working→done skip the justShipped check entirely (which only fires for working→idle, line 1037). They fall into the 'disappeared' branch: 400ms fade + 'depart' door event. No confetti, no completion toast, no worker-specific celebration line. The whole WORKER_COMPLETION_LINES map is useless for done-status workers.",
+      "effort": "small",
+      "strike": 2
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Mobile: pinned hover card on Office characters has no visible dismiss control",
-      "description": "On touch devices, tapping a character in the Office view toggles `pinnedCard` instead of navigating to dashboard (correct behavior per `window.matchMedia('(hover: none)')`). But the resulting `char-hover-card` popup has no close button — the only way to dismiss it is to tap the same character again, which is non-obvious. Add a small ✕ button or an outside-tap-to-dismiss handler (a transparent overlay or document click listener) to the pinned card path.",
+      "title": "Mobile: pinned hover card has no visible dismiss control",
+      "description": "On touch devices, clicking a character pins the hover card (Office.jsx line 749). Dismissal relies on clicking outside the .char element (line 685-689) — but there is no visible X / close button inside the hover card (lines 823-843). Touch users can be stuck with the card open until they intuit the 'tap elsewhere' interaction. At minimum, add a small close button inside the card that only renders when pinnedCard is true.",
       "effort": "small",
-      "assign_to": "Maya"
+      "strike": 2
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Footer quote counter hides on the last item in the cycle",
+      "description": "App.jsx line 1473: `quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length` — when quoteBonus reaches BONUS_TAGLINES.length (8), the counter is hidden because 8 < 8 is false. The last tagline is shown without its counter. The onClick wraps quoteBonus back to 1 on the next click so users never see '8/8'. Fix: change condition to `quoteBonus > 0 && quoteBonus <= BONUS_TAGLINES.length`.",
+      "effort": "small",
+      "strike": 2
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Footer quote counter disappears on the last item in the cycle",
-      "description": "The counter `{quoteBonus}/{BONUS_TAGLINES.length}` only renders when `quoteBonus < BONUS_TAGLINES.length`. So the 8th (last) quote shows no counter, silently hiding the position indicator right when users most need to know they've reached the end. One line fix: change the condition from `quoteBonus < BONUS_TAGLINES.length` to `quoteBonus <= BONUS_TAGLINES.length`.",
-      "effort": "small",
-      "assign_to": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Worker cards are not keyboard-navigable via Tab",
-      "description": "`WorkerCard` has `tabIndex={-1}` on the outer `role=\"article\"` wrapper, meaning keyboard-only users cannot Tab between cards in the Dashboard grid. The ℹ️ flip button and task tags inside are focusable, but users must already be inside the card to reach them. Consider `tabIndex={0}` on the card wrapper, or at minimum ensure the ℹ️ button is reachable from outside the card. The current behavior means screen reader users get read-only summary only via the `aria-label` but cannot interact without a mouse.",
+      "title": "Worker cards not keyboard-navigable via Tab",
+      "description": "WorkerCard renders with tabIndex={-1} (App.jsx line 321). Cards cannot receive focus via Tab — only the info button inside them is reachable. Screen-reader and keyboard-only users can't navigate between cards, only into individual controls inside them. The card acts as an article/region and warrants a tabIndex={0} with appropriate focus styling, or at least a visible landmark heading per card.",
       "effort": "medium",
-      "assign_to": "Maya"
+      "strike": 2
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "Office.css is 2411 lines — split into feature-scoped modules",
-      "description": "Office.css has grown to 2411 lines covering desks, characters, avatars, conference table, wall clock, whiteboard, weather, plants, door, and animations. This is a maintenance liability: any targeted change risks unintended side effects and the file is hard to search. Recommend splitting into colocated CSS modules (e.g. Character.module.css, Desk.module.css, OfficeDecorations.module.css) or at minimum logical @layer sections with clear demarcation comments. App.css at 1170 lines is approaching the same problem.",
+      "title": "Office.css is still 2411 lines — split into feature-scoped modules",
+      "description": "Office.css remains at exactly 2411 lines, unchanged from last review. Suggested modules: characters.css, desks.css, animations.css, widgets.css (clock, whiteboard, ficus), office-floor.css. The file mixes global variables, component scopes, keyframes, and responsive breakpoints in a single flat file. This is a maintenance liability as the feature surface grows.",
       "effort": "large",
-      "assign_to": "Maya"
+      "strike": 2
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Sky gradient 2h window desync — claimed fixed, still present",
+      "description": "WindowElement (Office.jsx lines 866-875): getGradient returns the sunset gradient for h >= 17 && h <= 21 (5 hours), but isGoldenHour is h >= 17 && h <= 19 (3 hours). Hours 20 and 21 display the warm sunset gradient with NO golden-hour clouds — the sky literally has a sunset glow with empty air. This was listed as fixed in the last commit but the code is unchanged. isDaytime cutoff at 16 also means 17:00 transitions sharply with no overlap handling.",
+      "effort": "small",
+      "strike": 1
     },
     {
       "priority": "low",
       "category": "bug",
       "title": "isTouchDevice evaluated at module load — breaks hybrid devices",
-      "description": "`const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches` is evaluated once when the module is imported. On hybrid laptops/tablets that support both mouse and touch, users who switch input modes mid-session will see stale messaging (e.g. the Paused banner still says 'Move mouse to refresh' after they switch to touch). Move this into a `useEffect` or `useCallback` that reads `window.matchMedia` at call time rather than at import time.",
+      "description": "App.jsx line 692: `const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches` is a module-level constant. On Surface Pro / iPad keyboard users, this is evaluated once at page load and stays stale for the session. The Office.jsx Character component (line 748) already correctly uses `window.matchMedia('(hover: none)').matches` inside handleClick for dynamic evaluation. App.jsx should do the same — read the media query at call-time, not at module load.",
       "effort": "small",
-      "assign_to": "Dave"
+      "strike": 2
     },
     {
       "priority": "low",
       "category": "bug",
-      "title": "getRelativeTime shows 'just now' for future-dated timestamps",
-      "description": "`getRelativeTime` in utils/time.js computes `diff = Date.now() - new Date(timestamp).getTime()`. If the activity.json server clock is ahead of the client (clock skew) or an entry has a future timestamp, diff is negative, `mins < 1` is true, and the function returns 'just now'. This could show stale or future activity as 'just now'. Add a guard: `if (diff < 0) return 'just now'` is already effectively there, but consider returning a neutral 'moments ago' or clamping to 0 explicitly so the intent is clear to future maintainers.",
+      "title": "getRelativeTime returns 'just now' for future-dated timestamps",
+      "description": "time.js line 6: `if (mins < 1) return 'just now'` — diff is computed as Date.now() - timestamp. If timestamp is in the future, diff is negative, mins rounds to 0 or a negative value that still hits < 1. A future-dated activity log entry will show 'just now' indefinitely instead of surfacing the data anomaly. Fix: add a guard `if (diff < 0) return 'just now'` separately, and add a comment explaining the intended behavior.",
       "effort": "small",
-      "assign_to": "Carlos"
+      "strike": 2
     },
     {
       "priority": "low",
       "category": "ux",
       "title": "ErrorBoundary retry button uses no design system styles",
-      "description": "The ErrorBoundary's catch UI renders a plain `<button>` with only `style={{ marginLeft: '1rem', cursor: 'pointer' }}`. It completely breaks visual consistency — no background, no border-radius, no color tokens. This is a rare state but users who hit it deserve the same polish as the rest of the app. Apply `.btn btn-sm btn-ghost` or an equivalent class consistent with the retry buttons elsewhere in the app.",
+      "description": "App.jsx lines 17-20: the ErrorBoundary fallback UI uses raw inline styles (color: #f87171, marginLeft: 1rem). The rest of the app uses CSS classes from App.css (btn, btn-sm, btn-ghost etc.) and CSS custom properties (var(--surface2), var(--text), var(--border)). The error screen will look visually inconsistent, especially in light mode where hardcoded dark colors break. Use design system classes and variables.",
       "effort": "small",
-      "assign_to": "Maya"
+      "strike": 2
     },
     {
       "priority": "low",
-      "category": "performance",
-      "title": "Vibe history written to localStorage on every teamVibe.key change — including initial mount",
-      "description": "The vibe-history effect runs on every `teamVibe.key` change, reads the full history JSON from localStorage, appends, and writes it back. On fast polling cycles where vibe flickers (e.g. single worker toggling in/out), this could generate several localStorage writes per 30-second interval. Low risk currently with only 5 workers, but consider debouncing the write or only writing when the key genuinely changes (guard: `if (prevKey === teamVibe.key) return` before the write).",
+      "category": "bug",
+      "title": "Vibe history written to localStorage on every teamVibe.key change including initial mount",
+      "description": "App.jsx lines 1113-1119: the vibe history append runs unconditionally inside `useEffect([teamVibe.key])`. The isInitialMount guard on line 1079 only protects the streak counter, not the history write. On every cold load, the current vibe is immediately pushed to history before any real vibe transition has occurred. Wrap the history push in the same `!isInitialMount` check used for streak.",
       "effort": "small",
-      "assign_to": "Carlos"
+      "strike": 2
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Bloberto speech bubble overflows tab bar on mobile",
+      "description": "Confirmed in screenshot: on 375px viewport the speech bubble positioned above Bloberto clips over the tab toggle bar ('Office' / 'Dashboard'). The bubble uses absolute positioning relative to the character element, with no viewport-aware clamping. On small screens where Bloberto is near the top of the office-floor, the bubble can escape the container bounds. Needs a max-width clamp and translateX adjustment to keep it within the office-floor boundary.",
+      "effort": "small",
+      "strike": 1
     }
   ],
-  "praise": [
-    "The 19-entry VIBE_TRANSITION_QUOTES map is absurdly thorough — every vibe-to-vibe transition has a bespoke Bloberto one-liner. This is the kind of detail that makes the app feel alive.",
-    "Worker-specific desk screen SVGs with separate error variants (carlos_error, sofia_error, etc.) are a delightful touch that most teams would never bother with.",
-    "safeSave/safeRead utility properly handles iOS private browsing and enterprise localStorage restrictions — quiet defensive coding that will save someone's sanity eventually.",
-    "The keyboard shortcut system is genuinely polished: ShortcutToast auto-dismisses, shows 'Got it ✓' confirmation, and persists dismissal in localStorage so it never nags.",
-    "PING_REACTIONS gives each worker a distinct voice (Carlos will always reference logs, Sofia will always reference edge cases). This is premium character work.",
-    "The dynamic favicon (red/green/grey canvas circle) is a small thing that shows real attention to the full browser experience, not just the viewport.",
-    "The paused polling state correctly differentiates touch vs mouse messaging — 'Tap to refresh' vs 'Move mouse to refresh' — a genuinely thoughtful UX detail."
+  "verified_fixes": [
+    "JSON.parse on VIBE_HISTORY_KEY now wrapped in try-catch (App.jsx lines 1114-1115) — corrupted localStorage no longer throws",
+    "SVG glow filter ID in ConferenceTable now uses useId() (Office.jsx line 908) — no more hardcoded id collision risk across multiple mounted instances",
+    "ErrorBoundary contradictory message removed — fallback now shows a clean 'Something went wrong.' with a functional Retry button"
   ],
-  "summary": "Review #87 finds the app in excellent aesthetic shape — visual polish and fun factor remain at full marks, and the level of characterization (worker-specific SVGs, ping reactions, vibe transition quotes) continues to be genuinely impressive. The score holds steady at 4.1 overall. The one concrete bug worth immediate attention is the R-key shortcut bypassing `onResume()`, which leaves the Paused banner stuck on screen after a manual refresh — a small inconsistency that undermines the otherwise solid keyboard UX. The silent disappearance of workers who transition to 'done' (no confetti, no toast) is a missed celebration moment that the animation infrastructure already supports. Mobile users are still slightly disadvantaged: the pinned hover card has no obvious dismiss path, and at 375px the office floor text labels (0.38rem nameplates) are approaching unreadable territory. Code quality is holding but the CSS files are inching toward 'nobody wants to touch this' territory — Office.css at 2411 lines is a ticking time bomb for the next person who needs to tweak desk layout on a specific breakpoint."
+  "praise": [
+    "The ping reaction system (PING_REACTIONS map + handleCharClick) is genuinely charming — every worker has 5 personality-correct one-liners and the pinged animation + speech bubble chain works cleanly",
+    "Completion celebration is properly per-worker with staggered confetti (2.6s apart), role-colored particles, and worker-specific WORKER_COMPLETION_LINES text — well above the bar for a dashboard tool",
+    "ConferenceTable now correctly uses useId() for SVG filter IDs — good catch in the last commit",
+    "The polling visibility-change handler is consolidated into a single effect with correct interval reset, title animation, and resume-on-return behavior — no more duplicate handlers",
+    "VibeSparkline with ranked y-positions and per-vibe colors is a nice touch — sparkline-legend pills with last-3 history are readable and non-intrusive",
+    "WindowElement's getHour tick is aligned to the next minute boundary, not a raw setInterval — clean approach that avoids drift",
+    "Lone survivor labels per-worker (LONE_SURVIVOR_WORKER_OVERRIDES) with vibe-specific overrides is the kind of detail that makes the app feel alive",
+    "ficus plant lifecycle (seedling → blooming → grief on streak break) with toast notification is delightful and mechanically sound"
+  ]
 }

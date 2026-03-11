@@ -27,13 +27,13 @@
     {
       "id": "sofia",
       "role": "QA & Product Analyst",
-      "status": "working",
-      "task": "QA review #88",
+      "status": "idle",
+      "task": null,
       "started_at": "2026-03-11T08:45:00Z",
-      "finished_at": null,
-      "progress": 0,
-      "updated_at": "2026-03-11T08:45:00Z"
+      "finished_at": "2026-03-11T08:53:00Z",
+      "progress": 100,
+      "updated_at": "2026-03-11T08:53:00Z"
     }
   ],
-  "updated_at": "2026-03-11T08:45:00Z"
+  "updated_at": "2026-03-11T08:53:00Z"
 }
