@@ -11,10 +11,10 @@
     {
       "id": "carlos",
       "role": "Backend Engineer",
-      "status": "working",
-      "task": "QA #98 fixes \u2014 2 critical + 2 high (vibe history guard, isTouchDevice, ProgressBar null, thought bubble quips)",
+      "status": "idle",
+      "task": "QA #98 fixes \u2014 4 items fixed (vibe history, isTouchDevice, ProgressBar, thought quips)",
       "started_at": "2026-03-11T11:46:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T11:48:00Z"
     },
     {
       "id": "maya",
@@ -43,5 +43,5 @@
       "updated_at": "2026-03-11T11:15:00Z"
     }
   ],
-  "updated_at": "2026-03-11T11:46:00Z"
+  "updated_at": "2026-03-11T11:48:00Z"
 }

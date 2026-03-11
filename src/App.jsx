@@ -377,7 +377,9 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             return <div className="worker-duration" data-tier={tier}>{tier === 'stuck' ? '⚠️ ' : ''}⏱️ {formatDuration(worker.updated_at)}</div>
           })()}
 
-          <ProgressBar progress={worker.progress} startedAt={worker.startedAt || worker.started_at} updatedAt={worker.updated_at} />
+          {worker.progress !== null && (
+            <ProgressBar progress={worker.progress} startedAt={worker.startedAt || worker.started_at} updatedAt={worker.updated_at} />
+          )}
         </div>
 
         <div className="worker-card__back" aria-hidden={!isFlipped || undefined} tabIndex={!isFlipped ? -1 : undefined}>
@@ -692,9 +694,10 @@ const HONORIFICS = { crushing: 'LEGEND 🔥', 'on-fire': 'captain 🚨', 'in-flo
 
 const PROGRESS_MILESTONES = [25, 50, 75, 100]
 
-const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+// Evaluated inside the component (via useMemo) to stay fresh on hybrid devices
 
 export default function App() {
+  const isTouchDevice = useMemo(() => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches, [])
   const [allWorkers, setAllWorkers] = useState([])
   const [roster, setRoster] = useState([])
   const [activityLog, setActivityLog] = useState([])
@@ -845,7 +848,7 @@ export default function App() {
         id: w.id || w.name?.toLowerCase().split(' ')[0],
         name: w.name || (w.id ? w.id.charAt(0).toUpperCase() + w.id.slice(1) : 'Unknown'),
         startedAt: w.startedAt || w.started_at,
-        progress: typeof w.progress === 'number' ? w.progress : 0
+        progress: typeof w.progress === 'number' ? w.progress : null
       })
       // Support both flat array and {workers:[], roster:[]} formats
       if (Array.isArray(data)) {
@@ -1113,13 +1116,15 @@ export default function App() {
     }
     previousVibeKeyRef.current = teamVibe.key
 
-    const raw = safeRead(VIBE_HISTORY_KEY)
-    let history = []
-    try { history = raw ? JSON.parse(raw) : [] } catch { /* corrupted localStorage */ }
-    history.push({ key: teamVibe.key, ts: Date.now() })
-    if (history.length > VIBE_HISTORY_MAX) history.splice(0, history.length - VIBE_HISTORY_MAX)
-    safeSave(VIBE_HISTORY_KEY, JSON.stringify(history))
-    setVibeHistory(history)
+    if (!isInitialMount) {
+      const raw = safeRead(VIBE_HISTORY_KEY)
+      let history = []
+      try { history = raw ? JSON.parse(raw) : [] } catch { /* corrupted localStorage */ }
+      history.push({ key: teamVibe.key, ts: Date.now() })
+      if (history.length > VIBE_HISTORY_MAX) history.splice(0, history.length - VIBE_HISTORY_MAX)
+      safeSave(VIBE_HISTORY_KEY, JSON.stringify(history))
+      setVibeHistory(history)
+    }
   }, [teamVibe.key])
 
   // ── Favicon: red=error, green=working, grey=idle ──

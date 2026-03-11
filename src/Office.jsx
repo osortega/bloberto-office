@@ -1352,9 +1352,22 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const thoughtQuipRef = useRef(null)
   thoughtQuipRef.current = () => {
     const errorCount = nonMgr.filter(w => w.status === 'error').length
-    if (isFullSync && nonMgr.length > 1) return 'Full squad! Let\'s go 🚀'
     if (errorCount >= 2) return 'This is fine 🔥'
+    if (errorCount === 1) return 'One of us is having a rough day… 😬'
+    if (isFullSync && nonMgr.length > 1) return 'Full squad! Let\'s go 🚀'
+    if (isFullSync && nonMgr.length === 1) return 'Flying solo, but make it count 💪'
     if (isFullIdle) return 'Anyone alive? 👀'
+    if (isLoneSurvivor) return 'Last one standing… respect 🫡'
+    if (vibe === 'crushing' && workingWorkers.length >= 3) return 'We are absolutely CRUSHING it rn 😤'
+    if (vibe === 'crushing') return 'Top tier numbers today 📈'
+    if (vibe === 'on-fire' && workingWorkers.length >= 2) return 'Squad is on fire 🔥🔥'
+    if (vibe === 'on-fire') return 'Things are heating up 🌶️'
+    if (vibe === 'in-flow') return 'Smooth operator energy 😎'
+    if (vibe === 'slow-day' && workingWorkers.length === 0) return 'It\'s giving: corporate screensaver 🫥'
+    if (vibe === 'slow-day') return 'Glacial pace today… 🧊'
+    if (vibe === 'after-hours') return 'Someone tell HR we\'re still here 🌙'
+    if (workingWorkers.length >= 4) return 'Full deployment mode activated 🛠️'
+    if (workingWorkers.length === 0) return 'Suspiciously quiet in here…'
     return 'Busy day... 💭'
   }
   const isFirstVibe = useRef(true)
