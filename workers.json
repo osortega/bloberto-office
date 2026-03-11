@@ -11,18 +11,18 @@
     {
       "id": "carlos",
       "role": "Backend Engineer",
-      "status": "working",
-      "task": "Bug fixes from Luna review #94 — JSON.parse guard, standupWorkers, SVG filter, sky sync, staleMins, deps cleanup",
+      "status": "idle",
+      "task": "Luna review #94 fixes — 6 bugs fixed",
       "started_at": "2026-03-11T09:00:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T09:05:00Z"
     },
     {
       "id": "maya",
       "role": "Frontend Engineer",
-      "status": "working",
-      "task": "Bug fixes from Luna review #94 — WorkerCard key, ErrorBoundary message, ETA badge staleness",
+      "status": "idle",
+      "task": "Luna review #94 fixes — 3 bugs fixed",
       "started_at": "2026-03-11T09:00:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T09:06:00Z"
     },
     {
       "id": "dave",
@@ -33,5 +33,5 @@
       "finished_at": "2026-03-11T04:35:00Z"
     }
   ],
-  "updated_at": "2026-03-11T09:00:00Z"
+  "updated_at": "2026-03-11T09:06:00Z"
 }
