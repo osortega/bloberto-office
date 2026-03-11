@@ -37,12 +37,12 @@
     {
       "id": "sofia",
       "role": "QA & Product Analyst",
-      "status": "idle",
-      "task": "QA review #103 complete \u2014 3 CRITICAL + 1 HIGH, overall 3.4/5",
-      "started_at": "2026-03-11T15:15:00Z",
-      "finished_at": "2026-03-11T15:45:00Z",
-      "updated_at": "2026-03-11T15:45:00Z"
+      "status": "working",
+      "task": "QA review #104 \u2014 30-min site analysis & code review",
+      "started_at": "2026-03-11T16:15:00Z",
+      "finished_at": null,
+      "updated_at": "2026-03-11T16:15:00Z"
     }
   ],
-  "updated_at": "2026-03-11T15:48:00Z"
+  "updated_at": "2026-03-11T16:15:00Z"
 }
