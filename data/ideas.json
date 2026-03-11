@@ -1,3 +1,80 @@
+[
+{
+  "creative_director": "Luna",
+  "review_number": 103,
+  "timestamp": "2026-03-11T14:52:00Z",
+  "theme": "Every surface tells a secret — the office knows more than it shows. This review turns dead space and invisible data into living architecture.",
+  "ideas": [
+    {
+      "priority": "must",
+      "category": "feature",
+      "title": "Sprint Tag Counter Board",
+      "description": "The back wall of the office has clean empty grid real estate between the window and the desks, and the TASK_TAG_DEFS system already classifies every active worker's task (Bug, Ship, Design, QA, Refactor, Plan) with emoji and color. But that aggregate picture — how many bugs vs. ships vs. designs are live right now — exists nowhere on the office floor. Add a small mounted board on the back wall that shows each active tag category as a labeled pill with a live count: '🔴 Bug ×2  🚀 Ship ×3  🎨 Design ×1'. The board goes dark when nobody is working. It turns urgent-red if Bug count ≥ 2. Zero new data structures needed — just a useMemo over active workers' parsed tags. WHY: the office floor tells you who is busy, but not what kind of busy. The board closes that gap at a glance, the way a real sprint room has a board on the wall.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Room Buzz — Ambient Ripple on Crowded Focus",
+      "description": "When 3+ workers are simultaneously active (working, not idle) and the vibe is 'in-flow' or 'crushing', the office goes acoustically silent in the CSS sense — no extra animations fire to represent human density. In real offices, a full room has an invisible hum. Add a CSS-only 'buzz' layer: faint concentric ring ripples that radiate from each active worker's avatar outward, at very low opacity (5–8%), with a slow 3s ease — like a sonar ping, not a spotlight. The rings don't overlap or collide; they just breathe. The animation fires only when the crowded + right-vibe condition is true, and stops instantly when it isn't. The office already has heat shimmer for on-fire and grid glow for vibes — this adds the human frequency layer. WHY: a full room should feel full even before you count heads.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Bloberto's HQ Desk Lamp",
+      "description": "Bloberto's HQ has a glowing purple border that pulses with presence, but the interior of his office is a nameplate and a title. Real CPO offices have a lamp on the desk — and that lamp is the first thing you notice when you walk past. Add a small SVG desk lamp inside the HQ card (left corner, behind his avatar). The lamp shade color matches the team vibe: warm amber for in-flow, hot coral for on-fire, soft indigo for after-hours, cool teal for crushing. Its animation matches vibe intensity: a slow deep breathe for slow-day, a steady glow for in-flow, an agitated flicker for on-fire. This is not the same as monitor glow (review #102 — worker desks reflecting task type). This is specifically Bloberto's personal barometer. His lamp tells the room how the building is feeling before you read a single status. WHY: Bloberto's HQ is the architectural heart. It should radiate, not just contain.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "office-life",
+      "title": "Focus Zone Ghost Footprints",
+      "description": "The FOCUS ZONE at the bottom of the office floor is a lightning bolt label on empty carpet. It has the right brand energy but zero data. Every active worker has a startedAt timestamp. Workers who have been continuously working for 45+ minutes are, by any reasonable definition, deep in a focus session. Surface that: render their character avatar as a faint 40% opacity 'footprint' inside the Focus Zone box, with a micro-caption 'Xm deep'. When they complete their task or go idle, the footprint fades out. When they hit 90 minutes, the footprint gets a tiny flame icon. Max 3 footprints; beyond that show '+N' overflow. No new state, no timers — just derived from worker.startedAt compared to Date.now(). WHY: the Focus Zone exists on the floor but nothing ever happens in it. Footprints make it a living record of who went deep today.",
+      "effort": "small",
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "could",
+      "category": "feature",
+      "title": "Day Arc — Workday Progress Ring in Stats Bar",
+      "description": "The Stats Bar has a vibe sparkline, worker counts, last-synced time — but no sense of *where in the day we are*. There is no workday clock. Add a thin semicircular progress arc between 9am and 6pm anchored to the right side of the stats bar, like the top half of a clock face. The arc fills proportionally with the current hour position; its stroke gradient matches VIBE_COLORS for the current vibe key. Before 9am the arc shows empty with a sunrise icon. After 6pm it becomes a crescent moon arc that counts up through the night. Hovering reveals the tooltip: '4h 20m into the workday · peak vibe: Crushing It'. This is distinct from the sparkline (which shows vibe transitions) — the arc shows *time*, not history. WHY: the office has a clock on the wall but the dashboard has no concept of the shape of the day. The arc gives every visit a temporal anchor.",
+      "effort": "medium",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "storytelling",
+      "title": "Worker 'Last Shipped' Hover Ghost",
+      "description": "When you hover over a working or idle worker's character on the office floor, the hover card shows their name, status, task, and idle time. It does not tell you when they last shipped. The activity log tracks every completion with worker name and timestamp. A worker who completed something 20 minutes ago versus 4 hours ago carries completely different energy — and you currently can't feel that difference from the floor. Add a single line at the bottom of the hover card for workers with a recent completion: '✅ last shipped 18 min ago' (within 2h), or '💤 no completions today' for workers with none. No new API calls — this is a filtered slice of activityEntries already passed into the Character component. WHY: the hover card tells you who someone is. It should also tell you what they've done. One line closes a meaningful gap between the activity log and the office floor.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "wild",
+      "category": "delight",
+      "title": "Vacant Desk Time Capsule Messages",
+      "description": "The vacant desk already shows a job posting (VACANT_ADS changes per vibe — 'Staff Wizard', 'URGENT: Firefighter', 'Night Watch'). But it's static. Every 90 seconds, a small folded-note SVG slowly rises from the vacant desk and unfolds, revealing a fictional future-hire message: 'Zara 🦁 — portfolio under review', '????? 👾 — resume: classified', 'Mx. T ⚡ — starting whenever the vibe is right', 'ghost dev 👻 — technically already here', 'Reese 🌊 — offer letter pending since Q3'. 8–10 pre-written messages, cycle deterministically by minute-epoch so different visitors see different ones but the same visitor doesn't get repeats for a while. Clicking the vacant desk mid-appearance shows all future candidates in a tiny scrollable ghost roster. This makes the empty desk feel alive and funny instead of just hiring-adjacent. WHY: empty space in a living office should haunt you a little.",
+      "effort": "medium",
+      "assigned_to": "luna"
+    }
+  ],
+  "hire_proposals": [
+    {
+      "role": "Mobile Engineer",
+      "emoji": "📱",
+      "rationale": "The mobile web view at 375px is valiant but physically compressed — the office floor, stats bar, and activity log are all fighting for space on a screen that deserves a native experience. A Mobile Engineer would own a React Native or PWA-enhanced version of Bloberto Office: native push notifications when the vibe flips to on-fire, a lock-screen widget showing active worker count, haptic feedback on task completions. The office already has all its data in a clean JSON API. The work is the presentation layer. This hire pays for itself the moment someone gets a haptic buzz on their wrist because their team just hit crushing-it."
+    },
+    {
+      "role": "Developer Experience Lead",
+      "emoji": "🛠️",
+      "rationale": "Bloberto Office is secretly a framework — workers.json, activity.json, ideas.json, a polling architecture, vibe classification logic — all of this could be extracted into a self-hostable kit that other small teams run for their own office. A DevEx Lead would own that extraction: the setup guide, the workers.json schema docs, the one-command deploy, the GitHub Action template that pumps real CI events into activity.json. Every team that adopts Bloberto Office is a proof point. Right now that potential sits entirely in Bloberto's own repo. One engineer with a taste for documentation and tooling infrastructure changes that."
+    }
+  ]
+},
 {
   "creative_director": "Luna",
   "review_number": 102,
@@ -63,3 +140,4 @@
   ],
   "hire_proposals": []
 }
+]
