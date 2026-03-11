@@ -4,17 +4,25 @@
       "id": "luna",
       "role": "Creative Director",
       "status": "idle",
-      "task": "Creative review #94 (timeout - using #93 ideas)",
+      "task": "Creative review #94 complete",
       "started_at": "2026-03-11T07:30:00Z",
       "finished_at": "2026-03-11T07:36:00Z"
     },
     {
       "id": "carlos",
       "role": "Backend Engineer",
-      "status": "idle",
-      "task": null,
-      "started_at": "2026-03-11T04:30:00Z",
-      "finished_at": "2026-03-11T04:35:00Z"
+      "status": "working",
+      "task": "Bug fixes from Luna review #94 — JSON.parse guard, standupWorkers, SVG filter, sky sync, staleMins, deps cleanup",
+      "started_at": "2026-03-11T09:00:00Z",
+      "finished_at": null
+    },
+    {
+      "id": "maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Bug fixes from Luna review #94 — WorkerCard key, ErrorBoundary message, ETA badge staleness",
+      "started_at": "2026-03-11T09:00:00Z",
+      "finished_at": null
     },
     {
       "id": "dave",
@@ -25,5 +33,5 @@
       "finished_at": "2026-03-11T04:35:00Z"
     }
   ],
-  "updated_at": "2026-03-11T07:36:00Z"
+  "updated_at": "2026-03-11T09:00:00Z"
 }
