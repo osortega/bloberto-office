@@ -59,6 +59,15 @@ export const DESKS = [
   { id: 5, left: 57, top: 50 },
 ]
 
+export const TASK_TAG_DEFS = [
+  { key: 'Bug',     emoji: '🔴' },
+  { key: 'Ship',    emoji: '🚀' },
+  { key: 'Design',  emoji: '🎨' },
+  { key: 'QA',      emoji: '🔍' },
+  { key: 'Refactor',emoji: '🔧' },
+  { key: 'Plan',    emoji: '📋' },
+]
+
 export const VIBE_WHITEBOARD = {
   'crushing':    '🏆 SHIP IT',
   'on-fire':     '🚨 HELP',

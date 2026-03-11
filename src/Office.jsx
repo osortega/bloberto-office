@@ -1,7 +1,7 @@
 import { useMemo, useState, useRef, useEffect, memo, useId, useCallback } from 'react'
 import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
-import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
+import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD, STATUS_LABELS, STATUS_EMOJIS, TASK_TAG_DEFS } from './utils/constants.js'
 import { VIBE_QUOTES, VIBE_TRANSITION_QUOTES } from './utils/quotes.js'
 import { getRelativeTime } from './utils/time.js'
 
@@ -1012,7 +1012,7 @@ function WindowElement({ vibe }) {
 // Chair positions around the table (angle in degrees, radius from center)
 const CHAIR_ANGLES = [0, 60, 120, 180, 240, 300]
 
-function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], lastHuddle }) {
+function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], lastHuddle, activityEntries = [] }) {
   const glowFilterId = useId()
   const vibe = vibeKey || 'in-flow'
   const [, setTick] = useState(0)
@@ -1123,6 +1123,13 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
               return <span style={{ opacity: 0.8, marginLeft: '4px', fontVariantNumeric: 'tabular-nums' }}>{mins < 1 ? '' : `· ${mins}m`}</span>
             })()}
           </div>
+          {(() => {
+            const huddleNames = new Set(meetingWorkers.map(w => w.name))
+            const topicEntry = [...activityEntries].reverse().find(e => e.worker && huddleNames.has(e.worker) && e.message)
+            return topicEntry ? (
+              <div className="conf-topic" title={topicEntry.message}>{topicEntry.message}</div>
+            ) : null
+          })()}
           {meetingWorkers.map((w, i) => {
             const angle = CHAIR_ANGLES[i];
             const rad = (angle * Math.PI) / 180;
@@ -1335,6 +1342,18 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const isFullIdle     = nonMgr.length > 0 && workingWorkers.length === 0 && idleWorkers.length === nonMgr.length
   const isLoneSurvivor = workingWorkers.length === 1 && idleWorkers.length === 0 && nonMgr.filter(w => w.status === 'error').length === 0
 
+  // Sprint tag counts — parsed from active worker task strings
+  const tagCounts = useMemo(() =>
+    TASK_TAG_DEFS
+      .map(({ key, emoji }) => {
+        const count = workingWorkers.filter(w => w.task && new RegExp(`\\b${key}\\b`, 'i').test(w.task)).length
+        return count > 0 ? { key, emoji, count } : null
+      })
+      .filter(Boolean),
+    [workingWorkers]
+  )
+  const tagBugCount = tagCounts.find(t => t.key === 'Bug')?.count ?? 0
+
   const avgProgress = Math.round(
     workingWorkers.reduce((s, w) => s + (w.progress || 0), 0) / Math.max(workingWorkers.length, 1)
   )
@@ -1530,6 +1549,24 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {/* Wall clock — top wall, between sign and manager area */}
         <WallClock vibeKey={vibe} />
 
+        {/* Sprint Tag Counter Board — back wall right, live tag counts from active tasks */}
+        <div
+          className={`sprint-tag-board${workingWorkers.length === 0 ? ' sprint-tag-board--dark' : ''}${tagBugCount >= 2 ? ' sprint-tag-board--urgent' : ''}`}
+          aria-label={workingWorkers.length === 0 ? 'Sprint board offline' : `Sprint tags: ${tagCounts.map(t => `${t.key} ${t.count}`).join(', ') || 'none'}`}
+        >
+          <span className="sprint-tag-board__label">SPRINT</span>
+          <div className="sprint-tag-board__pills">
+            {workingWorkers.length === 0
+              ? <span className="sprint-tag-board__offline">● offline</span>
+              : tagCounts.length === 0
+                ? <span className="sprint-tag-board__empty">no tags</span>
+                : tagCounts.map(({ key, emoji, count }) => (
+                    <span key={key} className="sprint-tag-board__pill">{emoji} {key} ×{count}</span>
+                  ))
+            }
+          </div>
+        </div>
+
         {/* Whiteboard — left wall, vibe-reactive */}
         <div
           key={vibe}
@@ -1585,6 +1622,34 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             <div className="mgr-desk__trophy" aria-hidden="true">🏆</div>
           )}
           {vibe === 'after-hours' && <div className="mgr-desk__candle" aria-hidden="true">🕯️</div>}
+          {/* HQ desk lamp — shade color and animation track team vibe */}
+          <svg
+            className={`mgr-desk__hq-lamp mgr-desk__hq-lamp--${vibe}`}
+            width="14" height="22"
+            viewBox="0 0 14 22"
+            aria-hidden="true"
+          >
+            {/* Glow bloom beneath shade */}
+            <ellipse
+              className="mgr-desk__hq-lamp-glow"
+              cx="7" cy="12" rx="5" ry="3"
+              opacity="0.35"
+            />
+            {/* Shade (trapezoid) */}
+            <polygon
+              className="mgr-desk__hq-lamp-shade"
+              points="2,12 12,12 10,7 4,7"
+            />
+            {/* Inner shade highlight */}
+            <polygon
+              points="4,11 10,11 9,8 5,8"
+              fill="rgba(255,255,255,0.12)"
+            />
+            {/* Stem */}
+            <line x1="7" y1="12" x2="7" y2="19" stroke="#9ca3af" strokeWidth="1.2" strokeLinecap="round" />
+            {/* Base */}
+            <ellipse cx="7" cy="20" rx="4" ry="1.5" fill="#9ca3af" opacity="0.6" />
+          </svg>
           <span className="sr-only">Manager desk</span>
         </div>
 
@@ -1621,6 +1686,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                 left: `${desk.left}%`,
                 top: `${desk.top}%`,
                 ...(isWorking ? { '--role-color': ROLE_COLORS[occ.worker.role] } : {}),
+                ...(isWorking && occ.worker.progress != null ? { '--progress': occ.worker.progress } : {}),
               }}
             >
               {/* Desk lamp — glows when occupied by a working character */}
@@ -1696,7 +1762,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         })}
 
         {/* Conference table — lower center */}
-        <ConferenceTable vibeKey={vibe} meetingWorkers={meetingWorkers} standupWorkers={standupWorkers} lastHuddle={lastHuddle} />
+        <ConferenceTable vibeKey={vibe} meetingWorkers={meetingWorkers} standupWorkers={standupWorkers} lastHuddle={lastHuddle} activityEntries={activityEntries} />
 
         {vibeCaption && <div className="vibe-caption" aria-live="polite">{vibeCaption}</div>}
 
@@ -1756,8 +1822,16 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
           const occ = deskOccupants[desk.id]
           if (!occ || occ.idle) return null
           if (standupWorkers.some(sw => sw.id === occ.worker.id)) return null
+          const showBuzzRipple = standupActive && !occ.ghost && occ.worker.status === 'working'
           return (
             <div key={occ.worker.id} style={{ position: 'absolute', left: `${desk.left + 7}%`, top: `${desk.top - 4}%` }}>
+              {showBuzzRipple && (
+                <>
+                  <div className={`buzz-ring buzz-ring--1`} data-vibe={vibe} />
+                  <div className={`buzz-ring buzz-ring--2`} data-vibe={vibe} />
+                  <div className={`buzz-ring buzz-ring--3`} data-vibe={vibe} />
+                </>
+              )}
               <Character
                 worker={occ.worker}
                 variant={occ.ghost ? 'ghost' : 'working'}
