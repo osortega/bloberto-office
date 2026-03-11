@@ -871,6 +871,7 @@ function WindowElement({ vibe }) {
   }
 
   const isMidnight = hour >= 0 && hour <= 4
+  const isNightSky = isMidnight || hour >= 22
   const isDaytime = hour >= 9 && hour <= 16
   const isGoldenHour = hour >= 17 && hour <= 19
   const timeLabel = hour < 5 ? 'midnight' : hour <= 8 ? 'sunrise' : hour <= 16 ? 'daylight' : hour <= 19 ? 'golden hour' : 'night'
@@ -879,7 +880,7 @@ function WindowElement({ vibe }) {
     <div className="office-window" role="img" aria-label={`Office window showing ${timeLabel} sky`}>
       <span className="office-window__time-caption">{timeLabel}</span>
       <div className="office-window__sky" style={{ background: getGradient(hour) }} data-vibe={vibe} data-daytime={isDaytime || undefined}>
-        {isMidnight && (
+        {isNightSky && (
           <>
             <span className="office-window__star" style={{ left: '18%', top: '20%' }} aria-hidden="true" />
             <span className="office-window__star" style={{ left: '58%', top: '12%' }} aria-hidden="true" />
