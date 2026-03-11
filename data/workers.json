@@ -21,9 +21,10 @@
       "id": "maya",
       "role": "Frontend Engineer",
       "status": "working",
-      "task": "Luna #99 \u2014 nameplate glitch, clipboard btn, idle desk objects",
-      "started_at": "2026-03-11T11:38:00Z",
-      "finished_at": null
+      "task": "Implement Luna review #101: light theme fix + desk lamp pulse + conference topic",
+      "started_at": "2026-03-11T12:36:00Z",
+      "finished_at": null,
+      "updated_at": "2026-03-11T12:36:00Z"
     },
     {
       "id": "dave",
@@ -44,5 +45,5 @@
       "updated_at": "2026-03-11T12:15:00Z"
     }
   ],
-  "updated_at": "2026-03-11T12:35:00Z"
+  "updated_at": "2026-03-11T12:36:00Z"
 }
