@@ -690,5 +690,15 @@
     "worker": "Luna",
     "action": "Creative Review #90 complete — 2 MUST bugs, 2 SHOULD fixes, 3 COULD items",
     "timestamp": "2026-03-11T00:35:00Z"
+  },
+  {
+    "worker": "Carlos",
+    "action": "Fixed 4 bugs from Luna review #90: workerHistory filter, tabIndex orphan, completion lines, standup desk glow",
+    "timestamp": "2026-03-11T00:40:00Z"
+  },
+  {
+    "worker": "Maya",
+    "action": "Fixed WallClock double-announcement from Luna review #90",
+    "timestamp": "2026-03-11T00:40:00Z"
   }
 ]

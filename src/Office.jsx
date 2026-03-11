@@ -1130,7 +1130,6 @@ function WallClock({ vibeKey }) {
       role="img"
       style={{ position: 'absolute', left: '22%', top: '2.5%', zIndex: 1, pointerEvents: 'auto' }}
     >
-      <title>{`${displayH}:${displayM} ${h >= 12 ? 'PM' : 'AM'} — ${CLOCK_COMMENTS[vibeKey] || CLOCK_COMMENTS['in-flow']}`}</title>
       {/* Clock face */}
       <circle cx="11" cy="11" r="9" fill={faceFill} stroke="var(--border)" strokeWidth="1" />
 
@@ -1444,10 +1443,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             const ghostMins = Math.floor(diffMs / 60000)
             ghostDeskTier = ghostMins < 60 ? 'fresh' : ghostMins < 180 ? 'stale' : 'abandoned'
           }
+          const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id || sw.id === occ.worker)
           return (
             <div
               key={desk.id}
-              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking ? ' desk--active' : ''}${isGhostDesk ? ' desk--ghost' : ''}${isIdle ? ' desk--idle' : ''}`}
+              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking && !isStandup ? ' desk--active' : ''}${isGhostDesk ? ' desk--ghost' : ''}${isIdle ? ' desk--idle' : ''}`}
               title={ghostDeskTitle}
               data-ghost-tier={isGhostDesk ? ghostDeskTier : undefined}
               style={{
@@ -1462,7 +1462,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                 <line x1="5" y1="6.5" x2="5" y2="12" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" />
                 <ellipse cx="5" cy="13" rx="3.5" ry="1.5" fill="#9ca3af" />
               </svg>
-              {isWorking && (
+              {isWorking && !isStandup && (
                 <div className='desk-keystrokes' aria-hidden='true'>
                   <span style={{animationDelay: '0s'}}>tap</span>
                   <span style={{animationDelay: '1.2s'}}>clack</span>

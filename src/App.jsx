@@ -272,11 +272,11 @@ const WORKER_TAGLINES = {
 }
 
 const WORKER_COMPLETION_LINES = {
-  carlos: 'Carlos locked in the backend',
-  sofia: 'Sofia squashed another bug',
-  maya: 'Maya shipped the pixels',
-  dave: 'Dave pushed to prod',
-  luna: 'Luna made it beautiful',
+  carlos: ['logs updated, task closed', 'merged and running', 'clean commit, no drama'],
+  sofia: ['tested, closed, documented', 'all edge cases covered', 'zero bugs escaped'],
+  maya: ['pixel-perfect and shipped', 'components delivered', 'design system updated'],
+  dave: ['pipeline cleared, stable', 'deployed — headphones back on', 'CI green across the board'],
+  luna: ['the brief is realized', 'creative review complete', 'vision shipped'],
 }
 
 const SOLO_SPOTLIGHT_MESSAGES = {
@@ -309,10 +309,10 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
     }
   }, [isFocused])
 
-  const workerHistory = [...activityEntries].reverse()
+  const workerHistory = activityEntries.filter(e => e.worker === worker.name).slice(-5).reverse()
 
   return (
-    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={0} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`} data-worker-name={worker.name}>
+    <div ref={cardRef} className={classes.join(' ')} style={{ '--i': index }} tabIndex={-1} role="article" aria-label={`${worker.name}, ${worker.role}, ${STATUS_LABELS[worker.status]}`} data-worker-name={worker.name}>
       <div className="worker-card__inner">
         <div className="worker-card__front" aria-hidden={isFlipped || undefined} tabIndex={isFlipped ? -1 : undefined}>
           <div className="worker-header">
@@ -1035,7 +1035,7 @@ export default function App() {
         const t = setTimeout(() => {
           setWorkerConfetti({ name: worker.name, color })
           const lines = WORKER_COMPLETION_LINES[worker.id]
-          const text = lines ?? (worker.name + ' shipped it!')
+          const text = Array.isArray(lines) ? worker.name + ': ' + lines[Math.floor(Math.random() * lines.length)] : (worker.name + ' shipped it!')
           setCompletionToast({ name: worker.name, color, text })
           workerConfettiTimerRef.current = setTimeout(() => setWorkerConfetti(null), 2500)
           const ct = setTimeout(() => setCompletionToast(null), 3000)
