@@ -1,6 +1,12 @@
 [
   {
     "type": "complete",
+    "worker": "Sofia",
+    "message": "\ud83d\udd0d QA review #97 complete \u2014 11 suggestions, 3.3/5 overall, 6 strike-five items flagged, 1 new bug found",
+    "timestamp": "2026-03-11T10:45:00Z"
+  },
+  {
+    "type": "complete",
     "worker": "Luna",
     "message": "Creative review #96 \u2014 7 ideas (2 should, 3 could, 2 wild). Focus: accessibility, mobile delight, ambient storytelling.",
     "timestamp": "2026-03-11T10:06:00Z"
