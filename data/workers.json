@@ -7,7 +7,17 @@
       "status": "working",
       "task": "Creative review #91",
       "started_at": "2026-03-11T01:00:00Z"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "role": "QA Engineer",
+      "status": "idle",
+      "task": "QA review #80 complete \u2014 awaiting next cycle",
+      "progress": 100,
+      "started_at": "2026-03-11T01:00:00Z",
+      "updated_at": "2026-03-11T01:20:00Z"
     }
   ],
-  "updated_at": "2026-03-11T01:20:00Z"
+  "updated_at": "2026-03-11T01:45:00Z"
 }
