@@ -1,7 +1,7 @@
 {
   "analyst": "Sofia",
-  "timestamp": "2026-03-11T12:20:32Z",
-  "review_number": 99,
+  "review_number": 100,
+  "timestamp": "2026-03-11T13:15:00Z",
   "scores": {
     "visual": 4,
     "ux": 3,
@@ -9,180 +9,167 @@
     "performance": 3,
     "accessibility": 2,
     "code_quality": 3,
-    "features": 5,
+    "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.5,
-  "screenshots": {
-    "desktop": "/workspace/data/qa99-desktop.png",
-    "mobile": "/workspace/data/qa99-mobile.png",
-    "note": "Buttons enumerated: ↺ sync, ☀️ theme, 🏢 Office, 📊 Dashboard, 📋 and ℹ️ nav buttons, ✕ Close × 3, filter buttons (All/Hires/Completions/Errors/System), worker filter buttons (All Workers, Luna, Carlos, Maya, Dave, Sofia), and footer tagline quote button."
-  },
-  "summary": "Review #99. Two solid fixes land: isTouchDevice correctly moved inside App() via useMemo (STRIKE-6 item, finally done), and vibe history push is now properly guarded with isInitialMount (STRIKE-6 item, done). Three delightful features shipped: STANDUP badge on the conference table, last-huddle timer tracking, and a vibe-transition caption overlay with 90s cooldown — all charming and well-built. The thought bubble quips grew from 4 to 20+ vibe-reactive strings, dramatically increasing replayability. However: 4 of the 6 STRIKE-6 items remain broken and are now STRIKE-7. Worker cards tabIndex=-1 is eight characters of change. ErrorBoundary #f87171 is two lines. Mobile hover card dismiss is five lines of JSX. App.jsx grew from 1482 to 1590 lines (+108) and Office.jsx from 1823 to 1863 lines (+40) — the monolith is still growing. A new ref-as-prop bug in lastHuddle causes stale huddle data in ConferenceTable. The double RAF handles in the thought bubble useEffect remain uncancelled on unmount (carried from #98).",
+  "overall_score": 3.4,
   "suggestions": [
     {
-      "priority": "critical",
+      "priority": "high",
+      "category": "ux",
+      "title": "Mobile pinned hover card has no visible dismiss control — STRIKE 8",
+      "description": "On touch devices, Character.jsx shows a pinned hover card (pinnedCard state) when tapped. The only dismiss is clicking outside .char — not discoverable, not announced, no X button, no visual affordance. A mobile user has no idea it's tappable-to-close. Add a small '×' close button inside the card when pinnedCard is true, visible only at (hover: none) media query. tabIndex=0, aria-label='Close card'.",
+      "effort": "small",
+      "strike": 8
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "App.jsx 1590 lines, Office.jsx 1871 lines — monolith keeps growing — STRIKE 8",
+      "description": "Office.jsx grew 8 lines this cycle (1863→1871). The file now contains: 15+ constant maps, 10+ helper components (CharacterAvatar, AwaySign, ConferenceTable, WallClock, WindowElement, VibeShockwave, Character, etc.), and the main Office export. Each of these components could live in their own file under src/components/office/. The code is readable but a future contributor debugging Character animation will wade through 1800 lines before finding it. Split at minimum: CharacterAvatar → components/CharacterAvatar.jsx; ConferenceTable → components/ConferenceTable.jsx; WallClock+WindowElement → components/OfficeDecor.jsx.",
+      "effort": "large",
+      "strike": 8
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "lastHuddle ref prop passes stale data to ConferenceTable — STRIKE 8",
+      "description": "Office.jsx passes `lastHuddle` (a React ref object) to ConferenceTable as a prop (line 1707). When the meeting ends, the useEffect on lines 1402–1410 mutates `lastHuddle.current.endedAt` AFTER the render caused by `meetingWorkers` going to []. ConferenceTable re-renders with the new props, reads `lastHuddle.current` — but at that moment, endedAt is still null because the effect hasn't fired yet. The tick interval that could save it (line 1019) is only active when meetingWorkers.length >= 2, which it no longer is. Result: 'Last huddle' info never reliably renders after a meeting ends. Fix: lift lastHuddle into actual useState so mutations trigger re-renders, or pass lastHuddleRef.current as a plain value prop.",
+      "effort": "small",
+      "strike": 8
+    },
+    {
+      "priority": "high",
+      "category": "ux",
+      "title": "Speech bubble escapes office floor container on mobile — STRIKE 7",
+      "description": "The manager speech bubble (speech-bubble--manager) has max-width: 160px and is positioned above the character. On narrow screens (375px), characters near the right edge push the bubble off-screen or under the header. Office.css line 824 sets max-width: 160px but no responsive clamp. Add CSS: @media (max-width: 480px) { .speech-bubble { max-width: calc(100vw - 40px); right: auto; left: 50%; transform: translateX(-50%); } }",
+      "effort": "small",
+      "strike": 7
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Thought bubble double RAF handles not cancelled on unmount — STRIKE 3",
+      "description": "Office.jsx lines 1454–1455: `requestAnimationFrame(() => { requestAnimationFrame(() => setThoughtBubble(...)) })`. Neither RAF ID is stored or cancelled in the useEffect cleanup (lines 1466–1469). If Office unmounts between the first and second RAF (tab navigation, hot reload), the second RAF fires and calls setState on an unmounted component. In React 18 this no longer throws, but it still runs stale state updates. Fix: `const r1 = requestAnimationFrame(() => { const r2 = requestAnimationFrame(...); cleanup.r2 = r2 }); cleanup.r1 = r1` with cancel in cleanup. Or use a simple `setTimeout(fn, 32)` instead of double-RAF.",
+      "effort": "small",
+      "strike": 3
+    },
+    {
+      "priority": "medium",
       "category": "accessibility",
-      "title": "Worker cards tabIndex={-1} — STRIKE 7, truly blocking",
-      "description": "WorkerCard outer div at App.jsx line 396 is permanently tabIndex={-1}. Screen-reader and keyboard users cannot navigate to any worker card. Seven consecutive reviews. The fix is eight characters: change tabIndex={-1} to tabIndex={0}. The inner elements correctly manage their own tabIndex (lines 398, 411, 433, 457, 462). This is a WCAG 2.1 SC 2.1.1 and SC 2.4.3 failure. At this point the card is not keyboard-focusable at any state and the aria-label on the outer div (which reads name/role/status) is unreachable by keyboard users. Unacceptable for seven cycles.",
-      "effort": "trivial",
-      "assigned_to": "maya"
+      "title": "vibeCaption aria-live region is conditionally rendered — misses announcements — STRIKE 3",
+      "description": "Office.jsx line 1709: `{vibeCaption && <div className='vibe-caption' aria-live='polite'>`. Screen readers require the live region to exist in the DOM before content changes are announced. When vibeCaption is null, the div is unmounted. When it becomes non-null and mounts with text already inside, the announcement is missed. Fix: render the div unconditionally with dynamic content: `<div className='vibe-caption' aria-live='polite' aria-atomic='true'>{vibeCaption ?? ''}</div>`.",
+      "effort": "small",
+      "strike": 3
     },
     {
-      "priority": "critical",
-      "category": "bug",
-      "title": "ErrorBoundary fallback hardcoded dark-mode color — STRIKE 7",
-      "description": "App.jsx line 17: color '#f87171' is hardcoded in the ErrorBoundary inline style. On a light-mode browser the red-400 text is invisible against white. Seven reviews, zero action. Fix is two lines: either color: 'var(--text-error, #f87171)' or extract to App.css .error-boundary-msg { color: #f87171 } and add a light-mode override. The button next to it (line 18) also has no color specified and will inherit the parent red, making the button text illegible in light mode too.",
-      "effort": "trivial",
-      "assigned_to": "maya"
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Footer quote button missing aria-label — STRIKE 6",
+      "description": "App.jsx line 1579–1584: The footer-tagline button has no aria-label attribute. Its accessible name is the quote text (e.g., 'if it compiles, ship it.'), which gives no indication of its action. A screen reader user hears just the quote with no context that it's an interactive button to cycle quotes. Add: aria-label='Cycle quote — tap for another thought'.",
+      "effort": "small",
+      "strike": 6
     },
     {
-      "priority": "high",
-      "category": "bug",
-      "title": "Mobile pinned hover card has no visible dismiss control — STRIKE 7",
-      "description": "On touch devices, tapping a character calls setPinnedCard (Office.jsx line 844) which pins the hover card open. Dismissal requires tapping outside the .char container (Office.jsx line 780: if (!e.target.closest('.char')) setPinnedCard(false)). This interaction is completely undiscoverable. Seven consecutive reviews with no fix. The hover card renders at Office.jsx line 931 inside the char-hover-card div. Add a close button: {pinnedCard && <button className='char-hover-card__close' onClick={e => { e.stopPropagation(); setPinnedCard(false) }} aria-label='Close worker card'>✕</button>}. Five lines of JSX plus two CSS lines.",
-      "effort": "low",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "App.jsx 1590 lines, Office.jsx 1863 lines — monolith keeps growing — STRIKE 7",
-      "description": "App.jsx grew from 1482 → 1590 lines (+108 this cycle). Office.jsx grew from 1823 → 1863 lines (+40). Combined source: 3453 lines (was 3305, +148). Seven cycles, zero splitting. STANDUP logic (lines 1331-1332 in Office.jsx), ConferenceTable (line 1015, 170 lines of component), AwaySign (line 584), thought bubble logic (lines 1348-1463), and VIBE_SHOCKWAVE_COLORS/WORKER_AWAY_MESSAGES/LONE_SURVIVOR_LABELS are all splitworthy. Proposed plan: ConferenceTable.jsx (own file), AwaySign.jsx (own file), officeConstants.js (VIBE_SHOCKWAVE_COLORS, WORKER_AWAY_MESSAGES, LONE_SURVIVOR_*). That alone removes ~400 lines from Office.jsx.",
-      "effort": "high",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "NEW: lastHuddle ref passed as prop — stale data in ConferenceTable",
-      "description": "Office.jsx line 1699 passes lastHuddle (a useRef) to ConferenceTable as a prop. React does not re-render on ref mutation — ConferenceTable will never update when lastHuddle.current changes unless its parent re-renders for another reason. The 'Last: [names] · [time]' display (lines 1113-1120 inside ConferenceTable) reads lastHuddle.current at render time, but since the ref mutation at lines 1396-1402 does not trigger a re-render, the display can show stale or missing huddle data. Fix: lift lastHuddle from a ref to useState so mutations cause re-renders, or pass lastHuddle.current (the plain object) as the prop and update it via setState.",
-      "effort": "low",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "Speech bubble escapes office floor container on mobile — STRIKE 6",
-      "description": "Characters near the top of the office floor render their speech bubble (bottom: calc(100% + 8px)) outside the clipped container. On 375px width the bubble clips or disappears. The parent .office-floor uses overflow: clip with overflow-clip-margin: 20px (Office.css lines 84-85) but top-row characters at top: ~4% still overflow. Fix: detect top-row characters and flip bubble direction downward, or add a CSS clamp on the bubble's bottom position relative to the floor.",
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Character tooltips implemented via CSS ::after data-tooltip — not in accessibility tree — STRIKE 6",
+      "description": "Character.jsx line 839: `{ 'data-tooltip': tooltipText }` — these are read by Office.css ::after pseudo-elements. Content in CSS ::after is not exposed to screen readers. A keyboard-navigating user tabbing into a working character (which correctly gets tabIndex=0) will hear the character name but not the tooltip (task description, deep work status). Fix: add aria-describedby pointing to a real DOM element, or append the tooltip text to the aria-label of the character div.",
       "effort": "medium",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Thought bubble double RAF handles not cancelled on unmount — STRIKE 2",
-      "description": "Office.jsx lines 1447-1448: two nested requestAnimationFrame calls inside showBubble() are not tracked or cancelled in the useEffect cleanup. The cleanup at line 1458 correctly cancels thoughtScheduleRef and thoughtHideRef (the setTimeout handles), but if Office unmounts between the two RAFs, the second RAF fires setThoughtBubble on a component that is no longer mounted. React 18 is tolerant but the handles should still be cancelled for correctness. Fix: const raf1 = requestAnimationFrame(() => { const raf2 = requestAnimationFrame(...); rafRef2.current = raf2 }); rafRef1.current = raf1; then cancel both in cleanup.",
-      "effort": "low",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "vibeCaption aria-live region is conditionally rendered — misses announcements",
-      "description": "Office.jsx line 1701: {vibeCaption && <div className='vibe-caption' aria-live='polite'>{vibeCaption}</div>}. The live region is created and destroyed with the content. Screen readers register aria-live regions at page load; a region that appears and disappears dynamically may not be picked up by all assistive technology. The correct pattern is to always render the live region but empty it when inactive: <div className='vibe-caption' aria-live='polite' aria-atomic='true'>{vibeCaption ?? ''}</div>. Same pattern applies to the full-sync and full-idle banners at lines 1527-1528 (those are always rendered when active, so they also benefit from this change).",
-      "effort": "trivial",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Footer quote button missing aria-label — STRIKE 5",
-      "description": "App.jsx line 1581: the footer-tagline button has no aria-label. The accessible name becomes the full rendered quote text (e.g., '✦\"if it compiles, ship it.\"'), which is the quote content — not the button's purpose. Screen readers read the full quote on focus, which is disorienting and not actionable. Add aria-label='Cycle team quote' to communicate the button's purpose. Five cycles, trivial fix.",
-      "effort": "trivial",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Character tooltips in CSS ::after — not in accessibility tree — STRIKE 5",
-      "description": "Character name/status tooltips rendered via CSS content attr(data-tooltip) are invisible to screen readers. The hover card (char-hover-card) is more informative but only appears on hover/click, not on keyboard focus. Keyboard users navigating the office floor get no task or status information from characters. Fix: add aria-describedby on the character .char element pointing to a visually-hidden span containing tooltip text, or ensure keyboard focus triggers the hover card the same way mouse hover does.",
-      "effort": "medium",
-      "assigned_to": "sofia"
+      "strike": 6
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "footer-tagline button uses key prop to force DOM remount — anti-pattern — STRIKE 4",
-      "description": "App.jsx line 1582: key={`${teamVibe.key}-${quoteBonus}`} on the footer button causes React to unmount and remount the button on every vibe change or quote click. This destroys focus (keyboard users lose their position), resets CSS transitions, and causes unnecessary DOM churn. Use a ref plus an imperative CSS animation class toggle instead of key remounting. The sparkle animation can be triggered by adding/removing a class via a ref rather than remounting the element.",
-      "effort": "low",
-      "assigned_to": "carlos"
+      "title": "footer-tagline uses key prop to force DOM remount — anti-pattern — STRIKE 5",
+      "description": "App.jsx line 1580: `key={\\`${teamVibe.key}-${quoteBonus}\\`}` on the footer button. Using key to intentionally unmount/remount a DOM element to trigger a CSS animation is a documented React anti-pattern. It also destroys focus state if the button is focused. Use a CSS animation class toggling approach instead: set a class on click, remove it after animation completes via transitionend listener or a short setTimeout.",
+      "effort": "small",
+      "strike": 5
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "ProgressBar renders unconditionally — root cause in normalize() — STRIKE 4",
-      "description": "App.jsx line 452: correctly guards with `worker.progress !== null` before rendering ProgressBar — this is now properly fixed from a prior review. However, normalize() at line 930 sets progress: typeof w.progress === 'number' ? w.progress : null, so when the API omits the field, progress is null and ProgressBar is correctly skipped. Verify this works end-to-end — the aria-valuenow at line 322 still falls back to 0 when progress is non-numeric, so a malformed progress value (e.g. a string) would silently show 0%. Add Number.isFinite(w.progress) in normalize() instead of typeof check.",
-      "effort": "trivial",
-      "assigned_to": "carlos"
+      "category": "accessibility",
+      "title": "polling-paused-pill button missing aria-label — NEW",
+      "description": "App.jsx lines 1350–1357: The `polling-paused-pill` button has `title='Auto-refresh paused due to inactivity'` but no `aria-label`. Titles are not reliably announced by all screen readers (especially on mobile). The button text reads '⏸ Paused · Tap to refresh' or 'Move mouse to refresh' depending on device — the first part is fine, but the emoji ⏸ with 'Paused' is ambiguous without context. Add `aria-label='Auto-refresh paused — click to resume'` to make it unambiguous.",
+      "effort": "small",
+      "strike": 1
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "standupActive computed inline — not memoized — minor perf issue",
-      "description": "Office.jsx line 1331: const standupActive = workingWorkers.length >= 3 && (vibe === 'crushing' || vibe === 'in-flow') is computed as a plain boolean in the render body. While this boolean is used in the standupWorkers useMemo on line 1332, it re-evaluates on every render. Wrap in useMemo(() => workingWorkers.length >= 3 && (vibe === 'crushing' || vibe === 'in-flow'), [workingWorkers.length, vibe]) to be consistent with the rest of the derived state pattern in this file.",
-      "effort": "trivial",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Office window flat rectangle in dark mode — STRIKE 3",
-      "description": "Office.css line 1055: .office-window uses border: 2px solid var(--border) which renders as a nearly-invisible flat square in dark mode. Add a 2-3px inset box-shadow in a slightly lighter tone and a thin top highlight to simulate a window sill. Minimal effort, meaningful polish.",
-      "effort": "low",
-      "assigned_to": "maya"
+      "title": "computeDailySummary references VIBE_RANK declared 380 lines below — code ordering — NEW",
+      "description": "App.jsx: `computeDailySummary` is defined at line 113 and references `VIBE_RANK` which is declared at line 493. While not a runtime bug (both are evaluated before the function is called during render), this violates the principle of declaration-before-use and will confuse any future contributor reading the file top-to-bottom. Either move VIBE_RANK to the top of the file alongside other constant maps (line ~50), or pass it as a parameter to computeDailySummary.",
+      "effort": "small",
+      "strike": 1
     },
     {
       "priority": "low",
       "category": "performance",
-      "title": "Stats bar may wrap to 2 rows at mid-range viewports — STRIKE 5",
-      "description": "App.css line 619: at 600-900px the stats bar shifts to repeat(3, 1fr). A 5-stat grid in 3 columns always produces a partial second row. Either hide secondary stats at this breakpoint or use repeat(auto-fit, minmax(120px, 1fr)) for fluid columns.",
-      "effort": "low",
-      "assigned_to": "maya"
+      "title": "ideas.json milestone fetch adds a 3rd network request on every app load — NEW",
+      "description": "App.jsx lines 1227–1245: The useEffect fires once per mount and fetches a separate ideas.json endpoint to check `review_number >= 100`. This fires on EVERY load for EVERY user, every time. Now that review_number is 101, all users get confetti on every load — which may be the intent (milestone celebration) but should probably be gated more carefully. Consider: (1) using safeRead to persist 'milestone-seen' to localStorage so confetti only fires once per session, OR (2) folding review metadata into the existing workers.json to eliminate the extra request. Currently milestoneConfettiFiredRef.current prevents double-fire within a session, but not across sessions.",
+      "effort": "small",
+      "strike": 1
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "lone-survivor-label uses inline style block instead of CSS class — STRIKE 2",
-      "description": "Office.jsx line 1772: the lone-survivor label uses a 9-property inline style object directly in JSX (fontSize, opacity, position, bottom, left, transform, whiteSpace, color). This is inconsistent with the rest of the file. Move to a .lone-survivor-label class in Office.css. Two cycles of this pattern.",
-      "effort": "trivial",
-      "assigned_to": "maya"
+      "title": "standupActive computed inline — not memoized — STRIKE 2",
+      "description": "Office.jsx line 1338: `const standupActive = workingWorkers.length >= 3 && (vibe === 'crushing' || vibe === 'in-flow')`. This is a derived boolean computed inline every render, while the heavier `standupWorkers` useMemo on line 1339 depends on it. Minor inconsistency — standupActive should be wrapped in useMemo like its peers, or at minimum moved inside the useMemo for standupWorkers. Low impact but adds to the 'inline compute scattered everywhere' pattern.",
+      "effort": "small",
+      "strike": 2
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Office window renders flat rectangle in dark mode — STRIKE 4",
+      "description": "Office.jsx WindowElement: the window frame has no border/shadow treatment that distinguishes it as a raised element in dark mode. The sky gradient fills it but the frame itself blends into the dark office floor background. In light mode (per ideas.json this is flagged as a full office light-theme parity issue) it's even worse. Add a subtle box-shadow and border to .office-window to give it depth: `box-shadow: inset 0 0 0 2px rgba(255,255,255,0.06), 0 2px 8px rgba(0,0,0,0.4)`.",
+      "effort": "small",
+      "strike": 4
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Stats bar may wrap to 2 rows at mid-range viewports (768–900px) — STRIKE 6",
+      "description": "StatsBar renders up to 7 stat cards (total, active, idle, sync, vibe, errors, stuck). At viewport widths 768–900px the flex-wrap on .stats-bar causes cards to reflow to a 2nd row, creating an uneven layout. Consider using a scrollable horizontal strip at <900px: `overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch;` — or reduce stat-card min-width in that breakpoint.",
+      "effort": "small",
+      "strike": 6
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "NEW: lastHuddle inline style block in ConferenceTable",
-      "description": "Office.jsx lines 1113-1120: the 'last huddle' display inside ConferenceTable uses an inline style object with 4 properties (opacity, fontSize, textAlign, marginTop) directly in JSX. Move to a .conf-last-huddle CSS class in Office.css for consistency.",
-      "effort": "trivial",
-      "assigned_to": "maya"
+      "title": "lone-survivor-label uses inline style block instead of CSS class — STRIKE 3",
+      "description": "Office.jsx line 1780: `<div className='lone-survivor-label' style={{ fontSize: '0.6rem', opacity: 0.6, position: 'absolute', bottom: '-0.6rem', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap', color: 'rgba(255,255,255,0.7)' }}>`. All seven style properties are inline. This exact same style has been flagged for 3 reviews. The class `.lone-survivor-label` already exists — move the styles there.",
+      "effort": "small",
+      "strike": 3
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "lastHuddle inline style block in ConferenceTable — STRIKE 2",
+      "description": "Office.jsx lines 1110–1113: The 'last huddle ended' div uses a fully inline style block with 4 properties. This is the second occurrence — extract to a CSS class `.conf-last-huddle` in Office.css.",
+      "effort": "small",
+      "strike": 2
+    },
+    {
+      "priority": "low",
+      "category": "accessibility",
+      "title": "bloberto-thought-bubble is aria-hidden but contains reactive team-state content — NEW",
+      "description": "Office.jsx line 1757: `<div className='bloberto-thought-bubble...' aria-hidden='true'>`. The thought bubble reacts to actual team state (error count, full sync, lone survivor, vibe) and displays contextual quips like 'This is fine 🔥' or 'Full squad! Let's go 🚀'. Marking it aria-hidden means screen reader users miss this ambient commentary. Given it appears every 15–20s and contains substantive state info, consider adding it to an aria-live polite region instead of hiding it.",
+      "effort": "small",
+      "strike": 1
     }
   ],
-  "verified_fixes": [
-    "isTouchDevice moved inside App() via useMemo — FIXED. App.jsx line 778 shows const isTouchDevice = useMemo(() => typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches, []) inside the App component body, with a clarifying comment above. This was a STRIKE-6 item. Clean fix.",
-    "Vibe history push guarded with isInitialMount — FIXED. App.jsx lines 1198-1204: if (!isInitialMount) { ... history.push({ key: teamVibe.key, ts: Date.now() }) ... setVibeHistory(history) }. The isInitialMount check (previousVibeKeyRef.current === null, line 1164) now correctly guards both the streak counter and the history array push. This was a STRIKE-6 item. Full fix.",
-    "Thought bubble quips expanded massively — from 4 static strings to 20+ vibe-reactive quips covering all vibe states, error counts, isFullSync, isFullIdle, isLoneSurvivor, and workingWorkers.length. The breadth is excellent: vibe-specific messages, error counts, lone survivor, full idle, full sync — all distinct. Review #98 complaint fully addressed.",
-    "STANDUP feature landed — when vibe is 'crushing' or 'in-flow' and ≥3 workers are active, standupWorkers array is populated (Office.jsx line 1331-1332) and the conference table displays a STANDUP badge with those workers rendered around the table (lines 1140-1155). Correctly mutually exclusive with the Huddle badge. Well-structured.",
-    "Huddle timer tracking landed — lastHuddle ref tracks startedAt/endedAt for meeting sessions. When a huddle ends and was within 30 minutes, 'Last: [names] · [time]' appears below the conference table (lines 1103-1120). getRelativeTime is correctly used for the timestamp. Note: ref-as-prop issue noted in suggestions above.",
-    "Vibe caption overlay landed — on vibe change, a 2.8-second overlay caption appears in the office floor with vibe-specific emoji+text (Office.jsx lines 1427-1438), with a 90s debounce (lastVibeCaptionRef) to avoid spamming on rapid vibe changes. Clean implementation.",
-    "nameplate-pop animation on vibe change — nameplateRef.current.classList.add('nameplate-pop') is triggered on vibe change with proper cleanup (line 1419). Adds tactile feedback to vibe transitions.",
-    "No console.log or console.warn calls in production source — still clean.",
-    "ProgressBar conditional rendering confirmed — App.jsx line 452: worker.progress !== null correctly guards ProgressBar rendering."
-  ],
-  "strike_five_hall_of_shame": [
-    "Worker cards tabIndex={-1} — SEVEN consecutive reviews. App.jsx line 396. Eight characters to fix. This is now a WCAG failure in production for seven release cycles.",
-    "ErrorBoundary hardcoded #f87171 — SEVEN consecutive reviews. App.jsx line 17. Two lines of change. Light-mode users see invisible error text.",
-    "Mobile pinned hover card no dismiss control — SEVEN consecutive reviews. Office.jsx char-hover-card. Five lines of JSX. Users are trapped with no discoverable way to close.",
-    "App.jsx + Office.jsx monolithic files — SEVEN consecutive reviews. Combined lines GREW from 3305 to 3453 (+148). App.jsx is now 1590 lines, Office.jsx is now 1863 lines.",
-    "Footer tagline button missing aria-label — FIVE consecutive reviews. App.jsx line 1581. Trivial fix. Screen readers read the full quote instead of the button purpose.",
-    "Character tooltips in CSS ::after not in accessibility tree — FIVE consecutive reviews. Keyboard users cannot access character status information.",
-    "Speech bubble escapes office floor container on mobile — SIX consecutive reviews. Characters near top:4% overflow the clipped container on 375px width."
-  ],
   "praise": [
-    "The STANDUP feature is the best new feature in several reviews. standupActive (vibe 'crushing'/'in-flow' + ≥3 workers) triggering the conference table STANDUP badge with workers rendered as avatars around the table is both visually charming and semantically meaningful. The mutual exclusion with the Huddle path (standupWorkers.length === 0 guard at line 1116) is correct.",
-    "Thought bubble quips expanding from 4 to 20+ is exactly what was asked for in #98. The coverage is thorough: 2-error 'This is fine 🔥', 1-error 'rough day', full sync, lone survivor, isFullIdle, all 5 vibe states with multi-worker variants, and a sensible fallback. This is genuinely fun to read.",
-    "The vibe caption overlay with 90-second debounce is elegant UX. Rapid vibe changes will not spam the caption, and the 2.8-second display time is just right. lastVibeCaptionRef.current = Date.now() as a debounce signal is the correct pattern (no state update triggered, no re-render, just a timestamp check).",
-    "isTouchDevice fix is clean and the comment above it ('Evaluated inside the component (via useMemo) to stay fresh on hybrid devices') is the first genuinely useful inline comment in this file in several reviews.",
-    "isInitialMount guard on the vibe history push is correct and symmetric with the streak guard above it. The previousVibeKeyRef.current === null sentinel is still the right pattern. Both guards now live together.",
-    "The huddle duration display ('Huddle · 3m') using Date.now() - startedAt inline at line 1123-1129 with tabular-nums font variant is a tiny but polished touch. The <1m case returning null instead of '0m' is the correct UX decision."
-  ]
+    "🎉 Two CRITICAL items from last cycle are FIXED: worker cards now correctly have tabIndex={0} (line 396) — keyboard navigation through the dashboard works as expected.",
+    "✅ ProgressBar null guard is fixed: `{worker.progress !== null && (` on line 452 prevents rendering ProgressBar with null progress — clean and correct.",
+    "✨ ErrorBoundary color now uses `var(--text-error, #f87171)` — the fallback is readable in both light and dark modes. Functionally resolved.",
+    "🚀 Milestone confetti feature is delightful — fetching ideas.json to detect review_number >= 100 and firing confetti is an extremely charming Easter egg that shows the codebase has genuine personality.",
+    "💡 The ideas.json architecture is clever — Luna's creative briefs living in a JSON file that the app can self-read for milestone detection is meta in the best way.",
+    "🎨 Screensaver SVGs per-worker (DESK_SCREENSAVER_SVG) are wonderful — idle Carlos gets a bouncing debug dot, idle Luna gets a floating crescent. This level of character is exceptional.",
+    "🧹 The WORKER_COMPLETION_LINES map and staggered confetti for multi-worker task completion are polished UX touches — each worker has their own voice.",
+    "⚡ The syncFromGitHub uses Promise.allSettled with graceful degradation: partial failure shows fetchWarn instead of fetchError — correct and resilient.",
+    "🔐 safeSave/safeRead wrappers in utils/safeSave.js are clean, minimal, and correctly swallow QuotaExceededError and SecurityError.",
+    "🏆 The vibe streak with tiered visual treatment (steady/hot/legendary) and streak eulogy toast on streak loss is peak product thinking."
+  ],
+  "milestone_note": "Review #100 🎂 — One hundred QA cycles on Bloberto's Office. This codebase has gone from a simple worker tracker to a living, breathing office simulation with personality, ambient animations, reactive quips, and now self-aware milestone confetti. Two CRITICALs closed this cycle — the worker card tabIndex fix alone clears months of keyboard accessibility debt. The monolith concern has now been raised 8 consecutive times with no movement; at review #200 I'm guessing Office.jsx will hit 3,000 lines. The app has genuine soul — no other project at this scale has this much craft in its error bubbles, PANIC SVGs, and away-sign sticky notes. Here's the real stat: 100 reviews in, and the fun factor has never dropped below 5. That's the number that actually matters."
 }

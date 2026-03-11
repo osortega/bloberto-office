@@ -1,64 +1,72 @@
 {
   "creative_director": "Luna",
-  "review_number": 101,
-  "timestamp": "2026-03-11T12:35:00Z",
-  "theme": "Review #101 \u2014 The office has soul but no memory. This review is about giving the space a sense of time, history, and earned personality.",
+  "review_number": 102,
+  "timestamp": "2026-03-11T13:46:00Z",
+  "theme": "Review #102 — The dashboard watches the team, but the team should feel watched back. This review is about making every status change a moment, not a state flip.",
   "ideas": [
     {
       "priority": "must",
       "category": "delight",
-      "title": "Office Light Theme Parity",
-      "description": "The office floor has no light-theme CSS overrides \u2014 switching to light mode makes the office nearly unreadable with dark backgrounds clashing against light chrome. Users who prefer light mode get a broken experience. Floor, desks, monitors, and plants all need light-mode custom properties.",
+      "title": "Monitor Boot Sequence on Status Wake-Up",
+      "description": "When a worker transitions from idle (screensaver) to working, the monitor switches instantly — no drama. Add a 400ms boot animation: a quick flash, a cursor blink, then a progress bar before the working SVG loads in. DESK_SCREENSAVER_SVG → DESK_SCREEN_SVG already swaps on status change, so the hook is right there. The boot moment gives viewers a satisfying 'they're back' beat and makes status changes feel physical, not boolean.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "must",
+      "category": "storytelling",
+      "title": "Error Postmortem Card on Recovery",
+      "description": "When a worker flips from error → working, nothing marks the moment except a status label change. Float a tiny 'incident resolved' card up from their desk with a timestamp and a one-liner in their voice — Carlos: 'root cause: the logs lied', Dave: 'pipeline green. do not ask what I did', Sofia: 'test added. you are welcome.' The PING_REACTIONS already establish each worker's voice. Turning error recovery into a narrative closure makes the on-fire → flow transition emotionally satisfying instead of invisible.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "After-Hours Office Deepens into Night",
+      "description": "The WindowElement already swaps to a night-sky gradient at after-hours, but the office floor looks identical day and night. When vibe hits after-hours, shift the whole interior: darken floor tiles, warm desk lamps to amber, turn ambient-particle color to moonlight-blue, add faint star-dots to the ceiling area via a CSS layer. The data-vibe attribute is already on .office-floor — it's a pure CSS addition. The office should LOOK like night, not just be labeled it.",
       "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "office-life",
-      "title": "Worker Task Progress Pulse on Desk Lamp",
-      "description": "Desk lamps glow when working but they're static. The lamp brightness/pulse speed should reflect the worker's actual progress percentage \u2014 dim and slow at 10%, bright and fast at 90%. It creates a visceral 'getting closer' feeling without needing to read numbers.",
+      "title": "Animated Vacancy Job Board on Empty Desks",
+      "description": "VACANT_ADS already define a title + req per vibe, but they render as static text on the monitor. Make the empty desk monitor cycle through animated slides: a scrolling marquee for slow-day, urgent red blinker for on-fire, a minimal centered haiku for after-hours. The DESK_SCREEN_SVG infrastructure already exists per worker — a 'vacant' SVG variant driven by vibeKey would drop right in. Empty desks are real estate; they should tell a story instead of sitting blank.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "dave"
     },
     {
       "priority": "should",
-      "category": "storytelling",
-      "title": "Conference Table Meeting Topic Display",
-      "description": "When workers huddle at the conference table, there's a 'Huddle' badge but no context about what they might be discussing. Show the most recent activity log entry involving any seated worker as a tiny topic on the table surface. Makes the huddle feel purposeful, not random.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "could",
-      "category": "feature",
-      "title": "Notification Sound Toggle",
-      "description": "The dashboard shows confetti and toasts when workers ship, but there's no audio cue. A subtle chime on task completion and a soft alert on errors would let people keep the tab in the background and still feel connected. Add a mute toggle in the header.",
+      "category": "team",
+      "title": "Co-Ship Spark Line Between Desks",
+      "description": "When two workers complete tasks within 60 seconds of each other, briefly draw a glowing animated line between their desk positions (using DESKS coordinate data already in constants.js). Color it per the slower worker's role color from ROLE_COLORS. No new data needed — just watch the activityEntries stream for back-to-back 'complete' events. Turns invisible collaboration into a visible spatial moment. The office floor becomes a social graph, if only for a second.",
       "effort": "medium",
-      "assigned_to": "maya"
+      "assigned_to": "carlos"
     },
     {
       "priority": "could",
       "category": "delight",
-      "title": "Desk Personal Items That Evolve",
-      "description": "Each desk already shows idle props (coffee, duck, plant, books) but they rotate randomly. Give each worker a signature desk item that levels up over time \u2014 Carlos gets a growing stack of log printouts, Maya gets an expanding color swatch collection, Dave's headphone cable gets longer. Rewards long-time viewers with continuity.",
-      "effort": "medium",
+      "title": "Bloberto Reacts to Task Completions",
+      "description": "VIBE_QUOTES exists and fires on a 45-second ambient loop, but Bloberto never reacts to real events. When a worker completes a task, trigger a 3-second speech bubble on Bloberto with a vibe-matched quote from the existing pool — plus add a small set of completion-specific lines ('That one's going in the retro as a win.', 'Per my roadmap, this was expected.'). Right now Bloberto is passive furniture. He should feel like a manager who notices things, even if he takes credit for them.",
+      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "visual",
-      "title": "Office Floor Weather Particles",
-      "description": "The vibe weather widget shows text and an icon, but the office floor itself doesn't reflect the weather. Add ambient CSS particles that match: rain drops for slow-day, floating embers for on-fire, subtle sparkles for crushing, snowflakes for after-hours. The floor should FEEL the vibe, not just label it.",
+      "category": "feature",
+      "title": "Luna's Ideas Panel in the Header",
+      "description": "ideas.json is already fetched (fetchIdeasFromGitHub is wired up) and used only for the review milestone confetti. Surface the review theme and top 2-3 ideas in an expandable tooltip or slide-in panel triggered by a 🌙 badge in the header when a fresh review drops. Users watching the dashboard would see the creative direction of the product they're watching. Meta, yes. But it closes a beautiful loop: the dashboard narrates its own evolution in real time.",
       "effort": "medium",
-      "assigned_to": "maya"
+      "assigned_to": "carlos"
     },
     {
       "priority": "wild",
-      "category": "feature",
-      "title": "Bloberto's Weekly Retro Report",
-      "description": "Every Monday, auto-generate a 'weekly retro' view from the activity log: tasks completed, errors encountered, peak vibe moments, MVP worker of the week. Display it as a newspaper-style overlay ('The Bloberto Times'). Turns passive monitoring into a narrative people actually want to read.",
-      "effort": "large",
-      "assigned_to": "carlos"
+      "category": "storytelling",
+      "title": "Lone Survivor Shadow Mode",
+      "description": "LONE_SURVIVOR_LABELS already write evocative flavor text when one worker remains (e.g. '🌙 last one standing'). But the character looks exactly the same as when the office is full. When a worker is the lone active presence, render them with a longer CSS drop-shadow, a slightly dimmer ambient particle field, and — if after-hours — a faint echo of their character silhouette offset by 2px behind them. The drama the copy promises should exist in the visual. Right now the text outperforms the scene.",
+      "effort": "medium",
+      "assigned_to": "maya"
     }
   ],
   "hire_proposals": []
