@@ -937,6 +937,18 @@
   border-top-color: rgba(10, 10, 28, 0.92);
 }
 
+/* Bubble below character — for characters near top of floor */
+.speech-bubble--below {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+.speech-bubble--below::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: rgba(10, 10, 28, 0.92);
+}
+
 /* ── Clipboard copy button inside Bloberto's speech bubble ── */
 .speech-bubble--manager {
   pointer-events: auto;
@@ -962,6 +974,9 @@
 }
 .speech-bubble--manager:hover .speech-bubble__copy-btn {
   opacity: 0.6;
+}
+@media (hover: none) {
+  .speech-bubble--manager .speech-bubble__copy-btn { opacity: 0.7; }
 }
 .speech-bubble__copy-btn:hover {
   opacity: 1 !important;
@@ -1509,6 +1524,26 @@
 .char-hover-card .hover-role { opacity: 0.7; }
 .char-hover-card .hover-task { margin-top: 4px; font-style: italic; }
 .char-hover-card .hover-time { opacity: 0.6; font-size: 0.7rem; margin-top: 3px; }
+
+/* Dismiss button — only visible on touch devices */
+.char-hover-card__dismiss {
+  display: none;
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: none;
+  color: var(--text, #e2e8f0);
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 2px 4px;
+}
+.char-hover-card__dismiss:hover { opacity: 1; }
+@media (hover: none) {
+  .char-hover-card__dismiss { display: block; }
+}
 
 /* ---- Office Plants ---- */
 .office-plant {

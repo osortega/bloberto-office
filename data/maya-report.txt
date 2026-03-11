@@ -1,0 +1,37 @@
+Maya's Bug Fix Report — Sofia QA Review #103
+=============================================
+Date: 2026-03-11
+
+BUG 1 — CRITICAL (strike 11): Mobile pinned hover card — no dismiss control
+-----------------------------------------------------------------------------
+File: src/Office.jsx
+Fix: Added a '✕' close button (<button class="char-hover-card__dismiss">) inside
+     .char-hover-card whenever pinnedCard is true. The button calls setPinnedCard(false)
+     and stops click propagation.
+
+File: src/Office.css
+Fix: Added .char-hover-card__dismiss styles (display: none by default, positioned
+     absolute top-right of card). Added @media (hover: none) rule to set display: block
+     so the button only appears on touch devices.
+
+BUG 2 — CRITICAL (strike 10): Bloberto speech bubble bleeds above floor border
+-------------------------------------------------------------------------------
+File: src/Office.jsx
+Fix: Added conditional class 'speech-bubble--below' to the manager speech bubble
+     div when the character's 'top' prop is < 20 (i.e., in the top 20% of the floor).
+     Bloberto is always rendered at top={4}, so this always applies.
+
+File: src/Office.css
+Fix: Added .speech-bubble--below rule that sets bottom: auto and top: calc(100% + 8px)
+     to render the bubble below the character. Also overrides ::after pseudo-element
+     to flip the triangle pointer to point upward (border-bottom-color instead of
+     border-top-color).
+
+BUG 3 — HIGH: Speech bubble copy button invisible on touch devices
+------------------------------------------------------------------
+File: src/Office.css
+Fix: Added @media (hover: none) { .speech-bubble--manager .speech-bubble__copy-btn
+     { opacity: 0.7; } } so the copy button is visible by default on touch devices
+     rather than requiring a :hover interaction.
+
+Build: Verified with `npm run build` — clean build, no errors.

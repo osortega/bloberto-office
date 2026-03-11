@@ -865,7 +865,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
         </div>
       )}
       {variant === 'manager' && bubble.quote && (
-        <div className={`speech-bubble speech-bubble--manager${bubble.show ? ' speech-bubble--visible' : ''}`}>
+        <div className={`speech-bubble speech-bubble--manager${bubble.show ? ' speech-bubble--visible' : ''}${top < 20 ? ' speech-bubble--below' : ''}`}>
           {bubble.quote}
           <button
             className={`speech-bubble__copy-btn${clipCopied ? ' speech-bubble__copy-btn--copied' : ''}`}
@@ -929,6 +929,13 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
       )}
       {(hovered || pinnedCard) && (variant === 'working' || variant === 'idle') && (
         <div className="char-hover-card">
+          {pinnedCard && (
+            <button
+              className="char-hover-card__dismiss"
+              onClick={(e) => { e.stopPropagation(); setPinnedCard(false) }}
+              aria-label="Dismiss"
+            >✕</button>
+          )}
           <strong>{worker.name}</strong>
           <span className="hover-role">{worker.role}</span>
           {worker.task && (

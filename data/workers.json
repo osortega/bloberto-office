@@ -20,11 +20,11 @@
     {
       "id": "maya",
       "role": "Frontend Engineer",
-      "status": "working",
-      "task": "Sofia QA #103 \u2014 Fix 3 CRITICAL: mobile dismiss button, speech bubble overflow, copy button touch visibility",
+      "status": "idle",
+      "task": "Fixed 3 QA #103 items: mobile dismiss, bubble overflow, copy button touch",
       "started_at": "2026-03-11T15:46:00Z",
-      "finished_at": null,
-      "updated_at": "2026-03-11T15:46:00Z"
+      "finished_at": "2026-03-11T15:48:00Z",
+      "updated_at": "2026-03-11T15:48:00Z"
     },
     {
       "id": "dave",
@@ -44,5 +44,5 @@
       "updated_at": "2026-03-11T15:45:00Z"
     }
   ],
-  "updated_at": "2026-03-11T15:46:00Z"
+  "updated_at": "2026-03-11T15:48:00Z"
 }
