@@ -3,11 +3,22 @@
     "id": "luna",
     "name": "Luna",
     "role": "Creative Director",
-    "emoji": "\ud83c\udf19",
+    "emoji": "🌙",
     "status": "working",
-    "task": "\ud83c\udfa8 Creative review #105",
+    "task": "🎨 Creative review #105",
     "progress": 0,
     "updated_at": "2026-03-11T17:10:00Z",
     "startedAt": "2026-03-11T17:10:00Z"
+  },
+  {
+    "id": "sofia",
+    "name": "Sofia",
+    "role": "QA & Product Analyst",
+    "emoji": "🔍",
+    "status": "working",
+    "task": "🔍 QA review #107",
+    "progress": 0,
+    "updated_at": "2026-03-11T18:15:00Z",
+    "startedAt": "2026-03-11T18:15:00Z"
   }
 ]
