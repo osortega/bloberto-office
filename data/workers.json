@@ -11,10 +11,10 @@
     {
       "id": "carlos",
       "role": "Backend Engineer",
-      "status": "idle",
-      "task": "QA #98 fixes \u2014 4 items fixed (vibe history, isTouchDevice, ProgressBar, thought quips)",
-      "started_at": "2026-03-11T11:46:00Z",
-      "finished_at": "2026-03-11T11:48:00Z"
+      "status": "working",
+      "task": "Luna #100 \u2014 browser tab pulse, stat daily summary tooltip, milestone confetti",
+      "started_at": "2026-03-11T12:07:00Z",
+      "finished_at": null
     },
     {
       "id": "maya",
@@ -43,5 +43,5 @@
       "updated_at": "2026-03-11T11:15:00Z"
     }
   ],
-  "updated_at": "2026-03-11T12:06:00Z"
+  "updated_at": "2026-03-11T12:07:00Z"
 }
