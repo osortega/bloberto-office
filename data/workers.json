@@ -15,11 +15,12 @@
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Analyst",
-      "status": "working",
-      "task": "QA review #85 \u2014 live site + codebase analysis",
-      "progress": 0,
+      "status": "idle",
+      "task": "QA review #85 complete \u2014 4.4/5, 2 MEDIUMs, 5 LOWs",
+      "progress": 100,
       "started_at": "2026-03-11T06:45:00Z",
-      "updated_at": "2026-03-11T06:45:00Z"
+      "updated_at": "2026-03-11T06:55:00Z",
+      "finished_at": "2026-03-11T06:55:00Z"
     },
     {
       "id": "maya",
@@ -33,5 +34,5 @@
       "finished_at": "2026-03-11T06:34:00Z"
     }
   ],
-  "updated_at": "2026-03-11T06:45:00Z"
+  "updated_at": "2026-03-11T06:55:00Z"
 }
