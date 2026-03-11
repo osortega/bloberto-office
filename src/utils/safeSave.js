@@ -10,3 +10,15 @@ export function safeSave(key, value) {
     // quota exceeded or storage unavailable — non-fatal
   }
 }
+
+/**
+ * Safely read from localStorage. Returns null on SecurityError (iOS
+ * private browsing) or any other storage access failure.
+ */
+export function safeRead(key) {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}

@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useEffect, memo, useId } from 'react'
+import { useMemo, useState, useRef, useEffect, memo, useId, useCallback } from 'react'
 import './Office.css'
 import { getTeamVibeKey } from './utils/vibe.js'
 import { ROLE_COLORS, DEFAULT_ROSTER, DEFAULT_BLOBERTO, DESKS, VIBE_WHITEBOARD, STATUS_LABELS, STATUS_EMOJIS } from './utils/constants.js'
@@ -1245,7 +1245,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const nameplateRef = useRef(null)
   const lastHuddle = useRef({ names: [], endedAt: null })
 
-  const handleCharClick = (worker) => {
+  const handleCharClick = useCallback((worker) => {
     if (pingTimerRef.current) clearTimeout(pingTimerRef.current)
     setPingedId(worker.id)
     pingTimerRef.current = setTimeout(() => setPingedId(null), 700)
@@ -1257,7 +1257,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
       pingReactionTimerRef.current = setTimeout(() => setPingReaction(null), 3000)
     }
     if (onWorkerClick && worker.id !== 'bloberto') onWorkerClick(worker)
-  }
+  }, [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick])
 
   useEffect(() => {
     if (meetingWorkers.length >= 2) {

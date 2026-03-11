@@ -1,0 +1,31 @@
+{
+  "author": "Carlos (Backend Engineer)",
+  "date": "2026-03-11",
+  "fixes": [
+    {
+      "id": "strike-5",
+      "title": "handleCharClick not wrapped in useCallback",
+      "file": "src/Office.jsx",
+      "change": "Added useCallback import; wrapped handleCharClick arrow function in useCallback with deps [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick]. Prevents memo() on Character components from being defeated on every 30s poll re-render."
+    },
+    {
+      "id": "strike-6",
+      "title": "Speech bubble clipped by office-floor overflow:hidden",
+      "file": "src/Office.css",
+      "change": "Changed .office-floor from 'overflow: hidden' to 'overflow: clip' with 'overflow-clip-margin: 20px'. This preserves the border-radius clipping for the floor contents while allowing Bloberto's speech bubble to render 20px outside the container without being cut off."
+    },
+    {
+      "id": "strike-3",
+      "title": "Arrow-key tab switching pushes browser history",
+      "file": "src/App.jsx",
+      "change": "Replaced all window.location.hash = X assignments (in handleTabKeyDown, handleWorkerClick, handleKeyDown useEffect, and tab onClick handlers) with history.replaceState(null, '', '#' + tab). Affected lines: ~793, ~798, ~804, ~877, ~878, ~1271, ~1284. This avoids polluting the browser back/forward history stack on tab switches."
+    },
+    {
+      "id": "strike-4",
+      "title": "localStorage crash in private browsing (BONUS)",
+      "files": ["src/utils/safeSave.js", "src/App.jsx"],
+      "change": "Added safeRead(key) helper to src/utils/safeSave.js matching the existing safeSave() pattern — wraps localStorage.getItem in try/catch, returns null on SecurityError. Updated import in App.jsx and replaced the three bare localStorage.getItem calls in useState initializers (bloberto-shortcuts-shown, bloberto-theme, footer-sparkle-seen) with safeRead()."
+    }
+  ],
+  "build": "✓ vite build succeeded with no errors"
+}

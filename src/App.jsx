@@ -4,7 +4,7 @@ import Office from './Office.jsx'
 import { getTeamVibe } from './utils/vibe.js'
 import { ROLE_EMOJIS, STATUS_LABELS, STATUS_EMOJIS, ROLE_COLORS } from './utils/constants.js'
 import { getRelativeTime } from './utils/time.js'
-import { safeSave } from './utils/safeSave.js'
+import { safeSave, safeRead } from './utils/safeSave.js'
 
 class ErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false } }
@@ -624,7 +624,7 @@ const SHORTCUT_KEYS = new Set(['1', '2', 'r', 'R', 'Escape'])
 
 function ShortcutToast() {
   const [phase, setPhase] = useState(() =>
-    localStorage.getItem('bloberto-shortcuts-shown') ? 'hidden' : 'pending'
+    safeRead('bloberto-shortcuts-shown') ? 'hidden' : 'pending'
   )
   const timerRef = useRef(null)
 
@@ -698,7 +698,7 @@ export default function App() {
   const [lastSynced, setLastSynced] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSyncing, setIsSyncing] = useState(false)
-  const [theme, setTheme] = useState(() => localStorage.getItem('bloberto-theme') || 'dark')
+  const [theme, setTheme] = useState(() => safeRead('bloberto-theme') || 'dark')
   const [vibeStreak, setVibeStreak] = useState(1)
   const prevStreakRef = useRef(0)
   const [tab, setTab] = useState(() => {
@@ -745,7 +745,7 @@ export default function App() {
   const focusedWorkerTimerRef = useRef(null)
   const [selectedTag, setSelectedTag] = useState(null)
   const [quoteBonus, setQuoteBonus] = useState(0)
-  const [sparkleUnseen, setSparkleUnseen] = useState(() => !localStorage.getItem('footer-sparkle-seen'))
+  const [sparkleUnseen, setSparkleUnseen] = useState(() => !safeRead('footer-sparkle-seen'))
 
   const handleTagClick = useCallback((tag) => {
     setSelectedTag(prev => prev === tag ? null : tag)
@@ -790,18 +790,18 @@ export default function App() {
       e.preventDefault()
       const next = TABS[(currentIdx + 1) % TABS.length]
       setTab(next)
-      window.location.hash = next
+      history.replaceState(null, '', '#' + next)
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       e.preventDefault()
       const prev = TABS[(currentIdx - 1 + TABS.length) % TABS.length]
       setTab(prev)
-      window.location.hash = prev
+      history.replaceState(null, '', '#' + prev)
     }
   }
 
   const handleWorkerClick = useCallback((worker) => {
     setTab('dashboard')
-    window.location.hash = 'dashboard'
+    history.replaceState(null, '', '#dashboard')
     setFocusedWorker(worker.id)
     if (focusedWorkerTimerRef.current) clearTimeout(focusedWorkerTimerRef.current)
     focusedWorkerTimerRef.current = setTimeout(() => {
@@ -874,8 +874,8 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable || e.isComposing) return
-      if (e.key === '1') { setTab('office'); window.location.hash = 'office' }
-      else if (e.key === '2') { setTab('dashboard'); window.location.hash = 'dashboard' }
+      if (e.key === '1') { setTab('office'); history.replaceState(null, '', '#office') }
+      else if (e.key === '2') { setTab('dashboard'); history.replaceState(null, '', '#dashboard') }
       else if (e.key === 'Escape') { setSelectedTag(null); setWorkerFilter(null); setActivityFilter('all'); document.activeElement?.blur() }
       else if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey && !isSyncing) syncFromGitHub()
     }
@@ -1268,7 +1268,7 @@ export default function App() {
             title="Office view (press 1)"
             tabIndex={tab === 'office' ? 0 : -1}
             className={tab === 'office' ? 'active' : ''}
-            onClick={() => { setTab('office'); window.location.hash = 'office' }}
+            onClick={() => { setTab('office'); history.replaceState(null, '', '#office') }}
             onKeyDown={handleTabKeyDown}
           >
             🏢 Office
@@ -1281,7 +1281,7 @@ export default function App() {
             title="Dashboard view (press 2)"
             tabIndex={tab === 'dashboard' ? 0 : -1}
             className={tab === 'dashboard' ? 'active' : ''}
-            onClick={() => { setTab('dashboard'); window.location.hash = 'dashboard' }}
+            onClick={() => { setTab('dashboard'); history.replaceState(null, '', '#dashboard') }}
             onKeyDown={handleTabKeyDown}
           >
             📊 Dashboard
