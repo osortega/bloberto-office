@@ -1,4 +1,19 @@
 {
-  "workers": [],
-  "updated_at": "2026-03-11T00:35:00Z"
+  "workers": [
+    {
+      "id": "carlos",
+      "role": "Backend Engineer",
+      "status": "working",
+      "task": "Fix 4 bugs from Luna review #90",
+      "started_at": "2026-03-11T00:36:00Z"
+    },
+    {
+      "id": "maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Fix WallClock double-announcement from Luna review #90",
+      "started_at": "2026-03-11T00:36:00Z"
+    }
+  ],
+  "updated_at": "2026-03-11T00:36:00Z"
 }
