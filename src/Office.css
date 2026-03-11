@@ -2641,21 +2641,21 @@
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.04); }
 }
+/* Radar ring: expands from desk bounds, fades out — disappears when stale class is removed */
 .desk--stale::after {
-  content: '···';
+  content: '';
   position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.4rem;
-  color: rgba(148,163,184,0.35);
-  letter-spacing: 0.3em;
-  animation: desk-dust-float 7s ease-in-out infinite;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--role-color, #ef4444);
+  background: transparent;
   pointer-events: none;
+  animation: stale-radar-ring 3.5s ease-out infinite;
+  z-index: 2;
 }
-@keyframes desk-dust-float {
-  0%, 80%, 100% { opacity: 0; transform: translateX(-50%) translateY(0); }
-  40% { opacity: 0.7; transform: translateX(-50%) translateY(-6px); }
+@keyframes stale-radar-ring {
+  0%   { transform: scale(1);   opacity: 0.35; }
+  100% { transform: scale(1.5); opacity: 0; }
 }
 
 /* === Ghost Desk Time Tiers === */
