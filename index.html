@@ -1,15 +1,1828 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/bloberto-office/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🫠 Bloberto's Office</title>
-    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' rel='stylesheet'>
-    <script type="module" crossorigin src="/bloberto-office/assets/index-DABMbHHM.js"></script>
-    <link rel="stylesheet" crossorigin href="/bloberto-office/assets/index-BI5s7rLf.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emergent World</title>
+<style>
+  /* ─── Variables ─────────────────────────────────────────────────── */
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --surface3: #21262d;
+    --border: #30363d;
+    --border-muted: #21262d;
+    --text: #c9d1d9;
+    --text-muted: #8b949e;
+    --text-faint: #484f58;
+    --amber: #d4a843;
+    --amber-dim: #8a6a28;
+    --amber-glow: rgba(212, 168, 67, 0.15);
+    --green: #3fb950;
+    --green-dim: #1a4a23;
+    --red: #f85149;
+    --red-dim: #4a1a1a;
+    --blue: #58a6ff;
+    --blue-dim: #1a3a5a;
+    --purple: #bc8cff;
+    --purple-dim: #3a1a5a;
+    --orange: #e3b341;
+    --orange-dim: #4a3a1a;
+    --gray: #8b949e;
+    --radius: 8px;
+    --radius-sm: 5px;
+  }
+
+  /* ─── Reset ─────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    outline: none;
+  }
+  a { color: inherit; text-decoration: none; }
+  pre, code { font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Menlo', monospace; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+  /* ─── Top Bar ───────────────────────────────────────────────────── */
+  #topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13, 17, 23, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .topbar-brand {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--amber);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topbar-brand .orb {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+    animation: pulse-orb 3s ease-in-out infinite;
+  }
+  @keyframes pulse-orb {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--amber); }
+    50% { opacity: 0.5; box-shadow: 0 0 4px var(--amber); }
+  }
+  .topbar-clock {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+  }
+  .topbar-stat {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .topbar-stat .label {
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .topbar-stat .value {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .topbar-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+  }
+  .topbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .btn-primary {
+    background: var(--amber);
+    color: #1a1200;
+    border-color: var(--amber);
+  }
+  .btn-primary:hover { background: #e0b84d; box-shadow: 0 0 12px var(--amber-glow); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border);
+  }
+  .btn-secondary:hover { background: var(--surface3); border-color: var(--text-muted); }
+  .btn-danger {
+    background: var(--red-dim);
+    color: var(--red);
+    border-color: rgba(248, 81, 73, 0.3);
+  }
+  .btn-danger:hover { background: rgba(248, 81, 73, 0.2); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .status-pill .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .status-pill.running {
+    background: rgba(63, 185, 80, 0.15);
+    color: var(--green);
+  }
+  .status-pill.running .dot {
+    background: var(--green);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  .status-pill.stopped {
+    background: var(--surface2);
+    color: var(--text-muted);
+  }
+  .status-pill.stopped .dot { background: var(--text-faint); }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .countdown { font-size: 11px; color: var(--text-muted); margin-left: 2px; }
+  .last-updated { font-size: 11px; color: var(--text-faint); white-space: nowrap; }
+
+  /* ─── Layout ────────────────────────────────────────────────────── */
+  #app {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 16px 16px 100px;
+  }
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 1100px) {
+    .main-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Section Headers ───────────────────────────────────────────── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-muted);
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::before {
+    content: '';
+    display: block;
+    width: 3px;
+    height: 14px;
+    background: var(--amber);
+    border-radius: 2px;
+  }
+
+  /* ─── Region Map ────────────────────────────────────────────────── */
+  .map-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 10px;
+  }
+  .region-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.1s;
+  }
+  .region-card:hover { border-color: var(--amber-dim); transform: translateY(-1px); }
+  .region-card.active { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber-dim), 0 0 20px var(--amber-glow); }
+  .region-card.center-card { grid-column: 1 / -1; }
+  .region-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .region-card.glow::before {
+    background: radial-gradient(ellipse at center, var(--amber-glow) 0%, transparent 70%);
+    animation: region-glow 2s ease-out forwards;
+  }
+  @keyframes region-glow {
+    0% { opacity: 0.8; }
+    100% { opacity: 0; }
+  }
+  .region-terrain-icon { font-size: 22px; margin-bottom: 4px; }
+  .region-name { font-size: 13px; font-weight: 600; color: var(--amber); margin-bottom: 3px; }
+  .region-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .region-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .region-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: var(--surface2);
+    color: var(--text-muted);
+    border: 1px solid var(--border-muted);
+  }
+  .region-badge.people { background: rgba(212, 168, 67, 0.1); color: var(--amber); border-color: var(--amber-dim); }
+  .region-weather { font-size: 10px; color: var(--text-faint); margin-top: 4px; font-style: italic; }
+  .region-features { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+  .feature-chip {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 8px;
+    background: var(--surface3);
+    color: var(--text-faint);
+    border: 1px solid var(--border-muted);
+  }
+
+  /* ─── Beings Panel ──────────────────────────────────────────────── */
+  .citizens-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .citizen-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    overflow: hidden;
+  }
+  .citizen-card:hover { border-color: var(--amber-dim); transform: translateY(-1px); }
+  .citizen-card.dead {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+  }
+  .citizen-card.dead:hover { border-color: var(--border); transform: none; }
+  .citizen-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .citizen-status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .citizen-status-dot.alive { background: var(--green); box-shadow: 0 0 4px var(--green); }
+  .citizen-status-dot.dead { background: var(--text-faint); }
+  .citizen-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .health-bar-wrap { margin-bottom: 6px; }
+  .health-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-faint);
+    margin-bottom: 2px;
+  }
+  .health-bar {
+    height: 4px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .health-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease, background-color 0.6s ease;
+  }
+  .citizen-region {
+    font-size: 10px;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .citizen-last-action {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 4px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ─── Event Log ─────────────────────────────────────────────────── */
+  #event-log-section { margin-bottom: 16px; }
+  .event-log-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 8px;
+  }
+  .event-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 2px;
+    animation: fade-in-down 0.3s ease;
+    transition: background 0.15s;
+  }
+  .event-item:hover { background: var(--surface2); }
+  @keyframes fade-in-down {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .event-tick {
+    font-size: 10px;
+    color: var(--text-faint);
+    white-space: nowrap;
+    padding-top: 1px;
+    min-width: 40px;
+    font-family: monospace;
+  }
+  .event-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .event-text { font-size: 12px; color: var(--text); line-height: 1.5; }
+  .event-item.gather .event-dot { background: var(--green); }
+  .event-item.gather .event-text { color: #a8ddb5; }
+  .event-item.interact .event-dot { background: var(--blue); }
+  .event-item.interact .event-text { color: #a8c9ff; }
+  .event-item.fight .event-dot { background: var(--red); }
+  .event-item.fight .event-text { color: #ffb3b0; }
+  .event-item.nothing .event-dot { background: var(--text-faint); }
+  .event-item.nothing .event-text { color: var(--text-muted); }
+  .event-item.move .event-dot { background: var(--purple); }
+  .event-item.move .event-text { color: #d9b8ff; }
+  .event-item.make .event-dot { background: var(--orange); }
+  .event-item.make .event-text { color: #ffd580; }
+  .event-item.death .event-dot { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .event-item.death .event-text { color: var(--red); font-weight: 500; }
+  .event-item.rest .event-dot { background: var(--text-faint); }
+  .event-item.rest .event-text { color: var(--text-muted); }
+  .event-item.explore .event-dot { background: #7dd3fc; }
+  .event-item.explore .event-text { color: #bae6fd; }
+  .event-log-empty {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--text-faint);
+    font-style: italic;
+  }
+  .event-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .event-filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    background: var(--surface2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .event-filter-tag:hover, .event-filter-tag.active {
+    background: var(--amber-glow);
+    border-color: var(--amber-dim);
+    color: var(--amber);
+  }
+
+  /* ─── Behind the Scenes ─────────────────────────────────────────── */
+  #bts-section {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    margin-top: 8px;
+  }
+  .bts-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .bts-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .bts-toggle-btn:hover { border-color: var(--purple); background: rgba(188, 140, 255, 0.05); }
+  .bts-toggle-btn .icon { font-size: 16px; }
+  .bts-toggle-btn .chevron { transition: transform 0.2s; color: var(--text-faint); }
+  .bts-toggle-btn.open .chevron { transform: rotate(180deg); }
+  .bts-content { display: none; }
+  .bts-content.open { display: block; }
+  .bts-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .bts-tick-select {
+    appearance: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    padding: 6px 28px 6px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%238b949e' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+  .bts-tick-select:focus { outline: 1px solid var(--purple); }
+  .bts-citizens-list { display: flex; flex-direction: column; gap: 12px; }
+  .bts-citizen-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .bts-citizen-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border-muted);
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .bts-citizen-header:hover { background: var(--surface3); }
+  .bts-citizen-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .bts-citizen-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .bts-citizen-region { font-size: 11px; color: var(--text-muted); }
+  .bts-action-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  .bts-chevron { color: var(--text-faint); transition: transform 0.2s; font-size: 12px; }
+  .bts-chevron.open { transform: rotate(180deg); }
+  .bts-citizen-body { display: none; padding: 14px; }
+  .bts-citizen-body.open { display: block; }
+  .bts-panels { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 900px) { .bts-panels { grid-template-columns: 1fr; } }
+  .bts-panel { display: flex; flex-direction: column; gap: 6px; }
+  .bts-panel-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-faint);
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-muted);
+    margin-bottom: 4px;
+  }
+  .bts-panel-label.prompt { color: var(--blue); border-color: rgba(88, 166, 255, 0.3); }
+  .bts-panel-label.response { color: var(--purple); border-color: rgba(188, 140, 255, 0.3); }
+  .bts-panel-label.action { color: var(--amber); border-color: var(--amber-dim); }
+  .bts-code {
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-muted);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .bts-code .kw { color: var(--blue); }
+  .bts-code .str { color: #a8ddb5; }
+  .bts-code .num { color: var(--orange); }
+  .bts-code .key { color: var(--purple); }
+  .bts-code .sys-label {
+    display: inline-block;
+    padding: 1px 6px;
+    background: rgba(88, 166, 255, 0.1);
+    color: var(--blue);
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .bts-code .user-label {
+    display: inline-block;
+    padding: 1px 6px;
+    background: rgba(63, 185, 80, 0.1);
+    color: var(--green);
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .bts-prompt-section { margin-bottom: 10px; }
+  .bts-prompt-text {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .bts-thinking {
+    font-size: 11px;
+    color: var(--purple);
+    font-style: italic;
+    line-height: 1.5;
+    padding: 8px;
+    background: rgba(188, 140, 255, 0.05);
+    border-left: 2px solid var(--purple);
+    border-radius: 0 3px 3px 0;
+    margin-bottom: 8px;
+  }
+  .bts-action-desc {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .bts-json {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ─── Citizen Modal ──────────────────────────────────────────────── */
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    animation: fade-in 0.15s ease;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  #modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  #modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 680px;
+    animation: slide-up 0.2s ease;
+    overflow: hidden;
+    margin: auto;
+  }
+  @keyframes slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-close {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .modal-close:hover { background: var(--surface3); color: var(--text); }
+  .modal-citizen-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--amber);
+    margin-bottom: 4px;
+  }
+  .modal-citizen-desc { font-size: 13px; color: var(--text-muted); font-style: italic; }
+  .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+  .modal-section {}
+  .modal-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-muted);
+  }
+  .modal-health-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .modal-health-big {
+    font-size: 24px;
+    font-weight: 700;
+    min-width: 40px;
+  }
+  .modal-health-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--surface3);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .modal-health-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease, background-color 0.6s ease;
+  }
+  .modal-food-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .food-dots { display: flex; gap: 3px; }
+  .food-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--surface3);
+  }
+  .food-dot.filled { background: var(--amber); }
+  .traits-list { display: flex; flex-direction: column; gap: 5px; }
+  .trait-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .trait-item::before { content: '◆'; color: var(--amber); font-size: 8px; margin-top: 4px; flex-shrink: 0; }
+  .inventory-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .inv-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text);
+  }
+  .inv-count {
+    background: var(--amber-dim);
+    color: var(--amber);
+    border-radius: 8px;
+    padding: 0px 5px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .memory-log {
+    max-height: 180px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .memory-item {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 6px 10px;
+    background: var(--surface2);
+    border-radius: 4px;
+    border-left: 2px solid var(--border-muted);
+    line-height: 1.4;
+  }
+  .memory-item:nth-child(1) { border-left-color: var(--amber-dim); color: var(--text); }
+  .memory-empty { color: var(--text-faint); font-style: italic; font-size: 12px; }
+  .modal-region-card {
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border-muted);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .modal-region-name { font-weight: 600; color: var(--amber); margin-bottom: 4px; font-size: 14px; }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .skill-item {
+    background: var(--surface2);
+    border: 1px solid var(--border-muted);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    text-align: center;
+  }
+  .skill-name { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-faint); margin-bottom: 4px; }
+  .skill-dots { display: flex; justify-content: center; gap: 3px; margin-bottom: 2px; }
+  .skill-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+  }
+  .skill-dot.filled { background: var(--amber); border-color: var(--amber); }
+  .skill-val { font-size: 11px; color: var(--text-muted); }
+  
+  /* ─── Loading / error states ─────────────────────────────────────── */
+  .loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--text-faint);
+    font-style: italic;
+    gap: 10px;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--amber);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .tick-in-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--amber);
+    padding: 3px 10px;
+    background: var(--amber-glow);
+    border: 1px solid var(--amber-dim);
+    border-radius: 10px;
+  }
+  .tick-in-progress .spinner { border-color: var(--amber-dim); border-top-color: var(--amber); width: 10px; height: 10px; }
+
+  /* ─── Misc util ─────────────────────────────────────────────────── */
+  .flex { display: flex; }
+  .items-center { align-items: center; }
+  .gap-8 { gap: 8px; }
+  .font-mono { font-family: monospace; }
+  .text-amber { color: var(--amber); }
+  .text-muted { color: var(--text-muted); }
+  .text-faint { color: var(--text-faint); }
+  .bold { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ─── TOP BAR ──────────────────────────────────────────────────────── -->
+<div id="topbar">
+  <div class="topbar-brand">
+    <span class="orb"></span>
+    Emergent World
+  </div>
+
+  <div class="topbar-divider"></div>
+
+  <div class="topbar-clock">
+    <div class="topbar-stat">
+      <span class="label">Tick</span>
+      <span class="value" id="tb-tick">—</span>
+    </div>
+    <div class="topbar-stat">
+      <span class="label">Season</span>
+      <span class="value" id="tb-season">—</span>
+    </div>
+    <div class="topbar-stat">
+      <span class="label">Year</span>
+      <span class="value" id="tb-year">—</span>
+    </div>
+    <div class="topbar-stat">
+      <span class="label">Population</span>
+      <span class="value" id="tb-pop">—</span>
+    </div>
+  </div>
+
+  <div class="topbar-divider"></div>
+
+  <div class="topbar-controls">
+    <div id="status-pill" class="status-pill stopped">
+      <span class="dot"></span>
+      <span id="status-text">Stopped</span>
+    </div>
+    <span id="tick-progress-indicator" style="display:none" class="tick-in-progress">
+      <span class="spinner"></span> Ticking…
+    </span>
+    <span id="countdown" class="countdown"></span>
+    <button id="btn-start" class="btn btn-primary">▶ Start</button>
+    <button id="btn-stop" class="btn btn-danger" style="display:none">■ Stop</button>
+    <button id="btn-tick" class="btn btn-secondary">⚡ Manual Tick</button>
+  </div>
+
+  <span id="last-updated" class="last-updated"></span>
+</div>
+
+<!-- ─── MAIN APP ──────────────────────────────────────────────────────── -->
+<div id="app">
+
+  <div class="main-grid">
+
+    <!-- LEFT: WORLD MAP -->
+    <div id="map-section">
+      <div class="section-header">
+        <div class="section-title">World Map</div>
+        <button id="clear-filter" class="btn btn-secondary" style="font-size:11px;padding:3px 10px;display:none">✕ Clear Filter</button>
+      </div>
+      <div class="map-grid" id="map-grid">
+        <div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div> Loading…</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: BEINGS -->
+    <div id="beings-section">
+      <div class="section-header">
+        <div class="section-title">Beings</div>
+        <span id="being-count" class="text-muted" style="font-size:12px"></span>
+      </div>
+      <div class="citizens-grid" id="citizens-grid">
+        <div class="loading-state" style="grid-column:1/-1"><div class="spinner"></div> Loading…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EVENT LOG -->
+  <div id="event-log-section">
+    <div class="section-header">
+      <div class="section-title">Event Log</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span id="filter-label" class="text-faint" style="font-size:11px"></span>
+        <span id="event-count" class="text-faint" style="font-size:11px"></span>
+      </div>
+    </div>
+    <div class="event-log-container" id="event-log">
+      <div class="event-log-empty">No events yet — run a tick to see what happens.</div>
+    </div>
+  </div>
+
+  <!-- BEHIND THE SCENES -->
+  <div id="bts-section">
+    <button class="bts-toggle-btn" id="bts-toggle">
+      <span style="display:flex;align-items:center;gap:10px">
+        <span class="icon">🔬</span>
+        <span>
+          <span style="font-size:14px;font-weight:600;color:var(--purple)">Behind the Scenes</span>
+          <span style="font-size:11px;color:var(--text-faint);margin-left:8px">— see exactly what each citizen thinks</span>
+        </span>
+      </span>
+      <span class="chevron">▼</span>
+    </button>
+
+    <div class="bts-content" id="bts-content">
+      <div style="height:12px"></div>
+      <div class="bts-controls">
+        <label style="font-size:12px;color:var(--text-muted)">Viewing tick:</label>
+        <select class="bts-tick-select" id="bts-tick-select">
+          <option value="latest">Latest tick</option>
+        </select>
+        <span id="bts-note" style="font-size:11px;color:var(--text-faint)"></span>
+      </div>
+      <div class="bts-citizens-list" id="bts-citizens-list">
+        <div class="loading-state"><div class="spinner"></div> Loading thoughts…</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── CITIZEN MODAL ─────────────────────────────────────────────────── -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-citizen-name" id="modal-name">—</div>
+        <div class="modal-citizen-desc" id="modal-desc">—</div>
+      </div>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────
+const S = {
+  world: null,       // { clock, regions, citizens }
+  history: [],       // array of history entries
+  thoughts: [],      // latest tick thoughts
+  status: null,      // simulation status
+  regionFilter: null,
+  lastUpdated: null,
+  countdownInterval: null,
+  btsOpen: false,
+  btsSelectedTick: 'latest',
+  citizenLastActions: {}, // citizenId -> last action description from history
+};
+
+// ─── Season helpers ───────────────────────────────────────────────────
+const SEASON_EMOJI = { spring: '🌱', summer: '🌞', autumn: '🍂', winter: '❄️' };
+const TERRAIN_ICON = {
+  forest: '🌲', valley: '🌾', coastal: '🌊', mountain: '⛰️', marsh: '🌿'
+};
+const REGION_ORDER = [
+  'northern-forest', 'mountain-pass',
+  'river-valley',
+  'coastal-plains', 'salt-marshes'
+];
+
+// ─── Event classification ─────────────────────────────────────────────
+function classifyEvent(text) {
+  const t = text.toLowerCase();
+  if (t.includes('died') || t.includes('death') || t.includes('collapse') || t.includes('no longer lives')) return 'death';
+  if (t.includes('fight') || t.includes('attack') || t.includes('combat') || t.includes('struck') || t.includes('hit')) return 'fight';
+  if (t.includes('gathered') || t.includes('collected') || t.includes('picked') || t.includes('ate') || t.includes('foraged')) return 'gather';
+  if (t.includes('interacted') || t.includes('shared') || t.includes('spoke') || t.includes('greeted') || t.includes('met')) return 'interact';
+  if (t.includes('moved') || t.includes('travel') || t.includes('walked') || t.includes('arrived') || t.includes('departed')) return 'move';
+  if (t.includes('craft') || t.includes('made') || t.includes('built') || t.includes('fashioned') || t.includes('make')) return 'make';
+  if (t.includes('explore') || t.includes('ventured') || t.includes('searched') || t.includes('investigate')) return 'explore';
+  if (t.includes('rest') || t.includes('sleep') || t.includes('sat') || t.includes('lay') || t.includes('nothing')) return 'rest';
+  if (t.includes('hunger') || t.includes('starv') || t.includes('weaker')) return 'death';
+  return 'nothing';
+}
+
+// ─── Health color ─────────────────────────────────────────────────────
+function healthColor(hp) {
+  const pct = hp / 10;
+  if (pct >= 0.7) return '#3fb950';
+  if (pct >= 0.4) return '#e3b341';
+  return '#f85149';
+}
+
+// ─── Inventory description ────────────────────────────────────────────
+const ITEM_LABELS = {
+  simple_tool: 'crude wooden implement',
+  stone_blade: 'sharp stone blade',
+  clay_vessel: 'rough clay container',
+  woven_rope: 'woven reed cord',
+  rough_shelter: 'bundle of branches',
+  fallen_branches: 'fallen branches',
+  clay: 'soft clay',
+  flat_stones: 'flat stones',
+  salt: 'crystallized salt',
+  stone: 'rough stone',
+  flint: 'sharp flint',
+  reeds: 'tall reeds',
+  mud: 'thick mud',
+  fresh_water: 'clear water',
+  wild_berries: 'wild berries',
+  small_game: 'small game',
+  river_fish: 'freshwater fish',
+  wild_grain: 'wild grain',
+  wild_herbs: 'wild herbs',
+};
+function itemLabel(key) {
+  return ITEM_LABELS[key] || key.replace(/_/g, ' ');
+}
+
+// ─── Skills → traits ──────────────────────────────────────────────────
+function skillsToTraits(skills) {
+  const t = [];
+  const { strength, dexterity, perception, endurance, social, curiosity } = skills;
+  if (strength >= 4) t.push('Powerfully built — heavy things yield to them');
+  else if (strength >= 3) t.push('Reasonably strong');
+  else if (strength <= 1) t.push('Lean body, not built for heavy work');
+  if (dexterity >= 4) t.push('Nimble, precise hands');
+  else if (dexterity >= 3) t.push('Decent coordination');
+  else if (dexterity <= 1) t.push('Fine movements come awkwardly');
+  if (perception >= 4) t.push('Exceptionally sharp senses — notices what others miss');
+  else if (perception >= 3) t.push('Observant and detail-oriented');
+  else if (perception <= 1) t.push('Sometimes misses things right in front of them');
+  if (endurance >= 4) t.push('Can push through pain far longer than most');
+  else if (endurance >= 3) t.push('Body holds up well under strain');
+  else if (endurance <= 1) t.push('Pain and tiredness hit harder than others');
+  if (social >= 4) t.push('Draws others in — communicating feels natural');
+  else if (social >= 3) t.push('Reasonably comfortable around others');
+  else if (social <= 1) t.push('Being around others feels awkward and strange');
+  if (curiosity >= 4) t.push('Restless mind, always questioning and exploring');
+  else if (curiosity >= 3) t.push('Drawn toward new things');
+  else if (curiosity <= 1) t.push('Tends toward the safe and familiar, wary of the unknown');
+  return t;
+}
+
+// ─── Resource descriptions ────────────────────────────────────────────
+const RESOURCE_LABELS = {
+  fallen_branches: '🪵 Fallen Wood',
+  wild_berries: '🍇 Wild Berries',
+  small_game: '🐇 Small Game',
+  wild_herbs: '🌿 Wild Herbs',
+  river_fish: '🐟 River Fish',
+  clay: '🧱 Clay',
+  wild_grain: '🌾 Wild Grain',
+  fresh_water: '💧 Fresh Water',
+  tidal_fish: '🐠 Tidal Fish',
+  flat_stones: '🪨 Flat Stones',
+  salt: '🧂 Salt',
+  shore_birds: '🦅 Shore Birds',
+  stone: '⛏️ Stone',
+  flint: '💎 Flint',
+  mountain_herbs: '🌱 Mountain Herbs',
+  marsh_fish: '🐡 Marsh Fish',
+  reeds: '🎋 Reeds',
+  strange_herbs: '🍃 Strange Herbs',
+  mud: '🟤 Mud',
+};
+function resourceLabel(key) {
+  return RESOURCE_LABELS[key] || key.replace(/_/g, ' ');
+}
+
+// ─── HTML escape ──────────────────────────────────────────────────────
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── JSON syntax highlight ────────────────────────────────────────────
+function highlightJson(obj) {
+  const s = JSON.stringify(obj, null, 2);
+  return s.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (m) => {
+    if (/^"/.test(m)) {
+      if (/:$/.test(m)) return `<span class="key">${esc(m)}</span>`;
+      return `<span class="str">${esc(m)}</span>`;
+    } else if (/true|false/.test(m)) return `<span class="kw">${esc(m)}</span>`;
+    else if (/null/.test(m)) return `<span class="kw">${esc(m)}</span>`;
+    return `<span class="num">${esc(m)}</span>`;
+  });
+}
+
+// ─── Action badge ─────────────────────────────────────────────────────
+const ACTION_STYLES = {
+  gather:  { bg: 'rgba(63,185,80,0.12)',   color: '#3fb950', label: 'Gathered' },
+  move:    { bg: 'rgba(188,140,255,0.12)', color: '#bc8cff', label: 'Moved' },
+  interact:{ bg: 'rgba(88,166,255,0.12)',  color: '#58a6ff', label: 'Interacted' },
+  fight:   { bg: 'rgba(248,81,73,0.12)',   color: '#f85149', label: 'Fought' },
+  make:    { bg: 'rgba(227,179,65,0.12)',  color: '#e3b341', label: 'Crafted' },
+  explore: { bg: 'rgba(125,211,252,0.12)', color: '#7dd3fc', label: 'Explored' },
+  rest:    { bg: 'rgba(139,148,158,0.12)', color: '#8b949e', label: 'Rested' },
+  nothing: { bg: 'rgba(139,148,158,0.12)', color: '#8b949e', label: 'Nothing' },
+};
+function actionBadge(type) {
+  const s = ACTION_STYLES[type] || ACTION_STYLES.nothing;
+  return `<span class="bts-action-badge" style="background:${s.bg};color:${s.color}">${s.label}</span>`;
+}
+
+// ─── API ──────────────────────────────────────────────────────────────
+async function api(path, method = 'GET') {
+  const res = await fetch(path, { method });
+  if (!res.ok) throw new Error(`${method} ${path} → ${res.status}`);
+  return res.json();
+}
+
+// ─── Extract last actions from history ───────────────────────────────
+function updateLastActions() {
+  if (!S.history.length) return;
+  S.citizenLastActions = {};
+  const recent = [...S.history].reverse().slice(0, 5);
+  for (const tick of recent) {
+    for (const evt of (tick.events || [])) {
+      // We parse events to extract citizen names and actions
+      // Events are plain text like "Eron gathered berries."
+      if (!S.world) continue;
+      for (const [id, cit] of Object.entries(S.world.citizens)) {
+        if (!S.citizenLastActions[id] && evt.toLowerCase().startsWith(cit.name.toLowerCase())) {
+          S.citizenLastActions[id] = evt;
+        }
+      }
+    }
+  }
+}
+
+// ─── Fetch all data ───────────────────────────────────────────────────
+async function fetchAll() {
+  try {
+    const [world, history, status] = await Promise.all([
+      api('/api/state'),
+      api('/api/history'),
+      api('/api/status'),
+    ]);
+    S.world = world;
+    S.history = history;
+    S.status = status;
+    S.lastUpdated = new Date();
+    updateLastActions();
+    renderAll();
+    updateCountdown();
+  } catch (e) {
+    console.error('fetchAll error:', e);
+  }
+}
+
+async function fetchThoughts() {
+  try {
+    const thoughts = await api('/api/thoughts');
+    S.thoughts = thoughts;
+    if (S.btsOpen) renderBTS();
+  } catch (e) {
+    console.error('fetchThoughts error:', e);
+  }
+}
+
+// ─── Render: Top Bar ──────────────────────────────────────────────────
+function renderTopBar() {
+  const { world, status } = S;
+  if (!world) return;
+  const { clock, citizens } = world;
+  const alive = Object.values(citizens).filter(c => c.alive).length;
+  const total = Object.values(citizens).length;
+
+  document.getElementById('tb-tick').textContent = `#${clock.tick}`;
+  document.getElementById('tb-season').textContent = `${SEASON_EMOJI[clock.season] || ''} ${clock.season.charAt(0).toUpperCase() + clock.season.slice(1)}`;
+  document.getElementById('tb-year').textContent = `Year ${clock.year}`;
+  document.getElementById('tb-pop').textContent = `${alive} / ${total}`;
+
+  if (status) {
+    const pill = document.getElementById('status-pill');
+    const txt = document.getElementById('status-text');
+    if (status.isRunning) {
+      pill.className = 'status-pill running';
+      txt.textContent = 'Running';
+    } else {
+      pill.className = 'status-pill stopped';
+      txt.textContent = 'Stopped';
+    }
+
+    const prog = document.getElementById('tick-progress-indicator');
+    prog.style.display = status.tickInProgress ? 'inline-flex' : 'none';
+
+    document.getElementById('btn-start').style.display = status.isRunning ? 'none' : '';
+    document.getElementById('btn-stop').style.display = status.isRunning ? '' : 'none';
+  }
+
+  if (S.lastUpdated) {
+    const t = S.lastUpdated;
+    const timeStr = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('last-updated').textContent = `Updated ${timeStr}`;
+  }
+}
+
+function updateCountdown() {
+  if (S.countdownInterval) clearInterval(S.countdownInterval);
+  const el = document.getElementById('countdown');
+  if (!S.status || !S.status.isRunning || !S.status.nextTickTime) {
+    el.textContent = '';
+    return;
+  }
+  function tick() {
+    if (!S.status || !S.status.nextTickTime) { el.textContent = ''; return; }
+    const diff = new Date(S.status.nextTickTime) - Date.now();
+    if (diff <= 0) { el.textContent = 'ticking soon…'; return; }
+    const m = Math.floor(diff / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = `next in ${m}:${String(s).padStart(2,'0')}`;
+  }
+  tick();
+  S.countdownInterval = setInterval(tick, 1000);
+}
+
+// ─── Render: Map ──────────────────────────────────────────────────────
+function renderMap() {
+  const { world } = S;
+  if (!world) return;
+  const { regions, citizens } = world;
+  const grid = document.getElementById('map-grid');
+
+  grid.innerHTML = REGION_ORDER.map((id, i) => {
+    const r = regions[id];
+    if (!r) return '';
+    const count = (r.citizens || []).filter(cid => citizens[cid]?.alive).length;
+    const isCenter = id === 'river-valley';
+    const isActive = S.regionFilter === id;
+    const icon = TERRAIN_ICON[r.terrain] || '🗺️';
+
+    const features = Object.entries(r.resources || {})
+      .filter(([, v]) => v > 0)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([k]) => `<span class="feature-chip">${resourceLabel(k)}</span>`)
+      .join('');
+
+    return `
+      <div class="region-card${isCenter ? ' center-card' : ''}${isActive ? ' active' : ''}" 
+           data-region="${esc(id)}" onclick="toggleRegionFilter('${esc(id)}')">
+        <div class="region-terrain-icon">${icon}</div>
+        <div class="region-name">${esc(r.name)}</div>
+        <div class="region-desc">${esc(r.description)}</div>
+        <div class="region-meta">
+          ${count > 0 ? `<span class="region-badge people">👤 ${count} being${count !== 1 ? 's' : ''}</span>` : '<span class="region-badge">Empty</span>'}
+          <span class="region-badge">${esc(r.terrain)}</span>
+        </div>
+        <div class="region-weather">☁️ ${esc(r.weather)}</div>
+        ${features ? `<div class="region-features">${features}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function glowRegion(regionId) {
+  const el = document.querySelector(`[data-region="${regionId}"]`);
+  if (!el) return;
+  el.classList.remove('glow');
+  void el.offsetWidth;
+  el.classList.add('glow');
+  setTimeout(() => el.classList.remove('glow'), 2500);
+}
+
+function toggleRegionFilter(id) {
+  S.regionFilter = S.regionFilter === id ? null : id;
+  renderMap();
+  renderEventLog();
+  const btn = document.getElementById('clear-filter');
+  btn.style.display = S.regionFilter ? '' : 'none';
+  const lbl = document.getElementById('filter-label');
+  if (S.regionFilter && S.world) {
+    const r = S.world.regions[S.regionFilter];
+    lbl.textContent = `Showing: ${r?.name || S.regionFilter}`;
+  } else {
+    lbl.textContent = '';
+  }
+}
+
+// ─── Render: Citizens ─────────────────────────────────────────────────
+function renderCitizens() {
+  const { world } = S;
+  if (!world) return;
+  const { citizens, regions } = world;
+  const grid = document.getElementById('citizens-grid');
+  const all = Object.values(citizens);
+  const alive = all.filter(c => c.alive).length;
+
+  document.getElementById('being-count').textContent = `${alive} alive, ${all.length - alive} dead`;
+
+  const sorted = [...all].sort((a, b) => {
+    if (a.alive !== b.alive) return a.alive ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  grid.innerHTML = sorted.map(c => {
+    const hpPct = Math.max(0, Math.min(100, (c.health / 10) * 100));
+    const hpColor = healthColor(c.health);
+    const region = regions[c.region];
+    const regionName = region?.name || c.region;
+    const regionIcon = TERRAIN_ICON[region?.terrain] || '📍';
+    const lastAction = S.citizenLastActions[c.id] || '';
+
+    return `
+      <div class="citizen-card${c.alive ? '' : ' dead'}" onclick="openCitizenModal('${esc(c.id)}')">
+        <div class="citizen-name">
+          ${esc(c.name)}
+          <span class="citizen-status-dot ${c.alive ? 'alive' : 'dead'}"></span>
+        </div>
+        <div class="citizen-desc">${esc(c.physical_description)}</div>
+        <div class="health-bar-wrap">
+          <div class="health-label">
+            <span>Health</span>
+            <span>${c.health}/10</span>
+          </div>
+          <div class="health-bar">
+            <div class="health-fill" style="width:${hpPct}%;background:${hpColor}"></div>
+          </div>
+        </div>
+        <div class="citizen-region">${regionIcon} ${esc(regionName)}</div>
+        ${lastAction ? `<div class="citizen-last-action">${esc(lastAction)}</div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ─── Render: Event Log ────────────────────────────────────────────────
+function renderEventLog() {
+  const log = document.getElementById('event-log');
+  if (!S.history.length) {
+    log.innerHTML = '<div class="event-log-empty">No events yet — run a tick to see what happens.</div>';
+    document.getElementById('event-count').textContent = '';
+    return;
+  }
+
+  // Build flat event list newest-first
+  const allEvents = [];
+  for (const entry of S.history) {
+    for (const evt of (entry.events || [])) {
+      allEvents.push({ tick: entry.tick, season: entry.season, text: evt });
+    }
+  }
+  allEvents.reverse();
+
+  // Apply region filter
+  let filtered = allEvents;
+  if (S.regionFilter && S.world) {
+    const region = S.world.regions[S.regionFilter];
+    const regionName = region?.name?.toLowerCase() || '';
+    const citizensInRegion = (region?.citizens || []).map(id => S.world.citizens[id]?.name?.toLowerCase()).filter(Boolean);
+    
+    filtered = allEvents.filter(e => {
+      const t = e.text.toLowerCase();
+      if (regionName && t.includes(regionName)) return true;
+      if (citizensInRegion.some(n => t.startsWith(n))) return true;
+      return false;
+    });
+  }
+
+  document.getElementById('event-count').textContent = `${filtered.length} event${filtered.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    log.innerHTML = '<div class="event-log-empty">No events match the current filter.</div>';
+    return;
+  }
+
+  log.innerHTML = filtered.slice(0, 200).map(e => {
+    const cls = classifyEvent(e.text);
+    const seasonEmoji = SEASON_EMOJI[e.season] || '';
+    return `
+      <div class="event-item ${cls}">
+        <span class="event-tick">#${e.tick}</span>
+        <span class="event-dot"></span>
+        <span class="event-text">${esc(e.text)}</span>
+      </div>`;
+  }).join('');
+}
+
+// ─── Render: BTS ──────────────────────────────────────────────────────
+function renderBTS() {
+  const container = document.getElementById('bts-citizens-list');
+  const select = document.getElementById('bts-tick-select');
+  const note = document.getElementById('bts-note');
+
+  if (!S.thoughts.length) {
+    container.innerHTML = '<div class="loading-state" style="color:var(--text-faint);font-style:italic">No thoughts recorded yet. Run a tick first.</div>';
+    note.textContent = '';
+    return;
+  }
+
+  // Update tick selector with available tick numbers from history
+  const currentValue = select.value;
+  const tickNumbers = S.history.map(h => h.tick).reverse();
+  select.innerHTML = '<option value="latest">Latest tick</option>' +
+    tickNumbers.map(n => `<option value="${n}">${n === (S.world?.clock?.tick) ? `Tick #${n} (current)` : `Tick #${n}`}</option>`).join('');
+  
+  // Restore selection
+  if ([...select.options].some(o => o.value === currentValue)) {
+    select.value = currentValue;
+  }
+
+  const thoughts = S.thoughts;
+  note.textContent = `${thoughts.length} citizen${thoughts.length !== 1 ? 's' : ''} processed`;
+
+  container.innerHTML = thoughts.map((t, i) => {
+    const parsed = t.parsedAction || {};
+    const atype = parsed.action_type || 'nothing';
+    const thinking = parsed.thinking || '';
+    const actionDesc = parsed.action_description || '';
+    
+    const regionName = S.world?.regions?.[t.region]?.name || t.region || '—';
+    
+    return `
+      <div class="bts-citizen-block">
+        <div class="bts-citizen-header" onclick="toggleBTSCitizen(${i})">
+          <div class="bts-citizen-header-left">
+            <div>
+              <div class="bts-citizen-name">${esc(t.citizenName)}</div>
+              <div class="bts-citizen-region">📍 ${esc(regionName)}</div>
+            </div>
+            ${actionBadge(atype)}
+            ${actionDesc ? `<div style="font-size:11px;color:var(--text-muted);margin-left:8px;font-style:italic;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(actionDesc)}</div>` : ''}
+          </div>
+          <span class="bts-chevron" id="bts-chev-${i}">▼</span>
+        </div>
+        <div class="bts-citizen-body" id="bts-body-${i}">
+          <div class="bts-panels">
+            
+            <!-- PROMPT -->
+            <div class="bts-panel">
+              <div class="bts-panel-label prompt">🔵 LLM Prompt</div>
+              <div class="bts-code">
+                <div class="bts-prompt-section">
+                  <span class="sys-label">System</span>
+                  <div class="bts-prompt-text">${esc(t.prompt?.system || '')}</div>
+                </div>
+                <div class="bts-prompt-section">
+                  <span class="user-label">User</span>
+                  <div class="bts-prompt-text">${esc(t.prompt?.user || '')}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RAW RESPONSE -->
+            <div class="bts-panel">
+              <div class="bts-panel-label response">🟣 Raw LLM Response</div>
+              <div class="bts-code">
+                ${thinking ? `<div class="bts-thinking">"${esc(thinking)}"</div>` : ''}
+                ${actionDesc ? `<div class="bts-action-desc">${esc(actionDesc)}</div>` : ''}
+                <pre class="bts-json">${esc(typeof t.rawResponse === 'string' ? t.rawResponse : JSON.stringify(t.rawResponse, null, 2))}</pre>
+              </div>
+            </div>
+
+            <!-- PARSED ACTION -->
+            <div class="bts-panel">
+              <div class="bts-panel-label action">🟡 Parsed Action</div>
+              <div class="bts-code">
+                <div class="bts-json">${highlightJson(parsed)}</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleBTSCitizen(i) {
+  const body = document.getElementById(`bts-body-${i}`);
+  const chev = document.getElementById(`bts-chev-${i}`);
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+// ─── Render: All ──────────────────────────────────────────────────────
+function renderAll() {
+  renderTopBar();
+  renderMap();
+  renderCitizens();
+  renderEventLog();
+  if (S.btsOpen) renderBTS();
+}
+
+// ─── Citizen Modal ────────────────────────────────────────────────────
+async function openCitizenModal(id) {
+  if (!S.world) return;
+  const citizen = S.world.citizens[id];
+  if (!citizen) return;
+
+  document.getElementById('modal-name').textContent = citizen.name;
+  document.getElementById('modal-desc').textContent = citizen.physical_description;
+  document.getElementById('modal-overlay').classList.add('open');
+
+  const body = document.getElementById('modal-body');
+
+  // Health & food
+  const hpPct = Math.max(0, Math.min(100, (citizen.health / 10) * 100));
+  const hpColor = healthColor(citizen.health);
+  const foodDots = Array.from({length: 5}, (_, i) => 
+    `<span class="food-dot${i < citizen.food ? ' filled' : ''}"></span>`).join('');
+
+  // Skills
+  const skillNames = ['strength', 'dexterity', 'perception', 'endurance', 'social', 'curiosity'];
+  const skillsHtml = skillNames.map(s => {
+    const val = citizen.skills[s] || 0;
+    const dots = Array.from({length: 5}, (_, i) => 
+      `<span class="skill-dot${i < val ? ' filled' : ''}"></span>`).join('');
+    return `
+      <div class="skill-item">
+        <div class="skill-name">${s}</div>
+        <div class="skill-dots">${dots}</div>
+        <div class="skill-val">${val}/5</div>
+      </div>`;
+  }).join('');
+
+  // Traits
+  const traits = skillsToTraits(citizen.skills);
+  const traitsHtml = traits.length 
+    ? traits.map(t => `<div class="trait-item">${esc(t)}</div>`).join('')
+    : '<div class="memory-empty">No notable traits.</div>';
+
+  // Inventory
+  const invItems = Object.entries(citizen.inventory || {}).filter(([, v]) => v > 0);
+  const invHtml = invItems.length
+    ? invItems.map(([k, v]) => `<span class="inv-item"><span class="inv-count">${v}</span> ${esc(itemLabel(k))}</span>`).join('')
+    : '<span style="color:var(--text-faint);font-style:italic;font-size:12px">Nothing in hand.</span>';
+
+  // Memory
+  const memories = [...(citizen.memory || [])].reverse();
+  const memHtml = memories.length
+    ? memories.map(m => `<div class="memory-item">${esc(m)}</div>`).join('')
+    : '<div class="memory-empty">No memories — this being simply exists.</div>';
+
+  // Region
+  const region = S.world.regions[citizen.region];
+  const regionHtml = region ? `
+    <div class="modal-region-card">
+      <div class="modal-region-name">${TERRAIN_ICON[region.terrain] || '📍'} ${esc(region.name)}</div>
+      <div>${esc(region.description)}</div>
+      <div style="margin-top:6px;font-size:11px;color:var(--text-faint)">☁️ ${esc(region.weather)}</div>
+    </div>` : '<div class="memory-empty">Unknown location.</div>';
+
+  // Status
+  const statusHtml = citizen.alive 
+    ? '<span style="color:var(--green);font-weight:600">● Alive</span>' 
+    : '<span style="color:var(--red);font-weight:600">✕ Deceased</span>';
+
+  body.innerHTML = `
+    <!-- Status -->
+    <div class="modal-section">
+      <div class="modal-section-title">Status</div>
+      ${statusHtml}
+    </div>
+
+    <!-- Vitals -->
+    <div class="modal-section">
+      <div class="modal-section-title">Vitals</div>
+      <div class="modal-health-row">
+        <div class="modal-health-big" style="color:${hpColor}">${citizen.health}</div>
+        <div style="flex:1">
+          <div style="font-size:11px;color:var(--text-faint);margin-bottom:4px">Health — ${citizen.health}/10</div>
+          <div class="modal-health-bar">
+            <div class="modal-health-fill" style="width:${hpPct}%;background:${hpColor}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-food-row">
+        <span>🍎 Food:</span>
+        <div class="food-dots">${foodDots}</div>
+        <span style="color:var(--text-faint)">${citizen.food}/5</span>
+        ${citizen.food === 0 ? '<span style="color:var(--red);font-size:11px">⚠ Starving</span>' : ''}
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div class="modal-section">
+      <div class="modal-section-title">Attributes</div>
+      <div class="skills-grid">${skillsHtml}</div>
+    </div>
+
+    <!-- Traits -->
+    <div class="modal-section">
+      <div class="modal-section-title">Physical Traits</div>
+      <div class="traits-list">${traitsHtml}</div>
+    </div>
+
+    <!-- Inventory -->
+    <div class="modal-section">
+      <div class="modal-section-title">Carrying</div>
+      <div class="inventory-grid">${invHtml}</div>
+    </div>
+
+    <!-- Location -->
+    <div class="modal-section">
+      <div class="modal-section-title">Current Location</div>
+      ${regionHtml}
+    </div>
+
+    <!-- Memories -->
+    <div class="modal-section">
+      <div class="modal-section-title">Memory (most recent first)</div>
+      <div class="memory-log">${memHtml}</div>
+    </div>`;
+}
+
+function closeCitizenModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// ─── Controls ────────────────────────────────────────────────────────
+async function startSim() {
+  document.getElementById('btn-start').disabled = true;
+  try {
+    await api('/api/start', 'POST');
+    await fetchAll();
+    await fetchThoughts();
+  } catch(e) { console.error(e); }
+  document.getElementById('btn-start').disabled = false;
+}
+
+async function stopSim() {
+  document.getElementById('btn-stop').disabled = true;
+  try {
+    await api('/api/stop', 'POST');
+    await fetchAll();
+  } catch(e) { console.error(e); }
+  document.getElementById('btn-stop').disabled = false;
+}
+
+async function manualTick() {
+  const btn = document.getElementById('btn-tick');
+  btn.disabled = true;
+  btn.textContent = '⏳ Ticking…';
+  document.getElementById('tick-progress-indicator').style.display = 'inline-flex';
+  try {
+    await api('/api/tick', 'POST');
+    await fetchAll();
+    await fetchThoughts();
+    // Glow all regions that had events
+    if (S.history.length) {
+      const lastTick = S.history[S.history.length - 1];
+      const regionsTouched = new Set();
+      for (const evt of (lastTick.events || [])) {
+        if (S.world) {
+          for (const r of Object.values(S.world.regions)) {
+            if (evt.toLowerCase().includes(r.name.toLowerCase())) {
+              regionsTouched.add(r.id);
+            }
+          }
+        }
+      }
+      regionsTouched.forEach(id => glowRegion(id));
+    }
+  } catch(e) {
+    console.error(e);
+    alert('Tick failed: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = '⚡ Manual Tick';
+  document.getElementById('tick-progress-indicator').style.display = 'none';
+}
+
+// ─── BTS Toggle ───────────────────────────────────────────────────────
+document.getElementById('bts-toggle').addEventListener('click', () => {
+  S.btsOpen = !S.btsOpen;
+  const content = document.getElementById('bts-content');
+  const btn = document.getElementById('bts-toggle');
+  content.classList.toggle('open', S.btsOpen);
+  btn.classList.toggle('open', S.btsOpen);
+  if (S.btsOpen && !S.thoughts.length) {
+    fetchThoughts();
+  } else if (S.btsOpen) {
+    renderBTS();
+  }
+});
+
+// Tick selector for BTS
+document.getElementById('bts-tick-select').addEventListener('change', async (e) => {
+  S.btsSelectedTick = e.target.value;
+  const note = document.getElementById('bts-note');
+  if (e.target.value === 'latest' || e.target.value === String(S.world?.clock?.tick)) {
+    // Already have latest
+    renderBTS();
+  } else {
+    note.textContent = 'Note: Only the latest tick\'s thoughts are available via API.';
+    renderBTS();
+  }
+});
+
+// ─── Event wiring ─────────────────────────────────────────────────────
+document.getElementById('btn-start').addEventListener('click', startSim);
+document.getElementById('btn-stop').addEventListener('click', stopSim);
+document.getElementById('btn-tick').addEventListener('click', manualTick);
+document.getElementById('modal-close').addEventListener('click', closeCitizenModal);
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeCitizenModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCitizenModal();
+});
+document.getElementById('clear-filter').addEventListener('click', () => {
+  S.regionFilter = null;
+  renderMap();
+  renderEventLog();
+  document.getElementById('clear-filter').style.display = 'none';
+  document.getElementById('filter-label').textContent = '';
+});
+
+// ─── Polling ──────────────────────────────────────────────────────────
+fetchAll();
+fetchThoughts();
+
+setInterval(fetchAll, 10000);
+setInterval(fetchThoughts, 30000);
+// Also poll status more frequently for countdown accuracy
+setInterval(async () => {
+  try {
+    const status = await api('/api/status');
+    const wasRunning = S.status?.isRunning;
+    S.status = status;
+    renderTopBar();
+    updateCountdown();
+    // If a tick just finished (tick number increased), re-fetch everything
+    if (S.world && status.currentTick > S.world.clock.tick) {
+      fetchAll();
+      fetchThoughts();
+    }
+  } catch(e) {}
+}, 5000);
+</script>
+</body>
 </html>
