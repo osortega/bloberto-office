@@ -11,19 +11,19 @@
     {
       "id": "carlos",
       "role": "Backend Engineer",
-      "status": "idle",
-      "task": null,
-      "started_at": "2026-03-11T02:32:00Z",
-      "finished_at": "2026-03-11T02:45:00Z"
+      "status": "working",
+      "task": "Dead code cleanup: isNight, isStandup, idleWorkers",
+      "started_at": "2026-03-11T04:30:00Z",
+      "finished_at": null
     },
     {
-      "id": "maya",
-      "role": "Frontend Engineer",
-      "status": "idle",
-      "task": null,
-      "started_at": "2026-03-11T02:32:00Z",
-      "finished_at": "2026-03-11T02:45:00Z"
+      "id": "dave",
+      "role": "DevOps Engineer",
+      "status": "working",
+      "task": "Fix worker confetti color regression + deduplicate constants",
+      "started_at": "2026-03-11T04:30:00Z",
+      "finished_at": null
     }
   ],
-  "updated_at": "2026-03-11T04:00:00Z"
+  "updated_at": "2026-03-11T04:30:00Z"
 }
