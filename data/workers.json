@@ -2,30 +2,36 @@
   "workers": [
     {
       "id": "luna",
-      "name": "Luna",
       "role": "Creative Director",
-      "emoji": "\ud83c\udf19",
-      "status": "idle",
-      "task": "Creative review #106 complete \u2014 7 ideas, 2 carry-forwards",
-      "progress": 0,
-      "updated_at": "2026-03-11T17:10:00Z",
-      "startedAt": "2026-03-11T17:10:00Z",
-      "started_at": "2026-03-11T18:23:00Z",
-      "finished_at": "2026-03-11T18:28:00Z"
+      "status": "working",
+      "task": "Creative review #107 — evaluating office and writing ideas",
+      "started_at": "2026-03-11T19:33:00Z",
+      "finished_at": null
     },
     {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA & Product Analyst",
-      "emoji": "\ud83d\udd0d",
+      "id": "carlos",
+      "role": "Backend Engineer",
       "status": "idle",
-      "task": "QA review #108 complete \u2014 4.0/5, 14 suggestions (3 HIGH, 7 MED, 4 LOW)",
-      "progress": 0,
-      "updated_at": "2026-03-11T19:25:00Z",
-      "startedAt": "2026-03-11T18:45:00Z",
-      "started_at": "2026-03-11T18:45:00Z",
-      "finished_at": "2026-03-11T19:25:00Z"
+      "task": "Luna review #94 fixes — 6 bugs fixed",
+      "started_at": "2026-03-11T09:00:00Z",
+      "finished_at": "2026-03-11T09:05:00Z"
+    },
+    {
+      "id": "maya",
+      "role": "Frontend Engineer",
+      "status": "idle",
+      "task": "Luna #97 fixes — 3 items shipped (desk lamp colors, whiteboard task preview, activity emoji confirmed)",
+      "started_at": "2026-03-11T10:37:00Z",
+      "finished_at": "2026-03-11T10:42:00Z"
+    },
+    {
+      "id": "dave",
+      "role": "DevOps Engineer",
+      "status": "idle",
+      "task": null,
+      "started_at": "2026-03-11T04:30:00Z",
+      "finished_at": "2026-03-11T04:35:00Z"
     }
   ],
-  "updated_at": "2026-03-11T19:25:00Z"
+  "updated_at": "2026-03-11T19:33:00Z"
 }
