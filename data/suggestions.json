@@ -1,122 +1,119 @@
 {
   "analyst": "Sofia",
-  "review_number": 80,
-  "timestamp": "2026-03-11T01:20:00.000Z",
+  "review_number": 81,
+  "timestamp": "2026-03-11T02:16:06.923Z",
   "screenshots": {
-    "note": "Container hit pthread_create EAGAIN — screenshots could not be captured. Code-only analysis from current source."
+    "desktop": "screenshot-sofia-desktop-81.png",
+    "mobile": "screenshot-sofia-mobile-81.png",
+    "notes": "Both captured successfully. Desktop 1280x800, mobile 375x812. Site is fully rendered — office floor active with 6 workers (Bloberto, Luna, Sofia, Carlos, Maya, Dave), vibe reading 'Crushing It', speech bubble visible and unclipped. Mobile layout functional, workers readable, footer wraps acceptably at this viewport. No blank screens, no crashes."
   },
   "scores": {
-    "visual": 8,
-    "ux": 7,
-    "responsiveness": 7,
-    "performance": 5,
-    "accessibility": 5,
-    "code_quality": 5,
-    "features": 9,
-    "fun_factor": 9
+    "visual": 8.5,
+    "ux": 7.0,
+    "responsiveness": 7.5,
+    "performance": 7.5,
+    "accessibility": 5.5,
+    "code_quality": 7.0,
+    "features": 8.5,
+    "fun_factor": 9.0
   },
-  "overall_score": 6.9,
-  "score_delta": -0.2,
-  "qa79_fixes_verification": {
-    "confirmed_fixed": [],
-    "partially_fixed": [],
-    "not_deployed": [
-      "Speech bubble still clipped by overflow:hidden on office-floor (Office.css line 84) — STRIKE 6",
-      "handleCharClick still a plain arrow function, not useCallback — defeats memo() on ALL Characters — STRIKE 5",
-      "Arrow-key tab navigation still pushes history entries via window.location.hash = next — STRIKE 3",
-      "activityByWorker useMemo creates new array refs on every poll — STRIKE 2",
-      "Footer quote counter still wraps to 1 instead of 0 — STRIKE 5",
-      "localStorage.getItem in useState initializers still unguarded — STRIKE 4",
-      "handleTabKeyDown not wrapped in useCallback — STRIKE 2",
-      "Activity filter radiogroups still lack arrow-key navigation — STRIKE 2",
-      "Dashboard activity log still passes inline-filtered arrays — STRIKE 2"
+  "overall_score": 7.6,
+  "score_delta": 0.7,
+  "qa80_fixes_verification": {
+    "confirmed_fixed": [
+      {
+        "item": "handleCharClick wrapped in useCallback",
+        "evidence": "Office.jsx:1248 — useCallback with deps [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick]. Properly memoized. NOTE: pingTimerRef and pingReactionTimerRef are refs and don't need to be in the dep array (refs are stable), but this is harmless. The core fix is solid."
+      },
+      {
+        "item": "Speech bubble overflow:clip fix",
+        "evidence": "Office.css:84-85 — .office-floor now has overflow:clip with overflow-clip-margin:20px. Speech bubbles are visible in desktop and mobile screenshots without clipping. Fix confirmed visually and in code."
+      },
+      {
+        "item": "history.replaceState for tab switching",
+        "evidence": "App.jsx:793, 798, 804, 877-878, 1271, 1284 — All tab navigation paths (onClick, onKeyDown, keyboard shortcut 1/2) call history.replaceState. Hash-based deep linking on init (line 704-706) and hashchange listener (lines 720-727) round out the fix. Comprehensive."
+      },
+      {
+        "item": "activityByWorker memo dependency fix",
+        "evidence": "App.jsx:956-962 — activityByWorker useMemo now includes fadingMap in deps AND processes Object.values(fadingMap ?? {}) to cover fading-out workers. Previously this was a carry-over medium item (strike 2). Marking as RESOLVED — strike reset."
+      }
+    ],
+    "not_fixed": [
+      {
+        "item": "safeRead() for localStorage — PARTIAL FIX ONLY",
+        "severity": "HIGH",
+        "evidence": "App.jsx:1060-1061 — The vibe streak effect still calls localStorage.getItem('bloberto-vibe-key') and localStorage.getItem('bloberto-vibe-streak') directly with NO try-catch wrapper. In iOS private browsing or enterprise locked-down environments, these throw SecurityError BEFORE reaching safeSave on lines 1065-1066. Additionally, App.jsx:1097-1104 — the vibe history block has a try-catch but still uses raw localStorage.getItem/setItem instead of the safeRead/safeSave helpers. Carlos migrated the writes but forgot to migrate the reads. Half a loaf."
+      }
     ]
   },
   "suggestions": [
     {
       "priority": "high",
-      "category": "code",
-      "title": "handleCharClick is STILL not useCallback — this is strike 5",
-      "description": "Office.jsx line 1248: handleCharClick is a plain arrow function. Every Office render creates a new reference. This is passed to every Character component (line 1568, 1583, 1613). Since Character is memo()-wrapped, the new function ref causes ALL character memo checks to fail on every render. This means every 30s poll re-renders every single character on screen. This has been reported since QA74. Fix: useCallback with deps [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick].",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "Speech bubble clipped — strike 6, never addressed",
-      "description": "office-floor has overflow:hidden (Office.css line 84). Bloberto at top:4% with bubble at bottom:calc(100%+8px) is clipped. This has been reported every review since QA71. Simple fix: move speech bubble inside the overflow boundary or use clip-path: inset(-20px 0 0 0) on office-floor to allow top overflow only.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "bug",
-      "title": "Arrow-key tab switching pushes browser history — Back button broken",
-      "description": "App.jsx lines 794/799: handleTabKeyDown sets window.location.hash directly. Each assignment creates a history entry. User presses ArrowRight 5 times → must press Back 5 times to leave page. Fix: history.replaceState(null, '', '#' + next). Also applies to lines 805, 877-878, 1271, 1284.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "code",
-      "title": "localStorage.getItem calls in useState initializers will crash in private browsing",
-      "description": "App.jsx lines 628, 702, 749: localStorage.getItem() called in useState(() => ...). iOS Safari private mode throws SecurityError. App has ErrorBoundary but user sees 'Something went wrong' with no recovery. Fix: wrap in try/catch. A safeRead() helper matching the existing safeSave() pattern.",
-      "effort": "small"
+      "category": "Reliability / Private Browsing",
+      "title": "Vibe streak reads still bypass safeRead() — private browsing will throw",
+      "description": "App.jsx lines 1060-1061: `localStorage.getItem('bloberto-vibe-key')` and `localStorage.getItem('bloberto-vibe-streak')` are called bare inside a useEffect with no try-catch. In iOS Safari private browsing or any storage-blocked context, these throw SecurityError and crash the entire vibe streak effect before safeSave is even reached. Fix: replace both reads with `safeRead('bloberto-vibe-key')` and `safeRead('bloberto-vibe-streak')`. Also consider replacing the try-catch block at lines 1097-1104 with safeRead/safeSave for consistency. This was labeled as a HIGH fix in QA#80 — it is only half-done.",
+      "effort": "small",
+      "carry_over": false,
+      "strike": 1
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "activityByWorker creates new array refs every poll — WorkerCard memo defeated",
-      "description": "App.jsx line 955: useMemo runs .filter().slice(-3) per worker. filter() always returns a new ref. Every 30s poll changes activityLog → new refs → all WorkerCards re-render. Fix: compare content before inserting, or use JSON.stringify comparison to stabilize refs.",
-      "effort": "medium"
+      "category": "Performance",
+      "title": "handleTabKeyDown still not wrapped in useCallback — strike 3",
+      "description": "App.jsx:787 — handleTabKeyDown is declared as a plain arrow function inside the App component body. It closes over `tab` state and is recreated on every render. It's passed to both tab buttons via onKeyDown (lines 1272, 1285), causing unnecessary re-renders of those buttons on every parent render cycle. Wrap in useCallback with dep [tab]. This has been flagged in QA#79 and QA#80. Strike 3.",
+      "effort": "small",
+      "carry_over": true,
+      "strike": 3
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "Footer quote counter wraps 1→1 — vibe tagline permanently lost",
-      "description": "App.jsx line 1448: setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1). Should wrap to 0 to show vibe tagline again. Strike 5.",
-      "effort": "small"
+      "category": "Accessibility",
+      "title": "ARIA radiogroup has no keyboard arrow-key handler — strike 3",
+      "description": "App.jsx:1385, 1404 — Two div[role='radiogroup'] elements hold buttons with role='radio'. Per WAI-ARIA spec, radiogroups require arrow-key roving focus: ArrowRight/ArrowDown moves to next radio, ArrowLeft/ArrowUp moves to previous, Home/End go to first/last. Currently keyboard users must Tab through every individual button. No onKeyDown handler exists on either radiogroup. Add a handleRadioGroupKeyDown function that implements the roving tabIndex pattern. This was flagged in QA#79 and QA#80. Strike 3.",
+      "effort": "medium",
+      "carry_over": true,
+      "strike": 3
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "handleTabKeyDown not wrapped in useCallback",
-      "description": "App.jsx line 788: plain function, new ref every render. Passed to both tab buttons' onKeyDown. Minor perf impact but easy fix.",
-      "effort": "small"
-    },
-    {
-      "priority": "medium",
-      "category": "accessibility",
-      "title": "Activity filter radiogroups violate ARIA contract — no arrow-key navigation",
-      "description": "App.jsx lines 1385/1404: role='radiogroup' with button[role='radio'] children. ARIA spec requires arrow keys to move between options. Keyboard users are stuck. Implement roving tabIndex pattern.",
-      "effort": "medium"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "ProgressBar ETA never updates between progress changes",
-      "description": "App.jsx line 229: ETA computed from Date.now() at render time only. No time subscription. If worker sits at 40% for 30 minutes, ETA label shows same stale value. Fix: add useTimeTick(60000) to ProgressBar.",
-      "effort": "small"
+      "category": "UX / Data Freshness",
+      "title": "ProgressBar ETA is a stale snapshot — never self-updates",
+      "description": "App.jsx:227-229 — `eta` is computed inline during render using `Date.now()`. Since ProgressBar has no internal interval and no state that ticks, the ETA display is frozen at the value it had when the parent last re-rendered (triggered by a progress prop change). A worker parked at 47% for 20 minutes will still show the same ETA until the next data sync updates progress. Fix: add a `useEffect` with a 60-second `setInterval` that calls a local `forceUpdate` or increments a `tick` state counter, triggering ETA recalculation. Carry-over from QA#80.",
+      "effort": "small",
+      "carry_over": true,
+      "strike": 2
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "standupWorkers.includes uses object reference equality",
-      "description": "Office.jsx line 1572: standupWorkers.includes(occ.worker) relies on reference identity. Will silently break if any normalization reconstructs objects. Fix: .some(sw => sw.id === occ.worker.id).",
-      "effort": "small"
+      "category": "UX / Responsive",
+      "title": "Footer quote button has no max-width — wraps jaggedly on narrow viewports — strike 6",
+      "description": "App.jsx:1444-1449 — The footer-tagline button contains the full quote text inline with no max-width or flex-wrap constraints on the parent footer. On viewports between ~375-480px the quote button line-breaks mid-sentence in unpredictable spots, and the counter badge `{quoteBonus}/{BONUS_TAGLINES.length}` orphans on its own line. Fix: add `max-width: min(480px, 90vw); display: inline-block;` to `.footer-tagline`, or wrap the footer content in a `flex-direction: column` container on mobile breakpoints. This has been flagged in every review since QA#76. Strike 6.",
+      "effort": "small",
+      "carry_over": true,
+      "strike": 6
     },
     {
       "priority": "low",
-      "category": "ux",
-      "title": "Conference table 'last huddle' text at 0.38rem is unreadable",
-      "description": "Office.jsx line 1002: fontSize 0.38rem ≈ 5px. Below legibility threshold. Has been this way since QA77. Bump to 0.65rem or hide behind tooltip.",
-      "effort": "small"
+      "category": "Code Quality",
+      "title": "handleCharClick useCallback dep array includes refs unnecessarily",
+      "description": "Office.jsx:1260 — The useCallback deps array for handleCharClick lists `pingTimerRef` and `pingReactionTimerRef`. React guarantees that ref objects returned by useRef have stable identity for the lifetime of the component — they never need to be in a dependency array. Listing them is misleading (implies they can change) and may confuse future contributors or exhaustive-deps linters. Remove refs from the dep array: `[setPingedId, setPingReaction, onWorkerClick]` is the correct and minimal set (and even the setState setters are stable, so in practice just `[onWorkerClick]` suffices).",
+      "effort": "small",
+      "carry_over": false,
+      "strike": 1
     },
     {
       "priority": "low",
-      "category": "accessibility",
-      "title": "vibeCaption aria-live region mounts with content — screen readers may miss it",
-      "description": "Office.jsx line 1524: conditionally rendered div with aria-live='polite'. ARIA spec says live regions should be present before content injection. Keep empty container always mounted.",
-      "effort": "small"
+      "category": "UX",
+      "title": "Worker filter radio toggle is inconsistent with type filter behavior",
+      "description": "App.jsx:1397 vs 1418 — The type filter (All/Hires/Completions/Errors/System) sets the filter on click and does not toggle off. The worker filter DOES toggle off when clicking an already-selected worker (`setWorkerFilter(workerFilter === member.name ? null : member.name)`). These are both role='radiogroup' patterns but behave differently. Users clicking a selected worker expect consistent behavior. Decide on one pattern: either both toggle off (radio-with-clear), or neither does (use a separate 'All' option for workers, which already exists). Currently inconsistent.",
+      "effort": "small",
+      "carry_over": false,
+      "strike": 1
     }
   ],
-  "summary": "QA80: Zero QA79 issues have been fixed. 9 carry-overs, 5 of which are on strike 5+. The handleCharClick useCallback gap alone causes every character to re-render on every poll — this is the single biggest performance issue in the app. Score dropped 0.2 to 6.9. Three HIGH items are all small-effort fixes that would meaningfully improve performance and UX."
+  "visual_notes": {
+    "desktop": "Office floor looks great — vibe 'Crushing It' glowing purple border, speech bubble visible above Bloberto's desk and unclipped. Worker desks well-positioned. Shortcuts tooltip appearing in corner. Minor: there appears to be a partial worker-card element bleeding from the left viewport edge — possibly a fading/entering card that got caught mid-transition in the screenshot moment. Not a persistent bug.",
+    "mobile": "Renders cleanly at 375x812. Workers identifiable though dense. Speech bubble visible. Tab bar slightly cramped but functional. Footer text visible at bottom — wraps but acceptably at this exact width. The 'COFFEE TRIPLE SHOT' label in the corner is tiny but present. No overflow clipping visible."
+  },
+  "overall_verdict": "Carlos knocked out the four HIGH items properly — useCallback on the heavy click handler, overflow:clip on the office floor, replaceState wired up everywhere it needed to be, and safeSave/safeRead infrastructure added. The activityByWorker memo with fadingMap deps is also a clean fix I'm calling resolved. That said: the safeRead migration is half-baked — the streak READS are still bare localStorage calls that will explode in private browsing. The ARIA radiogroup and handleTabKeyDown useCallback issues are now at strike 3 and deserve priority. Site is visually polished and fun. Score up to 7.6 from 6.9. Keep pushing."
 }
