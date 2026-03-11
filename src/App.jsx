@@ -750,6 +750,14 @@ export default function App() {
   const [quoteBonus, setQuoteBonus] = useState(0)
   const [sparkleUnseen, setSparkleUnseen] = useState(() => !safeRead('footer-sparkle-seen'))
 
+  const filteredActivityEntries = useMemo(() => activityLog.filter(e => {
+    if (activityFilter === 'hires') return e.type === 'hire'
+    if (activityFilter === 'completions') return e.type === 'complete'
+    if (activityFilter === 'errors') return e.type === 'error'
+    if (activityFilter === 'system') return e.type === 'system'
+    return true
+  }).filter(e => workerFilter !== null ? e.worker === workerFilter : true), [activityLog, activityFilter, workerFilter])
+
   const handleTagClick = useCallback((tag) => {
     setSelectedTag(prev => prev === tag ? null : tag)
   }, [])
@@ -1363,19 +1371,12 @@ export default function App() {
               <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                 {(() => {
                   const isFiltered = activityFilter !== 'all' || workerFilter !== null
-                  const filtered = activityLog.filter(e => {
-                    if (activityFilter === 'hires') return e.type === 'hire'
-                    if (activityFilter === 'completions') return e.type === 'complete'
-                    if (activityFilter === 'errors') return e.type === 'error'
-                    if (activityFilter === 'system') return e.type === 'system'
-                    return true
-                  }).filter(e => workerFilter !== null ? e.worker === workerFilter : true)
                   const DISPLAY_CAP = 20
                   return isFiltered
-                    ? `${Math.min(filtered.length, DISPLAY_CAP)} of ${filtered.length} events (filtered)`
-                    : filtered.length > DISPLAY_CAP
-                      ? `Latest ${DISPLAY_CAP} of ${filtered.length} events`
-                      : `${filtered.length} events`
+                    ? `${Math.min(filteredActivityEntries.length, DISPLAY_CAP)} of ${filteredActivityEntries.length} events (filtered)`
+                    : filteredActivityEntries.length > DISPLAY_CAP
+                      ? `Latest ${DISPLAY_CAP} of ${filteredActivityEntries.length} events`
+                      : `${filteredActivityEntries.length} events`
                 })()}
               </span>
             </div>
@@ -1420,16 +1421,7 @@ export default function App() {
               ))}
             </div>
             <ActivityLog
-              entries={activityLog.filter(e => {
-                if (activityFilter === 'hires') return e.type === 'hire'
-                if (activityFilter === 'completions') return e.type === 'complete'
-                if (activityFilter === 'errors') return e.type === 'error'
-                if (activityFilter === 'system') return e.type === 'system'
-                return true
-              }).filter(e => {
-                if (workerFilter !== null) return e.worker === workerFilter
-                return true
-              })}
+              entries={filteredActivityEntries}
               error={activityError}
               roster={roster}
             />
