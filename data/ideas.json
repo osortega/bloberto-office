@@ -1,149 +1,201 @@
 {
   "creative_director": "Luna",
-  "review_number": 93,
-  "timestamp": "2026-03-11T07:01:11Z",
+  "review_number": 94,
+  "timestamp": "2026-03-11T07:30:58Z",
   "screenshot_taken": false,
-  "screenshot_note": "Puppeteer failed — pthread_create: Resource temporarily unavailable (system thread limit hit). Review conducted on source code alone. Screenshots from luna-91 (ErrorBoundary crash) and sofia-81 (post-Carlos fix) remain the most recent visual references. Three confirmed fixes verified by reading App.jsx and Office.jsx directly.",
-  "theme": "Three must-fixes landed silently between reviews — the stale closure is gone, the radiogroups finally behave like radiogroups, and the ErrorBoundary can now recover. The office has better bones. Now let's fix the cracks that opened while we were patching the walls.",
-  "fixed_since_last_review": [
-    {
-      "title": "handleTabKeyDown Stale Closure — FIXED (Sofia Strike 4 Resolved)",
-      "was_flagged_in": [81, 82, 83, 84, 92],
-      "how_fixed": "App.jsx:714-716 + 803-816 — const tabRef = useRef(tab) and useEffect(() => { tabRef.current = tab }, [tab]) added. handleTabKeyDown now reads tabRef.current inside the callback and has empty dep array []. Zero stale-closure risk, zero unnecessary tab-button re-renders. Exactly the fix proposed in review 92. Four QA reviews + one creative review to land a 10-line change. It's here now."
-    },
-    {
-      "title": "ARIA Radiogroup Filter Bars — Arrow-Key Navigation and Roving TabIndex — FIXED (Sofia Strike 3 Resolved)",
-      "was_flagged_in": [79, 80, 92],
-      "how_fixed": "App.jsx:1389-1456 — Both activity filter radiogroups now have: (1) onKeyDown on the container handling ArrowLeft/ArrowRight with setActivityFilter/setWorkerFilter, (2) tabIndex={activityFilter === key ? 0 : -1} on each type-filter radio, (3) tabIndex={workerFilter === member.name ? 0 : -1} on each worker radio. Roving tabindex pattern is correct. Keyboard users can now navigate both filter bars with arrow keys as WCAG requires."
-    },
-    {
-      "title": "ErrorBoundary: componentDidCatch + Retry Button — FIXED",
-      "was_flagged_in": [92],
-      "how_fixed": "App.jsx:12-19 — componentDidCatch(error, info) { console.error('[Bloberto ErrorBoundary]', error, info) } is present. resetError = () => this.setState({ hasError: false }) is present. Retry button rendered inline with the error message. The 48-minute blind diagnosis window from the March 11 crash is closed. The next incident will leave a forensic record and give users a one-click recovery path."
-    }
-  ],
+  "screenshot_note": "Puppeteer timed out on Network.enable (protocolTimeout). System resource-constrained — same failure class as review 93. Review conducted on source code alone: App.jsx (62.7 KB), Office.jsx (77.9 KB), App.css, Office.css. Git log unavailable (forkpty error); fixed-items determination based on code inspection only.",
+  "theme": "Eleven items carried from review 93, zero fixed. Three new bugs found: a time-bomb JSON.parse that Sofia flagged in QA #85 (nine review cycles old across two reviewers), an ErrorBoundary message that contradicts its own Retry button, and a night sky that is starless while midnight shows stars. The coffee corner accessibility issue is worse than review 93 documented: not one CSS pseudo-element injection but four. The office accumulates technical debt faster than it pays it down.",
+  "fixed_since_last_review": [],
+  "fixed_since_last_review_note": "Git log was inaccessible (forkpty resource error). Code inspection of every flagged line from review 93 found all items unchanged. Zero confirmed fixes between review 93 and review 94.",
   "ideas": [
     {
       "priority": "must",
       "category": "bug",
-      "title": "WorkerCard Back Panel Key Uses Delimiter-Free Concatenation — The Same Bug We Fixed in ActivityLogEntry",
-      "description": "App.jsx:395 — workerHistory.map((e) => (<div key={e.timestamp + e.type + (e.worker || '')}...)). Review 92 fixed the ActivityLogEntry key (now uses underscore-separated template literal at line 157). The WorkerCard back panel was missed. It still uses the pre-fix string concatenation: if two events have the same timestamp and if that timestamp string ends with a character that equals the start of e.type, keys collide and React silently reorders or drops entries. The probability is low but non-zero — ISO timestamp ending in 'z' + type starting with 'z' (never happens) or a system event where worker is empty and type is 'error' after a timestamp ending in 'e'. More importantly: inconsistency. The ActivityLogEntry was fixed; the WorkerCard back panel was not. A future dev reading both will wonder why one uses delimiters and one doesn't. Fix: key={`${e.timestamp}_${e.type}_${e.worker ?? 'system'}`} — identical pattern to the fix that landed in review 92. Two-character change. WHY: the fix was applied in half the codebase. Finish it.",
+      "title": "JSON.parse(raw) Unguarded on VIBE_HISTORY_KEY — Silent Crash Loop in useEffect",
+      "description": "App.jsx:1114 — const history = raw ? JSON.parse(raw) : []. The safeRead() call on line 1113 handles SecurityError and iOS private mode. JSON.parse is NOT protected. If localStorage[\"bloberto-vibe-history\"] contains corrupted data (stale app version format, user-edited storage, partial write from page unload, browser extension), JSON.parse throws SyntaxError. This fires inside a useEffect — NOT during render — so the ErrorBoundary cannot catch it. React 18 logs an unhandled exception; vibeHistory stays empty; setVibeHistory on line 1118 never runs. Every subsequent vibe change re-enters the same effect, re-reads the same corrupted string, and throws again — infinite silent exceptions until the user manually clears localStorage. Sofia flagged this as MEDIUM in QA review #85. It has survived nine review cycles across two reviewers. Fix: wrap in try-catch: const history = (() => { try { return raw ? JSON.parse(raw) : [] } catch { return [] } })(). Better: add safeParseJSON(str, fallback) to src/utils/safeSave.js alongside safeSave and safeRead — the pattern is established, the utility belongs there, five lines. WHY: safeRead exists because storage access can fail silently. JSON.parse is the second half of that same contract. Both halves need protection.",
+      "effort": "trivial",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "must",
+      "category": "bug",
+      "title": "WorkerCard Back Panel Key Uses Delimiter-Free Concatenation — Same Bug Fixed Elsewhere (Carry-Over #93)",
+      "description": "App.jsx:395 — workerHistory.map((e) => (<div key={e.timestamp + e.type + (e.worker || \"\")}...)). ActivityLogEntry at line 157 was fixed in review 92 to use a template literal with underscore delimiters. The WorkerCard back panel was missed. String concatenation without delimiters produces collision-prone keys: two different timestamp+type combinations can produce the same concatenated string. The probability is low but the inconsistency with the already-fixed line 157 is active confusion for every developer reading both. Fix: key={e.timestamp + \"_\" + e.type + \"_\" + (e.worker ?? \"system\")}. Two-character change. WHY: the fix was applied to half the codebase in review 92. Finish it. Still open after review 93.",
       "effort": "trivial",
       "assigned_to": "maya"
     },
     {
       "priority": "must",
       "category": "bug",
-      "title": "standupWorkers Reference Equality Split — Partial Fix Created Inconsistent Behavior",
-      "description": "Office.jsx:1443 vs 1571 — Two standup checks exist in the same render, now using different strategies. Line 1443: const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id) — uses .some(), id-safe. Line 1571: if (standupWorkers.includes(occ.worker)) return null — still uses reference equality .includes(). This is WORSE than review 92's original single-check problem. Before the partial fix, both code paths used .includes() — consistently wrong. Now: the CSS class check (line 1443) uses .some() while the Character render skip (line 1571) uses .includes(). If references ever diverge (normalization clones, spread merge, any new worker field added during fetch), desk CSS will correctly exclude the standup class BUT the Character will still render at the desk — producing a ghost duplicate: the worker appears standing at their desk AND at the conference table simultaneously, with no thrown error and no obvious cause. The desk CSS says standup; the desk character says I'm here. Fix: change line 1571 to if (standupWorkers.some(sw => sw.id === occ.worker.id)) return null — one method call change. WHY: the partial fix made the failure mode harder to detect by creating an inconsistency between two paths that should always agree.",
+      "title": "standupWorkers Character Render Skip Uses .includes() While Desk Check Uses .some() — Inconsistent Split (Carry-Over #93)",
+      "description": "Office.jsx:1443 vs 1571 — Two checks that must always agree use different identity strategies. Line 1443: const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id) — id-safe, fixed in review 92. Line 1571: if (standupWorkers.includes(occ.worker)) return null — still uses reference equality. If object references diverge (normalization, spread, new field added in a data shape change), the desk correctly skips the standup class while the Character still renders at the desk — producing a visual duplicate where the same worker appears at their desk AND at the conference table simultaneously. Review 93 escalated this to must. Fix: change line 1571 to if (standupWorkers.some(sw => sw.id === occ.worker.id)) return null. WHY: before the partial fix, both checks were wrong together. Now they disagree, which is harder to detect and debug than a consistent error. Still open.",
       "effort": "trivial",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "bug",
-      "title": "ConferenceTable SVG Filter Has Hardcoded ID — Document-Scope Collision Risk",
-      "description": "Office.jsx:941 — <filter id=\"conf-fire-glow\" ...>. SVG filter IDs are document-scoped. ConferenceTable is currently rendered once, so no collision today. But: if kiosk mode (from review 92 wild idea) is ever built, if a test renders ConferenceTable twice, or if a future layout needs two office views side-by-side, the second instance's SVG will silently reference the first instance's filter definition — or not apply any glow at all depending on DOM parse order. CharacterAvatar already solves this correctly at line 230: const gradId = useId() — the pattern is established in this codebase. Fix: add const glowFilterId = useId() at the top of ConferenceTable, replace id=\"conf-fire-glow\" with id={glowFilterId}, and update the url() reference to url(#${glowFilterId}). Three lines. WHY: CharacterAvatar knows why global SVG IDs are dangerous. ConferenceTable should know too.",
-      "effort": "small",
-      "assigned_to": "carlos"
+      "title": "ErrorBoundary Message Tells Users to Refresh While a Retry Button Exists — Contradictory Instructions",
+      "description": "App.jsx:18-19 — The ErrorBoundary renders \"Something went wrong — refresh the page\" alongside a Retry button that calls this.resetError. These two instructions contradict each other. The text says: take one action (browser refresh, which clears React state and all loaded data). The button offers a different action (in-place error reset, which preserves all fetched worker data). A user who reads the text first will manually refresh, losing loaded data, when clicking Retry would recover in under a second with data intact. The message was written before the Retry button existed — componentDidCatch and resetError were added in review 92. The message was never updated. Fix: change line 18 to \"Something went wrong.\" and let the button speak for itself. Or: \"Something went wrong — click Retry, or refresh if it persists.\" WHY: user-facing copy that contradicts a UI element is a UX bug. The Retry button is the better recovery path. The copy should guide users toward it, not away.",
+      "effort": "trivial",
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "bug",
-      "title": "Window Sky Gradient and Header Greeting Are Two Hours Out of Sync",
-      "description": "App.jsx:866-871 (WindowElement) vs App.jsx:1163 — The window sky gradient activates deep purple night (linear-gradient(#4c1d95, #312e81)) at h >= 20 (8pm). The header greeting switches from 'Good evening' to 'Burning the midnight oil' at h >= 22 (10pm, the isAfterHours threshold fixed in review 91). The vibe system likely activates after-hours at a similar late threshold. Result: at 8pm and 9pm, the office window looks like deep midnight, starless purple sky — but the header cheerfully says 'Good evening, boss' and the team vibe doesn't feel after-hours at all. The visual storytelling and the verbal storytelling disagree for two full hours every evening. Fix: extend the golden-hour sky gradient to cover h >= 17 && h <= 21, and start the night-purple sky at h >= 22 to match the isAfterHours boundary. This aligns the window with the greeting and the vibe — the office looks late when it feels late. WHY: the sky is the most visible ambient storytelling element in the office view. When it says 'midnight' while the header says 'evening,' the immersion cracks.",
+      "title": "ConferenceTable SVG Filter Has Hardcoded ID — Document-Scope Collision Risk (Carry-Over #93)",
+      "description": "Office.jsx:941 — <filter id=\"conf-fire-glow\" ...>. SVG filter IDs are document-scoped. ConferenceTable is rendered once today so no collision exists yet. CharacterAvatar already solves this correctly at line 230: const gradId = useId() — the pattern is established in this codebase. If ConferenceTable is ever rendered twice (kiosk mode, test harness, split-view layout), the second instance silently references the first instance filter definition, or applies no glow at all. Fix: const glowFilterId = useId() at the top of ConferenceTable, replace id=\"conf-fire-glow\" with id={glowFilterId}, update the url() reference on line 933 to url(#). Three lines. WHY: CharacterAvatar knows why global SVG IDs are dangerous. ConferenceTable should too. Still open after review 93.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Luna's Creative Reviews Are Ghost Events — Never Appear in the Activity Log (Carry-Over Review 10)",
-      "description": "data/activity.json — Luna has completed 93 creative reviews. Zero appear in the activity log. The feed shows Sofia QA reviews and Carlos fixes and system vibe transitions. Luna does not exist in her own team's record. This has been flagged in reviews 83 through 93 — ten consecutive reviews. The action: after writing ideas.json, Luna appends an entry to activity.json with type='complete', worker='Luna', message='Creative review #93 complete — N ideas, N fixes verified', timestamp=ISO now. Same pattern Sofia uses after each QA review. This is not a code change. It is a data maintenance action that takes sixty seconds. WHY: if you check the activity log to understand what the team has been doing for the past week, you will see QA and DevOps work. You will not see creative direction. Luna is the Creative Director of a product with no creative record. That is the tenth review in a row with the same sentence.",
+      "title": "Window Sky Is Deep Purple Night at 8pm While Header Greets Good Evening — Two Hours Out of Sync (Carry-Over #93)",
+      "description": "Office.jsx:869 vs App.jsx:1163-1171 — The window sky gradient activates deep purple night at h >= 20 (8pm). The header greeting changes from Good evening to Burning the midnight oil only at h >= 22 (10pm, the isAfterHours threshold). Result: at 8pm and 9pm, the office window looks like deep midnight while the header says Good evening, boss. The sky is the loudest ambient storytelling element in the view. When it says midnight while the header says evening, the immersion breaks for two hours every evening. Fix: shift the night sky from h >= 20 to h >= 22. Extend the golden-hour gradient (currently h=17-19) to cover h=17-21. WHY: the sky must agree with the greeting. Still open after review 93.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Luna's 94 Creative Reviews Are Ghost Events — Still Not in the Activity Log (Carry-Over Reviews 83-93)",
+      "description": "data/activity.json — Luna has completed 94 creative reviews. Zero appear in the activity log. Sofia QA reviews through #85 are present. Carlos fixes appear. Vibe transitions appear. Luna does not exist in her own product record. Flagged in twelve consecutive reviews (83-94). The action: after writing ideas.json, append an entry to activity.json with type=complete, worker=Luna, message=Creative review #94 complete, timestamp=ISO now. Same pattern Sofia uses after each QA. Sixty seconds. The same sixty seconds not taken after reviews 83 through 93. WHY: the activity log is the team shared memory. If Creative Direction is invisible in that log, it does not exist in the record. Twelve reviews. Same sentence.",
       "effort": "trivial",
       "assigned_to": "luna"
     },
     {
       "priority": "should",
       "category": "perf",
-      "title": "staleMins Computed Twice in the Same Render Block — Still Open from Review 92",
-      "description": "Office.jsx:1433-1441 — Two separate Math.floor(staleDiffMs / 60000) computations exist 8 lines apart with different variable names: 'mins' inside the staleDeskTitle IIFE and 'ghostMins' in the tier-classification block. Review 92 flagged this and noted it as a clean-up of the partial fix from review 91. It is still open. The fix: const staleMins = isStaleWorking ? Math.floor(staleDiffMs / 60000) : 0 computed once before both uses; replace 'mins' and 'ghostMins' with staleMins throughout. One variable, one computation, no ambiguity about whether they could differ (they cannot — both compute the floor of the same staleDiffMs value). WHY: two different names for the same value in the same 20-line block implies to every reader that they might mean different things. They never can.",
+      "title": "staleMins Computed Twice in the Same Block With Different Names — Still Open (Carry-Over #92, #93)",
+      "description": "Office.jsx:1434 and 1440 — Two separate Math.floor(staleDiffMs / 60000) computations exist 6 lines apart. Line 1434: const mins = ... inside the staleDeskTitle IIFE. Line 1440: const ghostMins = ... for tier classification. Same value, two names, two computations. Fix: const staleMins = isStaleWorking ? Math.floor(staleDiffMs / 60000) : 0 before both uses. Replace mins and ghostMins with staleMins. One computation, no ambiguity about whether they could differ (they cannot — both floor the same staleDiffMs). WHY: two names for the same value in a 20-line block implies they might mean different things. They never can. Open since review 92.",
+      "effort": "trivial",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Night Sky at h=20-23 Has No Stars While Midnight Sky at h=0-4 Does — Storytelling Discontinuity",
+      "description": "Office.jsx:873 and 882-888 — isMidnight is defined as hour >= 0 && hour <= 4. Stars are rendered only inside the isMidnight block. The night sky gradient (h >= 20 && h <= 23) is visually identical (deep purple #4c1d95 to #312e81) but completely empty: no stars, no detail. At 11pm the window is a featureless dark rectangle. At 1am it has four blinking stars. The window looks more alive after midnight than before, which is backwards. Fix: change the star rendering condition to include isMidnight || hour >= 20. Optionally show slightly fewer stars at night than midnight for gradation. WHY: the sky gradient already acknowledges that night exists at 8pm. If the sky acknowledges night, it should look like night.",
       "effort": "trivial",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
       "category": "perf",
-      "title": "handleCharClick Over-Specified Dependency Array — Stable Values Listed as Dependencies",
-      "description": "Office.jsx:1257 — }, [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick]). Four of the five items in this dep array are stable by React contract: setPingedId and setPingReaction are useState setters (React guarantees stable references across renders); pingTimerRef and pingReactionTimerRef are useRef objects (same object reference for the component lifetime). Listing stable values in useCallback deps is not incorrect — React ignores values that never change — but it sends a misleading signal to every reader: 'this callback might recreate when setPingedId changes.' It never does. It also hides the one dep that matters (onWorkerClick, a prop that can genuinely change). Fix: }, [onWorkerClick]) — remove the four stable deps. WHY: dependency arrays should be documentation. An array of four stable values plus one real dep documents nothing useful and obscures the one thing worth knowing.",
+      "title": "handleCharClick Over-Specified Dependency Array — Four Stable Deps Obscure the One Real Dep (Carry-Over #93)",
+      "description": "Office.jsx:1257 — }, [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick]). Four of the five deps are stable by React contract: setPingedId and setPingReaction are useState setters (guaranteed stable); pingTimerRef and pingReactionTimerRef are useRef objects (same reference for component lifetime). They will never trigger a re-creation. But their presence tells every reader this callback might recreate when setPingedId changes — it never does. The one dep that genuinely matters (onWorkerClick, a prop) is buried in the noise. Fix: }, [onWorkerClick]). WHY: dependency arrays are documentation. An array of four stable values plus one real dep documents nothing and obscures the one thing worth knowing. Still open after review 93.",
       "effort": "trivial",
       "assigned_to": "carlos"
     },
     {
       "priority": "could",
       "category": "storytelling",
-      "title": "ETA Badge Shows Stale Predictions Without Decay — '~2m left' After 45 Minutes at 95%",
-      "description": "App.jsx:235 — const eta = (progress > 5 && progress < 100 && workingMins > 1) ? Math.round((workingMins / progress) * (100 - progress)) : null. The linear extrapolation is sound when a task is moving. But when a worker is stuck at 95% progress and updated_at stopped changing 45 minutes ago, the ETA computes (workingMins / 95) * 5 — which at 46 working minutes returns ~2.4 minutes. The badge says '~2m left' while the worker's duration badge says 'Working for 46m.' The WhitBoard shows 95%. The contradiction is visible on the same card. A worker who has been at 95% for longer than their estimated remaining time should not show a confident ETA — they should show '⏱ overdue' or the ETA should be suppressed. Fix: add a stale check — if the worker's updated_at timestamp is older than eta * 60 * 1.5, render null instead of the ETA, or render a small '⏱ overdue' label. Check worker.updated_at vs Date.now() with a 1.5× eta multiplier. WHY: false precision is worse than no precision. The ETA is the most visible metric on the card and currently lies to the viewer's face during exactly the situation when they most want accurate information.",
-      "effort": "small",
-      "assigned_to": "maya"
+      "title": "workers.json Task Field Is Stale by Five Reviews — Luna's Entry Shows Creative Review #89",
+      "description": "workers.json — Luna entry: status=idle, task=Creative review #89 — 3 fixes implemented by Bloberto, updated_at=2026-03-11T03:05:00Z. This is review #94. Five reviews behind. Also still missing id, role, and emoji fields (workers-json-missing-role-id carry-over). Luna worker card in the dashboard shows she last completed review #89. App.jsx:277 WORKER_TAGLINES for luna says Creative velocity is still velocity — that tagline is ironic when the worker card moves at zero velocity. Fix: update workers.json with id=luna, role=Creative, emoji=moon, name=Luna, status=working, task=Creative review #94, progress=75, started_at and updated_at as current timestamps. WHY: if the dashboard is the team live monitor, the Creative Director card should not be frozen in the past.",
+      "effort": "trivial",
+      "assigned_to": "luna"
     },
     {
       "priority": "could",
-      "category": "delight",
-      "title": "idleBubble Selection Is a 90-Character Inline Expression That Calls Date.now() in JSX",
-      "description": "App.jsx:813 — The idle bubble emoji is selected by an inline expression inside JSX: (WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES)[Math.floor((Date.now() / 12000) + (worker.id ? [...worker.id].reduce((h, c) => h * 31 + c.charCodeAt(0), 0) : 0)) % (WORKER_IDLE_BUBBLES[worker.id] || DEFAULT_IDLE_BUBBLES).length]. Three problems: (1) Date.now() is called inline on every render — if the component re-renders even once in the same 12-second window, the expression is recomputed but should return the same value (it will, because Math.floor(Date.now() / 12000) rounds to a 12-second bucket) — so no correctness issue but cognitive cost is high. (2) The array is computed inline twice (once for the pool, once for .length) — same allocation path evaluated twice. (3) This is unreadable. The bubble has already been set by the setIdleBubble(true) call in the useEffect at line 604 — the displayed value should be determined at set time, not at render time. Fix: change the setIdleBubble(true) call to setIdleBubble(pickIdleBubble(worker.id)) where pickIdleBubble is a pure function above the component. Store the emoji string in state, not just a boolean. Render {idleBubble} directly. WHY: the delight of idle micro-bubbles deserves to be implemented in a way that can be read, tested, and changed without a 90-character archaeology dig.",
+      "category": "storytelling",
+      "title": "ETA Badge Shows Stale Predictions Without Decay — ~2m Left After 45 Minutes at 95% (Carry-Over #93)",
+      "description": "App.jsx:235 — const eta = (progress > 5 && progress < 100 && workingMins > 1) ? Math.round((workingMins / progress) * (100 - progress)) : null. Linear extrapolation is sound when a task is moving. When a worker is stuck at 95% with updated_at frozen 45 minutes ago, the formula returns ~2 minutes while the duration badge says Working for 46m. The contradiction is visible on the same card at the same time. Fix: after computing eta, check if (worker.updated_at && eta !== null && (Date.now() - new Date(worker.updated_at).getTime()) > eta * 60 * 1000 * 1.5) set eta = null, or render an overdue indicator. WHY: false precision is worse than no precision. The ETA is the most prominent metric on the card and currently lies during exactly the situation when users most want accurate information. Still open after review 93.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "wild",
       "category": "delight",
-      "title": "quoteBonus Wrap Still Has No Ceremony — Ninth Consecutive Review",
-      "description": "App.jsx:1471 — setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1). The tagline counter reaches 8/8 and resets to 1 with zero acknowledgment. This has been flagged in reviews 83, 84, 85, 86, 87, 88, 89, 90, 91, 92 — ten consecutive reviews including this one. Ninth creative review. The fix has been written in this file three times. The infrastructure is all present: safeSave for localStorage flags, completionToast state for the golden border, sparkle class system for the footer sparkle. The missing branch: when p >= BONUS_TAGLINES.length, instead of resetting to 1, call safeSave('footer-all-taglines-seen', '1'), setCompletionToast({ text: 'You found all of Bloberto\u2019s thoughts. All eight of them.', color: '#fbbf24', type: 'milestone' }), add a footer-sparkle--complete class to freeze the sparkle gold, and THEN reset the counter. Maximum 20-line change. The wires are present. The spec has been written. Someone connect them. WHY: nine reviews. The tagline hunt is the only active discovery mechanic we have. A counter that goes 7/8 → silence is the worst possible ending to our only Easter egg. At some point 'this keeps being deprioritized' becomes 'this is the thing we never shipped' and that is the most embarrassing line on the creative record.",
+      "title": "quoteBonus Wrap Has No Ceremony — Tenth Consecutive Creative Review Without a Fix",
+      "description": "App.jsx:1471 — setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1). The tagline counter reaches 8/8 and resets to 1 in complete silence. Flagged in creative reviews 83 through 93 and now 94 — twelve total review cycles including QA. The fix infrastructure is entirely present: safeSave, setCompletionToast, the sparkle class system. The missing branch when p >= BONUS_TAGLINES.length: call safeSave(footer-all-taglines-seen, 1), setCompletionToast with a milestone text and gold color, add footer-sparkle--complete class to freeze the sparkle gold, then reset. Twenty lines maximum. WHY: ten creative reviews. The tagline hunt is the only active discovery mechanic the product ships. A hunt that ends in silence is not a hunt. It is an accidental loop. The wires are present. Someone connect them.",
       "effort": "small",
       "assigned_to": "luna"
     },
     {
       "priority": "wild",
       "category": "delight",
-      "title": "CSS ::after 'TRIPLE SHOT' Is Invisible to Screen Readers and Ctrl+F — Carry-Over from Review 92",
-      "description": "Office.css — [data-vibe='crushing'] .coffee-corner__label::after { content: ' TRIPLE SHOT'; font-weight: 700; }. The crushing-vibe coffee corner label is injected as CSS pseudo-element content. Delightful detail — but CSS-generated content is not read by all screen readers (NVDA+Chrome skips it), cannot be selected, copied, or found by Ctrl+F. Fix: render <span className='coffee-corner__boost'>TRIPLE SHOT</span> in JSX conditionally when vibe === 'crushing', remove the ::after rule, add aria-label='Coffee — triple shot' on the corner container for that vibe. Same visual, correct semantics. WHY: visible content should live in the DOM. Carry-over from review 92.",
+      "title": "CSS ::after Injects Four Vibe-Specific Coffee Labels — All Invisible to Screen Readers and Ctrl+F (Carry-Over #93, Expanded)",
+      "description": "Office.css:1673-1677 — Review 93 flagged only the TRIPLE SHOT injection for crushing vibe. The full scope is four variants all using ::after pseudo-elements: crushing adds TRIPLE SHOT, on-fire adds STRONG. NOW., slow-day adds ...zzz, after-hours adds (decaf? jk). All four: invisible to NVDA+Chrome, cannot be selected or copied, not findable by Ctrl+F, absent from the accessibility tree. Fix: remove all four ::after rules. In Office.jsx at line 1552, conditionally render a span with a COFFEE_SUFFIXES lookup keyed by vibe. Add aria-label on the corner container for screen reader context. Same four labels, in the DOM, readable by everyone. WHY: visible content should live in the DOM. Review 93 flagged one label. All four need the same fix.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "wild",
+      "category": "perf",
+      "title": "idleBubble Is a 90-Character Inline Date.now() Computation in JSX — Still Open (Carry-Over #93)",
+      "description": "Office.jsx:813 — The idle bubble emoji is selected by a 90-character inline expression that evaluates the pool array twice, calls Date.now() inline on every render, and buries the logic in JSX where it cannot be tested. The idleBubble state is a boolean (true/false) but the actual emoji is determined at render time, not at set time. Fix: change setIdleBubble(true) to setIdleBubble(pickIdleBubble(worker.id)) where pickIdleBubble is a pure function above the component that selects the emoji string. Store the string in state. Render {idleBubble} directly. WHY: the delight of idle micro-bubbles deserves to be implemented in a way that can be read, tested, and changed without an archaeology dig through 90 characters of inline JSX. Still open after review 93.",
       "effort": "small",
       "assigned_to": "maya"
     }
   ],
   "hire_proposals": [],
-  "_previous_review": 92,
+  "_previous_review": 93,
   "_still_open_from_prior": [
     {
-      "id": "quoteBonus-ceremony",
+      "id": "workercard-back-key",
       "status": "still open",
-      "note": "Ninth consecutive creative review (83 through 93). Ten reviews total including QA flagging. Escalated to wild in review 93. The infrastructure is complete. This is a will problem."
-    },
-    {
-      "id": "staleMins-computed-twice",
-      "status": "still open",
-      "note": "Carry-over from review 92 (partial fix of review 91). Office.jsx:1433-1441. Two Math.floor(staleDiffMs / 60000) computations with different names."
+      "note": "App.jsx:395 — key={e.timestamp + e.type + (e.worker || \"\")}. Promoted to must in review 93. ActivityLogEntry was fixed in review 92. WorkerCard back panel missed. Confirmed unchanged in review 94."
     },
     {
       "id": "standupWorkers-reference-equality",
-      "status": "partially fixed — worse inconsistency introduced",
-      "note": "CSS check at Office.jsx:1443 now uses .some(). Character render skip at Office.jsx:1571 still uses .includes(). Two checks now disagree on strategy — escalated to must in review 93."
+      "status": "still open — worse inconsistency",
+      "note": "Office.jsx:1443 uses .some(), line 1571 uses .includes(). Partial fix from review 92 created two checks that now disagree. Escalated to must in reviews 93 and 94. Confirmed unchanged."
+    },
+    {
+      "id": "json-parse-unguarded",
+      "status": "still open — added to Luna review list for first time (Sofia flagged in QA #85)",
+      "note": "App.jsx:1114 — JSON.parse(raw) without try-catch on VIBE_HISTORY_KEY. Sofia flagged as MEDIUM in QA #85. Luna escalates to must in review #94. Confirmed unchanged."
+    },
+    {
+      "id": "conf-fire-glow-hardcoded-id",
+      "status": "still open",
+      "note": "Office.jsx:941 — hardcoded SVG filter id. CharacterAvatar uses useId() at line 230. Confirmed unchanged."
+    },
+    {
+      "id": "sky-gradient-greeting-sync",
+      "status": "still open",
+      "note": "Office.jsx:869 night purple starts h>=20. App.jsx:1163 isAfterHours starts h>=22. Two-hour disconnect. Confirmed unchanged."
     },
     {
       "id": "luna-activity-log-ghost",
       "status": "still open",
-      "note": "Ten consecutive reviews. Luna has logged 93 creative reviews. Zero appear in activity.json. Sixty-second data entry task."
+      "note": "Twelve consecutive reviews (83-94). Zero creative review entries in data/activity.json. Sofia QA reviews through #85 present. Luna does not exist in her own product record."
     },
     {
-      "id": "css-after-triple-shot",
+      "id": "staleMins-computed-twice",
       "status": "still open",
-      "note": "Carry-over from review 92. Coffee corner TRIPLE SHOT injected via CSS pseudo-element, invisible to screen readers."
+      "note": "Office.jsx:1434 and 1440 — two Math.floor(staleDiffMs / 60000) calls with different names. Open since review 92. Confirmed unchanged."
+    },
+    {
+      "id": "quoteBonus-ceremony",
+      "status": "still open",
+      "note": "App.jsx:1471 — counter wraps from 8 to 1 silently. Ten consecutive creative reviews. Twelve total cycles. Infrastructure is complete. This is a will problem."
+    },
+    {
+      "id": "css-after-coffee-labels",
+      "status": "still open — scope expanded in review 94",
+      "note": "Office.css:1673-1677 — four vibe-specific labels via CSS ::after, not just TRIPLE SHOT. All four have same accessibility problem."
+    },
+    {
+      "id": "handleCharClick-over-specified-deps",
+      "status": "still open",
+      "note": "Office.jsx:1257 — four stable deps alongside the one real dep. Confirmed unchanged."
+    },
+    {
+      "id": "eta-badge-stale-prediction",
+      "status": "still open",
+      "note": "App.jsx:235 — linear ETA with no staleness check. Confirmed unchanged."
+    },
+    {
+      "id": "idleBubble-inline-expression",
+      "status": "still open",
+      "note": "Office.jsx:813 — 90-character inline Date.now() expression in JSX. Confirmed unchanged."
     },
     {
       "id": "workers-json-missing-role-id",
-      "status": "open",
-      "note": "Carry-over from review 92. workers.json entries missing role and id fields. Desks render with undefined role color."
+      "status": "still open — task field also stale by 5 reviews",
+      "note": "workers.json — Luna entry missing id, role, emoji. Task field shows Creative review #89, five reviews stale as of review #94."
     }
   ]
 }

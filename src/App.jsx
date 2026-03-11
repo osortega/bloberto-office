@@ -15,7 +15,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontSize: '1.1rem', color: '#f87171' }}>
-          Something went wrong — refresh the page
+          Something went wrong.
           <button onClick={this.resetError} style={{ marginLeft: '1rem', cursor: 'pointer' }}>Retry</button>
         </div>
       )
@@ -1111,7 +1111,8 @@ export default function App() {
     previousVibeKeyRef.current = teamVibe.key
 
     const raw = safeRead(VIBE_HISTORY_KEY)
-    const history = raw ? JSON.parse(raw) : []
+    let history = []
+    try { history = raw ? JSON.parse(raw) : [] } catch { /* corrupted localStorage */ }
     history.push({ key: teamVibe.key, ts: Date.now() })
     if (history.length > VIBE_HISTORY_MAX) history.splice(0, history.length - VIBE_HISTORY_MAX)
     safeSave(VIBE_HISTORY_KEY, JSON.stringify(history))

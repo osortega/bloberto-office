@@ -865,8 +865,8 @@ function WindowElement({ vibe }) {
   const getGradient = (h) => {
     if (h >= 5 && h <= 8)  return 'linear-gradient(to bottom, #f97316, #f472b6)'
     if (h >= 9 && h <= 16) return 'linear-gradient(to bottom, #bae6fd, #f0f9ff)'
-    if (h >= 17 && h <= 19) return 'linear-gradient(to bottom, #f59e0b, #f87171)'
-    if (h >= 20 && h <= 23) return 'linear-gradient(to bottom, #4c1d95, #312e81)'
+    if (h >= 17 && h <= 21) return 'linear-gradient(to bottom, #f59e0b, #f87171)'
+    if (h >= 22 && h <= 23) return 'linear-gradient(to bottom, #4c1d95, #312e81)'
     return 'linear-gradient(to bottom, #050510, #1e1b4b)'  // midnight 0-4
   }
 
@@ -905,6 +905,7 @@ function WindowElement({ vibe }) {
 const CHAIR_ANGLES = [0, 60, 120, 180, 240, 300]
 
 function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], lastHuddle }) {
+  const glowFilterId = useId()
   const vibe = vibeKey || 'in-flow'
   const [, setTick] = useState(0)
   useEffect(() => {
@@ -930,7 +931,7 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
   const tableOpacity = vibe === 'after-hours' ? 0.55 : 1
 
   // on-fire: red glow filter
-  const glowFilter = vibe === 'on-fire' ? 'url(#conf-fire-glow)' : undefined
+  const glowFilter = vibe === 'on-fire' ? `url(#${glowFilterId})` : undefined
 
   const cx = 52, cy = 52, tableR = 28, chairR = 6, orbitR = 38
 
@@ -938,7 +939,7 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
     <div className="conference-table" data-meeting={(meetingWorkers.length >= 2 || standupWorkers.length > 0) || undefined} aria-label="Conference table" role="img" style={{ position: 'relative' }}>
       <svg width="104" height="104" viewBox="0 0 104 104" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style={{ opacity: tableOpacity }}>
         <defs>
-          <filter id="conf-fire-glow" x="-40%" y="-40%" width="180%" height="180%">
+          <filter id={glowFilterId} x="-40%" y="-40%" width="180%" height="180%">
             <feGaussianBlur stdDeviation="4" result="blur" />
             <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
