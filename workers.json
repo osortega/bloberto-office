@@ -3,27 +3,27 @@
     {
       "id": "luna",
       "role": "Creative Director",
-      "status": "idle",
-      "task": null,
-      "started_at": "2026-03-11T02:30:46Z",
-      "finished_at": "2026-03-11T02:32:00Z"
+      "status": "working",
+      "task": "Creative review #90 — review live site and codebase, write ideas to data/ideas.json",
+      "started_at": "2026-03-11T03:30:00Z",
+      "finished_at": null
     },
     {
       "id": "carlos",
       "role": "Backend Engineer",
-      "status": "working",
-      "task": "Fix 3 bugs: activityByWorker slice mismatch, Bloberto click ghost-navigate, wandering workers reference equality",
+      "status": "idle",
+      "task": null,
       "started_at": "2026-03-11T02:32:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T02:45:00Z"
     },
     {
       "id": "maya",
       "role": "Frontend Engineer",
-      "status": "working",
-      "task": "Fix 2 bugs: VibeSparkline double-announce, wb-task-count font size",
+      "status": "idle",
+      "task": null,
       "started_at": "2026-03-11T02:32:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T02:45:00Z"
     }
   ],
-  "updated_at": "2026-03-11T02:32:00Z"
+  "updated_at": "2026-03-11T03:30:00Z"
 }
