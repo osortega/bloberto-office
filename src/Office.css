@@ -1550,7 +1550,7 @@
   .desk-away-sign { animation: none; opacity: 1; }
   .desk--error { animation: none; border: 2px solid #f87171; }
   .desk--active { animation: none; }
-  .desk--ghost .desk-character { animation: none; }
+  .desk--stale .desk-character { animation: none; }
   .char--coffee-break { animation: none; left: 92%; top: 8%; }
   .coffee-corner--visited::after { animation: none; opacity: 0.5; }
   .coffee-steam span { animation: none; opacity: 0.3; }
@@ -1738,7 +1738,7 @@
 }
 
 /* ── Ghost Desk — workers idle >15 min ── */
-.desk--ghost .desk-character {
+.desk--stale .desk-character {
   opacity: 0.25;
   animation: ghost-float 4s ease-in-out infinite;
 }
@@ -2300,7 +2300,7 @@
 }
 
 /* === Ghost Desk Dust Aura (Luna Review #41) === */
-.desk--ghost::before {
+.desk--stale::before {
   content: '';
   position: absolute;
   inset: -4px;
@@ -2314,7 +2314,7 @@
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.04); }
 }
-.desk--ghost::after {
+.desk--stale::after {
   content: '···';
   position: absolute;
   top: -10px;
@@ -2332,25 +2332,25 @@
 }
 
 /* === Ghost Desk Time Tiers === */
-.desk--ghost[data-ghost-tier='stale'] { border-color: rgba(245, 158, 11, 0.4); }
-.desk--ghost[data-ghost-tier='stale'] .desk-monitor-screen { filter: brightness(0.7) sepia(0.5); }
-.desk--ghost[data-ghost-tier='stale']::before { background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(245, 158, 11, 0.15), transparent 70%); animation: ghost-dust 6s ease-in-out infinite; }
+.desk--stale[data-ghost-tier='stale'] { border-color: rgba(245, 158, 11, 0.4); }
+.desk--stale[data-ghost-tier='stale'] .desk-monitor-screen { filter: brightness(0.7) sepia(0.5); }
+.desk--stale[data-ghost-tier='stale']::before { background: radial-gradient(ellipse 80% 60% at 50% 110%, rgba(245, 158, 11, 0.15), transparent 70%); animation: ghost-dust 6s ease-in-out infinite; }
 
-.desk--ghost[data-ghost-tier='abandoned'] { border-color: rgba(239, 68, 68, 0.4); animation: abandoned-pulse 1.5s ease-in-out infinite; }
-.desk--ghost[data-ghost-tier='abandoned'] .desk-monitor-screen { filter: brightness(0.5) sepia(0.3) hue-rotate(-30deg); }
+.desk--stale[data-ghost-tier='abandoned'] { border-color: rgba(239, 68, 68, 0.4); animation: abandoned-pulse 1.5s ease-in-out infinite; }
+.desk--stale[data-ghost-tier='abandoned'] .desk-monitor-screen { filter: brightness(0.5) sepia(0.3) hue-rotate(-30deg); }
 @keyframes abandoned-pulse { 0%,100% { box-shadow: none; } 50% { box-shadow: 0 0 8px 2px rgba(239,68,68,0.25); } }
 
-.desk--ghost[data-ghost-tier='stale'] {
+.desk--stale[data-ghost-tier='stale'] {
   box-shadow: 0 0 8px rgba(245,158,11,0.35) inset;
 }
-.desk--ghost[data-ghost-tier='stale'] .desk__monitor-screen {
+.desk--stale[data-ghost-tier='stale'] .desk__monitor-screen {
   filter: sepia(0.3) saturate(0.7);
 }
-.desk--ghost[data-ghost-tier='abandoned'] {
+.desk--stale[data-ghost-tier='abandoned'] {
   border-left: 2px solid #ef4444;
   box-shadow: 0 0 12px rgba(239,68,68,0.25) inset;
 }
-.desk--ghost[data-ghost-tier='abandoned'] .desk__monitor-screen {
+.desk--stale[data-ghost-tier='abandoned'] .desk__monitor-screen {
   filter: sepia(0.5) saturate(0.4) brightness(0.8);
 }
 

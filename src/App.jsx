@@ -134,7 +134,7 @@ function getTimeGroup(timestamp) {
 const TIME_GROUP_ORDER = ['Just now', 'Earlier today', 'Yesterday', 'Older']
 
 function ActivityLog({ entries, error, roster }) {
-  const displayed = [...entries].reverse().slice(0, 20)
+  const displayed = entries.slice(0, 20).reverse()
 
   const groups = TIME_GROUP_ORDER.map(label => ({
     label,
@@ -151,7 +151,7 @@ function ActivityLog({ entries, error, roster }) {
         groups.map(({ label, items }) => (
           <div key={label}>
             <div className="activity-time-separator"><span>{label}</span></div>
-            {items.map((entry, i) => <ActivityLogEntry key={entry.timestamp + entry.worker + i} entry={entry} roster={roster} />)}
+            {items.map((entry, i) => <ActivityLogEntry key={`${entry.timestamp}_${entry.worker ?? 'system'}_${i}`} entry={entry} roster={roster} />)}
           </div>
         ))
       )}
@@ -795,7 +795,7 @@ export default function App() {
 
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
-  const handleTabKeyDown = (e) => {
+  const handleTabKeyDown = useCallback((e) => {
     const currentIdx = TABS.indexOf(tab)
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault()
@@ -808,7 +808,7 @@ export default function App() {
       setTab(prev)
       history.replaceState(null, '', '#' + prev)
     }
-  }
+  }, [tab])
 
   const handleWorkerClick = useCallback((worker) => {
     setTab('dashboard')
@@ -966,7 +966,7 @@ export default function App() {
 
   const activityByWorker = useMemo(() => {
     const map = new Map()
-    for (const w of [...activeWorkers, ...Object.values(fadingMap ?? {})]) {
+    for (const w of [...activeWorkers, ...Object.values(fadingMap)]) {
       map.set(w.name, activityLog.filter(e => e.worker === w.name).slice(-5))
     }
     return map
@@ -1068,8 +1068,8 @@ export default function App() {
 
   // ── Vibe Streak Counter + Confetti Burst ──
   useEffect(() => {
-    const storedKey = localStorage.getItem('bloberto-vibe-key')
-    const storedStreak = parseInt(localStorage.getItem('bloberto-vibe-streak') || '0', 10)
+    const storedKey = safeRead('bloberto-vibe-key')
+    const storedStreak = parseInt(safeRead('bloberto-vibe-streak') ?? '0', 10)
     // Only increment if the vibe key is the same AND this isn't the initial mount
     const isInitialMount = previousVibeKeyRef.current === null
     const newStreak = storedKey === teamVibe.key ? storedStreak + (isInitialMount ? 0 : 1) : 1
@@ -1105,14 +1105,12 @@ export default function App() {
     }
     previousVibeKeyRef.current = teamVibe.key
 
-    try {
-      const raw = localStorage.getItem(VIBE_HISTORY_KEY)
-      const history = raw ? JSON.parse(raw) : []
-      history.push({ key: teamVibe.key, ts: Date.now() })
-      if (history.length > VIBE_HISTORY_MAX) history.splice(0, history.length - VIBE_HISTORY_MAX)
-      localStorage.setItem(VIBE_HISTORY_KEY, JSON.stringify(history))
-      setVibeHistory(history)
-    } catch { /* ignore */ }
+    const raw = safeRead(VIBE_HISTORY_KEY)
+    const history = raw ? JSON.parse(raw) : []
+    history.push({ key: teamVibe.key, ts: Date.now() })
+    if (history.length > VIBE_HISTORY_MAX) history.splice(0, history.length - VIBE_HISTORY_MAX)
+    safeSave(VIBE_HISTORY_KEY, JSON.stringify(history))
+    setVibeHistory(history)
   }, [teamVibe.key])
 
   // ── Favicon: red=error, green=working, grey=idle ──
@@ -1157,7 +1155,7 @@ export default function App() {
   const errorCount = activeWorkers.filter(w => w.status === 'error').length
 
   const currentHour = new Date().getHours()
-  const isAfterHours = currentHour < 5 || currentHour >= 20
+  const isAfterHours = currentHour < 5 || currentHour >= 22
   const greeting =
     isAfterHours
       ? '🌃 Burning the midnight oil'
@@ -1302,13 +1300,16 @@ export default function App() {
 
             <div className="section-header">
               <div className="section-title">🏢 Active Workers ({activeWorkers.length})</div>
-              {activeWorkers.length > 0 && (
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  {activeWorkers.filter((w) => w.status === 'working').length > 0
-                    ? `🔥 ${activeWorkers.filter((w) => w.status === 'working').length} grinding hard`
-                    : '😴 Everyone is on standby'}
-                </span>
-              )}
+              {activeWorkers.length > 0 && (() => {
+                const workingCount = activeWorkers.filter((w) => w.status === 'working').length
+                return (
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {workingCount > 0
+                      ? `🔥 ${workingCount} grinding hard`
+                      : '😴 Everyone is on standby'}
+                  </span>
+                )
+              })()}
             </div>
 
             {!isLoading && activeWorkers.length === 1 && activeWorkers[0].status !== 'error' && Object.keys(fadingMap).length === 0 ? (

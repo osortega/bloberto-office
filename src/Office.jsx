@@ -1426,27 +1426,27 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             ? Math.floor((Date.now() - new Date(occ.worker.updated_at).getTime()) / 60000)
             : 0
           const showAwaySign = isIdle && idleMinutes >= 10
-          const isGhostDesk = isWorking && occ.worker.updated_at &&
-            (Date.now() - new Date(occ.worker.updated_at).getTime()) > 900000
-          const ghostDeskTitle = isGhostDesk ? (() => {
-            const diff = Date.now() - new Date(occ.worker.updated_at).getTime()
-            const mins = Math.floor(diff / 60000)
-            const hours = Math.floor(diff / 3600000)
+          const staleDiffMs = isWorking && occ.worker.updated_at
+            ? Date.now() - new Date(occ.worker.updated_at).getTime()
+            : 0
+          const isStaleWorking = staleDiffMs > 900000
+          const staleDeskTitle = isStaleWorking ? (() => {
+            const mins = Math.floor(staleDiffMs / 60000)
+            const hours = Math.floor(staleDiffMs / 3600000)
             return `Last seen: ${mins < 60 ? `${mins}m ago` : `${hours}h ago`}`
           })() : undefined
-          let ghostDeskTier
-          if (isGhostDesk) {
-            const diffMs = Date.now() - new Date(occ.worker.updated_at).getTime()
-            const ghostMins = Math.floor(diffMs / 60000)
-            ghostDeskTier = ghostMins < 60 ? 'fresh' : ghostMins < 180 ? 'stale' : 'abandoned'
+          let staleDeskTier
+          if (isStaleWorking) {
+            const ghostMins = Math.floor(staleDiffMs / 60000)
+            staleDeskTier = ghostMins < 60 ? 'fresh' : ghostMins < 180 ? 'stale' : 'abandoned'
           }
           const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id)
           return (
             <div
               key={desk.id}
-              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking && !isStandup ? ' desk--active' : ''}${isGhostDesk ? ' desk--ghost' : ''}${isIdle ? ' desk--idle' : ''}`}
-              title={ghostDeskTitle}
-              data-ghost-tier={isGhostDesk ? ghostDeskTier : undefined}
+              className={`desk${!occ ? ' desk--vacant' : ''}${hasError ? ' desk--error' : ''}${isWorking && !isStandup && !isStaleWorking ? ' desk--active' : ''}${isStaleWorking ? ' desk--stale' : ''}${isIdle ? ' desk--idle' : ''}`}
+              title={staleDeskTitle}
+              data-ghost-tier={isStaleWorking ? staleDeskTier : undefined}
               style={{
                 left: `${desk.left}%`,
                 top: `${desk.top}%`,
@@ -1454,7 +1454,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
               }}
             >
               {/* Desk lamp — glows when occupied by a working character */}
-              <svg className={`desk-lamp${isWorking ? ' desk-lamp--working' : isIdle ? ' desk-lamp--idle' : hasError ? ' desk-lamp--error' : ''}`} width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
+              <svg className={`desk-lamp${isWorking && !isStaleWorking ? ' desk-lamp--working' : isIdle ? ' desk-lamp--idle' : hasError ? ' desk-lamp--error' : ''}`} width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
                 <ellipse cx="5" cy="4" rx="4.5" ry="2.5" fill={isWorking && occ ? (ROLE_COLORS[occ.worker.role] ?? '#fbbf24') : '#fbbf24'} />
                 <line x1="5" y1="6.5" x2="5" y2="12" stroke="#9ca3af" strokeWidth="1.5" strokeLinecap="round" />
                 <ellipse cx="5" cy="13" rx="3.5" ry="1.5" fill="#9ca3af" />
