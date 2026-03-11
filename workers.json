@@ -1,13 +1,21 @@
 {
   "workers": [
     {
-      "id": "luna",
-      "role": "Creative Director",
+      "id": "carlos",
+      "role": "Backend Engineer",
       "status": "working",
-      "task": "Creative review #89",
-      "started_at": "2026-03-11T02:00:00Z",
+      "task": "Fix 3 bugs: activityByWorker slice, Bloberto click ghost, wandering workers .includes()",
+      "started_at": "2026-03-11T02:06:00Z",
+      "finished_at": null
+    },
+    {
+      "id": "maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Fix 2 bugs: VibeSparkline double-announce, wb-task-count font size",
+      "started_at": "2026-03-11T02:06:00Z",
       "finished_at": null
     }
   ],
-  "updated_at": "2026-03-11T02:00:00Z"
+  "updated_at": "2026-03-11T02:06:00Z"
 }
