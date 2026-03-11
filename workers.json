@@ -3,10 +3,10 @@
     {
       "id": "luna",
       "role": "Creative Director",
-      "status": "idle",
-      "task": null,
-      "started_at": "2026-03-11T05:00:00Z",
-      "finished_at": "2026-03-11T05:30:00Z"
+      "status": "working",
+      "task": "Creative review #92",
+      "started_at": "2026-03-11T06:00:00Z",
+      "finished_at": null
     },
     {
       "id": "carlos",
@@ -25,5 +25,5 @@
       "finished_at": "2026-03-11T04:35:00Z"
     }
   ],
-  "updated_at": "2026-03-11T05:30:00Z"
+  "updated_at": "2026-03-11T06:00:00Z"
 }
