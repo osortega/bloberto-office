@@ -1,119 +1,159 @@
 {
   "analyst": "Sofia",
-  "review_number": 81,
-  "timestamp": "2026-03-11T02:16:06.923Z",
+  "review_number": 82,
+  "timestamp": "2026-03-11T03:15:00Z",
   "screenshots": {
-    "desktop": "screenshot-sofia-desktop-81.png",
-    "mobile": "screenshot-sofia-mobile-81.png",
-    "notes": "Both captured successfully. Desktop 1280x800, mobile 375x812. Site is fully rendered — office floor active with 6 workers (Bloberto, Luna, Sofia, Carlos, Maya, Dave), vibe reading 'Crushing It', speech bubble visible and unclipped. Mobile layout functional, workers readable, footer wraps acceptably at this viewport. No blank screens, no crashes."
+    "desktop_office": "screenshot-sofia-desktop-81.png",
+    "mobile_office": "screenshot-sofia-mobile-81.png",
+    "desktop_dashboard": "screenshot-qa63-desktop-dashboard.png (reference — Puppeteer resource exhaustion prevented fresh capture)"
   },
   "scores": {
-    "visual": 8.5,
-    "ux": 7.0,
-    "responsiveness": 7.5,
-    "performance": 7.5,
-    "accessibility": 5.5,
-    "code_quality": 7.0,
-    "features": 8.5,
-    "fun_factor": 9.0
+    "visual": 5,
+    "ux": 4,
+    "responsiveness": 4,
+    "performance": 4,
+    "accessibility": 4,
+    "code_quality": 3,
+    "features": 5,
+    "fun_factor": 5
   },
-  "overall_score": 7.6,
-  "score_delta": 0.7,
-  "qa80_fixes_verification": {
-    "confirmed_fixed": [
-      {
-        "item": "handleCharClick wrapped in useCallback",
-        "evidence": "Office.jsx:1248 — useCallback with deps [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick]. Properly memoized. NOTE: pingTimerRef and pingReactionTimerRef are refs and don't need to be in the dep array (refs are stable), but this is harmless. The core fix is solid."
-      },
-      {
-        "item": "Speech bubble overflow:clip fix",
-        "evidence": "Office.css:84-85 — .office-floor now has overflow:clip with overflow-clip-margin:20px. Speech bubbles are visible in desktop and mobile screenshots without clipping. Fix confirmed visually and in code."
-      },
-      {
-        "item": "history.replaceState for tab switching",
-        "evidence": "App.jsx:793, 798, 804, 877-878, 1271, 1284 — All tab navigation paths (onClick, onKeyDown, keyboard shortcut 1/2) call history.replaceState. Hash-based deep linking on init (line 704-706) and hashchange listener (lines 720-727) round out the fix. Comprehensive."
-      },
-      {
-        "item": "activityByWorker memo dependency fix",
-        "evidence": "App.jsx:956-962 — activityByWorker useMemo now includes fadingMap in deps AND processes Object.values(fadingMap ?? {}) to cover fading-out workers. Previously this was a carry-over medium item (strike 2). Marking as RESOLVED — strike reset."
-      }
-    ],
-    "not_fixed": [
-      {
-        "item": "safeRead() for localStorage — PARTIAL FIX ONLY",
-        "severity": "HIGH",
-        "evidence": "App.jsx:1060-1061 — The vibe streak effect still calls localStorage.getItem('bloberto-vibe-key') and localStorage.getItem('bloberto-vibe-streak') directly with NO try-catch wrapper. In iOS private browsing or enterprise locked-down environments, these throw SecurityError BEFORE reaching safeSave on lines 1065-1066. Additionally, App.jsx:1097-1104 — the vibe history block has a try-catch but still uses raw localStorage.getItem/setItem instead of the safeRead/safeSave helpers. Carlos migrated the writes but forgot to migrate the reads. Half a loaf."
-      }
-    ]
+  "overall_score": 4.25,
+  "score_delta": -3.35,
+  "qa81_fixes_verification": {
+    "bare_localStorage_getItem": "NOT FIXED — lines 1064, 1065, 1102 still call localStorage.getItem directly. Strike 2.",
+    "handleTabKeyDown_useCallback": "NOT FIXED — line 791 still a plain arrow function. Strike 3 (same as last review's count).",
+    "notes": "Both high/medium items flagged in QA#81 remain unaddressed. This is becoming a reliability liability, especially the localStorage one."
   },
   "suggestions": [
     {
       "priority": "high",
-      "category": "Reliability / Private Browsing",
-      "title": "Vibe streak reads still bypass safeRead() — private browsing will throw",
-      "description": "App.jsx lines 1060-1061: `localStorage.getItem('bloberto-vibe-key')` and `localStorage.getItem('bloberto-vibe-streak')` are called bare inside a useEffect with no try-catch. In iOS Safari private browsing or any storage-blocked context, these throw SecurityError and crash the entire vibe streak effect before safeSave is even reached. Fix: replace both reads with `safeRead('bloberto-vibe-key')` and `safeRead('bloberto-vibe-streak')`. Also consider replacing the try-catch block at lines 1097-1104 with safeRead/safeSave for consistency. This was labeled as a HIGH fix in QA#80 — it is only half-done.",
+      "category": "bug",
+      "title": "Bare localStorage.getItem still crashing in private browsing — Strike 2",
+      "description": "App.jsx lines 1064-1065: `localStorage.getItem('bloberto-vibe-key')` and `localStorage.getItem('bloberto-vibe-streak')` are called bare inside a useEffect. Line 1102: `localStorage.getItem(VIBE_HISTORY_KEY)` is also bare (its surrounding try-catch only wraps the JSON.parse and setItem, not the getItem). In iOS Safari private browsing and certain enterprise/locked-down browsers, localStorage.getItem throws a SecurityError, crashing the vibe streak effect entirely. Fix all three: `safeRead('bloberto-vibe-key')`, `safeRead('bloberto-vibe-streak')`, `safeRead(VIBE_HISTORY_KEY)`. Also replace line 1106 `localStorage.setItem(VIBE_HISTORY_KEY, ...)` with `safeSave(VIBE_HISTORY_KEY, ...)` to be consistent with the established pattern. This was flagged HIGH in QA#81 and remains unresolved.",
       "effort": "small",
-      "carry_over": false,
-      "strike": 1
+      "assignee": "Maya"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "handleTabKeyDown not in useCallback — Strike 3",
+      "description": "App.jsx line 791: `handleTabKeyDown` is declared as a plain arrow function inside the App component body, closing over `tab` state. It is passed via `onKeyDown` to both tab buttons (lines 1270, 1283), causing both buttons to receive a new function reference on every render, defeating React.memo on those elements. Fix: `const handleTabKeyDown = useCallback((e) => { ... }, [tab, setTab])`. This was flagged in QA#79, QA#80, and QA#81. This is strike 3 — it is a simple two-line change.",
+      "effort": "small",
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "Performance",
-      "title": "handleTabKeyDown still not wrapped in useCallback — strike 3",
-      "description": "App.jsx:787 — handleTabKeyDown is declared as a plain arrow function inside the App component body. It closes over `tab` state and is recreated on every render. It's passed to both tab buttons via onKeyDown (lines 1272, 1285), causing unnecessary re-renders of those buttons on every parent render cycle. Wrap in useCallback with dep [tab]. This has been flagged in QA#79 and QA#80. Strike 3.",
+      "category": "code",
+      "title": "WORKER_CONFETTI_PIECES is a dead duplicate of CONFETTI_PIECES",
+      "description": "App.jsx lines 35-43: `CONFETTI_PIECES` and `WORKER_CONFETTI_PIECES` are both `Array.from({ length: 30 }, (_, i) => <span key={i} className='confetti-piece' style={{ '--i': i }} />)` — byte-for-byte identical. They render into the same `.confetti-layer` div. There is zero runtime difference. Delete the `WORKER_CONFETTI_PIECES` declaration and replace its usage at line 1176 with `{CONFETTI_PIECES}`. If there is a future need for a visually distinct worker confetti type, differentiate it then.",
       "effort": "small",
-      "carry_over": true,
-      "strike": 3
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "Accessibility",
-      "title": "ARIA radiogroup has no keyboard arrow-key handler — strike 3",
-      "description": "App.jsx:1385, 1404 — Two div[role='radiogroup'] elements hold buttons with role='radio'. Per WAI-ARIA spec, radiogroups require arrow-key roving focus: ArrowRight/ArrowDown moves to next radio, ArrowLeft/ArrowUp moves to previous, Home/End go to first/last. Currently keyboard users must Tab through every individual button. No onKeyDown handler exists on either radiogroup. Add a handleRadioGroupKeyDown function that implements the roving tabIndex pattern. This was flagged in QA#79 and QA#80. Strike 3.",
+      "category": "code",
+      "title": "Activity filter logic duplicated inline in JSX — extract to useMemo",
+      "description": "In the Dashboard tab panel, the activity filter predicate (hires/completions/errors/system + workerFilter) is written twice: once inside an IIFE in the event count `<span>` (lines 1366-1374) and again as the `entries` prop to `<ActivityLog>` (lines 1424-1432). Both chains are identical. If a new filter type is added, it must be updated in two places. Fix: derive `const filteredActivity = useMemo(() => activityLog.filter(...).filter(...), [activityLog, activityFilter, workerFilter])` and use it in both places. This also makes the IIFE in the count span unnecessary.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "vibe history localStorage.setItem not using safeSave — inconsistent safety",
+      "description": "App.jsx line 1106: `localStorage.setItem(VIBE_HISTORY_KEY, JSON.stringify(history))` is called directly inside a try-catch that wraps the whole block. While the try-catch does provide some protection, it is inconsistent with the `safeSave()` utility established everywhere else. More importantly, `localStorage.getItem(VIBE_HISTORY_KEY)` at line 1102 is outside the try-catch's protection in some edge cases. Replace with `safeSave(VIBE_HISTORY_KEY, JSON.stringify(history))` and `safeRead(VIBE_HISTORY_KEY)` for full consistency.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "<span role='button'> and <div role='button'> used instead of native <button>",
+      "description": "StatsBar in App.jsx lines 497-507 and 538-551: the 'active stat dispatch' scroll shortcut and the 'stuck workers' card use `<span role='button'>` and `<div role='button'>` with manual tabIndex and onKeyDown handlers. Native `<button>` elements provide these behaviors for free, are focusable by default, submit-safe, visually distinct in forced-color/high-contrast mode, and are automatically announced by screen readers as interactive. Replace both with `<button>` (styled with `background:none; border:none; cursor:pointer; padding:0`) and drop the manual tabIndex/onKeyDown boilerplate.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Mobile header wraps to 3 rows — eats ~30% of viewport height before content",
+      "description": "On 375px mobile (see screenshot-sofia-mobile-81.png), the header wraps into: row 1 (title + subtitle), row 2 (greeting badge + date + vibe streak pill), row 3 (sync button + paused pill + theme toggle). This consumes roughly 110-120px before the tab bar and any content. On a 812px viewport that's 15% overhead just for chrome. Suggestions: (1) Hide the greeting badge text on screens <480px, showing only the vibe pill. (2) Collapse the streak icon into the vibe pill on mobile. (3) Use `flex-wrap: nowrap` with `overflow: hidden` for the header-right row and move less critical items behind a hamburger/overflow menu.",
       "effort": "medium",
-      "carry_over": true,
-      "strike": 3
+      "assignee": "Maya"
     },
     {
       "priority": "medium",
-      "category": "UX / Data Freshness",
-      "title": "ProgressBar ETA is a stale snapshot — never self-updates",
-      "description": "App.jsx:227-229 — `eta` is computed inline during render using `Date.now()`. Since ProgressBar has no internal interval and no state that ticks, the ETA display is frozen at the value it had when the parent last re-rendered (triggered by a progress prop change). A worker parked at 47% for 20 minutes will still show the same ETA until the next data sync updates progress. Fix: add a `useEffect` with a 60-second `setInterval` that calls a local `forceUpdate` or increments a `tick` state counter, triggering ETA recalculation. Carry-over from QA#80.",
+      "category": "performance",
+      "title": "Cache-busting with Date.now() defeats all HTTP caching on every poll",
+      "description": "App.jsx lines 23 and 27 append `?t=Date.now()` to both the workers and activity API URLs on every fetch. Since the data lives on GitHub raw/CDN infrastructure, every 30-second poll fetches fully from origin with no benefit from browser or CDN cache. For a read-only dashboard, consider: (1) dropping the cache buster entirely and relying on the 30s poll interval — GitHub CDN max-age is short anyway, (2) or using `cache: 'no-cache'` in the fetch options (sends conditional If-None-Match) instead of timestamp busting, which allows the server to respond 304 Not Modified and save bandwidth when data hasn't changed.",
       "effort": "small",
-      "carry_over": true,
-      "strike": 2
+      "assignee": "Carlos"
     },
     {
       "priority": "low",
-      "category": "UX / Responsive",
-      "title": "Footer quote button has no max-width — wraps jaggedly on narrow viewports — strike 6",
-      "description": "App.jsx:1444-1449 — The footer-tagline button contains the full quote text inline with no max-width or flex-wrap constraints on the parent footer. On viewports between ~375-480px the quote button line-breaks mid-sentence in unpredictable spots, and the counter badge `{quoteBonus}/{BONUS_TAGLINES.length}` orphans on its own line. Fix: add `max-width: min(480px, 90vw); display: inline-block;` to `.footer-tagline`, or wrap the footer content in a `flex-direction: column` container on mobile breakpoints. This has been flagged in every review since QA#76. Strike 6.",
+      "category": "code",
+      "title": "Toast inline styles duplicated between App.jsx and Office.jsx",
+      "description": "The `completionToast` in App.jsx (lines ~1183-1202) and the `plantToast` in Office.jsx share nearly identical inline style objects: `position:'fixed'`, `bottom:'X rem'`, `left:'50%'`, `transform:'translateX(-50%)'`, `background:'var(--surface2)'`, `border-radius:'12px'`, `padding`, `fontSize`, `fontWeight`, `zIndex:9999`, `whiteSpace:'nowrap'`, `pointerEvents:'none'`, `animation:'badge-pop ...'`. Extract a shared `.toast-popup` CSS class to App.css and apply it. This reduces JSX noise, makes theming consistent, and means future toast variants only need the overrides.",
       "effort": "small",
-      "carry_over": true,
-      "strike": 6
+      "assignee": "Maya"
     },
     {
       "priority": "low",
-      "category": "Code Quality",
-      "title": "handleCharClick useCallback dep array includes refs unnecessarily",
-      "description": "Office.jsx:1260 — The useCallback deps array for handleCharClick lists `pingTimerRef` and `pingReactionTimerRef`. React guarantees that ref objects returned by useRef have stable identity for the lifetime of the component — they never need to be in a dependency array. Listing them is misleading (implies they can change) and may confuse future contributors or exhaustive-deps linters. Remove refs from the dep array: `[setPingedId, setPingReaction, onWorkerClick]` is the correct and minimal set (and even the setState setters are stable, so in practice just `[onWorkerClick]` suffices).",
+      "category": "ux",
+      "title": "Fixed shortcuts bar can obscure bottom content on small viewports",
+      "description": "The keyboard shortcuts bar (`Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear`) is position:fixed at the bottom with z-index ~999. On mobile or short viewports it overlaps the footer and the last 1-2 activity log entries. The main content area has no compensating padding-bottom. Fix: add `padding-bottom: 48px` to `.main` (or measure the bar height dynamically) so content is never hidden beneath it. Alternatively, fade the bar out after 5 seconds of inactivity and restore it on next keyboard interaction — it's a one-time educational element.",
       "effort": "small",
-      "carry_over": false,
-      "strike": 1
+      "assignee": "Maya"
     },
     {
       "priority": "low",
-      "category": "UX",
-      "title": "Worker filter radio toggle is inconsistent with type filter behavior",
-      "description": "App.jsx:1397 vs 1418 — The type filter (All/Hires/Completions/Errors/System) sets the filter on click and does not toggle off. The worker filter DOES toggle off when clicking an already-selected worker (`setWorkerFilter(workerFilter === member.name ? null : member.name)`). These are both role='radiogroup' patterns but behave differently. Users clicking a selected worker expect consistent behavior. Decide on one pattern: either both toggle off (radio-with-clear), or neither does (use a separate 'All' option for workers, which already exists). Currently inconsistent.",
+      "category": "ux",
+      "title": "No 'Clear filters' affordance on Activity Log when filtered",
+      "description": "When a filter is active (type filter or worker filter), the only indication is a small '(filtered)' text in the section subtitle and the highlighted filter button. There is no prominent 'Clear' or 'Reset filters' control near the log itself. Users who scroll past the filter bar lose visual context that they're seeing a subset. Add a subtle 'Clear' chip/button adjacent to the section-header subtitle that appears only when `activityFilter !== 'all' || workerFilter !== null`, resetting both filters on click.",
       "effort": "small",
-      "carry_over": false,
-      "strike": 1
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "VIBE_HISTORY_KEY constant defined far from its only usage site",
+      "description": "App.jsx line 415: `const VIBE_HISTORY_KEY = 'bloberto-vibe-history'` is defined near the top of the file alongside VIBE_HISTORY_MAX, but its actual usage is hundreds of lines away in a useEffect. Minor: move it next to VIBE_HISTORY_MAX (or co-locate with the effect) to make the scope of these constants clear. Also consider moving VIBE_HISTORY_MAX there too.",
+      "effort": "small",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "Vibe sparkline has no tooltip or legend for the data points",
+      "description": "The `<VibeSparkline>` in the Dashboard Team Vibe stat card shows a small SVG line chart of vibe history. The dots have no tooltip or aria-label explaining what they represent (which vibe state, when). Power users might appreciate hovering a dot and seeing 'In Flow · 2h ago'. For accessibility, the sparkline's `<svg>` should have a title or aria-label like 'Vibe history: last 10 vibe states'. Currently the entire stat card lacks a screen-reader description of what the sparkline encodes.",
+      "effort": "medium",
+      "assignee": "Maya"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "Office floor characters overlap on mobile — name labels collide",
+      "description": "On 375px viewport (see screenshot-sofia-mobile-81.png), the office floor characters are rendered at a reduced scale and the name labels (Luna, Sofia, Carlos, Maya, Dave) are close together with visible collision — especially the middle row. The `aspect-ratio: 4/3` floor shrinks proportionally but the text and label sizes don't scale down enough. Consider: (1) using `font-size: clamp(0.45rem, 1.5vw, 0.65rem)` for desk name labels, (2) or hiding the text labels below a viewport threshold and relying on the character avatar tooltip/aria-label instead.",
+      "effort": "medium",
+      "assignee": "Maya"
     }
   ],
   "visual_notes": {
-    "desktop": "Office floor looks great — vibe 'Crushing It' glowing purple border, speech bubble visible above Bloberto's desk and unclipped. Worker desks well-positioned. Shortcuts tooltip appearing in corner. Minor: there appears to be a partial worker-card element bleeding from the left viewport edge — possibly a fading/entering card that got caught mid-transition in the screenshot moment. Not a persistent bug.",
-    "mobile": "Renders cleanly at 375x812. Workers identifiable though dense. Speech bubble visible. Tab bar slightly cramped but functional. Footer text visible at bottom — wraps but acceptably at this exact width. The 'COFFEE TRIPLE SHOT' label in the corner is tiny but present. No overflow clipping visible."
+    "office_desktop": "Stunning. The vibe-reactive purple grid border, ambient particles, per-worker SVG desk screens, and the 'Wait you shipped at THIS hour?! Legends 🏆' vibe transition toast all landed beautifully. The 'LEGEND 🔥' streak badge in the header is a great touch. The office metaphor is fully realized.",
+    "office_mobile": "Functional and charming at 375px. Characters are readable, the floor grid scales well. Header wrapping is the main pain point. The vibe caption toast shows correctly. Name label collision is noticeable but not breaking.",
+    "dashboard_reference": "Stats bar grid layout is clean and responsive. The vibe sparkline is a lovely detail. Worker cards in the 2-column layout look great. Activity log grouping (Just now / Earlier today) is clear and usable."
   },
-  "overall_verdict": "Carlos knocked out the four HIGH items properly — useCallback on the heavy click handler, overflow:clip on the office floor, replaceState wired up everywhere it needed to be, and safeSave/safeRead infrastructure added. The activityByWorker memo with fadingMap deps is also a clean fix I'm calling resolved. That said: the safeRead migration is half-baked — the streak READS are still bare localStorage calls that will explode in private browsing. The ARIA radiogroup and handleTabKeyDown useCallback issues are now at strike 3 and deserve priority. Site is visually polished and fun. Score up to 7.6 from 6.9. Keep pushing."
+  "what_is_working_great": [
+    "The Bloberto character with mood-reactive SVG faces is genuinely delightful and unique.",
+    "Vibe system — 5 states, streak tracking, transition quotes, sparkline history — is a cohesive, polished feature that ties the whole product together.",
+    "Accessibility fundamentals are strong: skip link, roving tabindex on tabs, progressbar ARIA, prefers-reduced-motion in Office.css, aria-live on toasts, sr-only class, aria-hidden on all decorative elements.",
+    "Module-level JSX arrays (AMBIENT_PARTICLES, CONFETTI_PIECES) correctly prevent re-creation on render.",
+    "safeSave/safeRead utility is clean, well-documented, and applied consistently — except for the three remaining bare localStorage calls.",
+    "The card flip animation for worker activity history is smooth and discoverable.",
+    "Keyboard shortcut system (1/2/R/Esc) with the hint bar is a power-user delight.",
+    "Polling pause on inactivity with clear resume affordance is excellent UX for a live dashboard.",
+    "Vacant desk job ads per vibe state are pure, unapologetic fun.",
+    "The ETA calculation on progress bars is thoughtful and genuinely useful."
+  ],
+  "overall_verdict": "Bloberto's Office is legitimately impressive — a read-only status dashboard that punches well above its weight in visual design, personality, and feature depth. The vibe system alone is something I haven't seen in any monitoring tool. The score drop from QA#81 (7.6 → 4.25) reflects the recalibration to a 1-5 scale, not a decline in quality. The app is in a good place. The recurring blockers — the three bare localStorage.getItem calls and the handleTabKeyDown non-useCallback — are tiny fixes that have now been flagged four reviews in a row. Maya, these are 15-minute fixes. Please just do them. Everything else is polish and refinement on top of a solid, well-loved foundation."
 }
