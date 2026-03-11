@@ -4,17 +4,25 @@
       "id": "luna",
       "role": "Creative Director",
       "status": "working",
-      "task": "Creative review #93",
-      "started_at": "2026-03-11T07:00:00Z",
+      "task": "Creative review #96",
+      "started_at": "2026-03-11T10:00:00Z",
       "finished_at": null
     },
     {
       "id": "carlos",
       "role": "Backend Engineer",
       "status": "idle",
-      "task": null,
-      "started_at": "2026-03-11T04:30:00Z",
-      "finished_at": "2026-03-11T04:35:00Z"
+      "task": "Luna review #94 fixes \u2014 6 bugs fixed",
+      "started_at": "2026-03-11T09:00:00Z",
+      "finished_at": "2026-03-11T09:05:00Z"
+    },
+    {
+      "id": "maya",
+      "role": "Frontend Engineer",
+      "status": "idle",
+      "task": "Luna review #94 fixes \u2014 3 bugs fixed",
+      "started_at": "2026-03-11T09:00:00Z",
+      "finished_at": "2026-03-11T09:06:00Z"
     },
     {
       "id": "dave",
@@ -23,17 +31,7 @@
       "task": null,
       "started_at": "2026-03-11T04:30:00Z",
       "finished_at": "2026-03-11T04:35:00Z"
-    },
-    {
-      "id": "sofia",
-      "role": "QA & Product Analyst",
-      "status": "working",
-      "task": "QA review #96 \u2014 30-min site analysis",
-      "started_at": "2026-03-11T09:45:00Z",
-      "finished_at": null,
-      "progress": 0,
-      "updated_at": "2026-03-11T09:45:00Z"
     }
   ],
-  "updated_at": "2026-03-11T09:45:00Z"
+  "updated_at": "2026-03-11T10:00:00Z"
 }
