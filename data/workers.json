@@ -21,10 +21,10 @@
       "id": "maya",
       "role": "Frontend Engineer",
       "status": "working",
-      "task": "Luna #103 \u2014 Room Buzz ripple + HQ Desk Lamp",
-      "started_at": "2026-03-11T15:00:00Z",
+      "task": "Sofia QA #103 \u2014 Fix 3 CRITICAL: mobile dismiss button, speech bubble overflow, copy button touch visibility",
+      "started_at": "2026-03-11T15:46:00Z",
       "finished_at": null,
-      "updated_at": "2026-03-11T12:36:00Z"
+      "updated_at": "2026-03-11T15:46:00Z"
     },
     {
       "id": "dave",
@@ -44,5 +44,5 @@
       "updated_at": "2026-03-11T15:45:00Z"
     }
   ],
-  "updated_at": "2026-03-11T15:45:00Z"
+  "updated_at": "2026-03-11T15:46:00Z"
 }
