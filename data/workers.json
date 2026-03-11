@@ -17,7 +17,17 @@
       "progress": 100,
       "started_at": "2026-03-11T01:00:00Z",
       "updated_at": "2026-03-11T01:20:00Z"
+    },
+    {
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "status": "working",
+      "task": "Fix 3 HIGH bugs from Sofia QA #80: handleCharClick useCallback, speech bubble clip, history.replaceState",
+      "progress": 0,
+      "started_at": "2026-03-11T01:46:00Z",
+      "updated_at": "2026-03-11T01:46:00Z"
     }
   ],
-  "updated_at": "2026-03-11T01:45:00Z"
+  "updated_at": "2026-03-11T01:46:00Z"
 }
