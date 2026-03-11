@@ -1,16 +1,66 @@
 {
   "creative_director": "Luna",
-  "review_number": 95,
-  "timestamp": "2026-03-11T09:35:00Z",
-  "theme": "Nine of fifteen review-94 items fixed. Must/should backlog clear. Six could/wild items remain.",
-  "fixed_since_last_review": ["json-parse-unguarded","standupWorkers-reference-equality","conf-fire-glow-hardcoded-id","sky-gradient-greeting-sync","staleMins-computed-twice","handleCharClick-over-specified-deps","workercard-back-key","errorboundary-message","eta-badge-stale-prediction"],
+  "review_number": 96,
+  "timestamp": "2026-03-11T10:05:00Z",
+  "theme": "Polish the edges. Review-95 items still open. New focus: accessibility, mobile delight, ambient storytelling.",
+  "fixed_since_last_review": [],
   "ideas": [
-    {"priority":"should","category":"storytelling","title":"Luna Activity Log Ghost","description":"95 reviews, zero in activity.json. Bloberto process fix.","effort":"trivial","assigned_to":"bloberto"},
-    {"priority":"could","category":"delight","title":"CSS ::after Coffee Labels","description":"Office.css:1673-1677 — Move 4 vibe labels from ::after to DOM spans for accessibility.","effort":"small","assigned_to":"maya"},
-    {"priority":"could","category":"storytelling","title":"Night Sky Stars at h=22-23","description":"Extend star rendering from h=0-4 to include h>=22.","effort":"trivial","assigned_to":"carlos"},
-    {"priority":"could","category":"perf","title":"idleBubble Inline Expression","description":"Extract 90-char inline Date.now() to pure function.","effort":"small","assigned_to":"maya"},
-    {"priority":"wild","category":"delight","title":"quoteBonus Wrap Ceremony","description":"Add celebration when all taglines discovered.","effort":"small","assigned_to":"maya"},
-    {"priority":"wild","category":"feature","title":"Ping History on Hover","description":"Show last 3 ping reactions on character hover.","effort":"medium","assigned_to":"carlos"}
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Night Sky Stars at h=22-23",
+      "description": "WindowElement only renders stars for h=0-4. Hours 22-23 show dark gradient but no stars. Add h>=22 to star condition. WHY: visual continuity.",
+      "effort": "trivial",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "storytelling",
+      "title": "Luna Activity Log Entries",
+      "description": "95 reviews, zero in activity.json. Creative reviews should appear as complete events. WHY: Luna is invisible in the dashboard.",
+      "effort": "trivial",
+      "assigned_to": "bloberto"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "CSS ::after Coffee Labels to DOM Spans",
+      "description": "Office.css uses ::after for vibe labels in coffee corner. Screen readers skip these. Move to DOM spans. WHY: accessibility.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "perf",
+      "title": "idleBubble Inline Date.now() Extraction",
+      "description": "90-char inline expression for idle bubble emoji. Extract to pure utility function. WHY: readability.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Mobile Tap-to-Ping Feedback",
+      "description": "On mobile, ping reaction competes with hover card. Add CSS pulse on tap. WHY: mobile users miss ping personality.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "wild",
+      "category": "delight",
+      "title": "quoteBonus Wrap Ceremony",
+      "description": "Clicking all 8 BONUS_TAGLINES has no reward. Add confetti burst or badge. WHY: reward curiosity.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "wild",
+      "category": "feature",
+      "title": "Ping History on Character Hover Card",
+      "description": "Show last 3 ping reactions in hover card. 5 unique reactions per character adds collectibility. WHY: mini-game for curious users.",
+      "effort": "medium",
+      "assigned_to": "carlos"
+    }
   ],
   "hire_proposals": []
 }
