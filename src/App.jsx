@@ -75,6 +75,7 @@ const IDEAS_API_URL =
   'https://raw.githubusercontent.com/osortega/bloberto-office/main/data/ideas.json'
 const POLL_INTERVAL_ACTIVE = 30_000
 const POLL_INTERVAL_HIDDEN = 60_000
+const EMPTY_ACTIVITY = []
 
 const AMBIENT_PARTICLES = Array.from({ length: 12 }, (_, i) => (
   <span key={i} className="ambient-particle" style={{ '--i': i }} />
@@ -842,6 +843,8 @@ export default function App() {
   useEffect(() => { tabRef.current = tab }, [tab])
 
   const lastActivity = useRef(Date.now())
+  const speedDebounceRef = useRef(null)
+  const autoPausePrevErrorCountRef = useRef(null)
   const previousVibeKeyRef = useRef(null)
   const [confettiActive, setConfettiActive] = useState(false)
   const [workerConfetti, setWorkerConfetti] = useState(null) // { name, color }
@@ -852,6 +855,8 @@ export default function App() {
   const completionToastTimerRef = useRef(null)
   const [vibeHistory, setVibeHistory] = useState([])
   const [pollingPaused, setPollingPaused] = useState(false)
+  const [pollIntervalMs, setPollIntervalMs] = useState(POLL_INTERVAL_ACTIVE)
+  const [autoPause, setAutoPause] = useState(false)
   // ── Hash-based tab sync (browser back/forward) ──
   useEffect(() => {
     const handleHashChange = () => {
@@ -895,6 +900,15 @@ export default function App() {
     setSelectedTag(prev => prev === tag ? null : tag)
   }, [])
 
+  // Debounced speed slider: adjusts poll interval 150ms after last drag
+  const handleSpeedSlider = useCallback((e) => {
+    const multiplier = parseInt(e.target.value, 10)
+    clearTimeout(speedDebounceRef.current)
+    speedDebounceRef.current = setTimeout(() => {
+      setPollIntervalMs(Math.round(POLL_INTERVAL_ACTIVE / multiplier))
+    }, 150)
+  }, [])
+
   useEffect(() => {
     const touch = () => {
       lastActivity.current = Date.now()
@@ -919,6 +933,16 @@ export default function App() {
     const interval = setInterval(check, 15_000)
     return () => clearInterval(interval)
   }, [])
+
+  // Auto-pause polling when new error events arrive and autoPause is enabled
+  useEffect(() => {
+    const errorCount = activityLog.filter(e => e.type === 'error').length
+    if (autoPause && autoPausePrevErrorCountRef.current !== null && errorCount > autoPausePrevErrorCountRef.current) {
+      lastActivity.current = 0
+      setPollingPaused(true)
+    }
+    autoPausePrevErrorCountRef.current = errorCount
+  }, [activityLog, autoPause])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -1039,7 +1063,7 @@ export default function App() {
     syncFromGitHub(controller.signal)
 
     const getInterval = () =>
-      document.visibilityState === 'hidden' ? POLL_INTERVAL_HIDDEN : POLL_INTERVAL_ACTIVE
+      document.visibilityState === 'hidden' ? POLL_INTERVAL_HIDDEN : pollIntervalMs
 
     const pollTick = () => {
       if (Date.now() - lastActivity.current > IDLE_TIMEOUT) return
@@ -1086,7 +1110,7 @@ export default function App() {
       clearInterval(titleTimer)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [onResume, syncFromGitHub])
+  }, [onResume, syncFromGitHub, pollIntervalMs])
 
   const activeWorkers = useMemo(
     () => allWorkers.filter(
@@ -1389,6 +1413,20 @@ export default function App() {
             {vibeStreak >= 3 && <span className="streak-icon" key={vibeStreak} aria-label={`Vibe streak: ${vibeStreak}`}>{vibeStreak >= 10 ? '🏆' : vibeStreak >= 5 ? '🔥' : '👑'} x{vibeStreak}</span>}
           </span>
           <button className='sync-now-btn' onClick={() => syncFromGitHub()} disabled={isSyncing} aria-label='Sync now' title='Refresh data (R)'>↺</button>
+          <label className="speed-slider-wrap" title="Polling speed (1× = 30s, 10× = 3s)">
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>⚡</span>
+            <input
+              type="range"
+              min="1" max="10" step="1"
+              defaultValue={1}
+              onInput={handleSpeedSlider}
+              style={{ width: '56px', accentColor: 'var(--accent)', cursor: 'pointer', verticalAlign: 'middle' }}
+              aria-label="Polling speed multiplier"
+            />
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', minWidth: '2.2em', textAlign: 'right' }}>
+              {Math.round(POLL_INTERVAL_ACTIVE / pollIntervalMs)}×
+            </span>
+          </label>
           {pollingPaused && (
             <button
               className="polling-paused-pill"
@@ -1480,7 +1518,7 @@ export default function App() {
                     worker={activeWorkers[0]}
                     index={0}
                     isNew={newIds.has(activeWorkers[0].id)}
-                    activityEntries={activityByWorker.get(activeWorkers[0].name) ?? []}
+                    activityEntries={activityByWorker.get(activeWorkers[0].name) ?? EMPTY_ACTIVITY}
                     isFocused={focusedWorker === activeWorkers[0].id}
                     selectedTag={selectedTag}
                     onTagClick={handleTagClick}
@@ -1503,7 +1541,7 @@ export default function App() {
                         worker={w}
                         index={i}
                         isNew={newIds.has(w.id)}
-                        activityEntries={activityByWorker.get(w.name) ?? []}
+                        activityEntries={activityByWorker.get(w.name) ?? EMPTY_ACTIVITY}
                         isFocused={focusedWorker === w.id}
                         selectedTag={selectedTag}
                         onTagClick={handleTagClick}
@@ -1516,7 +1554,7 @@ export default function App() {
                         worker={w}
                         index={activeWorkers.length}
                         isFading
-                        activityEntries={activityByWorker.get(w.name) ?? []}
+                        activityEntries={activityByWorker.get(w.name) ?? EMPTY_ACTIVITY}
                         selectedTag={selectedTag}
                         onTagClick={handleTagClick}
                         isDimmed={selectedTag !== null && !getTaskTags(w.task).some(t => t.label === selectedTag)}
@@ -1572,6 +1610,16 @@ export default function App() {
                   {label}
                 </button>
               ))}
+              <button
+                role="switch"
+                className={autoPause ? 'active' : ''}
+                onClick={() => setAutoPause(p => !p)}
+                aria-checked={autoPause}
+                title="Pause polling when error events arrive"
+                style={{ marginLeft: 'auto' }}
+              >
+                ☠️ Auto-Pause
+              </button>
             </div>
             <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log by worker"
               onKeyDown={(e) => {

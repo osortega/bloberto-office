@@ -483,5 +483,66 @@
       }
     ],
     "hire_proposals": []
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 108,
+    "timestamp": "2026-03-11T21:57:08Z",
+    "theme": "The office knows what time it is, how long they've been grinding, and who's carrying the team \u2014 but none of it shows. This review makes the invisible clock visible.",
+    "screenshots": {
+      "desktop": "screenshot-luna-108-desktop.png",
+      "mobile": "screenshot-luna-108-mobile.png"
+    },
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "delight",
+        "title": "Completion Streak Counter in Activity Log",
+        "description": "Track consecutive 'complete' events without any intervening 'error' in the activityLog. In the ActivityLog component (App.jsx ~line 255), scan the reversed displayed entries with a single reduce pass to compute current streak length. When streak >= 3, render a '\ud83d\udd25 N-task streak' pill badge directly above the first time-group header. The badge entrance uses a quick scale-in keyframe. Streak resets to 0 on any 'error' event \u2014 the badge disappears immediately. Uses zero new data; pure derivation from the existing entries array already passed to ActivityLog.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "feature",
+        "title": "Error Age Burndown Badge on Worker Cards",
+        "description": "When worker.status === 'error', surface a time-in-error label inside WorkerCard (App.jsx ~line 490) using worker.updated_at and the existing formatIdleDuration() utility (App.jsx ~line 564). Render as '\u23f1\ufe0f Xm in error' inline below the status badge. Add a data-tier attribute: 'fresh' (<15m, muted), 'warn' (15\u201360m, amber), 'crit' (>60m, red pulse matching the ErrorBoundary red palette). Makes urgency visible at a glance without opening the activity log. 100% reuse of existing time formatting infrastructure \u2014 no new utilities needed.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Time-of-Day Office Warmth Shift",
+        "description": "In Office.jsx, set a --office-hour-tint CSS custom property on the office scene root via a useEffect that reads new Date().getHours() on mount and refreshes every 5 minutes. The variable drives an ::after pseudo-element overlay on .office-scene in Office.css with 6-10% opacity: warm amber at 6-9am, neutral at 10am-2pm, golden-orange at 3-6pm, blue-slate at 7-9pm, deep indigo at 10pm-5am. Entirely independent of the vibe color system \u2014 this is a real-world clock layer, not a team-state layer. The two systems coexist and compound beautifully on-fire-at-midnight vs crushing-at-noon.",
+        "effort": "medium",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "should",
+        "category": "delight",
+        "title": "In-the-Zone Aura Ring for Sustained Flow",
+        "description": "When a worker has status === 'working' for 45+ continuous minutes AND progress > 30, render a slow-pulsing radial aura ring beneath their desk sprite in Office.jsx. Compute zoneDurationMs from Date.now() - new Date(worker.updated_at).getTime() in the office render loop (already iterates over workers for desk rendering). Pass an isInZone boolean to Character. Inside Character, apply class 'char--in-zone' which triggers @keyframes zone-aura-pulse in Office.css: a soft glow circle scaling 1.0\u21921.3\u21921.0 over 3s, opacity 0.6\u21920\u21920.6, colored by ROLE_COLORS[worker.role]. Critically distinct from stale radar rings (those are warning/stuck state signals) \u2014 this celebrates sustained momentum.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "visual",
+        "title": "Moon Phase Display in the Night Panel",
+        "description": "The NIGHT side panel in Office.jsx renders a static dark card for after-hours vibe. Add a getMoonPhase(date) helper that computes lunar age from a known new-moon epoch (Jan 6, 2000 18:14 UTC) using the 29.53059-day synodic cycle, then maps the 0\u201329 day age to one of 8 moon emoji phases (\ud83c\udf11\ud83c\udf12\ud83c\udf13\ud83c\udf14\ud83c\udf15\ud83c\udf16\ud83c\udf17\ud83c\udf18). Render the phase emoji + a tooltip showing 'Waxing Gibbous \u00b7 Day 11' inside the NIGHT card. Zero API calls, ~12 lines of math. Visible in the Office view regardless of vibe \u2014 but especially magical during after-hours mode when the NIGHT card is prominent on the right sidebar.",
+        "effort": "small",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "could",
+        "category": "team",
+        "title": "Worker Completion Contribution Bar",
+        "description": "In the Dashboard tab (App.jsx ~line 1499), directly below the 'Active Workers' section header, add a ContributionBar component. Filter activityLog for type === 'complete', count by entry.worker, render a flex row of proportional color-coded div segments using ROLE_COLORS[worker.role] (already imported). Each segment is tooltipped 'Maya: 4 completions (31%)'. Workers with 0 completions are omitted. The bar only mounts when total completions > 0, otherwise renders nothing. Shows at a glance who has been carrying the sprint. Implementation: ~35 lines JSX, no new state. All data already available via activityLog prop.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      }
+    ],
+    "hire_proposals": []
   }
 ]
