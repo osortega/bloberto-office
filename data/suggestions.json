@@ -1,131 +1,159 @@
 {
   "analyst": "Sofia",
-  "review_number": 108,
-  "timestamp": "2026-03-11T19:15:47Z",
+  "review_number": 110,
+  "timestamp": "2026-03-11T20:55:14Z",
+  "screenshot_note": "IMPORTANT: The live URL https://osortega.github.io/bloberto-office/ serves 'Bloberto's Office' — a completely different project by the same author — not the Emergent World simulation. Screenshots (qa110-desktop.png / qa110-mobile.png) therefore show the wrong app. All code analysis below is based on the local /workspace/src/ source files for the Emergent World simulation.",
   "scores": {
-    "visual": 5,
-    "ux": 4,
+    "visual": 4,
+    "ux": 3,
     "responsiveness": 3,
-    "performance": 3,
-    "accessibility": 3,
+    "performance": 2,
+    "accessibility": 2,
     "code_quality": 4,
-    "features": 5,
-    "fun_factor": 5
+    "features": 3,
+    "fun_factor": 4
   },
-  "overall_score": 4.0,
-  "summary": "This codebase is genuinely impressive — polished visual storytelling, a rich feature set, and clear care put into the details. The custom SVG character avatars, vibe-driven behavior, and interactive office scene are delightful. That said, 'delightful' doesn't mean 'done': there are real accessibility gaps, a performance anti-pattern baked into every single data fetch, and a sneaky TASK_TAG_DEFS inconsistency that means the office sprint board and the dashboard worker cards aren't actually speaking the same language. Plus someone put FREQ_STOPWORDS inside the component body and I will be losing sleep over it.",
+  "overall_score": 3.1,
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "TASK_TAG_DEFS inconsistency: sprint board misses hotfixes, broken pipelines, and more",
-      "description": "App.jsx defines its own TASK_TAG_DEFS with rich regex patterns (e.g. /fix|bug|hotfix|broken|error/i for 'Bug'). Office.jsx imports the simplified constants.js version (just { key: 'Bug', emoji: '🔴' }) and builds regex by keyword name alone: /\\bBug\\b/i. A task like 'hotfix authentication endpoint' or 'pipeline broken after merge' will show a 🔴 Bug tag on the worker card in Dashboard, but register ZERO on the Sprint Board in Office. The two should use the same source of truth. Fix: move the full TASK_TAG_DEFS with patterns into constants.js, import in both App.jsx and Office.jsx, and remove the local redefinition.",
-      "effort": "medium",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "high",
       "category": "performance",
-      "title": "Cache-busting ?t=Date.now() on every poll defeats HTTP caching entirely",
-      "description": "fetchWorkersFromGitHub, fetchActivityFromGitHub, and fetchIdeasFromGitHub all append ?t=Date.now() to their URLs. This ensures every 30-second poll is a fully fresh network request — no browser cache, no CDN cache, no conditional GET. On GitHub Pages with raw.githubusercontent.com, the response will never serve from cache. With 5 workers watching, that's a minimum of 6 cache-missed requests per minute per user. Remove the timestamp query param and rely on the Last-Modified / ETag headers that GitHub's CDN already provides, or switch to Cache-Control: no-cache with conditional fetch (If-None-Match). Bandwidth and latency both win.",
-      "effort": "small",
-      "assigned_to": "Dave"
+      "title": "Stop blowing out the DOM on every tick",
+      "description": "renderAll() is called on every tick event, and inside it every major panel (regions, log, inspector) does a full innerHTML replacement. At 10x speed that is 10 full DOM rebuilds per second. renderLog() alone creates and destroys 200 DOM nodes per tick. The fix is incremental updates: prepend new log entries instead of rebuilding the list, and do targeted attribute/width updates on existing resource bar fills rather than recreating all region cards. This is the single biggest source of jank and wasted CPU.",
+      "effort": "medium"
+    },
+    {
+      "priority": "high",
+      "category": "ux",
+      "title": "Event log is unusable at any speed above 1x",
+      "description": "The log is rebuilt newest-first every tick. At 2x+ speed entries flash past before they can be read. There is also no filtering — idle and rest events (which fire for every citizen every tick) completely bury deaths, combats, and trades. Add (1) type-filter toggle chips above the log (critical/social/resource/all), and (2) pause-on-event toggle so the simulation auto-stops when a death or extinction fires. The underlying data model supports all of this — it's purely a UI gap.",
+      "effort": "medium"
     },
     {
       "priority": "high",
       "category": "accessibility",
-      "title": "data-tooltip on character buttons is invisible to screen readers",
-      "description": "Worker characters (the clickable .char elements) use data-tooltip='Name · task · click to inspect' for their CSS-driven tooltip. That attribute is not read by screen readers. The element has role='button' and tabIndex=0, so keyboard users will focus it expecting to understand what it does — but there's no aria-label or aria-describedby pointing at the tooltip content. Fix: replace data-tooltip with aria-label (or aria-describedby + a visually-hidden span) so the full context — name, task, deep-work status, 'click to inspect' — is announced on focus.",
-      "effort": "small",
-      "assigned_to": "Sofia"
+      "title": "Citizen links are inaccessible spans — break keyboard nav entirely",
+      "description": "Every .clink element is a <span data-id='...'> with a click handler. Spans are not keyboard-focusable and invisible to screen readers. Replace them with <button type='button' class='clink' data-id='...'> elements (button reset styles can handle the visual) or add tabindex='0' plus keydown handlers for Enter/Space. The population bar avatars have the same problem. This is a WCAG 2.1 SC 2.1.1 failure.",
+      "effort": "medium"
     },
     {
-      "priority": "medium",
-      "category": "code",
-      "title": "FREQ_STOPWORDS Set is recreated on every render of Office component",
-      "description": "Office.jsx line ~1369 declares 'const FREQ_STOPWORDS = new Set([...])' inside the Office function body. This allocates a new Set object on every render, even though the contents never change. The wordFreqPills useMemo correctly depends on it, but since FREQ_STOPWORDS is a new reference on every render, the memo's closure reference is stable (the Set is in the memo callback scope) — but the allocation itself is wasted work. Simple fix: hoist FREQ_STOPWORDS to module scope, alongside the other module-level constants like VACANT_ADS and PING_REACTIONS.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "ConferenceTable has two mutually exclusive useEffect intervals that should be one",
-      "description": "Office.jsx lines ~1028-1034 have two separate useEffect hooks that both set up a 30-second setTick interval for the conference table. The first returns early if meetingWorkers.length < 2 (runs only during meetings), the second returns early if meetingWorkers.length >= 2 (runs only outside meetings). They're mutually exclusive, so only one fires at a time — but this is needlessly confusing and doubles the effect bookkeeping. Merge into a single useEffect with a single setInterval that runs regardless of meeting state, or clarify via a comment why they're split if there's an intentional reason.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "medium",
+      "priority": "high",
       "category": "accessibility",
-      "title": "completionToast and plantToast aria-live regions missing aria-atomic='true'",
-      "description": "Both the worker completion toast (App.jsx) and the plant milestone toast (Office.jsx) use aria-live='polite' without aria-atomic='true'. Without aria-atomic, screen readers may announce partial DOM changes mid-update — e.g. just the worker name before the full message is rendered. Adding aria-atomic='true' ensures the entire toast content is announced as a single atomic unit. While you're in there: the completionToast div is positioned via inline style — consider a shared .toast-overlay class for consistency and easier theme maintenance.",
-      "effort": "small",
-      "assigned_to": "Sofia"
+      "title": "Event log has no ARIA live region — screen readers see nothing",
+      "description": "The event log is the heart of the simulation but is completely invisible to assistive technology. Add role='log' aria-live='polite' aria-atomic='false' to #el-log so screen readers announce new entries. The panel header should get role='heading' aria-level='2'. The inspector panel needs aria-live='polite' so updates to the selected citizen are announced. Without these, the entire experience is inaccessible.",
+      "effort": "small"
     },
     {
-      "priority": "medium",
+      "priority": "high",
       "category": "bug",
-      "title": "isTouchDevice comment claims 'stays fresh on hybrid devices' but useMemo with [] never re-evaluates",
-      "description": "App.jsx line 818 has the comment '// Evaluated inside the component (via useMemo) to stay fresh on hybrid devices' but the implementation is useMemo(() => window.matchMedia(...).matches, []) with an empty dependency array. This runs exactly once on mount and never updates. On a hybrid touchscreen/trackpad device, if the user switches input modes, isTouchDevice stays stale. Either: (a) remove the misleading comment and accept the once-on-mount behavior (probably fine for most use cases), or (b) actually listen to the pointer media query change event via a proper useState + useEffect pattern.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Dead citizens accumulate in _citizens array forever",
+      "description": "Simulation._citizens is never pruned. Dead citizens remain in the array and are serialized via toJSON() on every single tick (getState() maps over all of them). In a long run with many deaths, this means an ever-growing array of dead citizen objects, each with memory[], relationships{}, and inventory{} maps being cloned every tick. Either move dead citizens to a separate _deadCitizens archive after death (still accessible for inspector lookups) or limit the total dead roster to the last 50.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Keyboard users can't pin/hold the character hover card",
-      "description": "On touch devices, clicking a character opens a 'pinned card' with a dismiss button — persistent and readable. On desktop, the hover card shows on mouseenter/focus and hides on mouseleave/blur. But if a keyboard user Tabs to the next element, blur fires and the card disappears before they can finish reading it. Touch users got pinned cards as a gesture fallback, but keyboard users got nothing — they're worse off. Fix: when focus enters a .char button, also set pinnedCard=true (not just hovered=true), and only clear it on Escape or when focus leaves the entire character+card area. The dismiss button already exists in pinnedCard mode.",
-      "effort": "medium",
-      "assigned_to": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "WorkerCard memo gets no benefit when activityEntries array reference changes every render",
-      "description": "WorkerCard is wrapped in React.memo with no custom comparison function. In App.jsx, activityEntries are passed as activityByWorker.get(w.name) ?? []. The activityByWorker Map is recomputed in a useMemo that depends on [activityLog, activeWorkers, fadingMap]. Every time activityLog updates (every 30s poll), a new Map is created, and .get() returns a new array reference — which memo's default shallow equality will treat as a changed prop, re-rendering every card. Fix: either add a custom comparison function to WorkerCard that deep-compares activityEntries by timestamp, or memoize the per-worker entry arrays outside the render.",
-      "effort": "medium",
-      "assigned_to": "Carlos"
+      "title": "No single-tick step control",
+      "description": "The only temporal controls are Play/Pause and a speed slider. There is no 'Step →' button to advance exactly one tick while paused. This makes it impossible to study a specific situation — you either run at minimum speed (0.5x = 2 seconds per event) or miss things entirely. sim.runTick() is already exposed on the Simulation class; wiring a button to it is a one-liner.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "feature",
-      "title": "after-hours vibe doesn't account for time-of-day when workers ARE present",
-      "description": "getTeamVibe() only returns 'after-hours' when workers.length === 0. If someone (cough, Dave) is grinding at 2am and workers.length > 0, the vibe will be 'in-flow' or 'crushing' — not 'after-hours'. The header greeting already checks time (currentHour < 5 || currentHour >= 22 → '🌃 Burning the midnight oil'), so the concept exists. Suggestion: add a time check in getTeamVibe() — if it's outside business hours AND vibe would otherwise be 'in-flow', downgrade to 'after-hours'. Dave's CISO title and the midnight sky deserve to appear together.",
-      "effort": "small",
-      "assigned_to": "Carlos"
+      "title": "Relationship network is invisible — a hidden gem with no UI",
+      "description": "Every citizen tracks trust scores (-10 to +10) for every citizen they have interacted with, and these meaningfully affect trading, combat targeting, and talk decisions. But the inspector shows nothing about relationships. Add a Relationships section in the inspector listing the top 3 trusted and top 3 distrusted citizens as clickable links with a small score indicator. This would make the simulation's social layer legible and vastly more interesting to follow.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "Statistics panel — sim.getHistory() is completely unused",
+      "description": "The Simulation stores up to 500 tick results in _history, each containing full event lists, alive count, year, season. None of this data reaches the Dashboard tab (which appears to be unimplemented). A minimal chart showing population over time and a tally of deaths-by-cause would transform 'I wonder what happened' into 'I can see the winter of Year 3 killed four citizens.' Use a simple SVG polyline or canvas bar chart — no library needed.",
+      "effort": "large"
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "Extinction has no ceremony — the simulation just stops",
+      "description": "When all citizens die, stop() is called and an 'extinction' event is emitted, which adds one log entry. That is it. The simulation silently halts. This is the most dramatic possible event and deserves a full-screen overlay: cause of death breakdown, longest-surviving citizen, year reached, resource depletion timeline, and a 'New World' restart button. The history data to build this summary already exists.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "No UI to inject citizens mid-simulation",
+      "description": "sim.addCitizen(archetype, region) is a first-class public API, documented in the README, but has zero UI exposure. Adding a simple 'Spawn Citizen' popover (archetype select + region select + Spawn button) next to the Play/Pause button would let users intervene when a region is under-populated or an archetype is missing from the world. This is low implementation cost for high interactivity payoff.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "performance",
+      "title": "setSpeed() restarts the interval timer causing a visible tick skip",
+      "description": "setSpeed() calls stop() then start(), which clears and recreates the setInterval. If the user drags the speed slider quickly (likely — it's a range input), this fires many stop/start cycles, each potentially skipping or duplicating a tick. Debounce the slider input handler (e.g. 150ms) and reschedule the interval cleanly without full stop/start: clearInterval, recalculate interval ms, setInterval again.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Health status in region pills uses color only — no text fallback",
+      "description": "Citizen pills in region cards show names with border/text color from healthColor() (green/yellow/orange/red). Color is the sole health indicator for living citizens in the regions panel. The inspector has explicit HP text, but the quick-glance region view does not. Add a tiny HP fraction (e.g. '8') or the health emoji (🟢🟡🟠🔴) as a suffix inside each pill. This also helps users with color vision deficiency.",
+      "effort": "small"
+    },
+    {
+      "priority": "medium",
+      "category": "feature",
+      "title": "Skill progression is nearly invisible and almost never happens",
+      "description": "Skills can improve: crafting has a 10% chance on a successful craft, exploration has a 10% chance on an explore. Combat, farming, trading, and survival skills never improve at all. There is no event emitted when a skill increases, and no visual feedback. Consider: (1) emit a 'skill_up' event shown in the log, (2) add improvement chances for all skills based on activity, (3) show a brief highlight on the skill bar in the inspector when it changes. Skill growth is core to any simulation RPG.",
+      "effort": "medium"
+    },
+    {
+      "priority": "medium",
+      "category": "bug",
+      "title": "Boat and wall structures are crafted but have no gameplay effect",
+      "description": "CRAFTING_RECIPES defines 'boat' (8 wood, skill 4) and 'wall' (10 stone, skill 3) but the resolver and citizen decision engine have no logic for using them. A crafted boat goes into inventory as an item that does nothing. A wall similarly. Either remove them from the config until they are implemented, or implement basic effects: boats allow crossing to non-adjacent regions, walls reduce combat damage for sheltered defenders. Dangling no-op features erode trust.",
+      "effort": "large"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "VIBE_RANK and VIBE_LABELS_MAP are duplicated across App.jsx, Office.jsx is not affected — but maintenance risk exists",
-      "description": "VIBE_RANK is defined in App.jsx (line ~586) and used for sparkline sorting and confetti logic. computeDailySummary also has a local VIBE_LABELS_MAP. If a new vibe key is added, there are multiple places to update: VIBE_RANK, VIBE_COLORS, VIBE_VERSIONS, VIBE_WHITEBOARD, CLOCK_COMMENTS, DOOR_ICONS, etc. These are scattered across App.jsx, Office.jsx, and constants.js. Consider moving VIBE_RANK and the vibe key enum to constants.js as the single source of truth, to prevent future drift.",
-      "effort": "medium",
-      "assigned_to": "Carlos"
+      "title": "renderAll() causes double-renders for spawn/new_year/extinction events",
+      "description": "main.js registers handlers for 'spawn', 'new_year', and 'extinction' that each call renderAll(). These events are emitted from runTick() inside the auto-run loop, which also emits 'tick' — which also calls renderAll(). So each of these events causes two full renders per tick cycle. Remove the explicit renderAll() calls from the spawn/new_year/extinction handlers since the 'tick' handler will handle rendering. Extinction is a special case: stop() is called before 'tick' emits, so keep renderAll() there.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Array.findLast() used in citizen.js — not available in all browsers",
+      "description": "citizen._urgentFood() calls this.memory.findLast?.(m => ...). findLast was added to V8/SpiderMonkey in 2022 but is not available in Safari before 15.4 or any version of Edge before 108. Since the project has no build step or polyfill, this silently fails (optional chaining returns undefined) on older browsers. Replace with this.memory.slice().reverse().find(...) or [...this.memory].reverse().find(...) for guaranteed compatibility.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "ux",
+      "title": "Weather effects are not explained to the user anywhere",
+      "description": "Region cards show a weather icon and label (e.g. '⛈️ storm') but give no indication of what storm means mechanically. Experienced users won't know that storm blocks movement and reduces combat rolls, or that rain gives a 1.2x harvest bonus. Add a tooltip (title attribute or CSS tooltip) to the weather display: 'Storm: harvest ×0.5 | movement blocked | combat penalty'. The data is already in WEATHER_EFFECTS in config.js.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "visual",
-      "title": "Sprint board tag matching is too strict on word boundaries — 'Refactoring' won't match 'Refactor'",
-      "description": "Office.jsx builds sprint board tag regexes as /\\bRefactor\\b/i. A task that says 'Refactoring the auth module' won't match because \\b requires the word to end there. App.jsx's pattern /refactor|optimiz|benchmark|perf.../i has no boundary, so it matches correctly. After fixing the TASK_TAG_DEFS inconsistency (suggestion #1), this resolves itself. Flagging separately so it's not lost in the shuffle.",
-      "effort": "small",
-      "assigned_to": "Carlos"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Activity log shows max 20 items but filter counts show total unfiltered count — misleading",
-      "description": "The activity log header shows e.g. 'Latest 20 of 47 events' when unfiltered — accurate. But when filtered (e.g. 'Errors'), it shows '3 of 3 events (filtered)' — also accurate. The subtle issue: the displayed entries are entries.slice(0,20).reverse() applied BEFORE filtering in ActivityLog component, but filteredActivityEntries is computed by filtering activityLog (up to 50 items) first, THEN slice(0,20) happens inside ActivityLog. So the count in the header ('3 of 3') refers to pre-sliced filtered entries, and if there are > 20 filtered entries, the header could say '20 of 20 events (filtered)' when there are really more. Audit the slice vs filter ordering to ensure the count label is always correct.",
-      "effort": "medium",
-      "assigned_to": "Maya"
+      "title": "No visual fanfare for new year or milestone events",
+      "description": "Year transitions (new_year events with 🎆) and notable milestones (first shelter built, first trade, first combat death) deserve a brief visual celebration — even just a 1-second flash highlight on the topbar clock or a distinct sticky entry at the top of the log. Currently a new year is one line in the log that scrolls away instantly. These moments anchor the simulation's sense of progression and should feel significant.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "feature",
-      "title": "Ghost workers (OOO) have no 'last active task' context — missed storytelling opportunity",
-      "description": "Ghost characters show an OOO bubble on hover with their role and 'Last seen: Xh ago'. But the last activity entry for that worker (which exists in activityEntries) could show their last task — 'Last seen: 3h ago, was fixing the auth bug'. The ghost bubble already does the work of finding the lastEvent timestamp; adding lastEvent.message to the display is a one-liner that adds real personality. Carlos's ghost shouldn't just say 'Backend Engineer' — he should say 'Backend Engineer · last seen: In the logs'.",
-      "effort": "small",
-      "assigned_to": "Luna"
+      "title": "Memory system hints at depth that never surfaces",
+      "description": "Citizens record memories like 'harvested_grain @ river_valley' and 'moved @ mountain_pass', and the inspector shows the last 10. But the memory system is almost entirely unused by the decision engine — _urgentFood() has one findLast() call looking for 'food_seen' events that are never actually written into memory. The 'food_seen' memory event is never emitted anywhere in the codebase. Either wire up memory-guided decisions (citizens migrate to regions they remember having resources) or remove the unused memory lookup to avoid confusion.",
+      "effort": "medium"
+    },
+    {
+      "priority": "low",
+      "category": "feature",
+      "title": "No persistence — refreshing loses all state",
+      "description": "There is no save/load mechanism. A long simulation run (Year 10+, complex relationships, several deaths) is lost on page refresh. Since sim.getState() already serializes everything to a clean JSON object, localStorage autosave every 10 ticks would be trivial. Add an 'Export' button and a 'Load' file input for sharing runs. This would dramatically increase replay value for users who get attached to their citizens.",
+      "effort": "medium"
     }
   ]
 }

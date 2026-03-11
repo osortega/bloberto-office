@@ -20,7 +20,7 @@
       "id": "maya",
       "role": "Frontend Engineer",
       "status": "idle",
-      "task": "Luna #97 fixes — 3 items shipped (desk lamp colors, whiteboard task preview, activity emoji confirmed)",
+      "task": "Luna #97 fixes — 3 items shipped",
       "started_at": "2026-03-11T10:37:00Z",
       "finished_at": "2026-03-11T10:42:00Z"
     },
@@ -35,11 +35,11 @@
     {
       "id": "sofia",
       "role": "QA & Product Analyst",
-      "status": "working",
-      "task": "QA review #110 — Emergent World simulation analysis",
+      "status": "idle",
+      "task": "QA review #110 — Emergent World sim analysis (3.1/5, 20 suggestions)",
       "started_at": "2026-03-11T20:53:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T20:57:00Z"
     }
   ],
-  "updated_at": "2026-03-11T20:53:00Z"
+  "updated_at": "2026-03-11T20:57:00Z"
 }

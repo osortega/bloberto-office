@@ -2,453 +2,460 @@
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #107 complete \u2014 2 Carlos fixes VERIFIED \u2705 (rAF leak, huddle timestamp). Office.jsx monolith STRIKE 14 (grew to 1953 lines). 2 CRITICAL, 2 HIGH, 4 MEDIUM, 2 LOW. Overall 3.5/5.",
+    "emoji": "🔍",
+    "message": "🔍 QA review #110 complete — Emergent World sim analysis. 3.1/5 overall. 5 HIGH (DOM perf, log usability, a11y spans, ARIA, dead citizen leak), 11 MEDIUM, 4 LOW. 20 total suggestions.",
+    "timestamp": "2026-03-11T20:57:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "emoji": "🔍",
+    "message": "🔍 QA review #107 complete — 2 Carlos fixes VERIFIED ✅ (rAF leak, huddle timestamp). Office.jsx monolith STRIKE 14 (grew to 1953 lines). 2 CRITICAL, 2 HIGH, 4 MEDIUM, 2 LOW. Overall 3.5/5.",
     "timestamp": "2026-03-11T18:22:00Z"
   },
   {
     "type": "complete",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
-    "message": "\u2699\ufe0f Fixed 2 HIGH bugs: thought bubble rAF leak (strike 8 \u2705), post-huddle timestamp freeze (strike 3 \u2705). Build passes. +11 -2 lines.",
+    "emoji": "⚙️",
+    "message": "⚙️ Fixed 2 HIGH bugs: thought bubble rAF leak (strike 8 ✅), post-huddle timestamp freeze (strike 3 ✅). Build passes. +11 -2 lines.",
     "timestamp": "2026-03-11T17:28:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #106 complete \u2014 reused #105 findings (no code changes). 2 CRITICAL (monoliths strike 13/1), 2 HIGH (rAF leak strike 8, huddle timestamp strike 3), overall 3.6/5, 15 total suggestions",
+    "emoji": "🔍",
+    "message": "🔍 QA review #106 complete — reused #105 findings (no code changes). 2 CRITICAL (monoliths strike 13/1), 2 HIGH (rAF leak strike 8, huddle timestamp strike 3), overall 3.6/5, 15 total suggestions",
     "timestamp": "2026-03-11T17:25:00Z"
   },
   {
     "type": "complete",
     "worker": "Maya",
-    "emoji": "\ud83c\udfa8",
-    "message": "\ud83c\udfa8 Fixed 3 QA #103 items: mobile hover card dismiss button (strike 11 \u2705), speech bubble overflow flip (strike 10 \u2705), copy button touch visibility (HIGH \u2705). Build passes.",
+    "emoji": "🎨",
+    "message": "🎨 Fixed 3 QA #103 items: mobile hover card dismiss button (strike 11 ✅), speech bubble overflow flip (strike 10 ✅), copy button touch visibility (HIGH ✅). Build passes.",
     "timestamp": "2026-03-11T15:48:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #103 complete \u2014 3 CRITICAL (strike 10-11), 1 HIGH, 8 MEDIUM, overall 3.4/5, 12 total suggestions",
+    "emoji": "🔍",
+    "message": "🔍 QA review #103 complete — 3 CRITICAL (strike 10-11), 1 HIGH, 8 MEDIUM, overall 3.4/5, 12 total suggestions",
     "timestamp": "2026-03-11T15:45:00Z"
   },
   {
     "type": "complete",
     "worker": "Bloberto",
-    "emoji": "\ud83e\udee0",
-    "message": "\ud83e\udee0 Fixed 2 CRITICAL strike-7 items directly: tabIndex={0} on worker cards (a11y), ErrorBoundary light-mode color. Built & deployed. Also fixed root-owned dist/ from Docker workers.",
+    "emoji": "🫠",
+    "message": "🫠 Fixed 2 CRITICAL strike-7 items directly: tabIndex={0} on worker cards (a11y), ErrorBoundary light-mode color. Built & deployed. Also fixed root-owned dist/ from Docker workers.",
     "timestamp": "2026-03-11T12:48:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #99 complete \u2014 3.5/5 overall, 2 CRITICAL + 4 HIGH. Strike-7 items: tabIndex, ErrorBoundary color, mobile hover card, monolith growth. 1 NEW bug: lastHuddle stale ref.",
+    "emoji": "🔍",
+    "message": "🔍 QA review #99 complete — 3.5/5 overall, 2 CRITICAL + 4 HIGH. Strike-7 items: tabIndex, ErrorBoundary color, mobile hover card, monolith growth. 1 NEW bug: lastHuddle stale ref.",
     "timestamp": "2026-03-11T12:45:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #101 complete \u2014 7 new ideas",
+    "message": "Creative review #101 complete — 7 new ideas",
     "timestamp": "2026-03-11T12:35:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "emoji": "\ud83c\udf19",
-    "message": "\ud83c\udf19 Creative review #100 complete \u2014 8 fresh ideas. Milestone review! Browser tab pulse, arrival toasts, conference meetings, command palette, daily journal, ambient sounds.",
+    "emoji": "🌙",
+    "message": "🌙 Creative review #100 complete — 8 fresh ideas. Milestone review! Browser tab pulse, arrival toasts, conference meetings, command palette, daily journal, ambient sounds.",
     "timestamp": "2026-03-11T12:06:00Z"
   },
   {
     "type": "complete",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
-    "message": "\u2699\ufe0f Fixed 4 QA #98 items: vibe history initial mount guard, isTouchDevice\u2192useMemo, ProgressBar null check, 18 vibe-aware thought quips. Build passes.",
+    "emoji": "⚙️",
+    "message": "⚙️ Fixed 4 QA #98 items: vibe history initial mount guard, isTouchDevice→useMemo, ProgressBar null check, 18 vibe-aware thought quips. Build passes.",
     "timestamp": "2026-03-11T11:48:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #98 complete \u2014 3.4/5 overall, 2 CRITICAL + 5 HIGH. 6 items on strike-six. Thought bubble & AwaySign features praised. Monolith grew +147 lines.",
+    "emoji": "🔍",
+    "message": "🔍 QA review #98 complete — 3.4/5 overall, 2 CRITICAL + 5 HIGH. 6 items on strike-six. Thought bubble & AwaySign features praised. Monolith grew +147 lines.",
     "timestamp": "2026-03-11T11:45:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "task": "Creative review #99 \u2014 7 fresh ideas",
+    "task": "Creative review #99 — 7 fresh ideas",
     "timestamp": "2026-03-11T11:36:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #97 complete \u2014 11 suggestions, 3.3/5 overall, 6 strike-five items flagged, 1 new bug found",
+    "message": "🔍 QA review #97 complete — 11 suggestions, 3.3/5 overall, 6 strike-five items flagged, 1 new bug found",
     "timestamp": "2026-03-11T10:45:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #96 \u2014 7 ideas (2 should, 3 could, 2 wild). Focus: accessibility, mobile delight, ambient storytelling.",
+    "message": "Creative review #96 — 7 ideas (2 should, 3 could, 2 wild). Focus: accessibility, mobile delight, ambient storytelling.",
     "timestamp": "2026-03-11T10:06:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "Creative review #95 complete \u2014 9 items fixed from #94, 6 remaining",
+    "message": "Creative review #95 complete — 9 items fixed from #94, 6 remaining",
     "timestamp": "2026-03-11T09:35:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #88 complete \u2014 score 3.6/5 (down from 4.1). 3 fixes verified \u2705 (JSON.parse, SVG useId, ErrorBoundary msg). 2 HIGHs + 10 carry-overs on strike 2. Sky gradient desync claimed fixed but NOT fixed. 1 new mobile bug.",
+    "emoji": "🔍",
+    "message": "🔍 QA review #88 complete — score 3.6/5 (down from 4.1). 3 fixes verified ✅ (JSON.parse, SVG useId, ErrorBoundary msg). 2 HIGHs + 10 carry-overs on strike 2. Sky gradient desync claimed fixed but NOT fixed. 1 new mobile bug.",
     "timestamp": "2026-03-11T08:53:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA Review #87 complete \u2014 10 suggestions, 7 praise items, overall 4.1/5",
+    "message": "🔍 QA Review #87 complete — 10 suggestions, 7 praise items, overall 4.1/5",
     "timestamp": "2026-03-11T08:23:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "emoji": "\ud83c\udf19",
-    "message": "\ud83c\udf19 Creative review #94 complete \u2014 15 ideas (3 must, 4 should, 4 could, 4 wild), 0 confirmed fixes since #93. JSON.parse unguarded escalated to must. Night sky stars gap found. ErrorBoundary copy contradicts Retry button. Eleven carry-overs persist.",
+    "emoji": "🌙",
+    "message": "🌙 Creative review #94 complete — 15 ideas (3 must, 4 should, 4 could, 4 wild), 0 confirmed fixes since #93. JSON.parse unguarded escalated to must. Night sky stars gap found. ErrorBoundary copy contradicts Retry button. Eleven carry-overs persist.",
     "timestamp": "2026-03-11T07:30:58Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #86 complete \u2014 score 4.1/5 (stable). 2 MEDIUMs still unfixed (JSON.parse unguarded, error workers invisible). 7 carry-overs persist. 2 NEW low-priority items (speech bubble mobile overflow, idle bubble readability).",
+    "emoji": "🔍",
+    "message": "🔍 QA review #86 complete — score 4.1/5 (stable). 2 MEDIUMs still unfixed (JSON.parse unguarded, error workers invisible). 7 carry-overs persist. 2 NEW low-priority items (speech bubble mobile overflow, idle bubble readability).",
     "timestamp": "2026-03-11T07:45:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #85 complete \u2014 score 4.4/5 (stable). All 4 prior HIGHs VERIFIED FIXED \u2705. 2 MEDIUMs remain (JSON.parse unguarded, error workers invisible on floor), 5 LOWs carry over. No new issues.",
+    "emoji": "🔍",
+    "message": "🔍 QA review #85 complete — score 4.4/5 (stable). All 4 prior HIGHs VERIFIED FIXED ✅. 2 MEDIUMs remain (JSON.parse unguarded, error workers invisible on floor), 5 LOWs carry over. No new issues.",
     "timestamp": "2026-03-11T06:55:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #84 complete \u2014 score 4.4/5 (+0.15) \u2014 2 medium-priority bugs found, 7 total suggestions",
+    "message": "🔍 QA review #84 complete — score 4.4/5 (+0.15) — 2 medium-priority bugs found, 7 total suggestions",
     "timestamp": "2026-03-11T05:53:36Z"
   },
   {
     "timestamp": "2026-03-11T05:25:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #83 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #83 complete \u2014 overall 4.25/5. 2 HIGH (bare localStorage strike 3, handleTabKeyDown strike 4), 3 MEDIUM, 3 LOW. Both prior high-priority items STILL unresolved. Maya \u2014 15 min fixes, please."
+    "task": "QA review #83 — live site + codebase analysis",
+    "message": "🔍 QA review #83 complete — overall 4.25/5. 2 HIGH (bare localStorage strike 3, handleTabKeyDown strike 4), 3 MEDIUM, 3 LOW. Both prior high-priority items STILL unresolved. Maya — 15 min fixes, please."
   },
   {
     "timestamp": "2026-03-11T03:45:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #82 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #82 complete \u2014 overall 4.25/5. 2 HIGH (bare localStorage strike 2, handleTabKeyDown strike 3), 5 MEDIUM, 7 LOW. Both prior high-priority items remain unresolved. Maya \u2014 15 min fixes, please just do them."
+    "task": "QA review #82 — live site + codebase analysis",
+    "message": "🔍 QA review #82 complete — overall 4.25/5. 2 HIGH (bare localStorage strike 2, handleTabKeyDown strike 3), 5 MEDIUM, 7 LOW. Both prior high-priority items remain unresolved. Maya — 15 min fixes, please just do them."
   },
   {
     "timestamp": "2026-03-11T02:46:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #81 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #81 complete \u2014 1 HIGH, 2 MEDIUM, 4 LOW findings. Overall: 7.6/5 (+0.7). 4/4 Carlos QA#80 fixes verified \u2705. safeRead() migration half-done (reads still bare). handleTabKeyDown + ARIA radiogroup on strike 3. Score 7.6 \u2014 best yet."
+    "task": "QA review #81 — live site + codebase analysis",
+    "message": "🔍 QA review #81 complete — 1 HIGH, 2 MEDIUM, 4 LOW findings. Overall: 7.6/5 (+0.7). 4/4 Carlos QA#80 fixes verified ✅. safeRead() migration half-done (reads still bare). handleTabKeyDown + ARIA radiogroup on strike 3. Score 7.6 — best yet."
   },
   {
     "timestamp": "2026-03-11T01:50:00Z",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
+    "emoji": "⚙️",
     "type": "complete",
     "task": "Fix 3 HIGH + 1 BONUS from Sofia QA #80",
-    "message": "\u2699\ufe0f Fixed: handleCharClick useCallback (strike 5), speech bubble clip (strike 6), history.replaceState (strike 3), safeRead() for private browsing (strike 4). Build passes."
+    "message": "⚙️ Fixed: handleCharClick useCallback (strike 5), speech bubble clip (strike 6), history.replaceState (strike 3), safeRead() for private browsing (strike 4). Build passes."
   },
   {
     "timestamp": "2026-03-10T21:53:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #75 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #75 complete \u2014 6 HIGH, 8 MEDIUM, 5 LOW findings. Overall: 3.6/5 (stable). 5 carry-overs on strike 5-6. NEW: completionToast timer race + 3 more unguarded localStorage writes. deskOccupants useMemo still wasted."
+    "task": "QA review #75 — live site + codebase analysis",
+    "message": "🔍 QA review #75 complete — 6 HIGH, 8 MEDIUM, 5 LOW findings. Overall: 3.6/5 (stable). 5 carry-overs on strike 5-6. NEW: completionToast timer race + 3 more unguarded localStorage writes. deskOccupants useMemo still wasted."
   },
   {
     "timestamp": "2026-03-10T18:50:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #72 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #72 complete \u2014 5 HIGH, 6 MEDIUM, 4 LOW findings. Overall: 3.5/5 (stable). No code changes since #71 \u2014 all 16 items carry over to strike 2. Carlos QA#69-70 fixes verified \u2705. Top priorities: Bloberto ping exclusion, unmemoized filters, touch hover cards."
+    "task": "QA review #72 — live site + codebase analysis",
+    "message": "🔍 QA review #72 complete — 5 HIGH, 6 MEDIUM, 4 LOW findings. Overall: 3.5/5 (stable). No code changes since #71 — all 16 items carry over to strike 2. Carlos QA#69-70 fixes verified ✅. Top priorities: Bloberto ping exclusion, unmemoized filters, touch hover cards."
   },
   {
     "timestamp": "2026-03-10T10:15:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #64 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #64 complete \u2014 0 HIGH, 3 MEDIUM, 3 LOW findings. Overall: 3.3/5 (+0.2). 3 STRIKE-level bugs FINALLY fixed (overflow, visibilitychange, sparkleUnseen). 3 carry-overs remain (inline toast styles x2, radiogroup a11y). 3 new bugs found."
+    "task": "QA review #64 — live site + codebase analysis",
+    "message": "🔍 QA review #64 complete — 0 HIGH, 3 MEDIUM, 3 LOW findings. Overall: 3.3/5 (+0.2). 3 STRIKE-level bugs FINALLY fixed (overflow, visibilitychange, sparkleUnseen). 3 carry-overs remain (inline toast styles x2, radiogroup a11y). 3 new bugs found."
   },
   {
     "timestamp": "2026-03-10T09:22:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #63 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #63 complete \u2014 3 CRITICAL, 4 HIGH, 5 MEDIUM findings. Overall: 3.4/5 (flat). ZERO fixes from 22 open carry-overs. All issues now on strike 11. Assigning Carlos (critical bugs) and Maya (CSS/a11y)."
+    "task": "QA review #63 — live site + codebase analysis",
+    "message": "🔍 QA review #63 complete — 3 CRITICAL, 4 HIGH, 5 MEDIUM findings. Overall: 3.4/5 (flat). ZERO fixes from 22 open carry-overs. All issues now on strike 11. Assigning Carlos (critical bugs) and Maya (CSS/a11y)."
   },
   {
     "timestamp": "2026-03-10T08:45:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #62 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #62 complete \u2014 2 CRITICAL, 7 HIGH, 5 MEDIUM, 2 LOW findings. Overall: 3.4/5 (flat). ZERO bugs fixed from 19 open carry-overs. 3 new a11y/perf issues found. overflow:visible on strike 10+."
+    "task": "QA review #62 — live site + codebase analysis",
+    "message": "🔍 QA review #62 complete — 2 CRITICAL, 7 HIGH, 5 MEDIUM, 2 LOW findings. Overall: 3.4/5 (flat). ZERO bugs fixed from 19 open carry-overs. 3 new a11y/perf issues found. overflow:visible on strike 10+."
   },
   {
     "timestamp": "2026-03-10T07:53:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #61 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #61 complete \u2014 3 CRITICAL, 4 HIGH, 5 MEDIUM, 2 LOW findings. Overall: 3.4/5 (-0.1). ZERO carry-overs fixed (15 still open). 4 new issues found. overflow:visible on strike 9+."
+    "task": "QA review #61 — live site + codebase analysis",
+    "message": "🔍 QA review #61 complete — 3 CRITICAL, 4 HIGH, 5 MEDIUM, 2 LOW findings. Overall: 3.4/5 (-0.1). ZERO carry-overs fixed (15 still open). 4 new issues found. overflow:visible on strike 9+."
   },
   {
     "timestamp": "2026-03-10T03:25:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #55 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #55 complete \u2014 1 CRITICAL, 6 HIGH, 16 MEDIUM, 4 LOW findings. Overall: 3.4/5 (stable). 6 items on strike 12 (hall of shame). 4 new dead-code/perf issues found. code_quality dropped to 2/5."
+    "task": "QA review #55 — live site + codebase analysis",
+    "message": "🔍 QA review #55 complete — 1 CRITICAL, 6 HIGH, 16 MEDIUM, 4 LOW findings. Overall: 3.4/5 (stable). 6 items on strike 12 (hall of shame). 4 new dead-code/perf issues found. code_quality dropped to 2/5."
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "task": "Creative review #80 \u2014 timed out, Bloberto fixing recurring bugs directly",
+    "task": "Creative review #80 — timed out, Bloberto fixing recurring bugs directly",
     "timestamp": "2026-03-10T03:06:43.958146Z"
   },
   {
     "timestamp": "2026-03-09T23:58:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #52 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #52 complete \u2014 3 HIGH, 6 MEDIUM, 11 LOW findings. Overall: 3.4/5 (-0.4). Zero fixes since #51 \u2014 all 17 carry-overs still open. STRIKE 7 on inline toast styles. Office boundary overflow EXPANDED: coffee corner + DUSK window + weather label all escaping floor (confirmed in screenshots). 3 NEW bugs: Sofia role mismatch ('QA Analyst' != 'QA Engineer'), unreliable aria-live on conditional element, VIBE_LABELS/vibeRanking inside useEffect."
+    "task": "QA review #52 — live site + codebase analysis",
+    "message": "🔍 QA review #52 complete — 3 HIGH, 6 MEDIUM, 11 LOW findings. Overall: 3.4/5 (-0.4). Zero fixes since #51 — all 17 carry-overs still open. STRIKE 7 on inline toast styles. Office boundary overflow EXPANDED: coffee corner + DUSK window + weather label all escaping floor (confirmed in screenshots). 3 NEW bugs: Sofia role mismatch ('QA Analyst' != 'QA Engineer'), unreliable aria-live on conditional element, VIBE_LABELS/vibeRanking inside useEffect."
   },
   {
     "timestamp": "2026-03-09T19:45:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #49 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #49 complete \u2014 0 HIGH, 8 MEDIUM, 14 LOW findings. Overall: 3.9/5 (+0.3). All 5 Carlos fixes verified \u2705. 3 NEW issues found. 8 carry-overs hit 8th cycle. One cleanup PR would push score to 4.2+."
+    "task": "QA review #49 — live site + codebase analysis",
+    "message": "🔍 QA review #49 complete — 0 HIGH, 8 MEDIUM, 14 LOW findings. Overall: 3.9/5 (+0.3). All 5 Carlos fixes verified ✅. 3 NEW issues found. 8 carry-overs hit 8th cycle. One cleanup PR would push score to 4.2+."
   },
   {
     "timestamp": "2026-03-09T19:05:00Z",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
+    "emoji": "⚙️",
     "type": "complete",
     "task": "Fix 1 HIGH + 4 MEDIUM from QA #48",
-    "message": "\u2699\ufe0f Fixed: honorific night-owl daytime bug, paused pill touch text, ghost tabIndex a11y, daytime sky brightness, orphaned TEAM VIBE card on mobile"
+    "message": "⚙️ Fixed: honorific night-owl daytime bug, paused pill touch text, ghost tabIndex a11y, daytime sky brightness, orphaned TEAM VIBE card on mobile"
   },
   {
     "timestamp": "2026-03-09T18:55:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #48 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #48 complete \u2014 1 HIGH, 8 MEDIUM, 11 LOW. Overall: 3.75/5 (stable). All 20 items carry over from #47 \u2014 no code changes detected. Honorific bug on 4th strike."
+    "task": "QA review #48 — live site + codebase analysis",
+    "message": "🔍 QA review #48 complete — 1 HIGH, 8 MEDIUM, 11 LOW. Overall: 3.75/5 (stable). All 20 items carry over from #47 — no code changes detected. Honorific bug on 4th strike."
   },
   {
     "timestamp": "2026-03-09T17:50:00Z",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
+    "emoji": "⚙️",
     "type": "complete",
     "task": "Fix 2 HIGH + 3 code quality from QA #46",
-    "message": "\u2699\ufe0f Fixed: footer quote cycling (all taglines reachable), onResume immediate sync, moved HONORIFICS/FULL_IDLE_MESSAGES/WORKER_ERROR_BUBBLES to module scope"
+    "message": "⚙️ Fixed: footer quote cycling (all taglines reachable), onResume immediate sync, moved HONORIFICS/FULL_IDLE_MESSAGES/WORKER_ERROR_BUBBLES to module scope"
   },
   {
     "timestamp": "2026-03-09T17:45:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #46 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #46 complete \u2014 2 HIGH, 8 MEDIUM, 7 LOW findings. Overall: 3.6/5. Zero fixes from #45 verified. onResume gap elevated to HIGH. Code quality 2.9 \u2014 five static objects still created inside components every render."
+    "task": "QA review #46 — live site + codebase analysis",
+    "message": "🔍 QA review #46 complete — 2 HIGH, 8 MEDIUM, 7 LOW findings. Overall: 3.6/5. Zero fixes from #45 verified. onResume gap elevated to HIGH. Code quality 2.9 — five static objects still created inside components every render."
   },
   {
     "timestamp": "2026-03-09T15:50:00Z",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
+    "emoji": "⚙️",
     "type": "complete",
     "task": "Fix 4 HIGH + 1 MEDIUM bugs from Sofia QA #45",
-    "message": "\u2699\ufe0f Fixed: undefined emoji fallback, NaN progress bar, aria-label undefined%, stale useMemo Date.now(), activity log emoji fallback"
+    "message": "⚙️ Fixed: undefined emoji fallback, NaN progress bar, aria-label undefined%, stale useMemo Date.now(), activity log emoji fallback"
   },
   {
     "timestamp": "2026-03-09T15:45:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #45 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #45 complete \u2014 4 HIGH, 9 MEDIUM, 10 LOW findings. Overall: 3.1/5 (stable). 21/22 carry-overs from #44 still open. 1 NEW accessibility bug (emoji fallback). Idle wander boundary fix verified \u2705."
+    "task": "QA review #45 — live site + codebase analysis",
+    "message": "🔍 QA review #45 complete — 4 HIGH, 9 MEDIUM, 10 LOW findings. Overall: 3.1/5 (stable). 21/22 carry-overs from #44 still open. 1 NEW accessibility bug (emoji fallback). Idle wander boundary fix verified ✅."
   },
   {
     "timestamp": "2026-03-09T13:25:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #42 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #42 complete \u2014 3 HIGH, 5 MEDIUM, 8 LOW findings. Overall: 3.4/10 (stable). 13 carry-overs still unfixed. 3 NEW bugs found (stuck emoji undefined, progress bar NaN, keyboard tab hash)."
+    "task": "QA review #42 — live site + codebase analysis",
+    "message": "🔍 QA review #42 complete — 3 HIGH, 5 MEDIUM, 8 LOW findings. Overall: 3.4/10 (stable). 13 carry-overs still unfixed. 3 NEW bugs found (stuck emoji undefined, progress bar NaN, keyboard tab hash)."
   },
   {
     "timestamp": "2026-03-09T11:50:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #41 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #41 complete \u2014 2 CRITICAL, 4 HIGH, 4 MEDIUM, 5 LOW findings. Overall: 6.5/10. 5 carry-overs finally assigned to Carlos for immediate fix."
+    "task": "QA review #41 — live site + codebase analysis",
+    "message": "🔍 QA review #41 complete — 2 CRITICAL, 4 HIGH, 4 MEDIUM, 5 LOW findings. Overall: 6.5/10. 5 carry-overs finally assigned to Carlos for immediate fix."
   },
   {
     "timestamp": "2026-03-09T12:00:00Z",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
+    "emoji": "⚙️",
     "type": "complete",
     "task": "Fix 2 CRITICAL + 3 HIGH bugs from Sofia QA #41",
-    "message": "\u2699\ufe0f Fixed: resume re-pause bug, pingReaction wiring, wb-task-count nowrap, error useEffect deps, dead || true guard"
+    "message": "⚙️ Fixed: resume re-pause bug, pingReaction wiring, wb-task-count nowrap, error useEffect deps, dead || true guard"
   },
   {
     "timestamp": "2026-03-09T10:45:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #40 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #40 complete \u2014 5 HIGH, 6 MEDIUM, 2 LOW findings. Overall: 3.5/5 (-0.6). pingReaction wired only to Bloberto (NEW). 4 carry-overs still unfixed."
+    "task": "QA review #40 — live site + codebase analysis",
+    "message": "🔍 QA review #40 complete — 5 HIGH, 6 MEDIUM, 2 LOW findings. Overall: 3.5/5 (-0.6). pingReaction wired only to Bloberto (NEW). 4 carry-overs still unfixed."
   },
   {
     "timestamp": "2026-03-09T07:45:27Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #37 \u2014 live site + codebase analysis",
-    "message": "\ud83d\udd0d QA review #37 complete \u2014 2 HIGH, 9 MEDIUM, 8 LOW findings. Overall: 3.8/5 (+0.2). Tab clipping regression FIXED \u2705"
+    "task": "QA review #37 — live site + codebase analysis",
+    "message": "🔍 QA review #37 complete — 2 HIGH, 9 MEDIUM, 8 LOW findings. Overall: 3.8/5 (+0.2). Tab clipping regression FIXED ✅"
   },
   {
     "timestamp": "2026-03-09T05:45:26Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #35 findings evaluated by Bloberto \u2014 6 HIGH items triaged",
-    "message": "\ud83d\udd0d Sofia review #35 triage: 6 HIGH-priority items assigned \u2014 Carlos (4 bugs), Maya (1 bug), Carlos (1 perf fix)"
+    "task": "QA review #35 findings evaluated by Bloberto — 6 HIGH items triaged",
+    "message": "🔍 Sofia review #35 triage: 6 HIGH-priority items assigned — Carlos (4 bugs), Maya (1 bug), Carlos (1 perf fix)"
   },
   {
     "timestamp": "2026-03-09T04:15:00Z",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
+    "emoji": "🔍",
     "type": "complete",
-    "task": "QA review #34 \u2014 visual testing, code audit, UX analysis",
-    "message": "\ud83d\udd0d QA review #34 complete \u2014 20 suggestions filed, 6 carry-over items still unfixed (4th review in a row)"
+    "task": "QA review #34 — visual testing, code audit, UX analysis",
+    "message": "🔍 QA review #34 complete — 20 suggestions filed, 6 carry-over items still unfixed (4th review in a row)"
   },
   {
     "type": "review",
     "worker": "Luna",
-    "emoji": "\ud83c\udf19",
+    "emoji": "🌙",
     "task": "Creative review #60 (worker timed out, using #59 ideas)",
     "timestamp": "2026-03-09T03:35:00Z",
-    "message": "\ud83c\udf19 Luna attempted creative review #60 \u2014 worker timed out, review #59 ideas still current"
+    "message": "🌙 Luna attempted creative review #60 — worker timed out, review #59 ideas still current"
   },
   {
     "type": "complete",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
+    "emoji": "⚙️",
     "task": "Greeting fix + dispatch navigation (already implemented)",
     "timestamp": "2026-03-09T03:38:00Z",
-    "message": "\u2699\ufe0f Carlos verified: greeting fix and dispatch navigation already in codebase"
+    "message": "⚙️ Carlos verified: greeting fix and dispatch navigation already in codebase"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #33 complete \u2014 overall score 3.6/5 (+0.1) \u2014 2 HIGH bugs (inner setTimeout leak, Bloberto speech clipping), 4 carry-overs escalated, 12 total suggestions",
+    "emoji": "🔍",
+    "message": "🔍 QA review #33 complete — overall score 3.6/5 (+0.1) — 2 HIGH bugs (inner setTimeout leak, Bloberto speech clipping), 4 carry-overs escalated, 12 total suggestions",
     "timestamp": "2026-03-09T03:25:00Z"
   },
   {
     "type": "complete",
     "worker": "Carlos",
-    "emoji": "\u2699\ufe0f",
-    "message": "\u2699\ufe0f Fixed setPingReaction setTimeout memory leak (5th+ strike finally resolved!) + VIBE_WEATHER_LABELS key mismatch",
+    "emoji": "⚙️",
+    "message": "⚙️ Fixed setPingReaction setTimeout memory leak (5th+ strike finally resolved!) + VIBE_WEATHER_LABELS key mismatch",
     "timestamp": "2026-03-09T02:16:40Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "emoji": "\ud83d\udd0d",
-    "message": "\ud83d\udd0d QA review #32 complete \u2014 overall score 3.5/5 (stable) \u2014 1 HIGH bug (setTimeout leak, 5th+ strike), 12 total suggestions, 6 fixes verified from #31",
+    "emoji": "🔍",
+    "message": "🔍 QA review #32 complete — overall score 3.5/5 (stable) — 1 HIGH bug (setTimeout leak, 5th+ strike), 12 total suggestions, 6 fixes verified from #31",
     "timestamp": "2026-03-09T02:15:24Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "emoji": "\ud83c\udf19",
-    "message": "Creative review #59 complete \u2014 8 new ideas across storytelling, delight & features",
+    "emoji": "🌙",
+    "message": "Creative review #59 complete — 8 new ideas across storytelling, delight & features",
     "timestamp": "2026-03-09T01:42:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #31 complete \u2014 overall score 3.4/5 (-0.1) \u2014 7 HIGH-priority bugs (all carry-overs, 5th+ strike), 18 total suggestions",
+    "message": "🔍 QA review #31 complete — overall score 3.4/5 (-0.1) — 7 HIGH-priority bugs (all carry-overs, 5th+ strike), 18 total suggestions",
     "timestamp": "2026-03-09T01:25:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #30 complete \u2014 overall score 3.5/5 (-0.4) \u2014 4 high-priority bugs (3 carry-overs on 4th strike + 1 new), 19 total suggestions",
+    "message": "🔍 QA review #30 complete — overall score 3.5/5 (-0.4) — 4 high-priority bugs (3 carry-overs on 4th strike + 1 new), 19 total suggestions",
     "timestamp": "2026-03-09T00:52:00Z"
   },
   {
     "type": "complete",
     "worker": "Bloberto",
-    "message": "\ud83c\udf19 Luna review #57: implemented 4 small fixes \u2014 card timestamps, coffee names, vibe tooltips, fern progress",
+    "message": "🌙 Luna review #57: implemented 4 small fixes — card timestamps, coffee names, vibe tooltips, fern progress",
     "timestamp": "2026-03-09T00:35:00Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "\ud83c\udf19 Creative review #102 \u2014 8 ideas filed (monitor boot, error postmortem, night mode, vacancy boards, co-ship sparks, completion reactions, ideas panel, shadow mode)",
+    "message": "🌙 Creative review #102 — 8 ideas filed (monitor boot, error postmortem, night mode, vacancy boards, co-ship sparks, completion reactions, ideas panel, shadow mode)",
     "timestamp": "2026-03-11T13:48:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #101 complete \u2014 overall score 3.4/5 \u2014 4 high-priority items (3 carry-overs on strike 9 + 1 strike 8), 22 total suggestions",
+    "message": "🔍 QA review #101 complete — overall score 3.4/5 — 4 high-priority items (3 carry-overs on strike 9 + 1 strike 8), 22 total suggestions",
     "timestamp": "2026-03-11T14:15:42Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #102 complete \u2014 3 CRITICAL items at strike 10 (mobile dismiss, monolith, stale ref), overall 3.4/5, 19 total suggestions",
+    "message": "🔍 QA review #102 complete — 3 CRITICAL items at strike 10 (mobile dismiss, monolith, stale ref), overall 3.4/5, 19 total suggestions",
     "timestamp": "2026-03-11T14:50:27Z"
   },
   {
     "type": "complete",
     "worker": "Luna",
-    "message": "\ud83c\udf19 Creative review #106 complete \u2014 7 ideas (2 must carry-forwards, 2 should, 2 could, 1 wild). Theme: amplifying floor signals.",
+    "message": "🌙 Creative review #106 complete — 7 ideas (2 must carry-forwards, 2 should, 2 could, 1 wild). Theme: amplifying floor signals.",
     "timestamp": "2026-03-11T18:28:00Z"
   },
   {
     "type": "complete",
     "worker": "Carlos",
-    "message": "\u2699\ufe0f Shipped 2 must items from Luna #106: Sprint Board word-frequency fallback + Bloberto Error Boundary personality screen",
+    "message": "⚙️ Shipped 2 must items from Luna #106: Sprint Board word-frequency fallback + Bloberto Error Boundary personality screen",
     "timestamp": "2026-03-11T18:32:00Z"
   },
   {
     "type": "complete",
     "worker": "Sofia",
-    "message": "\ud83d\udd0d QA review #108 complete \u2014 4.0/5 overall, 3 HIGH items (TASK_TAG_DEFS bug, cache-busting perf, a11y gaps), 14 total suggestions",
+    "message": "🔍 QA review #108 complete — 4.0/5 overall, 3 HIGH items (TASK_TAG_DEFS bug, cache-busting perf, a11y gaps), 14 total suggestions",
     "timestamp": "2026-03-11T19:25:00Z"
   }
 ]
