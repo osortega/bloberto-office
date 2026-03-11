@@ -1,15 +1,15 @@
 {
   "workers": [
     {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Engineer",
-      "status": "idle",
-      "task": "",
-      "progress": 100,
-      "started_at": "2026-03-11T05:15:00Z",
-      "updated_at": "2026-03-11T05:25:00Z"
+      "id": "carlos",
+      "name": "Carlos",
+      "role": "Backend Engineer",
+      "status": "working",
+      "task": "Fix 2 HIGH from Sofia QA #83 — bare localStorage + handleTabKeyDown",
+      "progress": 10,
+      "started_at": "2026-03-11T05:26:00Z",
+      "updated_at": "2026-03-11T05:26:00Z"
     }
   ],
-  "updated_at": "2026-03-11T05:25:00Z"
+  "updated_at": "2026-03-11T05:26:00Z"
 }
