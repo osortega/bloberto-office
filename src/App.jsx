@@ -15,7 +15,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontSize: '1.1rem', color: '#f87171' }}>
-          Something went wrong.
+          Something went wrong — click Retry, or refresh if it persists.
           <button onClick={this.resetError} style={{ marginLeft: '1rem', cursor: 'pointer' }}>Retry</button>
         </div>
       )
@@ -198,7 +198,7 @@ function StatusBadge({ status }) {
   )
 }
 
-function ProgressBar({ progress, startedAt }) {
+function ProgressBar({ progress, startedAt, updatedAt }) {
   const milestonesRef = useRef(new Set())
   const prevProgressRef = useRef(progress)
   const innerFlashTimersRef = useRef([])
@@ -232,7 +232,10 @@ function ProgressBar({ progress, startedAt }) {
 
   const workingMs = startedAt ? Date.now() - new Date(startedAt).getTime() : null
   const workingMins = workingMs != null && workingMs > 0 ? workingMs / 60000 : 0
-  const eta = (progress > 5 && progress < 100 && workingMins > 1) ? Math.round((workingMins / progress) * (100 - progress)) : null
+  let eta = (progress > 5 && progress < 100 && workingMins > 1) ? Math.round((workingMins / progress) * (100 - progress)) : null
+  if (updatedAt && eta !== null && (Date.now() - new Date(updatedAt).getTime()) > eta * 60 * 1000 * 1.5) {
+    eta = null
+  }
 
   return (
     <div className="progress-wrapper">
@@ -374,7 +377,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             return <div className="worker-duration" data-tier={tier}>{tier === 'stuck' ? '⚠️ ' : ''}⏱️ {formatDuration(worker.updated_at)}</div>
           })()}
 
-          <ProgressBar progress={worker.progress} startedAt={worker.startedAt || worker.started_at} />
+          <ProgressBar progress={worker.progress} startedAt={worker.startedAt || worker.started_at} updatedAt={worker.updated_at} />
         </div>
 
         <div className="worker-card__back" aria-hidden={!isFlipped || undefined} tabIndex={!isFlipped ? -1 : undefined}>

@@ -1255,7 +1255,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
       pingReactionTimerRef.current = setTimeout(() => setPingReaction(null), 3000)
     }
     if (onWorkerClick && worker.id !== 'bloberto') onWorkerClick(worker)
-  }, [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick])
+  }, [onWorkerClick])
 
   useEffect(() => {
     if (meetingWorkers.length >= 2) {
