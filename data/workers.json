@@ -4,11 +4,12 @@
       "id": "carlos",
       "name": "Carlos",
       "role": "Backend Engineer",
-      "status": "working",
+      "status": "idle",
       "task": "Fix 2 HIGH from Sofia QA #83 \u2014 bare localStorage + handleTabKeyDown",
-      "progress": 10,
+      "progress": 100,
       "started_at": "2026-03-11T05:26:00Z",
-      "updated_at": "2026-03-11T05:26:00Z"
+      "updated_at": "2026-03-11T05:26:00Z",
+      "finished_at": "2026-03-11T06:30:00Z"
     },
     {
       "id": "sofia",
@@ -19,7 +20,17 @@
       "progress": 100,
       "started_at": "2026-03-11T05:45:33Z",
       "updated_at": "2026-03-11T05:53:36Z"
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Frontend Engineer",
+      "status": "working",
+      "task": "Fix ErrorBoundary, handleTabKeyDown stale closure, ARIA radiogroup navigation",
+      "progress": 0,
+      "started_at": "2026-03-11T06:32:00Z",
+      "updated_at": "2026-03-11T06:32:00Z"
     }
   ],
-  "updated_at": "2026-03-11T05:53:36Z"
+  "updated_at": "2026-03-11T06:32:00Z"
 }
