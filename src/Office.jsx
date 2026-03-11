@@ -870,7 +870,6 @@ function WindowElement({ vibe }) {
     return 'linear-gradient(to bottom, #050510, #1e1b4b)'  // midnight 0-4
   }
 
-  const isNight = (hour >= 0 && hour <= 4) || hour >= 20
   const isMidnight = hour >= 0 && hour <= 4
   const isDaytime = hour >= 9 && hour <= 16
   const isGoldenHour = hour >= 17 && hour <= 19
@@ -999,7 +998,7 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
         if (elapsed > 30 * 60 * 1000) return null
         const timeStr = getRelativeTime(h.endedAt)
         return (
-          <div style={{ opacity: 0.5, fontSize: '0.38rem', textAlign: 'center', marginTop: '2px' }}>
+          <div style={{ opacity: 0.65, fontSize: '0.6rem', textAlign: 'center', marginTop: '2px' }}>
             Last: {h.names.join(', ')} · {timeStr}
           </div>
         )
@@ -1216,7 +1215,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const nonMgr        = useMemo(() => workers.filter(w => w.id !== 'bloberto'), [workers])
   const workingWorkers = useMemo(() => nonMgr.filter(w => w.status === 'working'), [nonMgr])
   const workingIds     = useMemo(() => new Set(workingWorkers.map(w => w.id)), [workingWorkers])
-  const idleWorkers    = useMemo(() => nonMgr.filter(w => w.status === 'idle' && !workingIds.has(w.id)), [nonMgr, workingIds])
+  const idleWorkers    = useMemo(() => nonMgr.filter(w => w.status === 'idle'), [nonMgr])
   const meetingWorkers = useMemo(() => idleWorkers.length >= 2 ? idleWorkers.slice(0, Math.min(idleWorkers.length, 3)) : [], [idleWorkers])
   const meetingWorkerIds = useMemo(() => new Set(meetingWorkers.map(w => w.id)), [meetingWorkers])
   const coffeeWorkers  = useMemo(() => idleWorkers.filter(w => !meetingWorkerIds.has(w.id)), [idleWorkers, meetingWorkerIds])
@@ -1441,7 +1440,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             const ghostMins = Math.floor(diffMs / 60000)
             ghostDeskTier = ghostMins < 60 ? 'fresh' : ghostMins < 180 ? 'stale' : 'abandoned'
           }
-          const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id || sw.id === occ.worker)
+          const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id)
           return (
             <div
               key={desk.id}

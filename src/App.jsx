@@ -36,9 +36,8 @@ const CONFETTI_PIECES = Array.from({ length: 30 }, (_, i) => (
   <span key={i} className="confetti-piece" style={{ '--i': i }} />
 ))
 
-const WORKER_CONFETTI_PIECES = Array.from({ length: 30 }, (_, i) => (
-  <span key={i} className="confetti-piece" style={{ '--i': i }} />
-))
+// WORKER_CONFETTI_PIECES removed — worker confetti now uses CONFETTI_PIECES
+// with worker color applied via CSS custom property on the container
 
 const STAT_DISPATCHES = {
   active: { 0: 'ghost town', 1: 'lone wolf', 2: 'dynamic duo', 3: 'skeleton crew', 4: 'full squad', 5: 'all hands' },
@@ -1172,8 +1171,8 @@ export default function App() {
         </div>
       )}
       {workerConfetti && (
-        <div className="confetti-layer" aria-hidden="true">
-          {WORKER_CONFETTI_PIECES}
+        <div className="confetti-layer" style={{ '--worker-color': workerConfetti.color }} aria-hidden="true">
+          {CONFETTI_PIECES}
         </div>
       )}
       {completionToast && (

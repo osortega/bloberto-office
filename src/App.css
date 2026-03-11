@@ -1000,6 +1000,11 @@
 .confetti-piece:nth-child(3n+1) { background: var(--green); }
 .confetti-piece:nth-child(3n+2) { background: #f59e0b; }
 
+/* Worker-specific confetti: first 18 pieces use worker's color */
+.confetti-layer[style*="--worker-color"] .confetti-piece:nth-child(-n+18) {
+  background: var(--worker-color, var(--accent));
+}
+
 @keyframes confetti-fall {
   0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
   100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
