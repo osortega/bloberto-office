@@ -1028,6 +1028,11 @@ function ConferenceTable({ vibeKey, meetingWorkers = [], standupWorkers = [], la
     const id = setInterval(() => setTick(t => t + 1), 30_000)
     return () => clearInterval(id)
   }, [meetingWorkers.length])
+  useEffect(() => {
+    if (meetingWorkers.length >= 2) return
+    const id = setInterval(() => setTick(t => t + 1), 30_000)
+    return () => clearInterval(id)
+  }, [meetingWorkers.length])
 
   // How many chairs are visible per vibe (at least enough for meeting + standup workers)
   const baseCount = vibe === 'crushing' ? 6 : vibe === 'in-flow' ? 4 : 1
@@ -1374,6 +1379,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   const [thoughtBubble, setThoughtBubble] = useState({ text: null, show: false })
   const thoughtScheduleRef = useRef(null)
   const thoughtHideRef     = useRef(null)
+  const thoughtRaf1Ref     = useRef(null)
+  const thoughtRaf2Ref     = useRef(null)
   // Keep a ref to current team-state getter so the timer always sees latest state
   const thoughtQuipRef = useRef(null)
   thoughtQuipRef.current = () => {
@@ -1470,8 +1477,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
       const text = thoughtQuipRef.current()
       setThoughtBubble({ text, show: false })
       // small RAF delay so the element mounts before CSS transition fires
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setThoughtBubble(b => ({ ...b, show: true })))
+      thoughtRaf1Ref.current = requestAnimationFrame(() => {
+        thoughtRaf2Ref.current = requestAnimationFrame(() => setThoughtBubble(b => ({ ...b, show: true })))
       })
       thoughtHideRef.current = setTimeout(() => {
         setThoughtBubble(b => ({ ...b, show: false }))
@@ -1485,6 +1492,8 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
     return () => {
       clearTimeout(thoughtScheduleRef.current)
       clearTimeout(thoughtHideRef.current)
+      cancelAnimationFrame(thoughtRaf1Ref.current)
+      cancelAnimationFrame(thoughtRaf2Ref.current)
     }
   }, []) // runs once on mount; quip is always current via thoughtQuipRef
 

@@ -1,33 +1,41 @@
-Carlos — Bug Fix Summary
-========================
-Date: 2026-03-09
+Carlos Bug Fixes — Office.jsx
+==============================
+Date: 2026-03-11
 
-FIX 1 (HIGH — App.jsx): Honorific 'night owl' during daytime with empty team
-  Before: HONORIFICS[isAfterHours ? 'after-hours' : teamVibe.key]
-  After:  HONORIFICS[isAfterHours ? 'after-hours' : (teamVibe.key === 'after-hours' ? 'slow-day' : teamVibe.key)]
-  When vibe.js returns 'after-hours' (empty team) but it's not actually after-hours,
-  the key is remapped to 'slow-day' so the honorific reads "chief... you still there? 😐"
-  instead of "night owl 🌙".
+BUG 1 — Thought bubble double requestAnimationFrame (STRIKE 8)
+--------------------------------------------------------------
+Location: Character component, ~line 1473-1474 (useEffect for thought bubble)
 
-FIX 2 (MEDIUM — App.jsx): Paused pill shows wrong text on touch devices
-  Added onClick={onResume} to the polling-paused-pill span.
-  Text is now dynamically chosen: window.matchMedia('(pointer: coarse)').matches
-  shows 'Tap to refresh' on touch devices and 'Move mouse to refresh' on pointer devices.
+Problem: Two nested requestAnimationFrame() calls were made without storing the
+returned handles, so the animations could not be cancelled on cleanup. This risked
+setState calls on unmounted components.
 
-FIX 3 (MEDIUM — Office.jsx): Ghost characters had tabIndex=0 (focusable but non-interactive)
-  Changed tabIndex={0} → tabIndex={handleClick ? 0 : -1}
-  Ghost/non-interactive characters are now removed from the tab order.
+Fix:
+- Added two new useRef() declarations at the top of Character:
+    const thoughtRaf1Ref = useRef(null)
+    const thoughtRaf2Ref = useRef(null)
+- Stored both rAF handles:
+    thoughtRaf1Ref.current = requestAnimationFrame(() => {
+      thoughtRaf2Ref.current = requestAnimationFrame(() => ...)
+    })
+- Added cancelAnimationFrame(thoughtRaf1Ref.current) and
+  cancelAnimationFrame(thoughtRaf2Ref.current) in the cleanup return of
+  the same useEffect.
 
-FIX 4 (MEDIUM — Office.jsx + Office.css): Daytime sky too dark (brightness 0.7)
-  Added data-daytime={isDaytime || undefined} to the .office-window__sky div
-  (isDaytime = hours 9–16).
-  Added CSS rule:
-    .office-window__sky[data-daytime] { filter: brightness(1.1) saturate(1.05); }
-  Daytime sky is now bright and vivid instead of the default dim 0.7 brightness.
+BUG 2 — Post-huddle timestamp freezes (STRIKE 3)
+-------------------------------------------------
+Location: ConferenceTable component, ~line 1027
 
-FIX 5 (MEDIUM — App.css): TEAM VIBE stat card orphaned as half-width on mobile
-  In the @media (max-width: 600px) block, added:
-    .stats-bar .stat-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
-  When the last stat card lands alone in a 2-column row it now spans full width.
+Problem: The setTick interval (used to keep "X minutes ago" labels live) only
+ran while meetingWorkers.length >= 2. When a meeting ended the interval was
+cleared and never restarted, so the "Last: names · X minutes ago" label froze.
 
-Build: npm run build — ✓ passed (no errors)
+Fix: Added a second useEffect with the inverse guard that keeps the tick
+interval running when there is no active meeting (meetingWorkers.length < 2):
+    useEffect(() => {
+      if (meetingWorkers.length >= 2) return
+      const id = setInterval(() => setTick(t => t + 1), 30_000)
+      return () => clearInterval(id)
+    }, [meetingWorkers.length])
+
+Build: npm run build — ✓ succeeded (vite, no errors)
