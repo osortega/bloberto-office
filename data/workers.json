@@ -21,8 +21,8 @@
       "id": "maya",
       "role": "Frontend Engineer",
       "status": "working",
-      "task": "Implement Luna review #101: light theme fix + desk lamp pulse + conference topic",
-      "started_at": "2026-03-11T12:36:00Z",
+      "task": "Luna #102 fixes \u2014 monitor boot animation + error postmortem card",
+      "started_at": "2026-03-11T13:50:00Z",
       "finished_at": null,
       "updated_at": "2026-03-11T12:36:00Z"
     },
@@ -44,5 +44,5 @@
       "updated_at": "2026-03-11T13:15:00Z"
     }
   ],
-  "updated_at": "2026-03-11T13:48:00Z"
+  "updated_at": "2026-03-11T13:50:00Z"
 }
