@@ -1,6 +1,13 @@
 [
   {
     "type": "complete",
+    "worker": "Sofia",
+    "emoji": "\ud83d\udd0d",
+    "message": "\ud83d\udd0d QA review #98 complete \u2014 3.4/5 overall, 2 CRITICAL + 5 HIGH. 6 items on strike-six. Thought bubble & AwaySign features praised. Monolith grew +147 lines.",
+    "timestamp": "2026-03-11T11:45:00Z"
+  },
+  {
+    "type": "complete",
     "worker": "Luna",
     "task": "Creative review #99 \u2014 7 fresh ideas",
     "timestamp": "2026-03-11T11:36:00Z"

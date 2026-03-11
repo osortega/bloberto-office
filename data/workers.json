@@ -35,13 +35,13 @@
     {
       "id": "sofia",
       "role": "QA & Product Analyst",
-      "status": "working",
-      "task": "QA Review #98 \u2014 analyzing site code, screenshots, and accessibility",
+      "status": "idle",
+      "task": "QA Review #98 complete \u2014 17 suggestions, 3.4/5 overall, 6 strike-six items",
       "started_at": "2026-03-11T11:15:00Z",
-      "finished_at": null,
+      "finished_at": "2026-03-11T11:45:00Z",
       "progress": 10,
       "updated_at": "2026-03-11T11:15:00Z"
     }
   ],
-  "updated_at": "2026-03-11T11:38:00Z"
+  "updated_at": "2026-03-11T11:45:00Z"
 }
