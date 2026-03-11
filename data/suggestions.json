@@ -1,231 +1,122 @@
 {
   "analyst": "Sofia",
-  "review_number": 78,
-  "timestamp": "2026-03-11T00:15:46Z",
+  "review_number": 80,
+  "timestamp": "2026-03-11T01:20:00.000Z",
   "screenshots": {
-    "desktop": "screenshot-sofia-desktop-78.png",
-    "mobile": "screenshot-sofia-mobile-78.png",
-    "note": "Screenshots reused from QA #77 — Chromium failed to launch in current environment (pthread_create: Resource temporarily unavailable). Visual analysis based on prior captures + source code diff."
+    "note": "Container hit pthread_create EAGAIN — screenshots could not be captured. Code-only analysis from current source."
   },
   "scores": {
-    "visual": 3,
-    "ux": 3,
-    "responsiveness": 4,
-    "performance": 3,
-    "accessibility": 3,
-    "code_quality": 2,
-    "features": 5,
-    "fun_factor": 5
+    "visual": 8,
+    "ux": 7,
+    "responsiveness": 7,
+    "performance": 5,
+    "accessibility": 5,
+    "code_quality": 5,
+    "features": 9,
+    "fun_factor": 9
   },
-  "overall_score": 3.5,
-  "qa77_fixes_verification": {
-    "note": "0 out of 18 items from QA #77 were fixed. Every single suggestion — 3 HIGH, 7 MEDIUM, 8 LOW — is still present in the source code, verified line-by-line. This is the second consecutive QA cycle with zero backlog action. Carlos fixed 7/7 from QA #75 in one pass, so the capacity is clearly there. These are piling up.",
+  "overall_score": 6.9,
+  "score_delta": -0.2,
+  "qa79_fixes_verification": {
     "confirmed_fixed": [],
+    "partially_fixed": [],
     "not_deployed": [
-      "Bloberto speech bubble clipped (Office.jsx:1568 top=4, Office.css:84 overflow:hidden)",
-      "handleCharClick not useCallback'd (Office.jsx:1249)",
-      "Footer quote counter vanishes at last quote (App.jsx:1449)",
-      "StatsBar buried in Dashboard only (App.jsx:1296)",
-      "localStorage reads unguarded in useState initializers (App.jsx:702, 749, 628)",
-      "WorkerCard workerHistory reverse not memoized (App.jsx:312)",
-      "handleTabKeyDown not useCallback'd (App.jsx:788)",
-      "button[role=radio] activity filters no arrow-key navigation (App.jsx:1385-1422)",
-      "Dashboard activity log double-filters inline (App.jsx:1426-1435)",
-      "Conference table last-huddle text at 0.38rem (Office.jsx:1002)",
-      "ConferenceTable setTick re-render anti-pattern (Office.jsx:910-916)",
-      "Idle micro-bubble emoji selected at render time (Office.jsx:813)",
-      "Bloberto ping reactions generic (Office.jsx:217)",
-      "isTouchDevice module-level constant (App.jsx:687)",
-      "idleWorkers filter redundant !workingIds.has guard (Office.jsx:1222)",
-      "ActivityLogEntry key string concatenation (App.jsx:151)",
-      "lone-survivor-label all inline styles (Office.jsx:1588)",
-      "Sparkline legend pills index-as-key (App.jsx:438)"
+      "Speech bubble still clipped by overflow:hidden on office-floor (Office.css line 84) — STRIKE 6",
+      "handleCharClick still a plain arrow function, not useCallback — defeats memo() on ALL Characters — STRIKE 5",
+      "Arrow-key tab navigation still pushes history entries via window.location.hash = next — STRIKE 3",
+      "activityByWorker useMemo creates new array refs on every poll — STRIKE 2",
+      "Footer quote counter still wraps to 1 instead of 0 — STRIKE 5",
+      "localStorage.getItem in useState initializers still unguarded — STRIKE 4",
+      "handleTabKeyDown not wrapped in useCallback — STRIKE 2",
+      "Activity filter radiogroups still lack arrow-key navigation — STRIKE 2",
+      "Dashboard activity log still passes inline-filtered arrays — STRIKE 2"
     ]
   },
   "suggestions": [
     {
       "priority": "high",
-      "category": "bug",
-      "title": "Bloberto speech bubble hard-clipped at top of office floor",
-      "description": "Office.jsx line 1568 places Bloberto at top={4} (4% from top of .office-floor). The speech bubble uses position:absolute with bottom:calc(100%+8px). .office-floor has overflow:hidden (Office.css line 84). At 4% top, the bubble always overflows upward and is clipped. CONFIRMED in QA #77 screenshots. Fix: add overflow:visible to the manager character wrapper, or increase Bloberto's top to at least 10-12%, or apply a z-layer exception. This is the most visually obvious bug in the product.",
-      "effort": "small",
-      "carry_over_strike": 1
+      "category": "code",
+      "title": "handleCharClick is STILL not useCallback — this is strike 5",
+      "description": "Office.jsx line 1248: handleCharClick is a plain arrow function. Every Office render creates a new reference. This is passed to every Character component (line 1568, 1583, 1613). Since Character is memo()-wrapped, the new function ref causes ALL character memo checks to fail on every render. This means every 30s poll re-renders every single character on screen. This has been reported since QA74. Fix: useCallback with deps [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick].",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "performance",
-      "title": "handleCharClick not wrapped in useCallback — defeats memo() on ALL Character components",
-      "description": "Office.jsx line 1249: const handleCharClick = (worker) => { ... } is a plain function defined in the Office component body. Passed as onClick to every Character (lines 1568, 1583, 1613). Character is React.memo()'d, but memo() bails on every Office render because handleCharClick is a new reference each time. Fix: wrap in useCallback(() => {...}, [onWorkerClick]). No missing deps — pingTimerRef and pingReactionTimerRef are refs. Highest-leverage perf fix in the codebase. 2-minute change sitting unfixed for two QA cycles.",
-      "effort": "small",
-      "carry_over_strike": 2
+      "category": "bug",
+      "title": "Speech bubble clipped — strike 6, never addressed",
+      "description": "office-floor has overflow:hidden (Office.css line 84). Bloberto at top:4% with bubble at bottom:calc(100%+8px) is clipped. This has been reported every review since QA71. Simple fix: move speech bubble inside the overflow boundary or use clip-path: inset(-20px 0 0 0) on office-floor to allow top overflow only.",
+      "effort": "small"
     },
     {
       "priority": "high",
-      "category": "ux",
-      "title": "Footer quote counter vanishes at last quote AND wraps silently",
-      "description": "App.jsx line 1449: display condition quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length hides the counter at quoteBonus=8 (8 < 8 is false). BONUS_TAGLINES has 8 items. User clicks at 7/8, sees '7/8', clicks again — counter disappears instead of showing '8/8' then cycling. The wrap resets to 1 silently with zero visual feedback. Fix: change display condition to quoteBonus > 0 (remove the upper bound), or change < to <=. Optionally show a cycling icon on wrap. Two characters to fix, two cycles unfixed.",
-      "effort": "small",
-      "carry_over_strike": 2
+      "category": "bug",
+      "title": "Arrow-key tab switching pushes browser history — Back button broken",
+      "description": "App.jsx lines 794/799: handleTabKeyDown sets window.location.hash directly. Each assignment creates a history entry. User presses ArrowRight 5 times → must press Back 5 times to leave page. Fix: history.replaceState(null, '', '#' + next). Also applies to lines 805, 877-878, 1271, 1284.",
+      "effort": "small"
+    },
+    {
+      "priority": "high",
+      "category": "code",
+      "title": "localStorage.getItem calls in useState initializers will crash in private browsing",
+      "description": "App.jsx lines 628, 702, 749: localStorage.getItem() called in useState(() => ...). iOS Safari private mode throws SecurityError. App has ErrorBoundary but user sees 'Something went wrong' with no recovery. Fix: wrap in try/catch. A safeRead() helper matching the existing safeSave() pattern.",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "performance",
-      "title": "NEW: Character onKeyDown creates inline arrow function every render — memo() always bails",
-      "description": "Office.jsx line 764: onKeyDown={handleClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { ... } } : undefined}. This creates a brand-new anonymous function on every render of Character. Even if handleCharClick is fixed to be stable via useCallback (the existing HIGH issue), this inline onKeyDown arrow function will STILL be a new reference every time, causing React.memo() to bail and re-render every Character. Fix: extract the keyboard handler into a stable useCallback inside the Character component: const handleKeyDown = useCallback((e) => { if ((e.key === 'Enter' || e.key === ' ') && handleClick) { e.preventDefault(); handleClick(e); } }, [handleClick]). Then onKeyDown={handleClick ? handleKeyDown : undefined}. Independent of but works in tandem with fixing handleCharClick.",
-      "effort": "small",
-      "carry_over_strike": 0
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "StatsBar (live dot, error count, stuck workers, sync time) buried in Dashboard tab only",
-      "description": "App.jsx line 1296: StatsBar is rendered exclusively inside the tabpanel-dashboard div. The default tab is 'office'. On the Office tab — the primary view — users see ZERO data freshness indicators: no live/offline dot, no last-synced timestamp, no stuck worker alert, no error count. Users have no idea if the office view is stale or if there are errors unless they manually switch to Dashboard. Fix: move a minimal status strip (live dot + last synced + error badge) to either the header or just above the Office tabpanel. Full StatsBar stays in Dashboard.",
-      "effort": "medium",
-      "carry_over_strike": 1
+      "category": "code",
+      "title": "activityByWorker creates new array refs every poll — WorkerCard memo defeated",
+      "description": "App.jsx line 955: useMemo runs .filter().slice(-3) per worker. filter() always returns a new ref. Every 30s poll changes activityLog → new refs → all WorkerCards re-render. Fix: compare content before inserting, or use JSON.stringify comparison to stabilize refs.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "localStorage.getItem calls in useState initializers are unguarded — blank screen risk",
-      "description": "App.jsx line 702: useState(() => localStorage.getItem('bloberto-theme') || 'dark'), line 749: useState(() => !localStorage.getItem('footer-sparkle-seen')), and App.jsx line 628 (ShortcutToast): useState(() => localStorage.getItem('bloberto-shortcuts-shown') ? 'hidden' : 'pending'). All three call localStorage directly with no try/catch. localStorage.getItem throws SecurityError in iOS private browsing, Firefox strict privacy, and enterprise browser policies. If thrown in a lazy initializer, the component never mounts — blank screen. The VIBE_HISTORY_KEY read at line 1098 IS wrapped in try/catch (great). These three are not.",
-      "effort": "small",
-      "carry_over_strike": 2
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "WorkerCard workerHistory allocates a new reversed array on every render",
-      "description": "App.jsx line 312 (inside WorkerCard): const workerHistory = [...activityEntries].reverse() creates a new array on every render. WorkerCard is React.memo()'d, but this runs inside the component body on every re-render. Fix: useMemo(() => [...activityEntries].reverse(), [activityEntries]) — or precompute the reversed list in the activityByWorker useMemo in App and store it directly, so it is computed once at the source.",
-      "effort": "small",
-      "carry_over_strike": 2
+      "title": "Footer quote counter wraps 1→1 — vibe tagline permanently lost",
+      "description": "App.jsx line 1448: setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1). Should wrap to 0 to show vibe tagline again. Strike 5.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "handleTabKeyDown missing useCallback — new reference on every App render",
-      "description": "App.jsx line 788: const handleTabKeyDown = (e) => { ... } is defined in the App component body without useCallback. Arrow key navigation logic was added this cycle (lines 790-799) — good improvement — but the function still is not memoized. It is passed as onKeyDown to both tab buttons (lines 1272, 1285). The function closes over tab and TABS — useCallback(fn, [tab]) is correct. Without it, every polling tick (every 30s) hands a new function reference to the tab buttons.",
-      "effort": "small",
-      "carry_over_strike": 2
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "NEW: handleTabKeyDown arrow key navigation pushes browser history entries — Back button broken",
-      "description": "App.jsx lines 794 and 799: arrow-key tab navigation uses window.location.hash = next and window.location.hash = prev. Each assignment pushes a new entry onto the browser history stack. A user who presses an arrow key 10 times to navigate creates 10 history entries — pressing Back navigates through all of them before reaching actual page history. Fix: replace window.location.hash = next with history.replaceState(null, '', '#' + next) inside handleTabKeyDown. The click handlers (lines 1271, 1284) should keep their push behavior since those are intentional deep-link navigations.",
-      "effort": "small",
-      "carry_over_strike": 0
+      "title": "handleTabKeyDown not wrapped in useCallback",
+      "description": "App.jsx line 788: plain function, new ref every render. Passed to both tab buttons' onKeyDown. Minor perf impact but easy fix.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "accessibility",
-      "title": "button[role='radio'] activity filters have no arrow-key navigation — ARIA contract violated",
-      "description": "App.jsx lines 1385-1422: activity type and worker filter buttons use role='radio' inside role='radiogroup'. ARIA spec requires radio groups respond to arrow-key navigation (arrow keys move focus, Space selects). These buttons only handle onClick — no onKeyDown. Screen readers announce them as radio buttons but arrow keys do nothing; Tab moves through them individually. Note: the tab switcher (App.jsx:788-800) correctly added arrow-key navigation this cycle — apply the same pattern here. Or simpler: switch to role='button' with aria-pressed, which already matches their actual keyboard behavior.",
-      "effort": "small",
-      "carry_over_strike": 3
+      "title": "Activity filter radiogroups violate ARIA contract — no arrow-key navigation",
+      "description": "App.jsx lines 1385/1404: role='radiogroup' with button[role='radio'] children. ARIA spec requires arrow keys to move between options. Keyboard users are stuck. Implement roving tabIndex pattern.",
+      "effort": "medium"
     },
     {
       "priority": "medium",
-      "category": "performance",
-      "title": "Dashboard activity log double-filters activityLog inline on every render",
-      "description": "App.jsx lines 1426-1435: the ActivityLog component receives activityLog.filter(type).filter(worker) as inline JSX expressions. This runs on every App render (polling ticks, cursor activity, state changes). Fix: derive filteredActivity = useMemo(() => activityLog.filter(type).filter(worker), [activityLog, activityFilter, workerFilter]) and pass filteredActivity to ActivityLog.",
-      "effort": "small",
-      "carry_over_strike": 2
-    },
-    {
-      "priority": "medium",
-      "category": "bug",
-      "title": "Conference table 'last huddle' text rendered at 0.38rem — physically unreadable",
-      "description": "Office.jsx line 1002: fontSize: '0.38rem' renders the last-huddle recap. At 16px root, 0.38rem = 6.08px. This is below WCAG minimum for any text and invisible in practice. Appears to be an accidental value. Fix: raise to minimum 0.6rem, or move last-huddle info into a tooltip on hover. The conference table has role='img' so this text is inaccessible to screen readers in any case.",
-      "effort": "small",
-      "carry_over_strike": 1
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "ConferenceTable setTick re-render anti-pattern — entire component re-renders every 30s",
-      "description": "Office.jsx line 910: const [, setTick] = useState(0) with setInterval every 30s when meetingWorkers.length >= 2. The entire ConferenceTable re-renders — all SVG chair elements, CharacterAvatar for each participant, badge text. Only the huddle duration display (mins) actually changes. Fix: extract the huddle timer into a tiny HuddleTimer component with its own tick state. ConferenceTable itself becomes stable.",
-      "effort": "small",
-      "carry_over_strike": 2
+      "category": "code",
+      "title": "ProgressBar ETA never updates between progress changes",
+      "description": "App.jsx line 229: ETA computed from Date.now() at render time only. No time subscription. If worker sits at 40% for 30 minutes, ETA label shows same stale value. Fix: add useTimeTick(60000) to ProgressBar.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "bug",
-      "title": "Idle micro-bubble emoji selected via Date.now() at render time — flickers on re-renders",
-      "description": "Office.jsx line 813: idle bubble emoji selected via Math.floor((Date.now() / 12000) + hash) % length inside JSX. Each render evaluates Date.now() afresh — unrelated state changes during the 2.2s display window can swap the emoji mid-animation. Fix: store the chosen emoji string in setIdleBubble (e.g., setIdleBubble(chosenEmoji)) instead of setIdleBubble(true), then display idleBubble directly.",
-      "effort": "small",
-      "carry_over_strike": 2
+      "category": "code",
+      "title": "standupWorkers.includes uses object reference equality",
+      "description": "Office.jsx line 1572: standupWorkers.includes(occ.worker) relies on reference identity. Will silently break if any normalization reconstructs objects. Fix: .some(sw => sw.id === occ.worker.id).",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "Bloberto ping reactions are generic corporate platitudes — no personality",
-      "description": "PING_REACTIONS['bloberto'] at Office.jsx lines 217-221: 5 entries that read like a bad LinkedIn post. Every other character has sharp, specific, funny reactions. Bloberto's read like a parody that is not self-aware enough to land. Suggested replacements: 'the metrics are vibing', 'i believe in your velocity', 'roadmap says yes', 'we are exactly on track (i made the chart)', 'synergy achieved'. Pure copy work — 30 minutes.",
-      "effort": "small",
-      "carry_over_strike": 2
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "isTouchDevice evaluated at module load time — won't reflect input changes",
-      "description": "App.jsx line 687: const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches is a module-level constant evaluated once on import. Does not respond to MediaQueryList change events. Stale on hybrid touch/mouse devices and prevents test environments from controlling it. Fix: move inside the App component body (or a useMemo), and optionally subscribe to the MediaQueryList 'change' event.",
-      "effort": "small",
-      "carry_over_strike": 1
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "NEW: Office.jsx line 1595 re-derives coffeeWorkers inline instead of using memoized variable",
-      "description": "Office.jsx line 1595: idleWorkers.filter(w => !meetingWorkers.includes(w)) is computed inline in JSX on every render. This is logically identical to the already-memoized coffeeWorkers variable (line 1225: idleWorkers.filter(w => !meetingWorkerIds.has(w.id))). The inline version also uses Array.prototype.includes (O(n) per element) while coffeeWorkers uses the Set-based meetingWorkerIds.has (O(1)). Fix: replace the inline filter expression with coffeeWorkers. One word change eliminates the redundancy and the per-render allocation.",
-      "effort": "small",
-      "carry_over_strike": 0
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "idleWorkers filter has redundant !workingIds.has(w.id) guard",
-      "description": "Office.jsx line 1222: nonMgr.filter(w => w.status === 'idle' && !workingIds.has(w.id)). workingIds only contains workers with status 'working'. A worker with status 'idle' cannot also be in workingIds — status is mutually exclusive. The guard always evaluates true for idle workers. Remove it. If data integrity is a genuine concern, add validation at the normalization layer in syncFromGitHub instead.",
-      "effort": "small",
-      "carry_over_strike": 2
+      "title": "Conference table 'last huddle' text at 0.38rem is unreadable",
+      "description": "Office.jsx line 1002: fontSize 0.38rem ≈ 5px. Below legibility threshold. Has been this way since QA77. Bump to 0.65rem or hide behind tooltip.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "accessibility",
-      "title": "NEW: Ghost character OOO bubble has no accessible text — invisible to screen readers",
-      "description": "Office.jsx line 787: the ghost-ooo-bubble div contains OOO status, role, and last-seen time. Ghost Characters (variant === 'ghost') explicitly skip the data-tooltip (line 745: variant !== 'ghost' guard). Ghost characters also have onClick={undefined} so they have no role='button' and no tabIndex=0 — not keyboard-focusable at all. A screen reader user has no way to know who is OOO or when they were last seen. Fix: add aria-label to the ghost Character wrapper div, or ensure the OOO bubble content is announced via aria-live or an accessible tooltip that works without hover.",
-      "effort": "small",
-      "carry_over_strike": 0
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "ActivityLogEntry key uses string concatenation without separators — collision risk",
-      "description": "App.jsx line 151: key={entry.timestamp + entry.worker + i}. Three issues: (1) string concatenation without separators — different combinations could theoretically produce identical keys. (2) index i as fallback re-introduces index-as-key fragility. (3) ISO timestamp strings mixed with arbitrary strings. Fix: key={`${entry.timestamp}::${entry.worker ?? ''}::${entry.type}::${i}`} with explicit separators, or assign stable unique IDs to activity entries at the data source.",
-      "effort": "small",
-      "carry_over_strike": 2
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "lone-survivor-label uses all-inline styles — CSS class present but empty",
-      "description": "Office.jsx line 1588: the lone-survivor-label div has a className but 9 inline style properties (fontSize, opacity, position, bottom, left, transform, whiteSpace, color, etc). The className 'lone-survivor-label' contains none of these styles in Office.css. Inconsistent with the rest of the codebase. Same inline-style creep pattern as plantToast (Office.jsx:1334) and conference table lastHuddle text. Fix: move all properties into .lone-survivor-label in Office.css.",
-      "effort": "small",
-      "carry_over_strike": 1
-    },
-    {
-      "priority": "low",
-      "category": "feature",
-      "title": "No way to manually reset vibe streak — users stuck with stale persisted values",
-      "description": "The vibe streak counter (App.jsx lines 1060-1066) only increments automatically or breaks on vibe change. No user-facing reset affordance. If localStorage has a stale streak from a previous session, there is no escape hatch. Suggestion: long-press or double-click the streak badge triggers a confirmation reset. Low effort, high satisfaction for streak power users.",
-      "effort": "small",
-      "carry_over_strike": 2
-    },
-    {
-      "priority": "low",
-      "category": "accessibility",
-      "title": "Vibe sparkline legend pills use array index as React key — wrong pill animates on update",
-      "description": "App.jsx line 438: sparkline-legend__pill elements keyed by index i. The sparkline shows the last 3 vibes. When history shifts (new vibe added), React uses index-based reconciliation: wrong pills animate or no animation fires. Each history entry has a unique ts (Date.now() at insert, App.jsx line 1100). Fix: key={h.ts}.",
-      "effort": "small",
-      "carry_over_strike": 2
+      "title": "vibeCaption aria-live region mounts with content — screen readers may miss it",
+      "description": "Office.jsx line 1524: conditionally rendered div with aria-live='polite'. ARIA spec says live regions should be present before content injection. Keep empty container always mounted.",
+      "effort": "small"
     }
-  ]
+  ],
+  "summary": "QA80: Zero QA79 issues have been fixed. 9 carry-overs, 5 of which are on strike 5+. The handleCharClick useCallback gap alone causes every character to re-render on every poll — this is the single biggest performance issue in the app. Score dropped 0.2 to 6.9. Three HIGH items are all small-effort fixes that would meaningfully improve performance and UX."
 }
