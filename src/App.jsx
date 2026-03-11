@@ -9,11 +9,14 @@ import { safeSave, safeRead } from './utils/safeSave.js'
 class ErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { hasError: false } }
   static getDerivedStateFromError() { return { hasError: true } }
+  componentDidCatch(error, info) { console.error('[Bloberto ErrorBoundary]', error, info) }
+  resetError = () => this.setState({ hasError: false })
   render() {
     if (this.state.hasError) {
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontSize: '1.1rem', color: '#f87171' }}>
           Something went wrong — refresh the page
+          <button onClick={this.resetError} style={{ marginLeft: '1rem', cursor: 'pointer' }}>Retry</button>
         </div>
       )
     }
@@ -708,6 +711,8 @@ export default function App() {
     const h = window.location.hash.slice(1)
     return h === 'dashboard' || h === 'office' ? h : 'office'
   })
+  const tabRef = useRef(tab)
+  useEffect(() => { tabRef.current = tab }, [tab])
 
   const lastActivity = useRef(Date.now())
   const previousVibeKeyRef = useRef(null)
@@ -796,7 +801,7 @@ export default function App() {
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   const handleTabKeyDown = useCallback((e) => {
-    const currentIdx = TABS.indexOf(tab)
+    const currentIdx = TABS.indexOf(tabRef.current)
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault()
       const next = TABS[(currentIdx + 1) % TABS.length]
@@ -808,7 +813,7 @@ export default function App() {
       setTab(prev)
       history.replaceState(null, '', '#' + prev)
     }
-  }, [tab])
+  }, [])
 
   const handleWorkerClick = useCallback((worker) => {
     setTab('dashboard')
@@ -1381,7 +1386,19 @@ export default function App() {
                 })()}
               </span>
             </div>
-            <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log by type">
+            <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log by type"
+              onKeyDown={(e) => {
+                const keys = ['all', 'hires', 'completions', 'errors', 'system']
+                const idx = keys.indexOf(activityFilter)
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault()
+                  setActivityFilter(keys[(idx + 1) % keys.length])
+                } else if (e.key === 'ArrowLeft') {
+                  e.preventDefault()
+                  setActivityFilter(keys[(idx - 1 + keys.length) % keys.length])
+                }
+              }}
+            >
               {[
                 { key: 'all', label: 'All' },
                 { key: 'hires', label: '🟢 Hires' },
@@ -1395,17 +1412,32 @@ export default function App() {
                   className={activityFilter === key ? 'active' : ''}
                   onClick={() => setActivityFilter(key)}
                   aria-checked={activityFilter === key}
+                  tabIndex={activityFilter === key ? 0 : -1}
                 >
                   {label}
                 </button>
               ))}
             </div>
-            <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log by worker">
+            <div className="activity-filter-bar" role="radiogroup" aria-label="Filter activity log by worker"
+              onKeyDown={(e) => {
+                const workerList = roster.length > 0 ? roster : allWorkers
+                const keys = [null, ...workerList.map(m => m.name)]
+                const idx = keys.indexOf(workerFilter)
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault()
+                  setWorkerFilter(keys[(idx + 1) % keys.length])
+                } else if (e.key === 'ArrowLeft') {
+                  e.preventDefault()
+                  setWorkerFilter(keys[(idx - 1 + keys.length) % keys.length])
+                }
+              }}
+            >
               <button
                 role="radio"
                 className={workerFilter === null ? 'active' : ''}
                 onClick={() => setWorkerFilter(null)}
                 aria-checked={workerFilter === null}
+                tabIndex={workerFilter === null ? 0 : -1}
               >
                 All Workers
               </button>
@@ -1416,6 +1448,7 @@ export default function App() {
                   className={workerFilter === member.name ? 'active' : ''}
                   onClick={() => setWorkerFilter(workerFilter === member.name ? null : member.name)}
                   aria-checked={workerFilter === member.name}
+                  tabIndex={workerFilter === member.name ? 0 : -1}
                 >
                   {member.emoji ?? ROLE_EMOJIS[member.role] ?? '🤖'} {member.name}
                 </button>
