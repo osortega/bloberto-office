@@ -11,18 +11,18 @@
     {
       "id": "carlos",
       "role": "Backend Engineer",
-      "status": "idle",
-      "task": "Luna review #94 fixes — 6 bugs fixed",
-      "started_at": "2026-03-11T09:00:00Z",
-      "finished_at": "2026-03-11T09:05:00Z"
+      "status": "working",
+      "task": "QA #110 fixes — dead citizen leak, setSpeed debounce, double-render bug",
+      "started_at": "2026-03-11T21:00:00Z",
+      "finished_at": null
     },
     {
       "id": "maya",
       "role": "Frontend Engineer",
-      "status": "idle",
-      "task": "Luna #97 fixes — 3 items shipped",
-      "started_at": "2026-03-11T10:37:00Z",
-      "finished_at": "2026-03-11T10:42:00Z"
+      "status": "working",
+      "task": "QA #110 fixes — DOM perf, log filtering, a11y buttons/ARIA, step button, relationships",
+      "started_at": "2026-03-11T21:00:00Z",
+      "finished_at": null
     },
     {
       "id": "dave",
@@ -41,5 +41,5 @@
       "finished_at": "2026-03-11T20:57:00Z"
     }
   ],
-  "updated_at": "2026-03-11T20:57:00Z"
+  "updated_at": "2026-03-11T21:00:00Z"
 }
