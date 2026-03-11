@@ -1,38 +1,29 @@
 {
   "workers": [
     {
+      "id": "luna",
+      "role": "Creative Director",
+      "status": "working",
+      "task": "Creative review #93",
+      "started_at": "2026-03-11T07:00:00Z",
+      "finished_at": null
+    },
+    {
       "id": "carlos",
-      "name": "Carlos",
       "role": "Backend Engineer",
       "status": "idle",
-      "task": "Fix 2 HIGH from Sofia QA #83 \u2014 bare localStorage + handleTabKeyDown",
-      "progress": 100,
-      "started_at": "2026-03-11T05:26:00Z",
-      "updated_at": "2026-03-11T05:26:00Z",
-      "finished_at": "2026-03-11T06:30:00Z"
+      "task": null,
+      "started_at": "2026-03-11T04:30:00Z",
+      "finished_at": "2026-03-11T04:35:00Z"
     },
     {
-      "id": "sofia",
-      "name": "Sofia",
-      "role": "QA Analyst",
+      "id": "dave",
+      "role": "DevOps Engineer",
       "status": "idle",
-      "task": "QA review #85 complete \u2014 4.4/5, 2 MEDIUMs, 5 LOWs",
-      "progress": 100,
-      "started_at": "2026-03-11T06:45:00Z",
-      "updated_at": "2026-03-11T06:55:00Z",
-      "finished_at": "2026-03-11T06:55:00Z"
-    },
-    {
-      "id": "maya",
-      "name": "Maya",
-      "role": "Frontend Engineer",
-      "status": "idle",
-      "task": "Fixed ErrorBoundary, handleTabKeyDown stale closure, ARIA radiogroup nav",
-      "progress": 100,
-      "started_at": "2026-03-11T06:32:00Z",
-      "updated_at": "2026-03-11T06:32:00Z",
-      "finished_at": "2026-03-11T06:34:00Z"
+      "task": null,
+      "started_at": "2026-03-11T04:30:00Z",
+      "finished_at": "2026-03-11T04:35:00Z"
     }
   ],
-  "updated_at": "2026-03-11T06:55:00Z"
+  "updated_at": "2026-03-11T07:00:00Z"
 }
