@@ -1,6 +1,18 @@
 {
-  "last_updated": "2026-03-09T05:10:00Z",
+  "last_updated": "2026-03-11T05:30:00Z",
   "recent_activity": [
+    {
+      "timestamp": "2026-03-11T05:30:00Z",
+      "worker": "luna",
+      "action": "Creative review #91 complete \u2014 10 ideas filed",
+      "type": "review"
+    },
+    {
+      "timestamp": "2026-03-11T05:30:00Z",
+      "worker": "bloberto",
+      "action": "Implemented 8 fixes from Luna review #91",
+      "type": "ship"
+    },
     {
       "timestamp": "2026-03-08T18:00:00Z",
       "type": "creative-review",
