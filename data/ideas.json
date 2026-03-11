@@ -1,72 +1,64 @@
 {
   "creative_director": "Luna",
   "review_number": 102,
-  "timestamp": "2026-03-11T13:46:00Z",
-  "theme": "Review #102 — The dashboard watches the team, but the team should feel watched back. This review is about making every status change a moment, not a state flip.",
+  "timestamp": "2026-03-11T13:41:00Z",
+  "theme": "The office is alive — but it doesn’t know it yet. This review closes the gap between what the data knows and what the eye can feel.",
   "ideas": [
-    {
-      "priority": "must",
-      "category": "delight",
-      "title": "Monitor Boot Sequence on Status Wake-Up",
-      "description": "When a worker transitions from idle (screensaver) to working, the monitor switches instantly — no drama. Add a 400ms boot animation: a quick flash, a cursor blink, then a progress bar before the working SVG loads in. DESK_SCREENSAVER_SVG → DESK_SCREEN_SVG already swaps on status change, so the hook is right there. The boot moment gives viewers a satisfying 'they're back' beat and makes status changes feel physical, not boolean.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "must",
-      "category": "storytelling",
-      "title": "Error Postmortem Card on Recovery",
-      "description": "When a worker flips from error → working, nothing marks the moment except a status label change. Float a tiny 'incident resolved' card up from their desk with a timestamp and a one-liner in their voice — Carlos: 'root cause: the logs lied', Dave: 'pipeline green. do not ask what I did', Sofia: 'test added. you are welcome.' The PING_REACTIONS already establish each worker's voice. Turning error recovery into a narrative closure makes the on-fire → flow transition emotionally satisfying instead of invisible.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
     {
       "priority": "should",
       "category": "visual",
-      "title": "After-Hours Office Deepens into Night",
-      "description": "The WindowElement already swaps to a night-sky gradient at after-hours, but the office floor looks identical day and night. When vibe hits after-hours, shift the whole interior: darken floor tiles, warm desk lamps to amber, turn ambient-particle color to moonlight-blue, add faint star-dots to the ceiling area via a CSS layer. The data-vibe attribute is already on .office-floor — it's a pure CSS addition. The office should LOOK like night, not just be labeled it.",
-      "effort": "medium",
+      "title": "Task-Reactive Monitor Glow",
+      "description": "Every desk monitor is beautiful SVG art — Carlos's blue code lines, Maya's purple wireframes, Sofia's green bars, Dave's orange terminal, Luna's color palettes — but they all look identical regardless of what the worker is actually doing. The task tag system already classifies every active task (Bug, Ship, Design, QA, Refactor). Bridge that data to a CSS box-shadow or ring on the monitor: bug tasks glow red, design pulses purple, ship burns orange, QA flickers diagnostic blue. Zero SVG changes required — just a data attribute on the desk monitor div driven by the worker's resolved tag. WHY: the monitors tell you who someone is; they should also tell you what they're doing.",
+      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "office-life",
-      "title": "Animated Vacancy Job Board on Empty Desks",
-      "description": "VACANT_ADS already define a title + req per vibe, but they render as static text on the monitor. Make the empty desk monitor cycle through animated slides: a scrolling marquee for slow-day, urgent red blinker for on-fire, a minimal centered haiku for after-hours. The DESK_SCREEN_SVG infrastructure already exists per worker — a 'vacant' SVG variant driven by vibeKey would drop right in. Empty desks are real estate; they should tell a story instead of sitting blank.",
+      "category": "storytelling",
+      "title": "Trophy Shelf on Worker Desks",
+      "description": "Task completions fire confetti on the dashboard but leave zero persistent trace on the office floor. The justCompleted state on the Character component already fires a brief flash and vanishes. Extend it: each completion drops a tiny trophy SVG onto the worker's desk surface that persists for the session (max 5 visible, then an xN counter). At a glance you see Sofia has 4 and Maya has 1. The office floor accumulates evidence of the day's work. WHY: productivity should leave marks. The floor should tell the story of the sprint without a single number.",
       "effort": "small",
-      "assigned_to": "dave"
+      "assigned_to": "sofia"
     },
     {
       "priority": "should",
-      "category": "team",
-      "title": "Co-Ship Spark Line Between Desks",
-      "description": "When two workers complete tasks within 60 seconds of each other, briefly draw a glowing animated line between their desk positions (using DESKS coordinate data already in constants.js). Color it per the slower worker's role color from ROLE_COLORS. No new data needed — just watch the activityEntries stream for back-to-back 'complete' events. Turns invisible collaboration into a visible spatial moment. The office floor becomes a social graph, if only for a second.",
-      "effort": "medium",
-      "assigned_to": "carlos"
+      "category": "storytelling",
+      "title": "Whiteboard Quote Pins from Bloberto",
+      "description": "Bloberto's speech bubbles are the most-loved feature — 'Can we circle back on that PR?', 'This could have been a commit message.', 'Night crew came to work. Respect.' — and they already have a copy-to-clipboard button. But they vanish after 4 seconds. The whiteboard behind Bloberto's HQ currently shows only 5 static vibe labels (SHIP IT etc.) and is otherwise dead space. Add a pin button alongside the existing copy button. Pinned quotes appear as tiny sticky-note SVGs on the whiteboard, stacking across the session. WHY: the best quotes deserve a home, and the whiteboard is the only surface in the office with room to hold them.",
+      "effort": "small",
+      "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "delight",
-      "title": "Bloberto Reacts to Task Completions",
-      "description": "VIBE_QUOTES exists and fires on a 45-second ambient loop, but Bloberto never reacts to real events. When a worker completes a task, trigger a 3-second speech bubble on Bloberto with a vibe-matched quote from the existing pool — plus add a small set of completion-specific lines ('That one's going in the retro as a win.', 'Per my roadmap, this was expected.'). Right now Bloberto is passive furniture. He should feel like a manager who notices things, even if he takes credit for them.",
-      "effort": "small",
+      "category": "visual",
+      "title": "Animated Skylight Panel",
+      "description": "The office has a rectangular panel on the far right that already reacts to vibe — orange gradient labeled SUNRISE for crushing, warm amber for in-flow, purple labeled DUSK for after-hours. It's one of the most visually distinctive set pieces. But it's a static colored rectangle. Make it CSS-animated: drifting cloud shapes for in-flow, diagonal rain streaks for slow-day, rising ember sparks for on-fire, pulsing star-dots for after-hours, a climbing sun arc for crushing. The skylight becomes a second atmospheric vibe layer you feel without reading — the way a real window tells you the weather before you check your phone. WHY: the office has ambient floor particles; it deserves ambient sky too.",
+      "effort": "medium",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
       "category": "feature",
-      "title": "Luna's Ideas Panel in the Header",
-      "description": "ideas.json is already fetched (fetchIdeasFromGitHub is wired up) and used only for the review milestone confetti. Surface the review theme and top 2-3 ideas in an expandable tooltip or slide-in panel triggered by a 🌙 badge in the header when a fresh review drops. Users watching the dashboard would see the creative direction of the product they're watching. Meta, yes. But it closes a beautiful loop: the dashboard narrates its own evolution in real time.",
+      "title": "Expandable Vibe Timeline in Stats Bar",
+      "description": "The Team Vibe stat card holds a 64px sparkline — criminally small for the story it contains. The data is all there: every vibe transition with timestamps in vibeHistory (max 12 entries), VIBE_COLORS maps each key to a distinct color. Clicking the Team Vibe card should expand it inline to a full-width labeled timeline strip: colored vibe pills with timestamps — 'In Flow 9:02am → On Fire 2:14pm → Crushing It 4:30pm'. The full arc of the team's day, finally legible. Collapse on second click. WHY: vibeHistory is the most narrative-rich data in the entire app and a 64px polyline doesn't do it justice.",
       "effort": "medium",
       "assigned_to": "carlos"
     },
     {
-      "priority": "wild",
-      "category": "storytelling",
-      "title": "Lone Survivor Shadow Mode",
-      "description": "LONE_SURVIVOR_LABELS already write evocative flavor text when one worker remains (e.g. '🌙 last one standing'). But the character looks exactly the same as when the office is full. When a worker is the lone active presence, render them with a longer CSS drop-shadow, a slightly dimmer ambient particle field, and — if after-hours — a faint echo of their character silhouette offset by 2px behind them. The drama the copy promises should exist in the visual. Right now the text outperforms the scene.",
+      "priority": "could",
+      "category": "office-life",
+      "title": "Crisis Office Mode on Multi-Worker Error",
+      "description": "Individual worker errors trigger PANIC screens on desk monitors. But when two or more workers hit error simultaneously, the office doesn't collectively respond — the border stays teal, the floor is calm, Bloberto sits in his HQ. Flip the whole canvas: the outer office border pulses red, Bloberto's typing indicator fires rapidly, ambient floor particles shift to agitated warm-red, and a DEFCON-2 speech bubble triggers instead of the normal 45-second rotation. This is the 'all hands' feeling the on-fire vibe promises but never fully delivers in the Office view. WHY: multi-worker crisis deserves office-wide drama, not just individual monitor-level drama.",
       "effort": "medium",
-      "assigned_to": "maya"
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "wild",
+      "category": "delight",
+      "title": "Coffee Run Animation on Idle to Working Transition",
+      "description": "The COFFEE station ('COFFEE TRIPLE SHOT' on crushing vibe) is pure set dressing — nobody ever actually walks to it. When a worker transitions from idle to working, play a 3-second theater beat: the character walks from wherever they're wandering to the coffee machine, a steam puff SVG appears above it, then they walk to their desk and sit. The machine increments a session counter: coffee x7 today. The idle-to-working transition is the most emotionally resonant event in the whole office — someone showing up to do work. It deserves a ceremony, not an instant teleport. WHY: this is the kind of tiny theatrical moment that makes people show the app to their colleagues.",
+      "effort": "medium",
+      "assigned_to": "dave"
     }
   ],
   "hire_proposals": []
