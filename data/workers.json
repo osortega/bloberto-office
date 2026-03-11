@@ -11,18 +11,18 @@
     {
       "id": "carlos",
       "role": "Backend Engineer",
-      "status": "working",
-      "task": "QA #110 fixes — dead citizen leak, setSpeed debounce, double-render bug",
+      "status": "idle",
+      "task": "QA #110 fixes — container exited without completing",
       "started_at": "2026-03-11T21:00:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T21:15:00Z"
     },
     {
       "id": "maya",
       "role": "Frontend Engineer",
-      "status": "working",
-      "task": "QA #110 fixes — DOM perf, log filtering, a11y buttons/ARIA, step button, relationships",
+      "status": "idle",
+      "task": "QA #110 fixes — container exited without completing",
       "started_at": "2026-03-11T21:00:00Z",
-      "finished_at": null
+      "finished_at": "2026-03-11T21:15:00Z"
     },
     {
       "id": "dave",
@@ -35,11 +35,11 @@
     {
       "id": "sofia",
       "role": "QA & Product Analyst",
-      "status": "idle",
-      "task": "QA review #110 — Emergent World sim analysis (3.1/5, 20 suggestions)",
-      "started_at": "2026-03-11T20:53:00Z",
-      "finished_at": "2026-03-11T20:57:00Z"
+      "status": "working",
+      "task": "QA review #111 — Emergent World sim analysis",
+      "started_at": "2026-03-11T21:15:00Z",
+      "finished_at": null
     }
   ],
-  "updated_at": "2026-03-11T21:00:00Z"
+  "updated_at": "2026-03-11T21:15:00Z"
 }
