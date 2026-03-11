@@ -825,6 +825,7 @@ export default function App() {
       const normalize = w => ({
         ...w,
         id: w.id || w.name?.toLowerCase().split(' ')[0],
+        name: w.name || (w.id ? w.id.charAt(0).toUpperCase() + w.id.slice(1) : 'Unknown'),
         startedAt: w.startedAt || w.started_at,
         progress: typeof w.progress === 'number' ? w.progress : 0
       })
@@ -1306,7 +1307,7 @@ export default function App() {
               )}
             </div>
 
-            {!isLoading && activeWorkers.length === 1 && Object.keys(fadingMap).length === 0 ? (
+            {!isLoading && activeWorkers.length === 1 && activeWorkers[0].status !== 'error' && Object.keys(fadingMap).length === 0 ? (
               <div className="workers-grid--solo">
                 <div className="workers-grid workers-grid--solo-card">
                   <WorkerCard

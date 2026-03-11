@@ -2,6 +2,7 @@
   "workers": [
     {
       "id": "luna",
+      "name": "Luna",
       "role": "Creative Director",
       "status": "working",
       "task": "Creative review #91",
