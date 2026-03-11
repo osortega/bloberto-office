@@ -1,11 +1,21 @@
 {
   "analyst": "Sofia",
-  "review_number": 82,
-  "timestamp": "2026-03-11T03:15:00Z",
+  "review_number": 83,
+  "timestamp": "2026-03-11T05:15:44Z",
   "screenshots": {
-    "desktop_office": "screenshot-sofia-desktop-81.png",
-    "mobile_office": "screenshot-sofia-mobile-81.png",
-    "desktop_dashboard": "screenshot-qa63-desktop-dashboard.png (reference — Puppeteer resource exhaustion prevented fresh capture)"
+    "note": "Puppeteer unavailable in this environment (dbus socket missing). Visual review conducted from #81 screenshots (screenshot-sofia-desktop-81.png / screenshot-sofia-mobile-81.png). No visual regressions detected in source code since #82.",
+    "desktop": "screenshot-sofia-desktop-81.png (reference)",
+    "mobile": "screenshot-sofia-mobile-81.png (reference)"
+  },
+  "carry_over_verification": {
+    "high_bare_localStorage_strike2": {
+      "status": "NOT FIXED — Strike 3",
+      "detail": "App.jsx lines 1071–1072 still call localStorage.getItem('bloberto-vibe-key') and localStorage.getItem('bloberto-vibe-streak') directly with no try/catch. safeSave/safeRead utilities were added and are now used for writes (lines 1076–1077) and for theme/shortcuts/sparkle reads throughout the file — that partial improvement is real and appreciated. But the two reads at the top of the vibe streak effect remain bare and will throw SecurityError in iOS private browsing, crashing the entire streak logic. Fix: replace lines 1071–1072 with safeRead()."
+    },
+    "high_handleTabKeyDown_not_useCallback_strike3": {
+      "status": "NOT FIXED — Strike 4",
+      "detail": "App.jsx line 798: `const handleTabKeyDown = (e) => {` — still a plain inline function. This is recreated on every render of App, causing both tab buttons to see a new onKeyDown reference every time any state changes anywhere in App, defeating React.memo on any component that might receive it and creating unnecessary re-renders. Fix: wrap in useCallback with deps [tab]."
+    }
   },
   "scores": {
     "visual": 5,
@@ -18,142 +28,62 @@
     "fun_factor": 5
   },
   "overall_score": 4.25,
-  "score_delta": -3.35,
-  "qa81_fixes_verification": {
-    "bare_localStorage_getItem": "NOT FIXED — lines 1064, 1065, 1102 still call localStorage.getItem directly. Strike 2.",
-    "handleTabKeyDown_useCallback": "NOT FIXED — line 791 still a plain arrow function. Strike 3 (same as last review's count).",
-    "notes": "Both high/medium items flagged in QA#81 remain unaddressed. This is becoming a reliability liability, especially the localStorage one."
-  },
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "Bare localStorage.getItem still crashing in private browsing — Strike 2",
-      "description": "App.jsx lines 1064-1065: `localStorage.getItem('bloberto-vibe-key')` and `localStorage.getItem('bloberto-vibe-streak')` are called bare inside a useEffect. Line 1102: `localStorage.getItem(VIBE_HISTORY_KEY)` is also bare (its surrounding try-catch only wraps the JSON.parse and setItem, not the getItem). In iOS Safari private browsing and certain enterprise/locked-down browsers, localStorage.getItem throws a SecurityError, crashing the vibe streak effect entirely. Fix all three: `safeRead('bloberto-vibe-key')`, `safeRead('bloberto-vibe-streak')`, `safeRead(VIBE_HISTORY_KEY)`. Also replace line 1106 `localStorage.setItem(VIBE_HISTORY_KEY, ...)` with `safeSave(VIBE_HISTORY_KEY, ...)` to be consistent with the established pattern. This was flagged HIGH in QA#81 and remains unresolved.",
-      "effort": "small",
-      "assignee": "Maya"
+      "title": "Bare localStorage.getItem in vibe streak effect — Strike 3",
+      "description": "App.jsx lines 1071–1072 call localStorage.getItem() with no try/catch wrapper. In iOS Safari private browsing, Firefox with strict privacy, and certain enterprise environments, this throws a SecurityError and the entire useEffect callback aborts — the streak is never computed, setVibeStreak is never called, and safeSave on lines 1076–1077 is never reached. The writes below are already using safeSave; the reads need the same treatment.\n\nFix (2 lines):\n  line 1071: const storedKey = safeRead('bloberto-vibe-key')\n  line 1072: const storedStreak = parseInt(safeRead('bloberto-vibe-streak') ?? '0', 10)\n\nNote: The vibe history block (lines 1108–1115) is protected by try/catch and therefore low severity despite using bare localStorage — it's inconsistent but safe. Still, for coherence it should be migrated to safeRead/safeSave too.",
+      "effort": "small"
     },
     {
       "priority": "high",
       "category": "code",
-      "title": "handleTabKeyDown not in useCallback — Strike 3",
-      "description": "App.jsx line 791: `handleTabKeyDown` is declared as a plain arrow function inside the App component body, closing over `tab` state. It is passed via `onKeyDown` to both tab buttons (lines 1270, 1283), causing both buttons to receive a new function reference on every render, defeating React.memo on those elements. Fix: `const handleTabKeyDown = useCallback((e) => { ... }, [tab, setTab])`. This was flagged in QA#79, QA#80, and QA#81. This is strike 3 — it is a simple two-line change.",
-      "effort": "small",
-      "assignee": "Maya"
+      "title": "handleTabKeyDown not in useCallback — Strike 4",
+      "description": "App.jsx line 798 declares handleTabKeyDown as a plain arrow function inside the App component body. It closes over `tab` and `setTab` but is re-created on every render — every single state change in App (polling updates every 30s, timer ticks every 60s, isSyncing, confetti, etc.) produces a new function reference. Both tab buttons receive it via onKeyDown, meaning those buttons see prop changes on every App render even if nothing else about them changed.\n\nFix:\n  const handleTabKeyDown = useCallback((e) => {\n    const currentIdx = TABS.indexOf(tab)\n    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {\n      e.preventDefault()\n      const next = TABS[(currentIdx + 1) % TABS.length]\n      setTab(next)\n      history.replaceState(null, '', '#' + next)\n    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {\n      e.preventDefault()\n      const prev = TABS[(currentIdx - 1 + TABS.length) % TABS.length]\n      setTab(prev)\n      history.replaceState(null, '', '#' + prev)\n    }\n  }, [tab])",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "WORKER_CONFETTI_PIECES is a dead duplicate of CONFETTI_PIECES",
-      "description": "App.jsx lines 35-43: `CONFETTI_PIECES` and `WORKER_CONFETTI_PIECES` are both `Array.from({ length: 30 }, (_, i) => <span key={i} className='confetti-piece' style={{ '--i': i }} />)` — byte-for-byte identical. They render into the same `.confetti-layer` div. There is zero runtime difference. Delete the `WORKER_CONFETTI_PIECES` declaration and replace its usage at line 1176 with `{CONFETTI_PIECES}`. If there is a future need for a visually distinct worker confetti type, differentiate it then.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "code",
-      "title": "Activity filter logic duplicated inline in JSX — extract to useMemo",
-      "description": "In the Dashboard tab panel, the activity filter predicate (hires/completions/errors/system + workerFilter) is written twice: once inside an IIFE in the event count `<span>` (lines 1366-1374) and again as the `entries` prop to `<ActivityLog>` (lines 1424-1432). Both chains are identical. If a new filter type is added, it must be updated in two places. Fix: derive `const filteredActivity = useMemo(() => activityLog.filter(...).filter(...), [activityLog, activityFilter, workerFilter])` and use it in both places. This also makes the IIFE in the count span unnecessary.",
-      "effort": "small",
-      "assignee": "Maya"
+      "category": "ux",
+      "title": "ShortcutToast has no dismiss button for touch/mouse users",
+      "description": "The ShortcutToast (App.jsx ~line 611) can only be dismissed by: pressing a shortcut key, waiting 7 seconds for auto-dismiss, or it hides itself if a shortcut is used. There is no tap/click dismiss for mobile users or mouse users who can't figure out what keyboard keys to press. On mobile, the toast sits at the bottom right and can obscure content with no way to close it quickly.\n\nFrom the #81 screenshot, the toast is visible over the office floor. On mobile it overlaps the conference table area.\n\nFix: Add a small × close button inside the toast div:\n  <button className='shortcut-toast__close' onClick={() => dismiss(false)} aria-label='Dismiss keyboard shortcuts hint'>×</button>\n\nAlso consider: the toast currently says '⌨️ Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear' but on touch devices where keyboard shortcuts are irrelevant, maybe suppress the toast entirely (check isTouchDevice).",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "vibe history localStorage.setItem not using safeSave — inconsistent safety",
-      "description": "App.jsx line 1106: `localStorage.setItem(VIBE_HISTORY_KEY, JSON.stringify(history))` is called directly inside a try-catch that wraps the whole block. While the try-catch does provide some protection, it is inconsistent with the `safeSave()` utility established everywhere else. More importantly, `localStorage.getItem(VIBE_HISTORY_KEY)` at line 1102 is outside the try-catch's protection in some edge cases. Replace with `safeSave(VIBE_HISTORY_KEY, JSON.stringify(history))` and `safeRead(VIBE_HISTORY_KEY)` for full consistency.",
-      "effort": "small",
-      "assignee": "Maya"
+      "title": "Bloberto speech bubble overlaps tab bar on mobile",
+      "description": "Visible in the #81 mobile screenshot: Bloberto's speech bubble ('Knew all along...') renders over the tab selector row, making the Dashboard tab button partially obscured. The speech bubble uses CSS positioning relative to the character inside the office floor, but the office floor sits below the tab bar — speech bubbles that pop upward can overlap the tab bar when they grow tall enough.\n\nFix: Add a max-height or overflow:hidden on the speech bubble, or clamp the top position so it can't escape the .office-floor bounds. Alternatively, give the tab bar a z-index higher than the office floor's speech bubbles:\n  .tab-toggle { position: relative; z-index: 10; }\n  .speech-bubble { max-bottom: calc(100% of office-floor); }",
+      "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "accessibility",
-      "title": "<span role='button'> and <div role='button'> used instead of native <button>",
-      "description": "StatsBar in App.jsx lines 497-507 and 538-551: the 'active stat dispatch' scroll shortcut and the 'stuck workers' card use `<span role='button'>` and `<div role='button'>` with manual tabIndex and onKeyDown handlers. Native `<button>` elements provide these behaviors for free, are focusable by default, submit-safe, visually distinct in forced-color/high-contrast mode, and are automatically announced by screen readers as interactive. Replace both with `<button>` (styled with `background:none; border:none; cursor:pointer; padding:0`) and drop the manual tabIndex/onKeyDown boilerplate.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "ux",
-      "title": "Mobile header wraps to 3 rows — eats ~30% of viewport height before content",
-      "description": "On 375px mobile (see screenshot-sofia-mobile-81.png), the header wraps into: row 1 (title + subtitle), row 2 (greeting badge + date + vibe streak pill), row 3 (sync button + paused pill + theme toggle). This consumes roughly 110-120px before the tab bar and any content. On a 812px viewport that's 15% overhead just for chrome. Suggestions: (1) Hide the greeting badge text on screens <480px, showing only the vibe pill. (2) Collapse the streak icon into the vibe pill on mobile. (3) Use `flex-wrap: nowrap` with `overflow: hidden` for the header-right row and move less critical items behind a hamburger/overflow menu.",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "title": "Cache-busting with Date.now() defeats all HTTP caching on every poll",
-      "description": "App.jsx lines 23 and 27 append `?t=Date.now()` to both the workers and activity API URLs on every fetch. Since the data lives on GitHub raw/CDN infrastructure, every 30-second poll fetches fully from origin with no benefit from browser or CDN cache. For a read-only dashboard, consider: (1) dropping the cache buster entirely and relying on the 30s poll interval — GitHub CDN max-age is short anyway, (2) or using `cache: 'no-cache'` in the fetch options (sends conditional If-None-Match) instead of timestamp busting, which allows the server to respond 304 Not Modified and save bandwidth when data hasn't changed.",
-      "effort": "small",
-      "assignee": "Carlos"
+      "category": "code",
+      "title": "Vibe history block inconsistently uses bare localStorage inside try/catch",
+      "description": "App.jsx lines 1108–1115: the vibe history block wraps raw localStorage.getItem / localStorage.setItem in a try/catch. The crash protection is there, which is why this is medium not high. However, the rest of the codebase now uses safeRead/safeSave uniformly, and this block is the only place that deviated from that pattern. It creates a confusing inconsistency when reading the code — a future developer might think the try/catch pattern is intentional and replicate it elsewhere.\n\nFix: Replace lines 1109 and 1113 with safeRead(VIBE_HISTORY_KEY) and safeSave(VIBE_HISTORY_KEY, JSON.stringify(history)) and remove the try/catch (safeSave/safeRead absorb the exception internally).",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Toast inline styles duplicated between App.jsx and Office.jsx",
-      "description": "The `completionToast` in App.jsx (lines ~1183-1202) and the `plantToast` in Office.jsx share nearly identical inline style objects: `position:'fixed'`, `bottom:'X rem'`, `left:'50%'`, `transform:'translateX(-50%)'`, `background:'var(--surface2)'`, `border-radius:'12px'`, `padding`, `fontSize`, `fontWeight`, `zIndex:9999`, `whiteSpace:'nowrap'`, `pointerEvents:'none'`, `animation:'badge-pop ...'`. Extract a shared `.toast-popup` CSS class to App.css and apply it. This reduces JSX noise, makes theming consistent, and means future toast variants only need the overrides.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Fixed shortcuts bar can obscure bottom content on small viewports",
-      "description": "The keyboard shortcuts bar (`Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear`) is position:fixed at the bottom with z-index ~999. On mobile or short viewports it overlaps the footer and the last 1-2 activity log entries. The main content area has no compensating padding-bottom. Fix: add `padding-bottom: 48px` to `.main` (or measure the bar height dynamically) so content is never hidden beneath it. Alternatively, fade the bar out after 5 seconds of inactivity and restore it on next keyboard interaction — it's a one-time educational element.",
-      "effort": "small",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "No 'Clear filters' affordance on Activity Log when filtered",
-      "description": "When a filter is active (type filter or worker filter), the only indication is a small '(filtered)' text in the section subtitle and the highlighted filter button. There is no prominent 'Clear' or 'Reset filters' control near the log itself. Users who scroll past the filter bar lose visual context that they're seeing a subset. Add a subtle 'Clear' chip/button adjacent to the section-header subtitle that appears only when `activityFilter !== 'all' || workerFilter !== null`, resetting both filters on click.",
-      "effort": "small",
-      "assignee": "Maya"
+      "title": "Dead comment: WORKER_CONFETTI_PIECES",
+      "description": "App.jsx around line 40: `// WORKER_CONFETTI_PIECES removed — worker confetti now uses CONFETTI_PIECES\\n// with worker color applied via CSS custom property on the container`\n\nThis is a migration-era comment that explains a change that already happened. The code it references no longer exists. It adds noise without adding value — it just explains a ghost.\n\nFix: Delete the 2-line comment.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "VIBE_HISTORY_KEY constant defined far from its only usage site",
-      "description": "App.jsx line 415: `const VIBE_HISTORY_KEY = 'bloberto-vibe-history'` is defined near the top of the file alongside VIBE_HISTORY_MAX, but its actual usage is hundreds of lines away in a useEffect. Minor: move it next to VIBE_HISTORY_MAX (or co-locate with the effect) to make the scope of these constants clear. Also consider moving VIBE_HISTORY_MAX there too.",
-      "effort": "small",
-      "assignee": "Maya"
+      "title": "handleCharClick useCallback deps include stable refs",
+      "description": "Office.jsx handleCharClick useCallback (around line 1279) declares deps: [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick]. setState setters (setPingedId, setPingReaction) are guaranteed stable by React and should not be in the dep array. Refs (pingTimerRef, pingReactionTimerRef) never change their identity. Including them is harmless but trips lint rules (react-hooks/exhaustive-deps can flag refs as over-specified) and is misleading about what actually gates a re-memoize.\n\nFix: Trim dep array to [onWorkerClick] — the only non-stable value.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "feature",
-      "title": "Vibe sparkline has no tooltip or legend for the data points",
-      "description": "The `<VibeSparkline>` in the Dashboard Team Vibe stat card shows a small SVG line chart of vibe history. The dots have no tooltip or aria-label explaining what they represent (which vibe state, when). Power users might appreciate hovering a dot and seeing 'In Flow · 2h ago'. For accessibility, the sparkline's `<svg>` should have a title or aria-label like 'Vibe history: last 10 vibe states'. Currently the entire stat card lacks a screen-reader description of what the sparkline encodes.",
-      "effort": "medium",
-      "assignee": "Maya"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "Office floor characters overlap on mobile — name labels collide",
-      "description": "On 375px viewport (see screenshot-sofia-mobile-81.png), the office floor characters are rendered at a reduced scale and the name labels (Luna, Sofia, Carlos, Maya, Dave) are close together with visible collision — especially the middle row. The `aspect-ratio: 4/3` floor shrinks proportionally but the text and label sizes don't scale down enough. Consider: (1) using `font-size: clamp(0.45rem, 1.5vw, 0.65rem)` for desk name labels, (2) or hiding the text labels below a viewport threshold and relying on the character avatar tooltip/aria-label instead.",
-      "effort": "medium",
-      "assignee": "Maya"
+      "category": "ux",
+      "title": "isTouchDevice computed once at module load — hybrid devices get wrong label",
+      "description": "App.jsx: `const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches` is evaluated once when the module is first imported. The polling-paused pill then shows 'Tap to refresh' vs 'Move mouse to refresh' based on this snapshot. On hybrid/convertible devices (Surface, iPad with keyboard, etc.) that switch input modes at runtime, the label will be stale if the user switches after page load.\n\nThis is low impact but easy to fix. Consider moving the detection inside the component as a `useMemo` or listening to the `change` event on the media query:\n  const isTouchDevice = useMemo(() => window.matchMedia('(pointer: coarse)').matches, [])\n\nOr for live updates: `window.matchMedia('(pointer: coarse)').addEventListener('change', handler)`",
+      "effort": "small"
     }
-  ],
-  "visual_notes": {
-    "office_desktop": "Stunning. The vibe-reactive purple grid border, ambient particles, per-worker SVG desk screens, and the 'Wait you shipped at THIS hour?! Legends 🏆' vibe transition toast all landed beautifully. The 'LEGEND 🔥' streak badge in the header is a great touch. The office metaphor is fully realized.",
-    "office_mobile": "Functional and charming at 375px. Characters are readable, the floor grid scales well. Header wrapping is the main pain point. The vibe caption toast shows correctly. Name label collision is noticeable but not breaking.",
-    "dashboard_reference": "Stats bar grid layout is clean and responsive. The vibe sparkline is a lovely detail. Worker cards in the 2-column layout look great. Activity log grouping (Just now / Earlier today) is clear and usable."
-  },
-  "what_is_working_great": [
-    "The Bloberto character with mood-reactive SVG faces is genuinely delightful and unique.",
-    "Vibe system — 5 states, streak tracking, transition quotes, sparkline history — is a cohesive, polished feature that ties the whole product together.",
-    "Accessibility fundamentals are strong: skip link, roving tabindex on tabs, progressbar ARIA, prefers-reduced-motion in Office.css, aria-live on toasts, sr-only class, aria-hidden on all decorative elements.",
-    "Module-level JSX arrays (AMBIENT_PARTICLES, CONFETTI_PIECES) correctly prevent re-creation on render.",
-    "safeSave/safeRead utility is clean, well-documented, and applied consistently — except for the three remaining bare localStorage calls.",
-    "The card flip animation for worker activity history is smooth and discoverable.",
-    "Keyboard shortcut system (1/2/R/Esc) with the hint bar is a power-user delight.",
-    "Polling pause on inactivity with clear resume affordance is excellent UX for a live dashboard.",
-    "Vacant desk job ads per vibe state are pure, unapologetic fun.",
-    "The ETA calculation on progress bars is thoughtful and genuinely useful."
-  ],
-  "overall_verdict": "Bloberto's Office is legitimately impressive — a read-only status dashboard that punches well above its weight in visual design, personality, and feature depth. The vibe system alone is something I haven't seen in any monitoring tool. The score drop from QA#81 (7.6 → 4.25) reflects the recalibration to a 1-5 scale, not a decline in quality. The app is in a good place. The recurring blockers — the three bare localStorage.getItem calls and the handleTabKeyDown non-useCallback — are tiny fixes that have now been flagged four reviews in a row. Maya, these are 15-minute fixes. Please just do them. Everything else is polish and refinement on top of a solid, well-loved foundation."
+  ]
 }

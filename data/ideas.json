@@ -1,145 +1,136 @@
 {
   "creative_director": "Luna",
-  "review_number": 90,
-  "timestamp": "2026-03-11T03:31:53Z",
+  "review_number": 91,
+  "timestamp": "2026-03-11T05:00:00Z",
   "screenshot_taken": false,
-  "screenshot_note": "Puppeteer launched but remote navigation timed out — code review only",
-  "theme": "Four items fixed, one partial fix regressed, six new findings — the office is tightening up",
+  "screenshot_note": "Container review",
+  "theme": "Reverse-and-slice bug silences recent events, ghost naming collision breeds future haunting, seven reviews deep on the tagline ceremony — the debt is starting to echo",
   "fixed_since_last_review": [
     {
-      "title": "lone-survivor-label raised from 0.45rem to 0.6rem — Fixed",
-      "was_flagged_in": [89],
-      "how_fixed": "Office.jsx:1586 — style now reads `fontSize: '0.6rem'`. Matches wb-task-count. Legibility restored."
+      "title": "Worker confetti color regression — Fixed",
+      "was_flagged_in": [90],
+      "how_fixed": "App.jsx:39-41 comment confirms WORKER_CONFETTI_PIECES removed. App.jsx:1182 — workerConfetti container div now carries `style={{ '--worker-color': workerConfetti.color }}`. Color identity for each worker's shipping moment is restored."
     },
     {
-      "title": "isMidnight is now a separate check, not an alias — Fixed",
-      "was_flagged_in": [89],
-      "how_fixed": "Office.jsx:874 — `const isMidnight = hour >= 0 && hour <= 4`. No longer equals isNight. The star field now only fires during true midnight hours, not the full 8PM–4AM window. Semantically correct."
+      "title": "Conference table last-huddle label at 0.38rem — Fixed",
+      "was_flagged_in": [90],
+      "how_fixed": "Office.jsx:1001 — `style={{ opacity: 0.65, fontSize: '0.6rem', ... }}`. Both the font-size floor and the opacity target from the review were applied exactly."
     },
     {
-      "title": "WORKER_CONFETTI_PIECES moved to module scope — Partially Fixed (see regression below)",
-      "was_flagged_in": [89],
-      "how_fixed": "App.jsx:39-41 — constant now at module scope. The repeated inline allocation is gone. However, the worker color customization was dropped in the process (see 'Worker confetti loses its colors' finding)."
+      "title": "isNight dead variable — Fixed",
+      "was_flagged_in": [90],
+      "how_fixed": "Office.jsx:873-876 — the `isNight` declaration is gone. WindowElement now uses only `isMidnight`, `isDaytime`, and `isGoldenHour`. One less landmine for future contributors."
     },
     {
-      "title": "WorkerCard redundant filter removed — Fixed",
-      "was_flagged_in": [89],
-      "how_fixed": "App.jsx:316 — `activityEntries.slice(-5).reverse()` with no preceding `.filter(e => e.worker === worker.name)`. The dead allocating filter is gone."
+      "title": "isStandup dead object-vs-string OR clause — Fixed",
+      "was_flagged_in": [90],
+      "how_fixed": "Office.jsx:1443 — `const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id)`. The dead `|| sw.id === occ.worker` clause that compared a string to an object is gone."
+    },
+    {
+      "title": "idleWorkers permanently-true filter — Fixed",
+      "was_flagged_in": [90],
+      "how_fixed": "Office.jsx:1218 — `nonMgr.filter(w => w.status === 'idle')`. The `!workingIds.has(w.id)` guard that was always true for idle workers has been removed. Intent is now unmistakable."
+    },
+    {
+      "title": "Activity log filter logic duplicated in two places — Fixed",
+      "was_flagged_in": [90],
+      "how_fixed": "App.jsx:753-759 — `filteredActivityEntries` useMemo is the single source of truth. It feeds both the count label (line 1376) and the ActivityLog entries prop (line 1424). No drift possible."
+    },
+    {
+      "title": "WORKER_CONFETTI_PIECES identical to CONFETTI_PIECES — Fixed",
+      "was_flagged_in": [90],
+      "how_fixed": "App.jsx:39-41 — WORKER_CONFETTI_PIECES removed. Worker confetti now reuses CONFETTI_PIECES directly (App.jsx:1182-1184) with the worker color applied via CSS custom property on the container div. Dead inventory eliminated."
     }
   ],
   "ideas": [
     {
       "priority": "must",
       "category": "bug",
-      "title": "Worker Confetti Lost Its Colors in the Module-Scope Fix",
-      "description": "App.jsx:39-41 and 1174-1178 — WORKER_CONFETTI_PIECES was correctly moved to module scope to fix the per-render allocation, but the worker color personalization was silently dropped. The old inline version applied `style={{ '--i': i, ...(i < 18 ? { background: workerConfetti.color } : {}) }}`. The new module-scope version only sets `'--i'`. The parent `.confetti-layer` div (line 1175) has no `style={{ '--worker-color': workerConfetti.color }}`, and there is no CSS rule for `--worker-color` in App.css. Result: worker confetti now looks identical to vibe confetti — every worker ships with the same generic purple/green/amber pieces regardless of role color. This is a regression: Maya's shipping was once recognizable by purple pieces; Carlos's by teal. Fix option A (simplest): on the `confetti-layer` div, add `style={{ '--worker-color': workerConfetti?.color }}`, then in CSS add `.confetti-layer .confetti-piece:nth-child(-n+18) { background: var(--worker-color, var(--accent)); }`. Fix option B (clean): re-inline only the color override. WHY: the personalization is what makes the worker confetti emotionally distinct from the vibe burst. Without it, the feature loses half its meaning and WORKER_CONFETTI_PIECES is just a renamed clone of CONFETTI_PIECES.",
+      "title": "ActivityLog `reverse().slice(20)` Shows the 20 Oldest Events, Not the 20 Newest",
+      "description": "App.jsx:137 inside ActivityLog — `const displayed = [...entries].reverse().slice(0, 20)`. The `entries` prop is `filteredActivityEntries` which inherits the order of `activityLog`. The log is newest-first: synthetic vibe entries are always prepended (`[newEntry, ...prev].slice(0, 50)` at App.jsx:1098-1104), so `activityLog[0]` is always the most recent event. Reversing gives oldest-first (50 entries), then `slice(0, 20)` takes entries 31-50 in original ordering — the 20 OLDEST entries. The dashboard header says `'Latest ${DISPLAY_CAP} of ${N} events'` (App.jsx:1377), but when N > 20, the log shows the 20 stalest events. Users see yesterday's hires and not today's errors. Fix: swap the order — `entries.slice(0, 20).reverse()`. This takes the 20 most recent entries first, then reverses them to display oldest-of-those-20 first, preserving the chronological grouping ('Just now' → 'Earlier today' → 'Yesterday') that the ActivityLog component expects. WHY: this is a correctness bug that silently hides recent activity behind a label that promises the opposite. When the log is full (common during active shifts), users see a feed that looks populated but contains no data from the last 30+ minutes.",
       "effort": "small",
-      "assigned_to": "dave"
+      "assigned_to": "sofia"
     },
     {
       "priority": "must",
       "category": "visual",
-      "title": "Conference Table Last-Huddle Label at 0.38rem — Sub-pixel Legibility",
-      "description": "Office.jsx:1002 — `style={{ opacity: 0.5, fontSize: '0.38rem', textAlign: 'center', marginTop: '2px' }}`. At 0.38rem ≈ 6px, this is below the 0.6rem floor we've established across two previous reviews. This label shows the last-huddle summary ('Last: Sofia & Maya · 3m ago') when the conference table is idle. At 6px with 50% opacity it is not legible to any human without a microscope. Fix: raise to `0.6rem` and increase opacity to 0.65. WHY: the last-huddle label is a storytelling moment — it says 'the team just met, something happened'. At 6px it contributes nothing and reads as a broken UI artifact.",
+      "title": "Ghost (Stale) Desk Gets `desk--active` Class and Lit Lamp Simultaneously with `desk--ghost`",
+      "description": "Office.jsx:1447 and 1457 — When `isGhostDesk` is true (working worker, `updated_at` > 15 minutes ago), two conflicting visual states are applied at once. Line 1447: `${isWorking && !isStandup ? ' desk--active' : ''}${isGhostDesk ? ' desk--ghost' : ''}` — since `isGhostDesk` requires `isWorking === true`, both `desk--active` and `desk--ghost` are present in the className for any non-standup stale desk. Line 1457: `desk-lamp${isWorking ? ' desk-lamp--working' : ...}` — the lamp still glows with full role color when `isGhostDesk` is true. The intent of the ghost desk visual (dim, haunted, clearly 'something's off') directly contradicts the active desk visual (lit lamp, glowing border, role color). The two CSS classes fight each other and the result depends on specificity order. Fix: exclude `desk--active` and `desk-lamp--working` when `isGhostDesk` is true: `${isWorking && !isStandup && !isGhostDesk ? ' desk--active' : ''}` at line 1447; `isWorking && !isGhostDesk ? ' desk-lamp--working'` at line 1457. WHY: the ghost desk tier ('fresh' / 'stale' / 'abandoned') is meant to communicate 'this worker may have stepped away from keyboard'. A fully lit, role-colored, actively-glowing desk undermines that story completely.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "dave"
     },
     {
       "priority": "should",
       "category": "bug",
-      "title": "isNight Is Declared But Never Used — Dead Variable",
-      "description": "Office.jsx:873 — `const isNight = (hour >= 0 && hour <= 4) || hour >= 20`. The isMidnight fix in review #89 correctly separated isMidnight to `hour >= 0 && hour <= 4`. But isNight itself is never referenced in the JSX or logic — isMidnight (883), isDaytime (875), and isGoldenHour (876) are the only downstream usages. isNight is dead. Fix: delete the isNight declaration. If a full-night concept is ever needed (8PM–4AM), it lives in one place with a clear name. WHY: dead variables are landmines for future contributors who see `isNight` and assume it affects rendering — then spend time tracing it to nothing. The fix is one deleted line.",
-      "effort": "small",
-      "assigned_to": "carlos"
-    },
-    {
-      "priority": "should",
-      "category": "bug",
-      "title": "isStandup Has a Dead Object-vs-String OR Clause",
-      "description": "Office.jsx:1444 — `const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id || sw.id === occ.worker)`. The `|| sw.id === occ.worker` compares `sw.id` (a string like 'carlos') to `occ.worker` (a full worker object) — this is always false. The clause is dead code that never contributes to the result. It looks like the correct condition (`sw.id === occ.worker.id`) was accidentally duplicated with `.id` dropped from the right side. Fix: remove the dead clause — `standupWorkers.some(sw => sw.id === occ.worker.id)`. WHY: the existing `standupWorkers.includes(occ.worker)` at line 1572 already handles standup filtering by reference equality (which works because the same object references are preserved through the memoized arrays). Having a broken `.some()` check here that silently always returns the same result as the first condition is a correctness risk if the object references ever change.",
+      "title": "`isGhostDesk` and `occ.ghost` — Two Unrelated 'Ghost' Concepts Sharing a Word",
+      "description": "Office.jsx:1423-1447 — Two completely different concepts both use the word 'ghost': (1) `occ.ghost` (line 1314-1322) means the worker is a roster-only OOO member — they're not active at all, just a placeholder at a dark desk. (2) `isGhostDesk` (line 1429) means the worker IS working (`status === 'working'`), but their `updated_at` is more than 15 minutes stale — they're online but possibly AFK. These are not related. `isGhostDesk` is never true when `occ.ghost` is true (because `isGhostDesk` requires `isWorking`, which requires `!occ.ghost`). But a new contributor reading `isGhostDesk ? ' desk--ghost'` at line 1447 will naturally pattern-match on `occ.ghost` and assume the condition fires for OOO workers. It does not. This is a trap. Fix: rename `isGhostDesk` → `isStaleWorking` (or `isStaleDeskWorker`), rename the CSS class applied from `desk--ghost` to `desk--stale` (for the stale-working case), and keep `occ.ghost` for OOO. The two concepts live 8 lines apart and will only get more confusing as the desk rendering grows. WHY: naming is documentation. When two variables share a root word, readers assume they're related.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
-      "category": "bug",
-      "title": "idleWorkers Has a Permanently-True Filter Condition",
-      "description": "Office.jsx:1219 — `const idleWorkers = useMemo(() => nonMgr.filter(w => w.status === 'idle' && !workingIds.has(w.id)), ...)`. `workingIds` is built from workers whose `status === 'working'`. A worker with `status === 'idle'` can never appear in `workingIds`. The `!workingIds.has(w.id)` guard is always `true` for every idle worker and allocates a Set lookup that never changes the result. Fix: simplify to `nonMgr.filter(w => w.status === 'idle')`. WHY: the redundant condition implies to future readers that a worker can somehow be both idle and working simultaneously — which would be a data integrity bug. Removing it makes the intent clear: idle workers are workers with status idle, full stop. Correctness by clarity.",
+      "category": "perf",
+      "title": "Ghost Desk `diffMs` Recomputed Three Times in the Same Render Tick",
+      "description": "Office.jsx:1430, 1432, 1439 — `Date.now() - new Date(occ.worker.updated_at).getTime()` is evaluated three separate times for the same desk occupant in the same DESKS.map() iteration: once inline at line 1430 as part of `isGhostDesk`, once inside the IIFE at line 1432 (stored as `diff`), and once at line 1439 (stored as `diffMs`). Each call allocates a new `Date` object and invokes `Date.now()`. The three values will differ by microseconds (harmless), but the code is 13 lines that could be 5. The separate variable names `diff` and `diffMs` for the same computation reinforce the confusion. Fix: move the common computation before all three uses: `const ghostDiffMs = occ && occ.ghost === false && occ.worker.updated_at ? Date.now() - new Date(occ.worker.updated_at).getTime() : 0`, then replace all three inline computations with `ghostDiffMs`. WHY: three copies of the same computation is a classic maintainability hazard. If `updated_at` ever gains a timezone suffix or format change, three sites need updating instead of one.",
       "effort": "small",
       "assigned_to": "carlos"
     },
     {
       "priority": "should",
+      "category": "perf",
+      "title": "Working Count Filter Called Twice Inline in the Same JSX Expression",
+      "description": "App.jsx:1307-1309 — Inside the Active Workers section header, the same array filter runs twice in the same conditional expression: `activeWorkers.filter((w) => w.status === 'working').length > 0 ? \\`🔥 ${activeWorkers.filter((w) => w.status === 'working').length} grinding hard\\` : '😴 Everyone is on standby'`. The first call allocates an array to check `.length > 0`. The second call allocates a second identical array to read `.length` for the string. In the case where the result is falsy, only the first runs; in the truthy case, both run. Fix: `const displayWorkingCount = activeWorkers.filter(w => w.status === 'working').length` placed immediately before the `<div className='section-header'>` at line 1303. Use `displayWorkingCount` in both spots. This also makes the display logic easier to test in isolation. WHY: `activeWorkers` can have up to 6 entries, so this isn't a performance emergency. But the double filter signals to a reader that the two lengths might somehow differ — they can't, but the duplication implies they might.",
+      "effort": "small",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "should",
       "category": "bug",
-      "title": "Activity Log Filter Logic Duplicated — Two Places to Update",
-      "description": "App.jsx:1367-1380 and 1424-1432 — The activity filter logic (switching on activityFilter for hires/completions/errors/system, then filtering by workerFilter) is written identically in two separate places: once to compute the count label and once to produce the entries array for ActivityLog. If a new filter category is added (e.g., 'warnings'), it must be added in both places, and they could drift. Fix: `const filteredEntries = useMemo(() => activityLog.filter(...).filter(...), [activityLog, activityFilter, workerFilter])` — use this memo for both the count display and the ActivityLog entries prop. WHY: single-source of truth for filter logic prevents silent divergence. Currently if the count label says '3 events (filtered)' but ActivityLog actually shows 4 entries (because someone only updated one path), trust in the UI collapses.",
+      "title": "ActivityLogEntry Key Uses Delimiter-Free String Concatenation",
+      "description": "App.jsx:154 — `key={entry.timestamp + entry.worker + i}`. Concatenating strings without separators can produce colliding keys. Example: `timestamp='2026-03-11T05:00a'`, `worker='ya'`, `i=1` produces the same key `'2026-03-11T05:00aya1'` as `timestamp='2026-03-11T05:00'`, `worker='aya'`, `i=1`. Worker names and timestamps are controlled, so a collision has never occurred in production. But the key is a compound of three fields and the concatenation implies they're a single string. Fix: `` key={`${entry.timestamp}_${entry.worker ?? 'system'}_${i}`} `` — underscores as separators guarantee uniqueness since neither timestamps nor worker names contain underscores. WHY: React key collisions cause silent DOM reconciliation bugs (wrong component reuse, animation state leaks). The fix is two characters per separator.",
       "effort": "small",
       "assigned_to": "sofia"
     },
     {
       "priority": "should",
       "category": "delight",
-      "title": "quoteBonus Wrap Still Has No Ceremony — Sixth Consecutive Review",
-      "description": "App.jsx:1447 — `p >= BONUS_TAGLINES.length ? 1 : p + 1` wraps silently. The counter `{quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length && <span ...>{quoteBonus}/{BONUS_TAGLINES.length}</span>}` disappears at `quoteBonus === 8` with no acknowledgment. The user just saw `7/8`, clicked once more, and the counter vanished — replaced by nothing. Fix: when `p >= BONUS_TAGLINES.length`, set a localStorage flag `'footer-all-taglines-seen'`. On the reset tick, fire a subtle toast: `'✦ You found all of Bloberto's thoughts.'` in the same style as the completion toast but with golden border. After the flag is set, the ✦ sparkle renders permanently gold (not needing the twinkle state). WHY: sixth consecutive review. The tagline hunt is the only discovery mechanic in the footer. Its completion must land — not vanish. The pattern already exists: localStorage flags, toasts, and color-coded pills. This is assembly, not invention.",
+      "title": "quoteBonus Wrap Still Has No Ceremony — Seventh Consecutive Review",
+      "description": "App.jsx:1437 — `p >= BONUS_TAGLINES.length ? 1 : p + 1` wraps silently. The `{quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length && ...}` counter disappears at `quoteBonus === 8` with no acknowledgment. The tagline hunt has been unfinished since review #83. Seven reviews. The ceremony pattern is fully in the codebase: localStorage flags (`footer-sparkle-seen` at line 751), completion toasts (line 1186-1209), golden border completions. This is assembly of existing parts. Fix: on `p >= BONUS_TAGLINES.length`, write `'footer-all-taglines-seen'` to localStorage. On the reset tick, fire a completion toast with golden border (`'#fbbf24'` color): `text: '✦ You found all of Bloberto's thoughts. All eight of them.'`. After the flag is set, render the ✦ sparkle permanently gold via a new `footer-sparkle--complete` class (no twinkle, steady glow). WHY: seventh consecutive review. The tagline hunt is the only active discovery mechanic in the app. A counter that goes `7/8 → gone` with no payoff is an anticlimactic ending to the only Easter egg in the footer.",
       "effort": "small",
       "assigned_to": "luna"
-    },
-    {
-      "priority": "should",
-      "category": "perf",
-      "title": "WORKER_CONFETTI_PIECES and CONFETTI_PIECES Are Now Identical",
-      "description": "App.jsx:35-41 — Both constants are `Array.from({ length: 30 }, (_, i) => <span key={i} className='confetti-piece' style={{ '--i': i }} />)`. They produce identical React element arrays with the same keys, classes, and styles. Since the color regression was introduced, the only difference is the variable name. Fix: delete `WORKER_CONFETTI_PIECES` and use `CONFETTI_PIECES` everywhere — or alternatively, fix the color regression first (the 'must' finding above) and then WORKER_CONFETTI_PIECES can live as the colored variant. WHY: having two module-scope constants that render identically is dead inventory that confuses the reader into thinking they produce different visual output.",
-      "effort": "small",
-      "assigned_to": "dave"
-    },
-    {
-      "priority": "could",
-      "category": "visual",
-      "title": "Ghost Desk Has No Nameplate — OOO Info Invisible Without Character Hover",
-      "description": "Office.jsx:1500-1509 — When `occ.ghost === true`, neither nameplate branch renders. Working workers get `desk__nameplate--active`, idle workers get `desk__nameplate--away`, but ghost (roster-only) workers get nothing. The only way to see OOO info is to hover the Character SVG itself, which shows the `ghost-ooo-bubble`. But the Character for ghost workers is tiny (16px in standup, 36px at desk) and mobile users on touch devices get no hover. Fix: add a ghost nameplate branch: `{occ.ghost && <div className='desk__nameplate desk__nameplate--ghost'>📵 {occ.worker.name.split(' ')[0]}</div>}`. Optionally append relative last-seen time from activityEntries. WHY: empty desks with no nameplate look broken, not intentional. A small '📵 Dave' nameplate communicates 'this person exists, they're just not here today' — a human story vs an empty slot.",
-      "effort": "small",
-      "assigned_to": "maya"
     },
     {
       "priority": "could",
       "category": "UX",
-      "title": "Active Tag Filter Has No Indicator on Dashboard Tab",
-      "description": "App.jsx:750, 1262-1287 — `selectedTag` state persists across tab switches. When a tag filter is active (e.g., 'Bug' selected), worker cards are dimmed on the dashboard. Switching to the Office tab and back keeps the filter alive, but the Dashboard tab button shows no indication. Fix: add a small dot or badge to the Dashboard tab when `selectedTag !== null`: `📊 Dashboard{selectedTag ? <span className='tab-filter-dot' aria-label={`Filter active: ${selectedTag}`}>·</span> : null}`. WHY: invisible application state causes confusion. A user returning from the office doesn't know why half their cards are greyed out. The dot takes 3 lines of CSS and one JSX conditional.",
+      "title": "'Burning the Midnight Oil' Greeting Fires at 8pm",
+      "description": "App.jsx:1160-1163 — `const isAfterHours = currentHour < 5 || currentHour >= 20`. The greeting `'🌃 Burning the midnight oil'` fires at hour 20 (8:00pm). The previous branch `'🌙 Good evening'` covers hours 18-19 (6-7pm). At 8pm on a Wednesday, most users are at dinner or winding down, not burning midnight oil. The phrase implies past midnight or at least 11pm+ hours. The `WallClock`'s own gradient treats hour 20 as 'night' sky (deep purple), not 'midnight' — reinforcing that 8pm is not midnight. Fix: `currentHour < 5 || currentHour >= 22` — reserve 'midnight oil' for 10pm–4am, and extend 'good evening' to cover 18-21. WHY: small copy detail, but the greeting is the first thing the user reads on mount. 'Burning the midnight oil at 8pm' registers as a minor off-note that slightly undermines the app's ambient authenticity.",
       "effort": "small",
-      "assigned_to": "maya"
+      "assigned_to": "luna"
     },
     {
       "priority": "could",
-      "category": "storytelling",
-      "title": "CLOCK_COMMENTS Are Aria-Label Only — Nobody Reads aria-label on a Clock",
-      "description": "Office.jsx:1086-1092, 1127 — The WallClock has delightful vibe-aware comments: 'Time has no meaning during an incident.' / 'Do not look. It breaks the flow.' But they're buried in the `aria-label` attribute. On desktop they're invisible (no visible tooltip). On mobile they don't exist. Fix: when the user hovers the clock (add `onMouseEnter`/`onFocus` to the SVG, remove `pointerEvents: 'none'`), show a tiny speech bubble below the clock face with the CLOCK_COMMENTS text. The bubble disappears after 3s. The same pattern as Bloberto's speech bubble — already in the codebase. WHY: the clock comments are some of the best writing in the app. 'Still here? So am I. I am a clock. That is fine for me.' is the funniest line in the file. It deserves to be seen.",
+      "category": "bug",
+      "title": "`fadingMap ?? {}` Null-Guard Is a Misleading Signal",
+      "description": "App.jsx:969 — `for (const w of [...activeWorkers, ...Object.values(fadingMap ?? {})]) {`. `fadingMap` is initialized with `useState({})` at line 743 — it is always a plain object, never null or undefined. The `?? {}` guard implies to a reader that `fadingMap` can be nullish and that the code defensively handles that case. It can't and doesn't. The same false guard appears nowhere else for other `useState({})` values (like `fadingTimersRef`). Fix: remove `?? {}` — `Object.values(fadingMap)` is correct and honest. WHY: defensive code that can never fire erodes the signal value of defensive code that can. When a reader sees `?? {}`, they allocate mental effort to understand when `fadingMap` could be null. The answer is never — that effort is wasted, and the code smell accumulates.",
       "effort": "small",
-      "assigned_to": "luna"
+      "assigned_to": "carlos"
     },
     {
       "priority": "wild",
       "category": "delight",
-      "title": "Error Contagion: Nearby Workers Briefly React When a Colleague Errors",
-      "description": "Wild idea: when a worker transitions to `status === 'error'`, the Character component for other working/idle workers near them (computed by desk proximity — workers sharing a desk row in DESKS array) briefly shows an error-adjacent idle-micro-bubble. For idle workers: one of their existing `WORKER_ERROR_BUBBLES` entries plays for 1.5s. For working workers: their typing-dots stutter (add a brief CSS class `typing-dots--glitch` with shake keyframe). Bloberto gets the most expressive reaction: a new `on-fire` ambient quote fires immediately instead of waiting for the 45s interval. The whole thing is a 600ms ripple — subtle, never blocking. WHY: the office is currently siloed. Each character lives in their own bubble. When an error lands, only the erroring desk reacts. But in a real office, the sound of 'oh no' is heard across the floor. Three lines of CSS and one useEffect make the space feel alive and interdependent.",
-      "effort": "medium",
+      "title": "Office 'Deep Work' Ambient Badge: Visual Whisper for the Heads-Down Worker",
+      "description": "Wild idea: when a working worker has been on the same task for 45+ minutes (`updated_at` > 45 min ago — already detected at Office.jsx:836-838 for the hover card), render a tiny persistent ambient indicator directly on the Character in the office floor view. The hover card already shows '🎧 deep work' but this is invisible without a hover. Proposed: add a `<div className='char__deep-work-badge'>🎧</div>` rendered alongside `char__error-badge` (Office.jsx:804-806) — same size (8px × 8px), positioned top-left instead of top-right, with `opacity: 0.55` and a 4-second breathing pulse animation (scale 0.9 → 1.0 → 0.9, no color flash). No click handler. No tooltip. Just a quiet visual that says 'this person is in it.' The badge disappears automatically when the worker transitions to idle or their `updated_at` refreshes. No new props needed — the Character component already receives `worker.updated_at` and `worker.startedAt`. The detection threshold should match the hover card's existing 45-minute check for consistency. WHY: the office floor is the most expressive surface in the app. A typing character at a glowing desk tells the reader 'this person is working.' A headphone badge tells them 'this person should not be interrupted.' That's a qualitatively different story — and one that a real office reads at a glance but Bloberto's currently cannot.",
+      "effort": "small",
       "assigned_to": "luna"
-    },
-    {
-      "priority": "wild",
-      "category": "office-life",
-      "title": "Office Whiteboard Has Persistent Doodles That Accumulate Over Sessions",
-      "description": "Wild idea: the `wb-doodle` pre at the bottom of the whiteboard (Office.jsx:1401-1402) currently shows a fixed emoticon per vibe. Extend it: store a small doodle history array in localStorage (up to 5 entries). Each vibe transition appends the current doodle to the array. On mount, render the last 3 doodles stacked vertically at reduced opacity, with the current one at full opacity. The result: the whiteboard looks used — traces of previous vibes visible like erased chalk. On `slow-day`, add a 'Meeting at 3pm — do not erase' note that persists until vibe changes to 'on-fire' (when it gets crossed out with '🔥'). WHY: the whiteboard is the most visible piece of ambient storytelling in the office. It currently resets completely on every vibe change. Persistent marks make the office feel like a place that has history, not just a real-time dashboard with cartoon furniture.",
-      "effort": "medium",
-      "assigned_to": "carlos"
     }
   ],
   "hire_proposals": [],
-  "_previous_review": 89,
+  "_previous_review": 90,
   "_still_open_from_89": [
     {
       "id": "quoteBonus-ceremony",
       "status": "still open",
-      "note": "Sixth consecutive review. This finding survives because it's a delight gap, not a breakage — nothing forces it onto the P0 list."
+      "note": "Seventh consecutive review. Escalating from 'should' to 'this has been on the board longer than three sprints.' Assigned to luna."
     }
   ]
 }
