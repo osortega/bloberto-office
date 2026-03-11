@@ -1430,16 +1430,14 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             ? Date.now() - new Date(occ.worker.updated_at).getTime()
             : 0
           const isStaleWorking = staleDiffMs > 900000
-          const staleDeskTitle = isStaleWorking ? (() => {
-            const mins = Math.floor(staleDiffMs / 60000)
-            const hours = Math.floor(staleDiffMs / 3600000)
-            return `Last seen: ${mins < 60 ? `${mins}m ago` : `${hours}h ago`}`
-          })() : undefined
-          let staleDeskTier
-          if (isStaleWorking) {
-            const ghostMins = Math.floor(staleDiffMs / 60000)
-            staleDeskTier = ghostMins < 60 ? 'fresh' : ghostMins < 180 ? 'stale' : 'abandoned'
-          }
+          const staleMins = isStaleWorking ? Math.floor(staleDiffMs / 60000) : 0
+          const staleHours = isStaleWorking ? Math.floor(staleDiffMs / 3600000) : 0
+          const staleDeskTitle = isStaleWorking
+            ? `Last seen: ${staleMins < 60 ? `${staleMins}m ago` : `${staleHours}h ago`}`
+            : undefined
+          const staleDeskTier = isStaleWorking
+            ? (staleMins < 60 ? 'fresh' : staleMins < 180 ? 'stale' : 'abandoned')
+            : undefined
           const isStandup = occ && standupWorkers.some(sw => sw.id === occ.worker.id)
           return (
             <div
@@ -1568,7 +1566,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
         {DESKS.map((desk, i) => {
           const occ = deskOccupants[desk.id]
           if (!occ || occ.idle) return null
-          if (standupWorkers.includes(occ.worker)) return null
+          if (standupWorkers.some(sw => sw.id === occ.worker.id)) return null
           return (
             <div key={occ.worker.id} style={{ position: 'absolute', left: `${desk.left + 7}%`, top: `${desk.top - 4}%` }}>
               <Character

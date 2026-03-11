@@ -1,97 +1,102 @@
 {
   "analyst": "Sofia",
-  "review_number": 85,
-  "timestamp": "2026-03-11T06:45:00Z",
+  "review_number": 86,
+  "timestamp": "2026-03-11T07:15:00Z",
   "screenshots": {
-    "note": "Puppeteer unavailable in worker environment. Visual review based on code analysis + prior screenshots."
-  },
-  "carry_over_verification": {
-    "bare_localStorage_fixed": "VERIFIED — all localStorage access now uses safeSave/safeRead from utils/safeSave.js. No bare localStorage.getItem or .setItem calls remain in src/.",
-    "handleTabKeyDown_fixed": "VERIFIED — wrapped in useCallback with tabRef pattern. No stale closure. Tab buttons get stable function reference.",
-    "ErrorBoundary_fixed": "VERIFIED — has resetError method and Retry button.",
-    "ARIA_radiogroup_nav": "VERIFIED — both activity filter bars have onKeyDown with ArrowRight/ArrowLeft navigation."
+    "desktop": "screenshot-sofia-desktop-86.png",
+    "mobile": "screenshot-sofia-mobile-86.png",
+    "note": "Live screenshots captured via Puppeteer/Chromium from https://osortega.github.io/bloberto-office/"
   },
   "scores": {
     "visual": 5,
     "ux": 4,
     "responsiveness": 4,
     "performance": 4,
-    "accessibility": 4,
+    "accessibility": 3,
     "code_quality": 4,
-    "features": 5,
+    "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 4.4,
+  "overall_score": 4.1,
+  "carry_over_status": {
+    "json_parse_unguarded": "STILL UNFIXED — App.jsx:1114",
+    "error_workers_invisible": "STILL UNFIXED — deskOccupants never includes error-status workers",
+    "shortcut_toast_no_dismiss": "STILL UNFIXED — no button in ShortcutToast JSX",
+    "vibe_labels_in_effect": "STILL UNFIXED — App.jsx:1102, inline const inside useEffect",
+    "footer_quote_skip": "STILL UNFIXED — App.jsx:1471, `? 1 : p + 1` never returns to 0",
+    "sub_readable_text": "STILL UNFIXED — Office.css has 0.32rem–0.48rem text on floor elements",
+    "isTouchDevice_at_load": "STILL UNFIXED — App.jsx:692, module-level snapshot"
+  },
   "suggestions": [
     {
       "priority": "medium",
       "category": "bug",
-      "title": "JSON.parse on vibe history unguarded after safeSave migration",
-      "description": "App.jsx vibe useEffect: `const history = raw ? JSON.parse(raw) : []` — safeRead guards against localStorage throwing but NOT corrupt JSON. If stored value is malformed, JSON.parse throws SyntaxError, entire useEffect aborts — vibe streak, sparkline, and transition quotes all silently break. The old try/catch accidentally protected this. Fix: wrap in try/catch or add safeParseJSON utility.",
-      "effort": "small",
-      "carry_over": true,
-      "strike": 2
+      "title": "[CARRY-OVER #2] JSON.parse on vibe history is still unguarded",
+      "description": "App.jsx line 1114: `const history = raw ? JSON.parse(raw) : []`. If localStorage key 'bloberto-vibe-history' holds corrupted or non-JSON data (e.g., from a different app version, storage migration, or manual tampering), this throws a SyntaxError. That error is NOT caught by safeRead — safeRead only wraps localStorage.getItem, not parsing. The whole vibe-streak useEffect blows up, taking the activity log synthetic event with it. Fix: wrap in try/catch: `let history = []; try { history = raw ? JSON.parse(raw) : [] } catch { history = [] }`. Two-line fix. We've talked about this for two reviews now. Come on.",
+      "effort": "small"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Error-status workers invisible on Office floor",
-      "description": "Office.jsx filters workers into workingWorkers (status=working) and idleWorkers (status=idle). Error workers match neither — they're in activeIds so excluded from ghostRoster too. Result: office goes red/on-fire but the erroring worker is completely absent from the floor. All the error animations (char--glitch, WORKER_ERROR_BUBBLES, error desk screen SVGs) exist but never render. Fix: add error workers to deskOccupants after working workers.",
-      "effort": "small",
-      "carry_over": true,
-      "strike": 2
+      "title": "[CARRY-OVER #2] Error-status workers are still invisible on the Office floor",
+      "description": "Office.jsx deskOccupants (lines 1310-1323) is built from workingWorkers (status==='working') + idleWorkers (status==='idle') + ghostRoster. Workers with status==='error' match NONE of these — they're in activeWorkers from App.jsx's filter (`working || idle || error`), so they reach Office as props, but then fall through the desk-assignment logic completely. The hasError check at line 1422 can NEVER be true because no error worker is ever in deskOccupants. All that beautiful error CSS (desk--error, desk-lamp--error, DESK_SCREEN_SVG.*_error, char--glitch, char__error-badge) is dead code in practice. Fix: add `const errorWorkers = nonMgr.filter(w => w.status === 'error')` and slot them into deskOccupants after idleWorkers.",
+      "effort": "small"
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "VIBE_LABELS object created inside useEffect on every vibe change",
-      "description": "App.jsx vibe useEffect declares `const VIBE_LABELS = {...}` — a static mapping recreated every vibe transition. Move to module scope alongside VIBE_COLORS/VIBE_RANK.",
-      "effort": "small",
-      "carry_over": true,
-      "strike": 2
+      "category": "bug",
+      "title": "Bloberto speech bubble overflows office-floor container on mobile",
+      "description": "The manager Character is positioned at top: 4% inside .office-floor. The speech bubble uses `position: absolute; bottom: calc(100% + 8px)` which places it ABOVE the character — so roughly at top: -1% to 0% of the floor. On mobile (375px wide) where the office floor has reduced height, the bubble escapes the top boundary and renders in the tab-toggle area. The .office-floor has `overflow: clip; overflow-clip-margin: 20px` which allows content up to 20px outside to show, but the bubble can extend further than that. Visible in the mobile screenshot: the Bloberto speech bubble partially overlaps the tab buttons. Fix: add `overflow: hidden` or clamp the bubble's top position within the container.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "ShortcutToast has no dismiss button for mouse/touch users",
-      "description": "Toast can only be dismissed by keyboard shortcut or waiting 7s. No click/tap dismiss. On mobile it overlays content with no escape. Add a close button or suppress on touch devices entirely (shortcuts are irrelevant on mobile).",
-      "effort": "small",
-      "carry_over": true,
-      "strike": 2
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "Footer quote cycle permanently skips vibe-reactive tagline",
-      "description": "quoteBonus wraps from BONUS_TAGLINES.length back to 1, never returning to 0 (the vibe-specific tagline). After first click, vibe taglines are permanently bypassed.",
-      "effort": "small",
-      "carry_over": true,
-      "strike": 2
+      "title": "[CARRY-OVER] ShortcutToast has no dismiss button for mouse/touch users",
+      "description": "The ShortcutToast (App.jsx lines 631-686) auto-dismisses after 7s or on any shortcut keypress. Touch users who don't use keyboard shortcuts are forced to wait the full 7 seconds. The toast is already hidden on pointer:coarse + max-width:640px, but there's no X button or tap-to-dismiss for desktop mouse users who don't trigger shortcut keys. Keyboard users get immediate dismiss. Fix: add a small close button inside the toast JSX.",
+      "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "isTouchDevice snapshot at module load vs live matchMedia in Office",
-      "description": "App.jsx evaluates isTouchDevice once at module load. Office.jsx checks matchMedia live at click time. Inconsistency — header pill shows stale text on convertible devices.",
-      "effort": "small",
-      "carry_over": true,
-      "strike": 2
+      "title": "[CARRY-OVER] VIBE_LABELS constant re-declared inside useEffect on every vibe change",
+      "description": "App.jsx line 1102: `const VIBE_LABELS = { 'after-hours': 'After Hours', ... }` is declared inside the teamVibe.key useEffect. This object is identical on every run and is only used two lines later. It allocates a new object reference on every vibe transition. Extract it as a module-level constant. It's a trivially small allocation, but it's also a trivially simple fix — and leaving it here is just sloppy.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "[CARRY-OVER] Footer quote cycle permanently drops the vibe-reactive tagline after cycling through all bonus quotes",
+      "description": "App.jsx line 1471: `setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1)`. When the counter reaches BONUS_TAGLINES.length (8), it resets to 1 — skipping 0. But quoteBonus === 0 is the ONLY state that shows the vibe-reactive FOOTER_TAGLINES entry. After one full cycle, the user is locked out of the dynamic tagline forever. Fix: change `? 1 :` to `? 0 :` and update the counter display accordingly.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "visual",
+      "title": "[CARRY-OVER] Sub-readable text sizes persist on the office floor",
+      "description": "Office.css still has multiple floor elements at 0.32rem–0.48rem: char--idle .char__name (0.32rem), desk__nameplate (0.38rem/0.44rem at mobile breakpoints), wb-vibe-text (0.55rem at 480px), idle-duration (0.26rem). At 0.26rem on a physical mobile device this is approximately 3–4px — not even decorative, just technically visible. The very-small-text is a deliberate aesthetic choice for the isometric feel, but 0.26rem crosses from 'tiny but cute' into 'actively inaccessible'. Bump the floor to 0.5rem minimum for legible elements.",
+      "effort": "medium"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Dead WORKER_CONFETTI_PIECES comment",
-      "description": "App.jsx lines 39-40: migration-era comment about removed code. Delete it.",
-      "effort": "small",
-      "carry_over": true,
-      "strike": 2
+      "title": "[CARRY-OVER] isTouchDevice is a module-load snapshot, not a live media query",
+      "description": "App.jsx line 692: `const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches`. This evaluates ONCE when the module loads. Users who connect/disconnect a mouse (common on tablets, Surface devices, iPads with Magic Keyboard) will get stale results until a full page reload. Fix: either use `window.matchMedia('(pointer: coarse)').matches` inline at the point of use, or add a matchMedia change listener inside a useEffect.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Idle bubble index is a 190-character unreadable inline expression",
+      "description": "Office.jsx line 813: the idle micro-bubble array index is computed entirely inline inside JSX — 190+ characters including a reduce-based hash of the worker ID, all on one line inside a className-bearing div. This is not unreadable because it's clever; it's unreadable because it's lazy. Extract to a named function like `getIdleBubbleIndex(workerId, bubbleArray)` at the module level. Future maintainers (and linters) will thank you.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "completionToast and plantToast use copy-pasted inline style blocks",
+      "description": "App.jsx lines 1190-1212 and Office.jsx lines 1329-1351 both implement a fixed-bottom-center toast using virtually identical inline style objects (position:fixed, bottom:2rem/5.5rem, left:50%, transform, background, border, borderRadius, padding, zIndex, whiteSpace:nowrap, animation). This pattern is duplicated across two files. Extract as a shared `.toast-overlay` CSS class — or at minimum a shared inline style constant — to avoid the two implementations drifting apart over time.",
+      "effort": "small"
     }
-  ],
-  "verified_fixes": [
-    "safeSave/safeRead migration complete — no bare localStorage calls remain",
-    "handleTabKeyDown properly memoized with useCallback + tabRef",
-    "ErrorBoundary has Retry button",
-    "ARIA radiogroup keyboard navigation working on both filter bars"
-  ],
-  "summary": "QA #85: Score stable at 4.4/5. All 4 HIGH items from prior reviews VERIFIED FIXED. 2 MEDIUMs remain (unguarded JSON.parse, invisible error workers on office floor), 5 LOWs carry over. No new issues found — codebase is in good shape."
+  ]
 }

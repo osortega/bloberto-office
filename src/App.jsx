@@ -392,7 +392,7 @@ const WorkerCard = React.memo(function WorkerCard({ worker, index = 0, isNew = f
             <div className="worker-card__back-empty">No activity on record.</div>
           ) : (
             workerHistory.map((e) => (
-              <div key={e.timestamp + e.type + (e.worker || '')} className="worker-card__back-entry">
+              <div key={`${e.timestamp}_${e.type}_${e.worker ?? 'system'}`} className="worker-card__back-entry">
                 <span style={{ marginRight: '0.35rem' }}>{ACTIVITY_ICONS[e.type] ?? '🔧'}</span>
                 {e.message}
                 <span className='worker-card__back-time' style={{ opacity: 0.5, fontSize: '0.7rem', marginLeft: '0.35rem' }}>· {getRelativeTime(e.timestamp)}</span>
