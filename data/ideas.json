@@ -3,29 +3,29 @@
     "creative_director": "Luna",
     "review_number": 104,
     "timestamp": "2026-03-11T16:00:00Z",
-    "theme": "The office has edges — dark edges, static edges, invisible edges. This review finds every surface the product forgot it had and makes it breathe.",
+    "theme": "The office has edges \u2014 dark edges, static edges, invisible edges. This review finds every surface the product forgot it had and makes it breathe.",
     "ideas": [
       {
         "priority": "must",
         "category": "feature",
         "title": "Error Boundary Bloberto Recovery Screen",
-        "description": "The ErrorBoundary in App.jsx renders 'Something went wrong — refresh the page' in plain red text against a pitch-black void — confirmed by screenshots luna-93-desktop and luna-93-mobile, which show exactly this state. It is the coldest surface in the entire product. Bloberto has rich SVG avatar art, per-worker error monitor states, panic speech bubbles, and VIBE_QUOTES already imported at the top of Office.jsx. The error boundary's componentDidCatch logs to console and its render method is a single bare div. Replace it: show Bloberto's avatar in error variant, cycle a randomly selected on-fire VIBE_QUOTE above his head, render a large animated retry button with a 5-second countdown that auto-reloads, and pulse the outer container border in #ef4444 at 2s ease-in-out — the same red pulse individual worker monitors get during PANIC. All SVG art and CSS keyframes already exist. WHY: the error screen is the only surface in the app that has zero Bloberto personality, and it's the worst possible moment to go silent. The app breaks and then becomes a stranger. That's the last thing it should do.",
+        "description": "The ErrorBoundary in App.jsx renders 'Something went wrong \u2014 refresh the page' in plain red text against a pitch-black void \u2014 confirmed by screenshots luna-93-desktop and luna-93-mobile, which show exactly this state. It is the coldest surface in the entire product. Bloberto has rich SVG avatar art, per-worker error monitor states, panic speech bubbles, and VIBE_QUOTES already imported at the top of Office.jsx. The error boundary's componentDidCatch logs to console and its render method is a single bare div. Replace it: show Bloberto's avatar in error variant, cycle a randomly selected on-fire VIBE_QUOTE above his head, render a large animated retry button with a 5-second countdown that auto-reloads, and pulse the outer container border in #ef4444 at 2s ease-in-out \u2014 the same red pulse individual worker monitors get during PANIC. All SVG art and CSS keyframes already exist. WHY: the error screen is the only surface in the app that has zero Bloberto personality, and it's the worst possible moment to go silent. The app breaks and then becomes a stranger. That's the last thing it should do.",
         "effort": "small",
         "assigned_to": "carlos"
       },
       {
         "priority": "should",
         "category": "feature",
-        "title": "Full-Squad Unlock — Cheer When Everyone Is In",
-        "description": "When the entire team is simultaneously working (every occupied desk = working status, no idle, no error), the app does absolutely nothing special. No signal. No recognition. Yet this is statistically the rarest positive state the office can reach — everyone clocked in, at their desk, active. The confetti infrastructure is already live (confettiActive state, CONFETTI_PIECES component, 2.5s duration). The doorEvent architecture triggers on new worker appearances. VibeShockwave fires on vibe transitions. Wire one new condition in the workers polling useEffect: when workingCount === occupiedDeskCount && occupiedDeskCount >= 3, fire global confetti + trigger a 4-second fading banner on the office floor reading '⚡ FULL SQUAD ⚡' (same layering as plantToast) + have Bloberto emit a dedicated 'full squad' quote variant. The condition resets when any worker goes idle or errors. WHY: the app celebrates completions loudly and vibes continuously but never marks the moment the whole team shows up. That moment deserves theater.",
+        "title": "Full-Squad Unlock \u2014 Cheer When Everyone Is In",
+        "description": "When the entire team is simultaneously working (every occupied desk = working status, no idle, no error), the app does absolutely nothing special. No signal. No recognition. Yet this is statistically the rarest positive state the office can reach \u2014 everyone clocked in, at their desk, active. The confetti infrastructure is already live (confettiActive state, CONFETTI_PIECES component, 2.5s duration). The doorEvent architecture triggers on new worker appearances. VibeShockwave fires on vibe transitions. Wire one new condition in the workers polling useEffect: when workingCount === occupiedDeskCount && occupiedDeskCount >= 3, fire global confetti + trigger a 4-second fading banner on the office floor reading '\u26a1 FULL SQUAD \u26a1' (same layering as plantToast) + have Bloberto emit a dedicated 'full squad' quote variant. The condition resets when any worker goes idle or errors. WHY: the app celebrates completions loudly and vibes continuously but never marks the moment the whole team shows up. That moment deserves theater.",
         "effort": "small",
         "assigned_to": "maya"
       },
       {
         "priority": "should",
         "category": "visual",
-        "title": "Stale Worker Radar Ring — Make Overdue Status Unmissable",
-        "description": "The desk--stale CSS class fires when a worker has been 'working' for 2+ hours with no status update — the condition is already computed in App.jsx (staleWorkers useMemo, threshold 7_200_000ms). But the class produces only a subtle color shift on the desk nameplate. You have to already be looking for it; it reads as a design state, not an alert. Add a slow CSS-only radar ring on every stale desk: a 1px translucent circle (same hue as the worker's ROLE_COLOR, opacity 0.35) that expands from the desk center outward over 3.5s and resets, repeating — like a sonar sweep. The ring disappears the instant the worker's status updates. No new props, no new state: the desk--stale class already exists, just extend its keyframe. WHY: stale workers are a real signal — blocked? stuck? forgot to update? The current visual treatment is too subtle to function as an alert. The radar ring communicates urgency passively, without demanding to be read.",
+        "title": "Stale Worker Radar Ring \u2014 Make Overdue Status Unmissable",
+        "description": "The desk--stale CSS class fires when a worker has been 'working' for 2+ hours with no status update \u2014 the condition is already computed in App.jsx (staleWorkers useMemo, threshold 7_200_000ms). But the class produces only a subtle color shift on the desk nameplate. You have to already be looking for it; it reads as a design state, not an alert. Add a slow CSS-only radar ring on every stale desk: a 1px translucent circle (same hue as the worker's ROLE_COLOR, opacity 0.35) that expands from the desk center outward over 3.5s and resets, repeating \u2014 like a sonar sweep. The ring disappears the instant the worker's status updates. No new props, no new state: the desk--stale class already exists, just extend its keyframe. WHY: stale workers are a real signal \u2014 blocked? stuck? forgot to update? The current visual treatment is too subtle to function as an alert. The radar ring communicates urgency passively, without demanding to be read.",
         "effort": "small",
         "assigned_to": "dave"
       },
@@ -33,23 +33,23 @@
         "priority": "could",
         "category": "feature",
         "title": "Activity Log Inline Text Search",
-        "description": "The activity log already supports tag filtering (click a task-tag pill to filter) and worker filtering (click a stat badge to filter by worker), both wired through the activityFilter / workerFilter state in App.jsx. But there is no free-text search. With 50+ activity entries per session, finding the line where a specific deploy landed, a PR was merged, or an error was first logged requires scrolling through time-grouped history. Add a collapsible search input at the top of the activity log panel — hidden by default behind a 🔍 icon toggle, expanding on click to a 200px inline input. It filters filteredActivityEntries in real time against entry.message using a simple case-insensitive includes(). Keyboard shortcut / focuses it (consistent with the existing ? for shortcuts, already handled in the App.jsx keydown listener). Pressing Escape collapses and clears. Search state is local to the component, cleared on tab switch. WHY: the activity log is the most information-dense surface in the app and the one you reach for first when something goes wrong. Search makes it a tool instead of a scroll.",
+        "description": "The activity log already supports tag filtering (click a task-tag pill to filter) and worker filtering (click a stat badge to filter by worker), both wired through the activityFilter / workerFilter state in App.jsx. But there is no free-text search. With 50+ activity entries per session, finding the line where a specific deploy landed, a PR was merged, or an error was first logged requires scrolling through time-grouped history. Add a collapsible search input at the top of the activity log panel \u2014 hidden by default behind a \ud83d\udd0d icon toggle, expanding on click to a 200px inline input. It filters filteredActivityEntries in real time against entry.message using a simple case-insensitive includes(). Keyboard shortcut / focuses it (consistent with the existing ? for shortcuts, already handled in the App.jsx keydown listener). Pressing Escape collapses and clears. Search state is local to the component, cleared on tab switch. WHY: the activity log is the most information-dense surface in the app and the one you reach for first when something goes wrong. Search makes it a tool instead of a scroll.",
         "effort": "small",
         "assigned_to": "carlos"
       },
       {
         "priority": "could",
         "category": "storytelling",
-        "title": "Worker Card Back — Recent Tag History Strip",
-        "description": "The worker card has a fully built flip animation: the front shows status, task, and tag pills; the back shows a worker tagline and a 'Back to work' flip-back button. The card back is otherwise empty white space — a large surface area currently doing nothing. App.jsx already computes workerActivityMap: a Map of worker name to last 5 activity entries. Each entry has a type and message already parsed by getTaskTags(). Add a horizontal strip of up to 4 compact tag-history pills along the bottom of the card back: '🔴 Bug · 2h ago', '🚀 Ship · yesterday', rendered from the workerActivityMap slice. Entries with no recognized tag are skipped. The strip is faint (opacity 0.7) so it doesn't compete with the tagline. No new data fetching — this is a pure client-side derivation from state already loaded. WHY: the card flip is a delightful interaction that currently reveals a one-liner and a close button. The tag history gives it a reason to exist: you flip to see what someone has actually been doing.",
+        "title": "Worker Card Back \u2014 Recent Tag History Strip",
+        "description": "The worker card has a fully built flip animation: the front shows status, task, and tag pills; the back shows a worker tagline and a 'Back to work' flip-back button. The card back is otherwise empty white space \u2014 a large surface area currently doing nothing. App.jsx already computes workerActivityMap: a Map of worker name to last 5 activity entries. Each entry has a type and message already parsed by getTaskTags(). Add a horizontal strip of up to 4 compact tag-history pills along the bottom of the card back: '\ud83d\udd34 Bug \u00b7 2h ago', '\ud83d\ude80 Ship \u00b7 yesterday', rendered from the workerActivityMap slice. Entries with no recognized tag are skipped. The strip is faint (opacity 0.7) so it doesn't compete with the tagline. No new data fetching \u2014 this is a pure client-side derivation from state already loaded. WHY: the card flip is a delightful interaction that currently reveals a one-liner and a close button. The tag history gives it a reason to exist: you flip to see what someone has actually been doing.",
         "effort": "small",
         "assigned_to": "sofia"
       },
       {
         "priority": "could",
         "category": "office-life",
-        "title": "Ambient Pan Screensaver — The Office When Nobody's Watching",
-        "description": "When the browser tab has been idle (no mouse movement, no keystrokes) for 5 minutes, the office should feel like it's still running — not frozen. Enter a CSS screensaver mode: the office floor div slowly scales to 115% over 60 seconds and pans left-to-right using CSS @keyframes translate, then resets — a slow broadcast-camera dolly. Worker avatar animations get a 1.4x amplitude multiplier via a data-screensaver attribute CSS override. The stats bar fades to 15% opacity. Any mousemove or keydown event triggers instant CSS transition back to 100% scale and full opacity. An IntersectionObserver on the office div prevents the mode from activating if the office isn't in the viewport. Additive only — no state changes, no API calls, pure CSS transform on a class toggle. WHY: the office is built as a living space but freezes visually when unattended. When someone walks past the screen, the slow pan makes it look like a real building on a security monitor, not a frozen React component.",
+        "title": "Ambient Pan Screensaver \u2014 The Office When Nobody's Watching",
+        "description": "When the browser tab has been idle (no mouse movement, no keystrokes) for 5 minutes, the office should feel like it's still running \u2014 not frozen. Enter a CSS screensaver mode: the office floor div slowly scales to 115% over 60 seconds and pans left-to-right using CSS @keyframes translate, then resets \u2014 a slow broadcast-camera dolly. Worker avatar animations get a 1.4x amplitude multiplier via a data-screensaver attribute CSS override. The stats bar fades to 15% opacity. Any mousemove or keydown event triggers instant CSS transition back to 100% scale and full opacity. An IntersectionObserver on the office div prevents the mode from activating if the office isn't in the viewport. Additive only \u2014 no state changes, no API calls, pure CSS transform on a class toggle. WHY: the office is built as a living space but freezes visually when unattended. When someone walks past the screen, the slow pan makes it look like a real building on a security monitor, not a frozen React component.",
         "effort": "medium",
         "assigned_to": "maya"
       },
@@ -57,7 +57,7 @@
         "priority": "wild",
         "category": "delight",
         "title": "Vibe-Gated Background Tab Push Notifications",
-        "description": "The office is a peripheral awareness tool — but only if you're looking at the tab. When document.hidden is true (tab backgrounded) and the vibe transitions from a positive state (crushing, in-flow) to on-fire or slow-day, fire a browser Notification (Web Notifications API, permission prompt on first use): '🔥 Bloberto Office: team just went On Fire — 3 active' or '� Things got quiet. 1 active.' The app already polls every 30s and vibeHistoryRef tracks transitions. Notifications fire exactly once per unique vibe transition, not per poll cycle. A small bell icon in the top bar (next to the keyboard shortcut hint area) controls opt-in: off by default, clicking triggers the permission prompt. The bell stores preference in localStorage (same pattern as bloberto-shortcuts-shown already used). Clicking the notification brings the tab to focus. WHY: the single most compelling use case for this dashboard is passive awareness — knowing when the team catches fire without staring at a browser tab. Notifications complete that promise.",
+        "description": "The office is a peripheral awareness tool \u2014 but only if you're looking at the tab. When document.hidden is true (tab backgrounded) and the vibe transitions from a positive state (crushing, in-flow) to on-fire or slow-day, fire a browser Notification (Web Notifications API, permission prompt on first use): '\ud83d\udd25 Bloberto Office: team just went On Fire \u2014 3 active' or '\ufffd Things got quiet. 1 active.' The app already polls every 30s and vibeHistoryRef tracks transitions. Notifications fire exactly once per unique vibe transition, not per poll cycle. A small bell icon in the top bar (next to the keyboard shortcut hint area) controls opt-in: off by default, clicking triggers the permission prompt. The bell stores preference in localStorage (same pattern as bloberto-shortcuts-shown already used). Clicking the notification brings the tab to focus. WHY: the single most compelling use case for this dashboard is passive awareness \u2014 knowing when the team catches fire without staring at a browser tab. Notifications complete that promise.",
         "effort": "medium",
         "assigned_to": "luna"
       }
@@ -65,8 +65,8 @@
     "hire_proposals": [
       {
         "role": "Accessibility Engineer",
-        "emoji": "♿",
-        "rationale": "Bloberto Office has keyboard shortcut infrastructure (? to show hints, letter keys to navigate, aria-live regions for ping reactions), but the office floor itself is a dense SVG and absolute-positioned character grid that is essentially invisible to screen readers and keyboard-only users. An Accessibility Engineer would own a full audit and remediation pass: ARIA roles on the office floor canvas, focus management between tabs, keyboard navigation for the activity log, color contrast passes for all vibe states, and a reduced-motion mode for users with prefers-reduced-motion set. The office floor is a theatrical product — but theater should be accessible. One engineer with a focus-ring mentality changes what it means to say 'everyone can see the vibe.'"
+        "emoji": "\u267f",
+        "rationale": "Bloberto Office has keyboard shortcut infrastructure (? to show hints, letter keys to navigate, aria-live regions for ping reactions), but the office floor itself is a dense SVG and absolute-positioned character grid that is essentially invisible to screen readers and keyboard-only users. An Accessibility Engineer would own a full audit and remediation pass: ARIA roles on the office floor canvas, focus management between tabs, keyboard navigation for the activity log, color contrast passes for all vibe states, and a reduced-motion mode for users with prefers-reduced-motion set. The office floor is a theatrical product \u2014 but theater should be accessible. One engineer with a focus-ring mentality changes what it means to say 'everyone can see the vibe.'"
       }
     ]
   },
@@ -74,21 +74,21 @@
     "creative_director": "Luna",
     "review_number": 103,
     "timestamp": "2026-03-11T14:52:00Z",
-    "theme": "Every surface tells a secret — the office knows more than it shows. This review turns dead space and invisible data into living architecture.",
+    "theme": "Every surface tells a secret \u2014 the office knows more than it shows. This review turns dead space and invisible data into living architecture.",
     "ideas": [
       {
         "priority": "must",
         "category": "feature",
         "title": "Sprint Tag Counter Board",
-        "description": "The back wall of the office has clean empty grid real estate between the window and the desks, and the TASK_TAG_DEFS system already classifies every active worker's task (Bug, Ship, Design, QA, Refactor, Plan) with emoji and color. But that aggregate picture — how many bugs vs. ships vs. designs are live right now — exists nowhere on the office floor. Add a small mounted board on the back wall that shows each active tag category as a labeled pill with a live count: '🔴 Bug ×2  🚀 Ship ×3  🎨 Design ×1'. The board goes dark when nobody is working. It turns urgent-red if Bug count ≥ 2. Zero new data structures needed — just a useMemo over active workers' parsed tags. WHY: the office floor tells you who is busy, but not what kind of busy. The board closes that gap at a glance, the way a real sprint room has a board on the wall.",
+        "description": "The back wall of the office has clean empty grid real estate between the window and the desks, and the TASK_TAG_DEFS system already classifies every active worker's task (Bug, Ship, Design, QA, Refactor, Plan) with emoji and color. But that aggregate picture \u2014 how many bugs vs. ships vs. designs are live right now \u2014 exists nowhere on the office floor. Add a small mounted board on the back wall that shows each active tag category as a labeled pill with a live count: '\ud83d\udd34 Bug \u00d72  \ud83d\ude80 Ship \u00d73  \ud83c\udfa8 Design \u00d71'. The board goes dark when nobody is working. It turns urgent-red if Bug count \u2265 2. Zero new data structures needed \u2014 just a useMemo over active workers' parsed tags. WHY: the office floor tells you who is busy, but not what kind of busy. The board closes that gap at a glance, the way a real sprint room has a board on the wall.",
         "effort": "small",
         "assigned_to": "carlos"
       },
       {
         "priority": "should",
         "category": "visual",
-        "title": "Room Buzz — Ambient Ripple on Crowded Focus",
-        "description": "When 3+ workers are simultaneously active (working, not idle) and the vibe is 'in-flow' or 'crushing', the office goes acoustically silent in the CSS sense — no extra animations fire to represent human density. In real offices, a full room has an invisible hum. Add a CSS-only 'buzz' layer: faint concentric ring ripples that radiate from each active worker's avatar outward, at very low opacity (5–8%), with a slow 3s ease — like a sonar ping, not a spotlight. The rings don't overlap or collide; they just breathe. The animation fires only when the crowded + right-vibe condition is true, and stops instantly when it isn't. The office already has heat shimmer for on-fire and grid glow for vibes — this adds the human frequency layer. WHY: a full room should feel full even before you count heads.",
+        "title": "Room Buzz \u2014 Ambient Ripple on Crowded Focus",
+        "description": "When 3+ workers are simultaneously active (working, not idle) and the vibe is 'in-flow' or 'crushing', the office goes acoustically silent in the CSS sense \u2014 no extra animations fire to represent human density. In real offices, a full room has an invisible hum. Add a CSS-only 'buzz' layer: faint concentric ring ripples that radiate from each active worker's avatar outward, at very low opacity (5\u20138%), with a slow 3s ease \u2014 like a sonar ping, not a spotlight. The rings don't overlap or collide; they just breathe. The animation fires only when the crowded + right-vibe condition is true, and stops instantly when it isn't. The office already has heat shimmer for on-fire and grid glow for vibes \u2014 this adds the human frequency layer. WHY: a full room should feel full even before you count heads.",
         "effort": "small",
         "assigned_to": "maya"
       },
@@ -96,7 +96,7 @@
         "priority": "should",
         "category": "storytelling",
         "title": "Bloberto's HQ Desk Lamp",
-        "description": "Bloberto's HQ has a glowing purple border that pulses with presence, but the interior of his office is a nameplate and a title. Real CPO offices have a lamp on the desk — and that lamp is the first thing you notice when you walk past. Add a small SVG desk lamp inside the HQ card (left corner, behind his avatar). The lamp shade color matches the team vibe: warm amber for in-flow, hot coral for on-fire, soft indigo for after-hours, cool teal for crushing. Its animation matches vibe intensity: a slow deep breathe for slow-day, a steady glow for in-flow, an agitated flicker for on-fire. This is not the same as monitor glow (review #102 — worker desks reflecting task type). This is specifically Bloberto's personal barometer. His lamp tells the room how the building is feeling before you read a single status. WHY: Bloberto's HQ is the architectural heart. It should radiate, not just contain.",
+        "description": "Bloberto's HQ has a glowing purple border that pulses with presence, but the interior of his office is a nameplate and a title. Real CPO offices have a lamp on the desk \u2014 and that lamp is the first thing you notice when you walk past. Add a small SVG desk lamp inside the HQ card (left corner, behind his avatar). The lamp shade color matches the team vibe: warm amber for in-flow, hot coral for on-fire, soft indigo for after-hours, cool teal for crushing. Its animation matches vibe intensity: a slow deep breathe for slow-day, a steady glow for in-flow, an agitated flicker for on-fire. This is not the same as monitor glow (review #102 \u2014 worker desks reflecting task type). This is specifically Bloberto's personal barometer. His lamp tells the room how the building is feeling before you read a single status. WHY: Bloberto's HQ is the architectural heart. It should radiate, not just contain.",
         "effort": "small",
         "assigned_to": "maya"
       },
@@ -104,15 +104,15 @@
         "priority": "could",
         "category": "office-life",
         "title": "Focus Zone Ghost Footprints",
-        "description": "The FOCUS ZONE at the bottom of the office floor is a lightning bolt label on empty carpet. It has the right brand energy but zero data. Every active worker has a startedAt timestamp. Workers who have been continuously working for 45+ minutes are, by any reasonable definition, deep in a focus session. Surface that: render their character avatar as a faint 40% opacity 'footprint' inside the Focus Zone box, with a micro-caption 'Xm deep'. When they complete their task or go idle, the footprint fades out. When they hit 90 minutes, the footprint gets a tiny flame icon. Max 3 footprints; beyond that show '+N' overflow. No new state, no timers — just derived from worker.startedAt compared to Date.now(). WHY: the Focus Zone exists on the floor but nothing ever happens in it. Footprints make it a living record of who went deep today.",
+        "description": "The FOCUS ZONE at the bottom of the office floor is a lightning bolt label on empty carpet. It has the right brand energy but zero data. Every active worker has a startedAt timestamp. Workers who have been continuously working for 45+ minutes are, by any reasonable definition, deep in a focus session. Surface that: render their character avatar as a faint 40% opacity 'footprint' inside the Focus Zone box, with a micro-caption 'Xm deep'. When they complete their task or go idle, the footprint fades out. When they hit 90 minutes, the footprint gets a tiny flame icon. Max 3 footprints; beyond that show '+N' overflow. No new state, no timers \u2014 just derived from worker.startedAt compared to Date.now(). WHY: the Focus Zone exists on the floor but nothing ever happens in it. Footprints make it a living record of who went deep today.",
         "effort": "small",
         "assigned_to": "dave"
       },
       {
         "priority": "could",
         "category": "feature",
-        "title": "Day Arc — Workday Progress Ring in Stats Bar",
-        "description": "The Stats Bar has a vibe sparkline, worker counts, last-synced time — but no sense of *where in the day we are*. There is no workday clock. Add a thin semicircular progress arc between 9am and 6pm anchored to the right side of the stats bar, like the top half of a clock face. The arc fills proportionally with the current hour position; its stroke gradient matches VIBE_COLORS for the current vibe key. Before 9am the arc shows empty with a sunrise icon. After 6pm it becomes a crescent moon arc that counts up through the night. Hovering reveals the tooltip: '4h 20m into the workday · peak vibe: Crushing It'. This is distinct from the sparkline (which shows vibe transitions) — the arc shows *time*, not history. WHY: the office has a clock on the wall but the dashboard has no concept of the shape of the day. The arc gives every visit a temporal anchor.",
+        "title": "Day Arc \u2014 Workday Progress Ring in Stats Bar",
+        "description": "The Stats Bar has a vibe sparkline, worker counts, last-synced time \u2014 but no sense of *where in the day we are*. There is no workday clock. Add a thin semicircular progress arc between 9am and 6pm anchored to the right side of the stats bar, like the top half of a clock face. The arc fills proportionally with the current hour position; its stroke gradient matches VIBE_COLORS for the current vibe key. Before 9am the arc shows empty with a sunrise icon. After 6pm it becomes a crescent moon arc that counts up through the night. Hovering reveals the tooltip: '4h 20m into the workday \u00b7 peak vibe: Crushing It'. This is distinct from the sparkline (which shows vibe transitions) \u2014 the arc shows *time*, not history. WHY: the office has a clock on the wall but the dashboard has no concept of the shape of the day. The arc gives every visit a temporal anchor.",
         "effort": "medium",
         "assigned_to": "carlos"
       },
@@ -120,7 +120,7 @@
         "priority": "could",
         "category": "storytelling",
         "title": "Worker 'Last Shipped' Hover Ghost",
-        "description": "When you hover over a working or idle worker's character on the office floor, the hover card shows their name, status, task, and idle time. It does not tell you when they last shipped. The activity log tracks every completion with worker name and timestamp. A worker who completed something 20 minutes ago versus 4 hours ago carries completely different energy — and you currently can't feel that difference from the floor. Add a single line at the bottom of the hover card for workers with a recent completion: '✅ last shipped 18 min ago' (within 2h), or '💤 no completions today' for workers with none. No new API calls — this is a filtered slice of activityEntries already passed into the Character component. WHY: the hover card tells you who someone is. It should also tell you what they've done. One line closes a meaningful gap between the activity log and the office floor.",
+        "description": "When you hover over a working or idle worker's character on the office floor, the hover card shows their name, status, task, and idle time. It does not tell you when they last shipped. The activity log tracks every completion with worker name and timestamp. A worker who completed something 20 minutes ago versus 4 hours ago carries completely different energy \u2014 and you currently can't feel that difference from the floor. Add a single line at the bottom of the hover card for workers with a recent completion: '\u2705 last shipped 18 min ago' (within 2h), or '\ud83d\udca4 no completions today' for workers with none. No new API calls \u2014 this is a filtered slice of activityEntries already passed into the Character component. WHY: the hover card tells you who someone is. It should also tell you what they've done. One line closes a meaningful gap between the activity log and the office floor.",
         "effort": "small",
         "assigned_to": "sofia"
       },
@@ -128,7 +128,7 @@
         "priority": "wild",
         "category": "delight",
         "title": "Vacant Desk Time Capsule Messages",
-        "description": "The vacant desk already shows a job posting (VACANT_ADS changes per vibe — 'Staff Wizard', 'URGENT: Firefighter', 'Night Watch'). But it's static. Every 90 seconds, a small folded-note SVG slowly rises from the vacant desk and unfolds, revealing a fictional future-hire message: 'Zara 🦁 — portfolio under review', '????? 👾 — resume: classified', 'Mx. T ⚡ — starting whenever the vibe is right', 'ghost dev 👻 — technically already here', 'Reese 🌊 — offer letter pending since Q3'. 8–10 pre-written messages, cycle deterministically by minute-epoch so different visitors see different ones but the same visitor doesn't get repeats for a while. Clicking the vacant desk mid-appearance shows all future candidates in a tiny scrollable ghost roster. This makes the empty desk feel alive and funny instead of just hiring-adjacent. WHY: empty space in a living office should haunt you a little.",
+        "description": "The vacant desk already shows a job posting (VACANT_ADS changes per vibe \u2014 'Staff Wizard', 'URGENT: Firefighter', 'Night Watch'). But it's static. Every 90 seconds, a small folded-note SVG slowly rises from the vacant desk and unfolds, revealing a fictional future-hire message: 'Zara \ud83e\udd81 \u2014 portfolio under review', '????? \ud83d\udc7e \u2014 resume: classified', 'Mx. T \u26a1 \u2014 starting whenever the vibe is right', 'ghost dev \ud83d\udc7b \u2014 technically already here', 'Reese \ud83c\udf0a \u2014 offer letter pending since Q3'. 8\u201310 pre-written messages, cycle deterministically by minute-epoch so different visitors see different ones but the same visitor doesn't get repeats for a while. Clicking the vacant desk mid-appearance shows all future candidates in a tiny scrollable ghost roster. This makes the empty desk feel alive and funny instead of just hiring-adjacent. WHY: empty space in a living office should haunt you a little.",
         "effort": "medium",
         "assigned_to": "luna"
       }
@@ -136,13 +136,13 @@
     "hire_proposals": [
       {
         "role": "Mobile Engineer",
-        "emoji": "📱",
-        "rationale": "The mobile web view at 375px is valiant but physically compressed — the office floor, stats bar, and activity log are all fighting for space on a screen that deserves a native experience. A Mobile Engineer would own a React Native or PWA-enhanced version of Bloberto Office: native push notifications when the vibe flips to on-fire, a lock-screen widget showing active worker count, haptic feedback on task completions. The office already has all its data in a clean JSON API. The work is the presentation layer. This hire pays for itself the moment someone gets a haptic buzz on their wrist because their team just hit crushing-it."
+        "emoji": "\ud83d\udcf1",
+        "rationale": "The mobile web view at 375px is valiant but physically compressed \u2014 the office floor, stats bar, and activity log are all fighting for space on a screen that deserves a native experience. A Mobile Engineer would own a React Native or PWA-enhanced version of Bloberto Office: native push notifications when the vibe flips to on-fire, a lock-screen widget showing active worker count, haptic feedback on task completions. The office already has all its data in a clean JSON API. The work is the presentation layer. This hire pays for itself the moment someone gets a haptic buzz on their wrist because their team just hit crushing-it."
       },
       {
         "role": "Developer Experience Lead",
-        "emoji": "🛠️",
-        "rationale": "Bloberto Office is secretly a framework — workers.json, activity.json, ideas.json, a polling architecture, vibe classification logic — all of this could be extracted into a self-hostable kit that other small teams run for their own office. A DevEx Lead would own that extraction: the setup guide, the workers.json schema docs, the one-command deploy, the GitHub Action template that pumps real CI events into activity.json. Every team that adopts Bloberto Office is a proof point. Right now that potential sits entirely in Bloberto's own repo. One engineer with a taste for documentation and tooling infrastructure changes that."
+        "emoji": "\ud83d\udee0\ufe0f",
+        "rationale": "Bloberto Office is secretly a framework \u2014 workers.json, activity.json, ideas.json, a polling architecture, vibe classification logic \u2014 all of this could be extracted into a self-hostable kit that other small teams run for their own office. A DevEx Lead would own that extraction: the setup guide, the workers.json schema docs, the one-command deploy, the GitHub Action template that pumps real CI events into activity.json. Every team that adopts Bloberto Office is a proof point. Right now that potential sits entirely in Bloberto's own repo. One engineer with a taste for documentation and tooling infrastructure changes that."
       }
     ]
   },
@@ -150,13 +150,13 @@
     "creative_director": "Luna",
     "review_number": 102,
     "timestamp": "2026-03-11T13:41:00Z",
-    "theme": "The office is alive — but it doesn’t know it yet. This review closes the gap between what the data knows and what the eye can feel.",
+    "theme": "The office is alive \u2014 but it doesn\u2019t know it yet. This review closes the gap between what the data knows and what the eye can feel.",
     "ideas": [
       {
         "priority": "should",
         "category": "visual",
         "title": "Task-Reactive Monitor Glow",
-        "description": "Every desk monitor is beautiful SVG art — Carlos's blue code lines, Maya's purple wireframes, Sofia's green bars, Dave's orange terminal, Luna's color palettes — but they all look identical regardless of what the worker is actually doing. The task tag system already classifies every active task (Bug, Ship, Design, QA, Refactor). Bridge that data to a CSS box-shadow or ring on the monitor: bug tasks glow red, design pulses purple, ship burns orange, QA flickers diagnostic blue. Zero SVG changes required — just a data attribute on the desk monitor div driven by the worker's resolved tag. WHY: the monitors tell you who someone is; they should also tell you what they're doing.",
+        "description": "Every desk monitor is beautiful SVG art \u2014 Carlos's blue code lines, Maya's purple wireframes, Sofia's green bars, Dave's orange terminal, Luna's color palettes \u2014 but they all look identical regardless of what the worker is actually doing. The task tag system already classifies every active task (Bug, Ship, Design, QA, Refactor). Bridge that data to a CSS box-shadow or ring on the monitor: bug tasks glow red, design pulses purple, ship burns orange, QA flickers diagnostic blue. Zero SVG changes required \u2014 just a data attribute on the desk monitor div driven by the worker's resolved tag. WHY: the monitors tell you who someone is; they should also tell you what they're doing.",
         "effort": "small",
         "assigned_to": "maya"
       },
@@ -172,7 +172,7 @@
         "priority": "should",
         "category": "storytelling",
         "title": "Whiteboard Quote Pins from Bloberto",
-        "description": "Bloberto's speech bubbles are the most-loved feature — 'Can we circle back on that PR?', 'This could have been a commit message.', 'Night crew came to work. Respect.' — and they already have a copy-to-clipboard button. But they vanish after 4 seconds. The whiteboard behind Bloberto's HQ currently shows only 5 static vibe labels (SHIP IT etc.) and is otherwise dead space. Add a pin button alongside the existing copy button. Pinned quotes appear as tiny sticky-note SVGs on the whiteboard, stacking across the session. WHY: the best quotes deserve a home, and the whiteboard is the only surface in the office with room to hold them.",
+        "description": "Bloberto's speech bubbles are the most-loved feature \u2014 'Can we circle back on that PR?', 'This could have been a commit message.', 'Night crew came to work. Respect.' \u2014 and they already have a copy-to-clipboard button. But they vanish after 4 seconds. The whiteboard behind Bloberto's HQ currently shows only 5 static vibe labels (SHIP IT etc.) and is otherwise dead space. Add a pin button alongside the existing copy button. Pinned quotes appear as tiny sticky-note SVGs on the whiteboard, stacking across the session. WHY: the best quotes deserve a home, and the whiteboard is the only surface in the office with room to hold them.",
         "effort": "small",
         "assigned_to": "maya"
       },
@@ -180,7 +180,7 @@
         "priority": "could",
         "category": "visual",
         "title": "Animated Skylight Panel",
-        "description": "The office has a rectangular panel on the far right that already reacts to vibe — orange gradient labeled SUNRISE for crushing, warm amber for in-flow, purple labeled DUSK for after-hours. It's one of the most visually distinctive set pieces. But it's a static colored rectangle. Make it CSS-animated: drifting cloud shapes for in-flow, diagonal rain streaks for slow-day, rising ember sparks for on-fire, pulsing star-dots for after-hours, a climbing sun arc for crushing. The skylight becomes a second atmospheric vibe layer you feel without reading — the way a real window tells you the weather before you check your phone. WHY: the office has ambient floor particles; it deserves ambient sky too.",
+        "description": "The office has a rectangular panel on the far right that already reacts to vibe \u2014 orange gradient labeled SUNRISE for crushing, warm amber for in-flow, purple labeled DUSK for after-hours. It's one of the most visually distinctive set pieces. But it's a static colored rectangle. Make it CSS-animated: drifting cloud shapes for in-flow, diagonal rain streaks for slow-day, rising ember sparks for on-fire, pulsing star-dots for after-hours, a climbing sun arc for crushing. The skylight becomes a second atmospheric vibe layer you feel without reading \u2014 the way a real window tells you the weather before you check your phone. WHY: the office has ambient floor particles; it deserves ambient sky too.",
         "effort": "medium",
         "assigned_to": "maya"
       },
@@ -188,7 +188,7 @@
         "priority": "could",
         "category": "feature",
         "title": "Expandable Vibe Timeline in Stats Bar",
-        "description": "The Team Vibe stat card holds a 64px sparkline — criminally small for the story it contains. The data is all there: every vibe transition with timestamps in vibeHistory (max 12 entries), VIBE_COLORS maps each key to a distinct color. Clicking the Team Vibe card should expand it inline to a full-width labeled timeline strip: colored vibe pills with timestamps — 'In Flow 9:02am → On Fire 2:14pm → Crushing It 4:30pm'. The full arc of the team's day, finally legible. Collapse on second click. WHY: vibeHistory is the most narrative-rich data in the entire app and a 64px polyline doesn't do it justice.",
+        "description": "The Team Vibe stat card holds a 64px sparkline \u2014 criminally small for the story it contains. The data is all there: every vibe transition with timestamps in vibeHistory (max 12 entries), VIBE_COLORS maps each key to a distinct color. Clicking the Team Vibe card should expand it inline to a full-width labeled timeline strip: colored vibe pills with timestamps \u2014 'In Flow 9:02am \u2192 On Fire 2:14pm \u2192 Crushing It 4:30pm'. The full arc of the team's day, finally legible. Collapse on second click. WHY: vibeHistory is the most narrative-rich data in the entire app and a 64px polyline doesn't do it justice.",
         "effort": "medium",
         "assigned_to": "carlos"
       },
@@ -196,7 +196,7 @@
         "priority": "could",
         "category": "office-life",
         "title": "Crisis Office Mode on Multi-Worker Error",
-        "description": "Individual worker errors trigger PANIC screens on desk monitors. But when two or more workers hit error simultaneously, the office doesn't collectively respond — the border stays teal, the floor is calm, Bloberto sits in his HQ. Flip the whole canvas: the outer office border pulses red, Bloberto's typing indicator fires rapidly, ambient floor particles shift to agitated warm-red, and a DEFCON-2 speech bubble triggers instead of the normal 45-second rotation. This is the 'all hands' feeling the on-fire vibe promises but never fully delivers in the Office view. WHY: multi-worker crisis deserves office-wide drama, not just individual monitor-level drama.",
+        "description": "Individual worker errors trigger PANIC screens on desk monitors. But when two or more workers hit error simultaneously, the office doesn't collectively respond \u2014 the border stays teal, the floor is calm, Bloberto sits in his HQ. Flip the whole canvas: the outer office border pulses red, Bloberto's typing indicator fires rapidly, ambient floor particles shift to agitated warm-red, and a DEFCON-2 speech bubble triggers instead of the normal 45-second rotation. This is the 'all hands' feeling the on-fire vibe promises but never fully delivers in the Office view. WHY: multi-worker crisis deserves office-wide drama, not just individual monitor-level drama.",
         "effort": "medium",
         "assigned_to": "dave"
       },
@@ -204,7 +204,7 @@
         "priority": "wild",
         "category": "delight",
         "title": "Coffee Run Animation on Idle to Working Transition",
-        "description": "The COFFEE station ('COFFEE TRIPLE SHOT' on crushing vibe) is pure set dressing — nobody ever actually walks to it. When a worker transitions from idle to working, play a 3-second theater beat: the character walks from wherever they're wandering to the coffee machine, a steam puff SVG appears above it, then they walk to their desk and sit. The machine increments a session counter: coffee x7 today. The idle-to-working transition is the most emotionally resonant event in the whole office — someone showing up to do work. It deserves a ceremony, not an instant teleport. WHY: this is the kind of tiny theatrical moment that makes people show the app to their colleagues.",
+        "description": "The COFFEE station ('COFFEE TRIPLE SHOT' on crushing vibe) is pure set dressing \u2014 nobody ever actually walks to it. When a worker transitions from idle to working, play a 3-second theater beat: the character walks from wherever they're wandering to the coffee machine, a steam puff SVG appears above it, then they walk to their desk and sit. The machine increments a session counter: coffee x7 today. The idle-to-working transition is the most emotionally resonant event in the whole office \u2014 someone showing up to do work. It deserves a ceremony, not an instant teleport. WHY: this is the kind of tiny theatrical moment that makes people show the app to their colleagues.",
         "effort": "medium",
         "assigned_to": "dave"
       }
@@ -215,13 +215,13 @@
     "creative_director": "Luna",
     "review_number": 105,
     "timestamp": "2026-03-11T17:12:00Z",
-    "theme": "The office has been living in the present — this review builds its memory. Every ephemeral flash, every empty board, every invisible dynamic becomes part of the ambient record.",
+    "theme": "The office has been living in the present \u2014 this review builds its memory. Every ephemeral flash, every empty board, every invisible dynamic becomes part of the ambient record.",
     "ideas": [
       {
         "priority": "must",
         "category": "feature",
         "title": "Sprint Board Untagged Work Frequency Fallback",
-        "description": "In the screenshot, the Sprint Tag Board in Office.jsx reads 'no tags' — and this is not a rare edge case. It fires whenever no active worker's task string matches the 8 TASK_TAG_DEFS patterns (Bug, Ship, Design, QA, Data, Docs, Plan, Refactor). Tasks like 'Reviewing quarterly targets', 'Prep for client sync', or 'Onboarding docs pass' are real work that doesn't map to any regex. The board goes dark and contributes nothing despite holding prime real estate in the office-floor's top-right corner. Fix: when `workingWorkers.length > 0` but `tagCounts.length === 0`, replace the 'no tags' label with a live word-frequency readout. Split all active workers' task strings by whitespace, lowercase them, filter out common stopwords ('a', 'the', 'for', 'of', 'in', 'to', 'with', 'on', 'and', 'at'), then count unique word frequencies. Render the top 3 as weighted pills: 'Reviewing ×2 · Client ×1 · Targets ×1'. The pills use a neutral grey color distinct from the 8 tag colors so they don't look like parsed tags. Max 3 pills. The fallback disappears as soon as any real tag matches. This is a pure client-side computation over `workingWorkers.map(w => w.task)` — no new state, no props. WHY: the SPRINT board exists on the office floor specifically to tell you what kind of work is happening right now. When it says 'no tags' during a Crushing It session with 5 active workers, it reads as broken. The frequency fallback turns a failure state into a genuinely useful signal about the texture of today's work.",
+        "description": "In the screenshot, the Sprint Tag Board in Office.jsx reads 'no tags' \u2014 and this is not a rare edge case. It fires whenever no active worker's task string matches the 8 TASK_TAG_DEFS patterns (Bug, Ship, Design, QA, Data, Docs, Plan, Refactor). Tasks like 'Reviewing quarterly targets', 'Prep for client sync', or 'Onboarding docs pass' are real work that doesn't map to any regex. The board goes dark and contributes nothing despite holding prime real estate in the office-floor's top-right corner. Fix: when `workingWorkers.length > 0` but `tagCounts.length === 0`, replace the 'no tags' label with a live word-frequency readout. Split all active workers' task strings by whitespace, lowercase them, filter out common stopwords ('a', 'the', 'for', 'of', 'in', 'to', 'with', 'on', 'and', 'at'), then count unique word frequencies. Render the top 3 as weighted pills: 'Reviewing \u00d72 \u00b7 Client \u00d71 \u00b7 Targets \u00d71'. The pills use a neutral grey color distinct from the 8 tag colors so they don't look like parsed tags. Max 3 pills. The fallback disappears as soon as any real tag matches. This is a pure client-side computation over `workingWorkers.map(w => w.task)` \u2014 no new state, no props. WHY: the SPRINT board exists on the office floor specifically to tell you what kind of work is happening right now. When it says 'no tags' during a Crushing It session with 5 active workers, it reads as broken. The frequency fallback turns a failure state into a genuinely useful signal about the texture of today's work.",
         "effort": "small",
         "assigned_to": "carlos"
       },
@@ -229,7 +229,7 @@
         "priority": "should",
         "category": "visual",
         "title": "Desk Lamp Progress Intensity Scale",
-        "description": "Every occupied working desk already renders a small SVG desk lamp (the `desk-lamp` element in Office.jsx, lines 1700-1704). Its shade color is already set to `ROLE_COLORS[occ.worker.role]`. But all working desks glow at the same intensity — whether the worker is at 3% or 97%. The desk already receives `--progress` as a CSS custom property: `...(isWorking && occ.worker.progress != null ? { '--progress': occ.worker.progress } : {})`. This means the lamp can already read `var(--progress)` in CSS with zero JSX changes. Add to the `.desk-lamp--working .desk-lamp` CSS: an `opacity` scaling from 0.45 (0% progress) to 1.0 (100% progress) via `calc(0.45 + var(--progress, 50) / 100 * 0.55)`; a `filter: blur()` scaling inversely so lamps become crisp as workers progress; and on the `<ellipse>` shade, a `rx` value that expands slightly (4.5 → 5.5) at high progress. Workers deep in a task blaze bright; workers just starting glow faint. Distinct from radar rings (stale alert, review #104) and monitor glow (task-type color, review #102) — the lamp is about forward momentum, not alert level or task type. WHY: the 5 desk lamps are the most spatially distributed visual indicators on the office floor. They already differentiate by role color — making them differentiate by progress turns them into a real-time fuel gauge for each worker's energy.",
+        "description": "Every occupied working desk already renders a small SVG desk lamp (the `desk-lamp` element in Office.jsx, lines 1700-1704). Its shade color is already set to `ROLE_COLORS[occ.worker.role]`. But all working desks glow at the same intensity \u2014 whether the worker is at 3% or 97%. The desk already receives `--progress` as a CSS custom property: `...(isWorking && occ.worker.progress != null ? { '--progress': occ.worker.progress } : {})`. This means the lamp can already read `var(--progress)` in CSS with zero JSX changes. Add to the `.desk-lamp--working .desk-lamp` CSS: an `opacity` scaling from 0.45 (0% progress) to 1.0 (100% progress) via `calc(0.45 + var(--progress, 50) / 100 * 0.55)`; a `filter: blur()` scaling inversely so lamps become crisp as workers progress; and on the `<ellipse>` shade, a `rx` value that expands slightly (4.5 \u2192 5.5) at high progress. Workers deep in a task blaze bright; workers just starting glow faint. Distinct from radar rings (stale alert, review #104) and monitor glow (task-type color, review #102) \u2014 the lamp is about forward momentum, not alert level or task type. WHY: the 5 desk lamps are the most spatially distributed visual indicators on the office floor. They already differentiate by role color \u2014 making them differentiate by progress turns them into a real-time fuel gauge for each worker's energy.",
         "effort": "small",
         "assigned_to": "dave"
       },
@@ -237,7 +237,7 @@
         "priority": "should",
         "category": "feature",
         "title": "Progress Bar Velocity Arrow",
-        "description": "The `ProgressBar` component in App.jsx (lines 273-334) already computes `eta` from `startedAt` and `progress`. It tells you WHERE you are and approximately WHEN you'll finish. But it has no sense of HOW FAST you're moving — whether the progress bar is accelerating toward completion or has been frozen at 47% for the last 40 minutes. Add a small velocity arrow immediately to the left of the existing `progress-pct` span. Track progress readings in a `velocityRef = useRef([])` — append `{ progress, ts: Date.now() }` each time the `progress` prop changes, keeping the last 3 readings. On each update, compare the most recent delta: if progress increased by ≥ 3% in the last update → render `↑↑` in green; if increased by 1-2% → `↑` in teal; if unchanged for 2+ readings → `→` in grey at opacity 0.5; if decreased → `↓` in red. The arrow is 0.7rem, displayed inline, with no tooltip or animation. It appears only when `progress > 0 && progress < 100` and the worker has at least 2 progress readings. Clearing on task reset (same as the existing `milestonesRef.current = new Set()` guard). WHY: ETA is interesting but velocity is the emotional signal. When Sofia's bar is at 60% and accelerating (↑↑), that reads completely differently than 60% with → frozen for an hour. One number; two completely different vibes. The arrow adds the third dimension the progress bar currently lacks.",
+        "description": "The `ProgressBar` component in App.jsx (lines 273-334) already computes `eta` from `startedAt` and `progress`. It tells you WHERE you are and approximately WHEN you'll finish. But it has no sense of HOW FAST you're moving \u2014 whether the progress bar is accelerating toward completion or has been frozen at 47% for the last 40 minutes. Add a small velocity arrow immediately to the left of the existing `progress-pct` span. Track progress readings in a `velocityRef = useRef([])` \u2014 append `{ progress, ts: Date.now() }` each time the `progress` prop changes, keeping the last 3 readings. On each update, compare the most recent delta: if progress increased by \u2265 3% in the last update \u2192 render `\u2191\u2191` in green; if increased by 1-2% \u2192 `\u2191` in teal; if unchanged for 2+ readings \u2192 `\u2192` in grey at opacity 0.5; if decreased \u2192 `\u2193` in red. The arrow is 0.7rem, displayed inline, with no tooltip or animation. It appears only when `progress > 0 && progress < 100` and the worker has at least 2 progress readings. Clearing on task reset (same as the existing `milestonesRef.current = new Set()` guard). WHY: ETA is interesting but velocity is the emotional signal. When Sofia's bar is at 60% and accelerating (\u2191\u2191), that reads completely differently than 60% with \u2192 frozen for an hour. One number; two completely different vibes. The arrow adds the third dimension the progress bar currently lacks.",
         "effort": "small",
         "assigned_to": "sofia"
       },
@@ -245,7 +245,7 @@
         "priority": "could",
         "category": "storytelling",
         "title": "Bloberto Thought Bubble Pinboard in HQ Card",
-        "description": "The `thoughtBubble` system in Office.jsx (lines 1373-1489) fires a reactive quip from `thoughtQuipRef.current()` every 15-20 seconds — things like 'We are absolutely CRUSHING it rn 😤', 'Last one standing… respect 🫡', 'It\\'s giving: corporate screensaver 🫥'. The quip appears as `bloberto-thought-bubble` on the office floor and disappears after 5 seconds with no trace. These are the funniest, most reactive lines in the product and they vanish like nothing happened. The HQ card's `mgr-desk` (lines 1620-1661) already renders the monitor, nameplate, HQ lamp, and optional vibe decorators (trophy 🏆 for crushing, coffee ☕ for on-fire, candle 🕯️ for after-hours). There is room in the top-right corner of the HQ card for a sticky note cluster. Mechanic: each time `thoughtBubble.show` transitions from `false` to `true`, automatically push the quip into `pinnedThoughts` in `useState` (max 4, oldest dropped). Render each pinned thought as a tiny 28px×20px yellow sticky note div positioned absolutely in the mgr-desk top-right, stacked with a slight rotation offset per index. On hover, the hovered note expands to show full text. Notes persist for the session in `sessionStorage` using the existing `safeSave` pattern. This is explicitly DIFFERENT from the Whiteboard Quote Pins idea (review #102), which was about Bloberto's SPEECH BUBBLES (what he says out loud) being manually pinned to the whiteboard by the user. This is about THOUGHT BUBBLE quips (internal monologue) that auto-accumulate on his desk as small private notes. Different content source, different trigger, different surface, automatic not manual. WHY: the thought bubble quips are already the best real-time commentary in the product. The pinboard turns his desk into a running psychological portrait of the day — visible to anyone who visits the HQ, a record of what the manager was privately thinking as the team's vibe shifted.",
+        "description": "The `thoughtBubble` system in Office.jsx (lines 1373-1489) fires a reactive quip from `thoughtQuipRef.current()` every 15-20 seconds \u2014 things like 'We are absolutely CRUSHING it rn \ud83d\ude24', 'Last one standing\u2026 respect \ud83e\udee1', 'It\\'s giving: corporate screensaver \ud83e\udee5'. The quip appears as `bloberto-thought-bubble` on the office floor and disappears after 5 seconds with no trace. These are the funniest, most reactive lines in the product and they vanish like nothing happened. The HQ card's `mgr-desk` (lines 1620-1661) already renders the monitor, nameplate, HQ lamp, and optional vibe decorators (trophy \ud83c\udfc6 for crushing, coffee \u2615 for on-fire, candle \ud83d\udd6f\ufe0f for after-hours). There is room in the top-right corner of the HQ card for a sticky note cluster. Mechanic: each time `thoughtBubble.show` transitions from `false` to `true`, automatically push the quip into `pinnedThoughts` in `useState` (max 4, oldest dropped). Render each pinned thought as a tiny 28px\u00d720px yellow sticky note div positioned absolutely in the mgr-desk top-right, stacked with a slight rotation offset per index. On hover, the hovered note expands to show full text. Notes persist for the session in `sessionStorage` using the existing `safeSave` pattern. This is explicitly DIFFERENT from the Whiteboard Quote Pins idea (review #102), which was about Bloberto's SPEECH BUBBLES (what he says out loud) being manually pinned to the whiteboard by the user. This is about THOUGHT BUBBLE quips (internal monologue) that auto-accumulate on his desk as small private notes. Different content source, different trigger, different surface, automatic not manual. WHY: the thought bubble quips are already the best real-time commentary in the product. The pinboard turns his desk into a running psychological portrait of the day \u2014 visible to anyone who visits the HQ, a record of what the manager was privately thinking as the team's vibe shifted.",
         "effort": "small",
         "assigned_to": "luna"
       },
@@ -253,7 +253,7 @@
         "priority": "could",
         "category": "visual",
         "title": "Ghost Worker Temporal Desaturation",
-        "description": "The `ghostRoster` mechanic in Office.jsx (line 1493) renders `char--ghost` variant characters at desks for roster members who are currently OOO. The hover state shows a small `ghost-ooo-bubble` with their role and 'Last seen: X ago'. But there is no visual difference between a ghost who left 20 minutes ago and one who hasn't been seen in 3 days — they render identically: same opacity, same styles, same everything. Fix via CSS-only on the Character component: when `variant === 'ghost'`, compute `timeSinceLastActivity` from the last `activityEntry` for that worker in `activityEntries` (already available as prop). Pass it as a `--ghost-age` CSS custom property on the char div (in hours, clamped 0-72). In CSS: `.char--ghost { filter: grayscale(calc(var(--ghost-age, 0) / 72 * 80%)) opacity(calc(1 - var(--ghost-age, 0) / 72 * 0.35)) }`. A ghost 1 hour old is nearly full color. A ghost 24 hours old is noticeably faded. A 3-day ghost (72h) is 80% greyscale and 35% dimmer — a true spectre. The computation happens inside the existing DESKS.map render loop where `activityEntries` is already in scope. WHY: in the current UI, ghosts feel like placeholders rather than absences. A ghost who left 3 days ago should feel like a memory — something you can see but not quite touch. Temporal desaturation makes OOO feel real without adding a single label.",
+        "description": "The `ghostRoster` mechanic in Office.jsx (line 1493) renders `char--ghost` variant characters at desks for roster members who are currently OOO. The hover state shows a small `ghost-ooo-bubble` with their role and 'Last seen: X ago'. But there is no visual difference between a ghost who left 20 minutes ago and one who hasn't been seen in 3 days \u2014 they render identically: same opacity, same styles, same everything. Fix via CSS-only on the Character component: when `variant === 'ghost'`, compute `timeSinceLastActivity` from the last `activityEntry` for that worker in `activityEntries` (already available as prop). Pass it as a `--ghost-age` CSS custom property on the char div (in hours, clamped 0-72). In CSS: `.char--ghost { filter: grayscale(calc(var(--ghost-age, 0) / 72 * 80%)) opacity(calc(1 - var(--ghost-age, 0) / 72 * 0.35)) }`. A ghost 1 hour old is nearly full color. A ghost 24 hours old is noticeably faded. A 3-day ghost (72h) is 80% greyscale and 35% dimmer \u2014 a true spectre. The computation happens inside the existing DESKS.map render loop where `activityEntries` is already in scope. WHY: in the current UI, ghosts feel like placeholders rather than absences. A ghost who left 3 days ago should feel like a memory \u2014 something you can see but not quite touch. Temporal desaturation makes OOO feel real without adding a single label.",
         "effort": "small",
         "assigned_to": "maya"
       },
@@ -261,17 +261,164 @@
         "priority": "could",
         "category": "office-life",
         "title": "Door Event Arrival/Departure Memory Strip",
-        "description": "The `office-door` element at the bottom center of the office floor (line 1810 in Office.jsx) already reacts to `doorEvent` for 1.5-2 seconds — showing a notify dot, an icon with sparkles on 'arrive', and the DOOR_LABELS label. But the door has zero memory: once the event window closes, there is no trace of who came and went. Worker arrivals and departures are tracked in App.jsx via `appeared` and `disappeared` arrays in the `useEffect` at line 1065. Accumulate the last 3 door events in `doorHistory` state in App.jsx — each entry: `{ type: 'arrive'|'depart', name: string, ts: number }`. Pass `doorHistory` to Office alongside `doorEvent`. In Office.jsx, render `doorHistory` as 3 micro-text lines below the door label: `← Dave left 12m ago`, `→ Sofia arrived 18m ago`, `← Carlos left 2h ago`. Style them at opacity 0.45, 0.65rem font, fading left-to-right oldest-to-newest. The strip shows only for 2+ hours; entries older than 4 hours drop off. WHY: the door is one of the most evocative set pieces in the office — it has vibe-specific labels and icons — but it functions as a one-second flash with no residue. A door that remembers who walked through it turns the entrance from a decorative event indicator into a quiet social record of the day's comings and goings.",
+        "description": "The `office-door` element at the bottom center of the office floor (line 1810 in Office.jsx) already reacts to `doorEvent` for 1.5-2 seconds \u2014 showing a notify dot, an icon with sparkles on 'arrive', and the DOOR_LABELS label. But the door has zero memory: once the event window closes, there is no trace of who came and went. Worker arrivals and departures are tracked in App.jsx via `appeared` and `disappeared` arrays in the `useEffect` at line 1065. Accumulate the last 3 door events in `doorHistory` state in App.jsx \u2014 each entry: `{ type: 'arrive'|'depart', name: string, ts: number }`. Pass `doorHistory` to Office alongside `doorEvent`. In Office.jsx, render `doorHistory` as 3 micro-text lines below the door label: `\u2190 Dave left 12m ago`, `\u2192 Sofia arrived 18m ago`, `\u2190 Carlos left 2h ago`. Style them at opacity 0.45, 0.65rem font, fading left-to-right oldest-to-newest. The strip shows only for 2+ hours; entries older than 4 hours drop off. WHY: the door is one of the most evocative set pieces in the office \u2014 it has vibe-specific labels and icons \u2014 but it functions as a one-second flash with no residue. A door that remembers who walked through it turns the entrance from a decorative event indicator into a quiet social record of the day's comings and goings.",
         "effort": "small",
         "assigned_to": "carlos"
       },
       {
         "priority": "wild",
         "category": "delight",
-        "title": "Desk Completion Footprint — The Task Leaves a Mark",
-        "description": "In App.jsx, when a worker transitions from working → idle (justShipped), `workerConfetti` fires at the app level and `completionToast` appears centered at the bottom of the screen. On the Dashboard tab, confetti rains. But on the Office tab, the actual desk that just shipped — the exact grid square where the work happened — does absolutely nothing. Add a spatial celebration: when `justShipped` fires for worker W, find their current desk occupancy (`deskOccupants` in Office.jsx, keyed by desk ID from `DESKS`), then render a brief `desk-completion-footprint` div absolutely positioned at that desk's coordinates. The footprint is a simple CSS-only star burst (4 radial lines, same color as `ROLE_COLORS[worker.role]`, no SVG) that scales from 0 to 120% in 0.3s, holds for 1.2s, then fades out over 0.5s — total 2 seconds. A `data-worker-id` attribute on the footprint allows per-worker color. The footprint is positioned via the same `left: desk.left%, top: desk.top%` coordinates already used for Character placement. State: a `shipBursts` array in Office (or passed as prop from App.jsx where justShipped is computed) of `{ deskId, workerId, key: timestamp }`. Each footprint self-removes after 2s via a `useEffect` cleanup timeout. Max 3 simultaneous (multiple completions in a burst). WHY: work happens at a desk. The office floor should feel the completion where it occurred — not just as a screen-center toast and dashboard confetti. The first time a user sees that star burst at Carlos's desk exactly when he ships, they will feel the spatial truth of the office in a way that no amount of global confetti ever achieves.",
+        "title": "Desk Completion Footprint \u2014 The Task Leaves a Mark",
+        "description": "In App.jsx, when a worker transitions from working \u2192 idle (justShipped), `workerConfetti` fires at the app level and `completionToast` appears centered at the bottom of the screen. On the Dashboard tab, confetti rains. But on the Office tab, the actual desk that just shipped \u2014 the exact grid square where the work happened \u2014 does absolutely nothing. Add a spatial celebration: when `justShipped` fires for worker W, find their current desk occupancy (`deskOccupants` in Office.jsx, keyed by desk ID from `DESKS`), then render a brief `desk-completion-footprint` div absolutely positioned at that desk's coordinates. The footprint is a simple CSS-only star burst (4 radial lines, same color as `ROLE_COLORS[worker.role]`, no SVG) that scales from 0 to 120% in 0.3s, holds for 1.2s, then fades out over 0.5s \u2014 total 2 seconds. A `data-worker-id` attribute on the footprint allows per-worker color. The footprint is positioned via the same `left: desk.left%, top: desk.top%` coordinates already used for Character placement. State: a `shipBursts` array in Office (or passed as prop from App.jsx where justShipped is computed) of `{ deskId, workerId, key: timestamp }`. Each footprint self-removes after 2s via a `useEffect` cleanup timeout. Max 3 simultaneous (multiple completions in a burst). WHY: work happens at a desk. The office floor should feel the completion where it occurred \u2014 not just as a screen-center toast and dashboard confetti. The first time a user sees that star burst at Carlos's desk exactly when he ships, they will feel the spatial truth of the office in a way that no amount of global confetti ever achieves.",
         "effort": "medium",
         "assigned_to": "maya"
+      }
+    ],
+    "hire_proposals": []
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 106,
+    "timestamp": "2026-03-11T18:24:47Z",
+    "theme": "The office speaks in layers \u2014 every surface has an untold story, every interaction a missing punchline. This review makes the invisible legible.",
+    "screenshots": {
+      "desktop": "screenshot-luna-106-desktop.png",
+      "mobile": "screenshot-luna-106-mobile.png"
+    },
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "feature",
+        "title": "Activity Log Entry \u2014 One-Click Worker Filter Tap",
+        "description": "Each ActivityLogEntry (App.jsx ~line 171) renders a worker name badge via the `activity-worker` span, but clicking it does nothing. The `setWorkerFilter` callback already exists at line 786 and the worker filter bar at line 1533 already handles state. WHY: Power users scan the activity log to diagnose incidents. When Carlos surfaces 3 errors in a row, the natural move is tap-his-name-see-only-his-log. Right now that takes 3 extra clicks to the filter bar. Tying onClick directly to the worker name in ActivityLogEntry \u2014 with a visual affordance (underline, pointer cursor, subtle highlight on hover) \u2014 collapses a 4-step workflow into 1. Zero new state, zero new components, max ergonomic gain.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "storytelling",
+        "title": "Worker Card Back \u2014 Vibe-Tagged Activity Entries",
+        "description": "The WorkerCard back panel (App.jsx lines 457-479) shows up to 5 recent activity entries as bare messages with timestamps. But every event happened inside a vibe \u2014 a merged PR during 'on-fire' tells a completely different story than one during 'slow-day.' The vibeHistory array is already tracked in localStorage (VIBE_HISTORY_KEY, line 494) and updated every vibe change (lines 1199-1205). WHY: Tagging each back-panel entry with a tiny vibe pill (derived by matching entry.timestamp against the vibeHistory timeline) transforms 'Carlos: logs updated, task closed \u00b7 2h ago' into 'Carlos: logs updated, task closed \u00b7 2h ago \ud83d\udd25 on-fire.' This costs a ~10-line utility lookup and one CSS pill per entry, but turns the card back from a raw changelog into a dramatic timeline. This is the worker biography the office deserves.",
+        "effort": "medium",
+        "assigned_to": "luna"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Office Hover Card \u2014 Mini Progress Arc in Working State",
+        "description": "The char-hover-card in Office.jsx (lines 930-957) shows name, role, task snippet, time-on-task, and deep-work flag. But for a working character with a non-null worker.progress, there is no visual. The progress-ring SVG is already rendered on the character avatar (lines 900-910) tracking progress perfectly. WHY: When you hover a working character and see 'on task for 1h 20m,' you want to know if that means 15% done or 85% done. A 28px SVG arc inside the hover card \u2014 reusing the exact same progress-ring math \u2014 closes this perceptual gap. A number alone ('67%') is cold. An arc is a gestalt. Assign to Maya because this is a design-first micro-component that will end up touching hover card CSS.",
+        "effort": "medium",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "delight",
+        "title": "Ficus Watering Ceremony \u2014 Animated Growth Burst on Streak Increment",
+        "description": "The ficus grows through 5 stages (seedling \u2192 sprout \u2192 small-plant \u2192 leafy \u2192 blooming) tracked via plantStage in Office.jsx (line 1314). The plantMilestone state already triggers for 1.8s (line 1327) and sets data-milestone on the plant div (line 1900). But the only ceremony is a text toast. The actual plant just silently changes CSS class. WHY: The ficus is the office Tamagotchi \u2014 the most emotionally resonant ambient object in the whole UI. When it levels up, it should earn it. A CSS keyframe burst (3-4 tiny animated water-drop SVGs arcing up from the pot) triggered by the existing data-milestone attribute would cost ~15 lines of CSS + a simple inline SVG. The burst lasts 1.2s and never blocks anything. It transforms a tooltip into a moment.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "should",
+        "category": "storytelling",
+        "title": "VibeSparkline \u2014 Peak and Drop Annotation Labels",
+        "description": "The VibeSparkline component (App.jsx lines 497-528) renders colored dots connected by a polyline and a title tag with raw timestamp + key. The sparkline-legend shows the last 3 vibe pills. But there is no annotation for when something interesting happened. VIBE_RANK (line 493) already provides a numeric rank per vibe. WHY: Scanning 12 unlabeled dots is noise. Annotating just 2 dots \u2014 the all-time peak (highest rank in history) and the most recent change \u2014 with a tiny SVG text label ('peak', 'now') or an up/down arrow transforms the sparkline from a decorative artifact into a narrative. The algorithm is trivial: iterate history, find max-rank entry, render a text label above that dot. Sofia should own this because she will write 4 tests for the edge case where all vibes are equal.",
+        "effort": "medium",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "could",
+        "category": "office-life",
+        "title": "Conference Table \u2014 Meeting Mood Emoji Stamp on Huddle End",
+        "description": "The ConferenceTable component (Office.jsx lines 1022-1176) shows a 'Last: names \u00b7 Xmin ago' ghost label after a huddle ends (lines 1115-1126). It displays who met and when, but nothing about the energy in the room. The lastHuddle ref already tracks startedAt, endedAt, and names. The vibe at huddle time is available via vibeHistoryRef. WHY: A single derived emoji stamp \u2014 \ud83d\ude24 for on-fire, \u26a1 for crushing, \u2601\ufe0f for slow-day, \ud83d\ude0c for in-flow \u2014 appended to the 'Last: \u2026' line would make the conference table tell a story about meeting culture at different vibes. It costs 5 lines of logic and 0 new state. It makes empty desks feel inhabited.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "wild",
+        "category": "feature",
+        "title": "Bloberto Emergency Broadcast Strip on Multi-Error (2+ workers)",
+        "description": "When errorCount >= 2, the vibe is already 'on-fire,' Bloberto's title is 'CFO,' and data-has-error is set on the .office-floor (Office.jsx line 1555). But the manager desk stays visually calm \u2014 same lamp, same nameplate, same thought bubble cadence. The thoughtBubble system (lines 1379-1498) already shows 'This is fine \ud83d\udd25' when 2+ workers error. WHY: When the whole team is broken, the CEO desk should broadcast it. A full-width amber ticker strip beneath the mgr-desk__nameplate \u2014 showing worker names in error with a CSS marquee scroll animation, triggered by errorCount >= 2 \u2014 would make the manager desk the unambiguous incident command center. It uses existing errorCount state, requires ~20 lines of JSX + CSS animation, and creates a moment the team will screenshot every time. Dave owns infra panic; he owns this.",
+        "effort": "medium",
+        "assigned_to": "dave"
+      }
+    ],
+    "hire_proposals": [
+      {
+        "role": "Interaction Micro-Detail Engineer",
+        "why": "The office has world-class ambient storytelling but its interactive surfaces \u2014 log entries, sparkline dots, hover cards \u2014 are still one gesture away from zero feedback. This hire lives in the 200ms interactions that separate 'functional' from 'delightful.' They sit between Maya and Carlos in the stack.",
+        "reports_to": "luna",
+        "urgency": "should"
+      },
+      {
+        "role": "Office Lore Keeper (part-time, async)",
+        "why": "The WORKER_TAGLINES (App.jsx line 347), PING_REACTIONS (line 266), and WORKER_COMPLETION_LINES (line 355) are brilliant but static. A Lore Keeper rotates fresh lines monthly, writes seasonal variants (Friday afternoon, sprint week, post-launch), and keeps the office voice from going stale. Luna cannot also be Luna and write all the copy.",
+        "reports_to": "luna",
+        "urgency": "could"
+      }
+    ]
+  },
+  {
+    "creative_director": "Luna",
+    "review_number": 106,
+    "timestamp": "2026-03-11T18:23:00Z",
+    "theme": "The office speaks in visuals but whispers in data \u2014 this review amplifies the signals the floor already knows but hasn't learned to show.",
+    "ideas": [
+      {
+        "priority": "must",
+        "category": "feature",
+        "title": "Sprint Board Fallback \u2014 Word Frequency When No Tags Match",
+        "description": "This is a carry-forward from review #105 that hasn't shipped yet. The Sprint Tag Board shows 'no tags' when active workers have tasks that don't match TASK_TAG_DEFS. With workers doing creative reviews, QA passes, and planning sessions, this is the COMMON state, not the edge case. The fallback word-frequency approach from #105 is the right fix. Shipping this is overdue. WHY: the sprint board occupies premium office real estate and says 'no tags' during peak activity. That's a broken signal.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "must",
+        "category": "visual",
+        "title": "Error Boundary Personality \u2014 Bloberto's Crash Screen",
+        "description": "Carry-forward from review #104. The ErrorBoundary renders a bare red text div with a retry button \u2014 the most personality-void surface in the entire app. It already has a resetError handler. Add Bloberto's avatar, a random VIBE_QUOTE, and the pulsing red border from PANIC state. This is the moment users need Bloberto most and he's completely absent. WHY: the worst moment to lose personality is when things break.",
+        "effort": "small",
+        "assigned_to": "carlos"
+      },
+      {
+        "priority": "should",
+        "category": "visual",
+        "title": "Stale Worker Radar Ring",
+        "description": "Carry-forward from review #104. The desk--stale class exists but its visual treatment is too subtle. A CSS-only radar ring animation on stale desks would make overdue workers unmissable without adding any new state. WHY: stale workers are a real operational signal being visually buried.",
+        "effort": "small",
+        "assigned_to": "dave"
+      },
+      {
+        "priority": "should",
+        "category": "feature",
+        "title": "Full-Squad Unlock Celebration",
+        "description": "Carry-forward from review #104. When all desks are occupied and working, nothing special happens. The confetti infra exists. The condition check is trivial. WHY: the rarest positive state deserves recognition.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "visual",
+        "title": "Vibe-Colored Ambient Floor Grain Texture",
+        "description": "The office floor is a flat colored surface that changes with vibe but has no texture. Add a subtle CSS noise/grain overlay (SVG filter or repeating-radial-gradient) at 3-5% opacity that shifts hue with VIBE_COLORS. Real floors have texture. Digital ones should too \u2014 it adds depth without weight. WHY: the floor is the largest visual surface and currently the least interesting one.",
+        "effort": "small",
+        "assigned_to": "maya"
+      },
+      {
+        "priority": "could",
+        "category": "storytelling",
+        "title": "Worker Desk Nameplate Task Preview",
+        "description": "Each desk nameplate shows the worker's name and role emoji. The task string is only visible on hover or in the dashboard tab. Truncate the current task to ~20 chars and render it as a faint subtitle under the nameplate: 'Fixing auth bug...' at 0.55rem, opacity 0.6. No new data \u2014 just surfacing worker.task on the floor. WHY: you should be able to glance at the office and know what everyone is working on without hovering each desk.",
+        "effort": "small",
+        "assigned_to": "sofia"
+      },
+      {
+        "priority": "wild",
+        "category": "delight",
+        "title": "Konami Code Easter Egg \u2014 Bloberto Dance Mode",
+        "description": "Detect the Konami code (\u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192BA) via the existing keydown listener. On trigger: all worker avatars do a synchronized 3-second CSS wiggle animation, Bloberto's speech bubble says 'You found the thing! \ud83d\udd7a', confetti fires, and a hidden achievement counter increments in localStorage. Second activation plays a different animation. WHY: easter eggs are the purest form of product delight. They reward curiosity and give people something to share.",
+        "effort": "small",
+        "assigned_to": "dave"
       }
     ],
     "hire_proposals": []
