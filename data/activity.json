@@ -438,5 +438,11 @@
     "worker": "Luna",
     "message": "\ud83c\udf19 Creative review #106 complete \u2014 7 ideas (2 must carry-forwards, 2 should, 2 could, 1 wild). Theme: amplifying floor signals.",
     "timestamp": "2026-03-11T18:28:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Carlos",
+    "message": "\u2699\ufe0f Shipped 2 must items from Luna #106: Sprint Board word-frequency fallback + Bloberto Error Boundary personality screen",
+    "timestamp": "2026-03-11T18:32:00Z"
   }
 ]
