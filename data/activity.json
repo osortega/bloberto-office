@@ -1,5 +1,13 @@
 [
   {
+    "timestamp": "2026-03-11T01:50:00Z",
+    "worker": "Carlos",
+    "emoji": "\u2699\ufe0f",
+    "type": "complete",
+    "task": "Fix 3 HIGH + 1 BONUS from Sofia QA #80",
+    "message": "\u2699\ufe0f Fixed: handleCharClick useCallback (strike 5), speech bubble clip (strike 6), history.replaceState (strike 3), safeRead() for private browsing (strike 4). Build passes."
+  },
+  {
     "timestamp": "2026-03-10T21:53:00Z",
     "worker": "Sofia",
     "emoji": "\ud83d\udd0d",
