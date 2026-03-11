@@ -642,6 +642,14 @@ const WORKER_ERROR_BUBBLES = {
   luna: ['the deck is burning', 'every color is wrong', 'the brief changed again']
 }
 
+const IDLE_DESK_PROPS = ['☕', '🦆', '🪴', '📚']
+
+function getIdleDeskProp(workerId) {
+  const hourEpoch = Math.floor(Date.now() / 3600000)
+  const hash = Math.abs([...workerId].reduce((h, c) => h * 31 + c.charCodeAt(0), 0)) ^ hourEpoch
+  return IDLE_DESK_PROPS[hash % IDLE_DESK_PROPS.length]
+}
+
 const Character = memo(function Character({ worker, left, top, variant, wanderIdx = 0, delay = 0, tooltip, managerVibe, vibeKey, isSyncing = false, activityEntries = [], onClick, isPinged = false, pingReaction = null }) {
   const firstName = worker.name.split(' ')[0]
   const avatarSize = worker.id === 'bloberto' ? 44 : 36
@@ -655,6 +663,7 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
   const [justCompleted, setJustCompleted] = useState(false)
   const [idleBubble, setIdleBubble] = useState(false)
   const [errorBubble, setErrorBubble] = useState(null)
+  const [clipCopied, setClipCopied] = useState(false)
   const timerRef = useRef(null)      // hover auto-hide timeout
   const ambientRef = useRef(null)    // ambient broadcast interval
   const isHoveringRef = useRef(false) // prevents ambient overlap with hover
@@ -856,8 +865,21 @@ const Character = memo(function Character({ worker, left, top, variant, wanderId
         </div>
       )}
       {variant === 'manager' && bubble.quote && (
-        <div className={`speech-bubble${bubble.show ? ' speech-bubble--visible' : ''}`}>
+        <div className={`speech-bubble speech-bubble--manager${bubble.show ? ' speech-bubble--visible' : ''}`}>
           {bubble.quote}
+          <button
+            className={`speech-bubble__copy-btn${clipCopied ? ' speech-bubble__copy-btn--copied' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              navigator.clipboard.writeText(bubble.quote)
+              setClipCopied(true)
+              setTimeout(() => setClipCopied(false), 1500)
+            }}
+            aria-label="Copy quote to clipboard"
+            title="Copy"
+          >
+            {clipCopied ? '✓' : '📋'}
+          </button>
         </div>
       )}
       {variant !== 'manager' && variant !== 'ghost' && pingReaction && (
@@ -1638,7 +1660,7 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                   )}
                   {!occ.ghost && !occ.idle && (
                     <div
-                      className={`desk__nameplate${isWorking ? ' desk__nameplate--active' : ''}${hasError ? ' desk__nameplate--error' : ''}`}
+                      className={`desk__nameplate${isWorking ? ' desk__nameplate--active' : ''}${hasError ? ' desk__nameplate--error desk-error-glitch' : ''}`}
                     >
                       {occ.worker.name.split(' ')[0]}
                     </div>
@@ -1648,6 +1670,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
                   )}
                   {showAwaySign && (
                     <AwaySign workerId={occ.worker.id} idleMinutes={idleMinutes} />
+                  )}
+                  {isIdle && !occ.ghost && (
+                    <div className="desk-idle-prop" aria-hidden="true">
+                      {getIdleDeskProp(occ.worker.id)}
+                    </div>
                   )}
                 </div>
               )}
