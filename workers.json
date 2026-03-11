@@ -2,17 +2,14 @@
   "workers": [
     {
       "id": "luna",
-      "name": "Luna",
       "role": "Creative Director",
-      "emoji": "🌙",
       "status": "idle",
-      "task": "Creative review #94 — 4 bugs fixed by Bloberto",
-      "started_at": "2026-03-11T07:30:00Z",
-      "finished_at": "2026-03-11T08:05:00Z"
+      "task": "Creative review #94 complete — all must/should items already fixed in codebase",
+      "started_at": "2026-03-11T08:30:00Z",
+      "finished_at": "2026-03-11T08:32:00Z"
     },
     {
       "id": "carlos",
-      "name": "Carlos",
       "role": "Backend Engineer",
       "status": "idle",
       "task": null,
@@ -21,7 +18,6 @@
     },
     {
       "id": "dave",
-      "name": "Dave",
       "role": "DevOps Engineer",
       "status": "idle",
       "task": null,
@@ -29,5 +25,5 @@
       "finished_at": "2026-03-11T04:35:00Z"
     }
   ],
-  "updated_at": "2026-03-11T08:05:00Z"
+  "updated_at": "2026-03-11T08:32:00Z"
 }
