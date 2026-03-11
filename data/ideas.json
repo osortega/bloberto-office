@@ -1,68 +1,65 @@
 {
   "creative_director": "Luna",
-  "review_number": 96,
-  "timestamp": "2026-03-11T10:05:00Z",
-  "theme": "Polish the edges. Review-95 items still open. New focus: accessibility, mobile delight, ambient storytelling.",
-  "fixed_since_last_review": [
-    "night-sky-stars-h22-23",
-    "luna-activity-log-entries"
-  ],
+  "review_number": 97,
+  "timestamp": "2026-03-11T10:35:00Z",
+  "theme": "The office has furniture — now give it weather, memory, and gossip.",
+  "fixed_since_last_review": [],
   "ideas": [
     {
       "priority": "should",
-      "category": "visual",
-      "title": "Night Sky Stars at h=22-23",
-      "description": "WindowElement only renders stars for h=0-4. Hours 22-23 show dark gradient but no stars. Add h>=22 to star condition. WHY: visual continuity.",
-      "effort": "trivial",
-      "assigned_to": "carlos"
+      "category": "office-life",
+      "title": "Conference Table Spontaneous Huddles",
+      "description": "The conference table exists in CSS (.conference-table, .char--seated, .conf-meeting-badge) but idle workers never spontaneously gather there. When 2+ workers are idle simultaneously, occasionally animate them walking to the conference table seats for a 'sync' or 'coffee chat'. Show the conf-meeting-badge with playful labels like 'quick sync' or 'vibe check'. WHY: idle workers just wander aimlessly — the conference table is a perfect set piece that's going completely unused. Meetings are a universal office experience.",
+      "effort": "medium",
+      "assigned_to": "maya"
     },
     {
       "priority": "should",
       "category": "storytelling",
-      "title": "Luna Activity Log Entries",
-      "description": "95 reviews, zero in activity.json. Creative reviews should appear as complete events. WHY: Luna is invisible in the dashboard.",
+      "title": "Activity Log Worker Emoji Avatars",
+      "description": "The activity log shows .activity-worker-emoji but all entries look the same. Each worker has a unique emoji (Luna 🌙, Carlos ⚙️, Maya 🎨, Dave 🔧, Sofia 🔍). Show their emoji avatar inline before their name in every log entry. WHY: scanning a wall of text for who did what is tedious. A splash of emoji makes the log scannable at a glance — same trick Slack uses with profile photos.",
       "effort": "trivial",
-      "assigned_to": "bloberto"
+      "assigned_to": "maya"
     },
     {
-      "priority": "could",
+      "priority": "should",
       "category": "delight",
-      "title": "CSS ::after Coffee Labels to DOM Spans",
-      "description": "Office.css uses ::after for vibe labels in coffee corner. Screen readers skip these. Move to DOM spans. WHY: accessibility.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "could",
-      "category": "perf",
-      "title": "idleBubble Inline Date.now() Extraction",
-      "description": "90-char inline expression for idle bubble emoji. Extract to pure utility function. WHY: readability.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "could",
-      "category": "delight",
-      "title": "Mobile Tap-to-Ping Feedback",
-      "description": "On mobile, ping reaction competes with hover card. Add CSS pulse on tap. WHY: mobile users miss ping personality.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "wild",
-      "category": "delight",
-      "title": "quoteBonus Wrap Ceremony",
-      "description": "Clicking all 8 BONUS_TAGLINES has no reward. Add confetti burst or badge. WHY: reward curiosity.",
-      "effort": "small",
-      "assigned_to": "maya"
-    },
-    {
-      "priority": "wild",
-      "category": "feature",
-      "title": "Ping History on Character Hover Card",
-      "description": "Show last 3 ping reactions in hover card. 5 unique reactions per character adds collectibility. WHY: mini-game for curious users.",
+      "title": "Office Window Weather Sync",
+      "description": "The office window (.office-window) shows a sky gradient with stars and clouds, but it's purely cosmetic — disconnected from any real data. Sync the window sky to Osvaldo's actual local weather via wttr.in: rain shows animated droplets on the glass, clouds drift across, clear sky shows sun/moon. WHY: this tiny detail would make people do a double-take — 'wait, is that MY weather?' It bridges the virtual office to the real world.",
       "effort": "medium",
       "assigned_to": "carlos"
+    },
+    {
+      "priority": "should",
+      "category": "visual",
+      "title": "Whiteboard Task Queue Preview",
+      "description": "The whiteboard (.office-whiteboard) shows vibe text and a progress bar, but never shows WHAT's being worked on. Add a tiny 2-3 line task preview showing the current top worker's task name, truncated. Cycle through active workers every 8s. WHY: the whiteboard is the natural place to answer 'what's the team working on?' at a glance without switching to the dashboard tab. It's currently wasted space.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "could",
+      "category": "feature",
+      "title": "Worker Completion Sound Effect",
+      "description": "When a worker completes (confetti fires, checkmark appears), play a subtle chime using the Web Audio API — no audio files needed, just a synthesized 3-note ascending tone. Gate it behind a mute toggle in the header. WHY: people leave the tab open in the background. An audio cue when work finishes is genuinely useful — it's the difference between checking back manually and being notified. Every CI/CD tool has this.",
+      "effort": "small",
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "could",
+      "category": "delight",
+      "title": "Desk Lamp Color Personality",
+      "description": "All active desk lamps glow the same warm yellow. Tint each worker's desk lamp to their role-color (--role-color CSS variable is already set per worker). Maya's lamp glows pink-ish, Carlos's glows blue-ish, etc. The lamp becomes a signature. WHY: it's a one-line CSS change (use color-mix with --role-color) that adds surprising personality. When you look at the office, you can tell who's working by lamp color alone.",
+      "effort": "trivial",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "wild",
+      "category": "storytelling",
+      "title": "Daily Office Newspaper",
+      "description": "Generate a tiny 'Bloberto Times' newspaper overlay accessible from the whiteboard. Auto-generated daily from activity.json: 'BREAKING: Carlos deployed 3 fixes before lunch', 'OPINION: Is Dave's uptime streak sustainable?', 'WEATHER: Vibe forecast — crushing with a chance of on-fire'. Pure satire. WHY: this transforms raw activity data into narrative. People don't remember stats, they remember stories. Plus it's hilarious.",
+      "effort": "large",
+      "assigned_to": "tbd"
     }
   ],
   "hire_proposals": []
