@@ -422,5 +422,11 @@
     "worker": "Maya",
     "message": "Fixed 3 bugs from Luna review #94: ErrorBoundary msg, ETA staleness, WorkerCard key verified",
     "timestamp": "2026-03-11T09:06:00Z"
+  },
+  {
+    "type": "complete",
+    "worker": "Sofia",
+    "message": "\ud83d\udd0d QA review #95 complete \u2014 15 suggestions, overall 3.8/5, 3 high-priority bugs found",
+    "timestamp": "2026-03-11T09:25:00Z"
   }
 ]

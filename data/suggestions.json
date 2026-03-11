@@ -1,10 +1,10 @@
 {
   "analyst": "Sofia",
-  "review_number": 88,
-  "timestamp": "2026-03-11T08:45:00Z",
+  "timestamp": "2026-03-11T09:15:00Z",
+  "review_number": 95,
   "scores": {
     "visual": 4,
-    "ux": 3,
+    "ux": 4,
     "responsiveness": 3,
     "performance": 4,
     "accessibility": 3,
@@ -12,118 +12,143 @@
     "features": 4,
     "fun_factor": 5
   },
-  "overall_score": 3.6,
+  "overall_score": 3.8,
   "suggestions": [
     {
       "priority": "high",
       "category": "bug",
-      "title": "R-key refresh does not clear paused polling state",
-      "description": "App.jsx line 896: the keyboard shortcut calls syncFromGitHub() directly instead of onResume(). onResume() sets pollingPaused to false AND updates lastActivity.current — syncFromGitHub() does neither. So pressing R while paused triggers one data fetch, but the PAUSED banner stays visible and the 15s inactivity check re-parks polling immediately. Fix: replace `syncFromGitHub()` with `onResume()` in the keydown handler.",
+      "title": "Desk assignment non-deterministic — workers teleport between polling cycles",
+      "description": "Office.jsx lines 1311-1323: deskOccupants fills slots by iteration order (working first, then idle, then ghosts). If any worker's status changes between polling cycles, ALL subsequent workers get reassigned to different desks. Carlos leaves a task → Dave slides left → Maya jumps to Dave's old seat. The 'office' metaphor breaks because a worker's desk identity resets every 30 seconds. Fix: assign each worker a stable desk slot by hashing their id against the DESKS array (e.g., DESKS[stableHash(worker.id) % DESKS.length]), falling back to first-available only when that slot is already taken.",
       "effort": "small",
-      "strike": 2
+      "assigned_to": "carlos"
     },
     {
       "priority": "high",
       "category": "bug",
-      "title": "Workers transitioning to 'done' status disappear silently with no celebration",
-      "description": "activeWorkers filters on status === 'working' | 'idle' | 'error' (App.jsx line 964). Workers that go directly working→done skip the justShipped check entirely (which only fires for working→idle, line 1037). They fall into the 'disappeared' branch: 400ms fade + 'depart' door event. No confetti, no completion toast, no worker-specific celebration line. The whole WORKER_COMPLETION_LINES map is useless for done-status workers.",
+      "title": "R-key refresh bypasses onResume — PAUSED banner persists (strike 3)",
+      "description": "App.jsx keyboard shortcut handler (inside the useEffect at line ~896): calls syncFromGitHub() directly on R/r keypress instead of onResume(). onResume() is the correct path — it sets pollingPaused(false) and updates lastActivity.current. Without it, pressing R while paused fires one fetch but the PAUSED banner remains visible, and the 15-second inactivity check re-parks polling immediately on the next tick. One-line fix: replace syncFromGitHub() with onResume() in the keydown handler. This has been flagged three reviews in a row.",
       "effort": "small",
-      "strike": 2
+      "assigned_to": "carlos"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Activity log display order depends on unsorted API response",
+      "description": "App.jsx line 140: `const displayed = entries.slice(0, 20).reverse()` — no sort by timestamp before slicing. The code assumes activity.json is always in reverse-chronological order (newest entry at index 0). If the API ever returns entries out-of-order, or if synthetic vibe-transition entries (prepended at line 1111) interleave incorrectly with fetched entries, the time-group buckets ('Just now', 'Earlier today') will be populated with wrong entries and the chronological display breaks. Fix: sort entries by timestamp descending before slicing — `[...entries].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 20).reverse()`.",
+      "effort": "small",
+      "assigned_to": "carlos"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Mobile: pinned hover card has no visible dismiss control",
-      "description": "On touch devices, clicking a character pins the hover card (Office.jsx line 749). Dismissal relies on clicking outside the .char element (line 685-689) — but there is no visible X / close button inside the hover card (lines 823-843). Touch users can be stuck with the card open until they intuit the 'tap elsewhere' interaction. At minimum, add a small close button inside the card that only renders when pinnedCard is true.",
-      "effort": "small",
-      "strike": 2
+      "title": "Single error worker triggers team-wide alarm state",
+      "description": "vibe.js line 8-9: `workers.some(w => w.status === 'error')` — one error in a 5-person team puts the entire vibe into '🚨 On Fire', floods the header with the red border, changes Bloberto's expression, and triggers the stat-card error pulse. If a worker stays in error state for hours (common), this creates persistent alarm that drowns out actual emergencies. Consider a proportional threshold: error vibe only if >20% of workers are in error, or if the error has persisted >30 minutes. A single transient error should show the error stat-card without escalating the whole team vibe.",
+      "effort": "medium",
+      "assigned_to": "carlos"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Footer quote counter hides on the last item in the cycle",
-      "description": "App.jsx line 1473: `quoteBonus > 0 && quoteBonus < BONUS_TAGLINES.length` — when quoteBonus reaches BONUS_TAGLINES.length (8), the counter is hidden because 8 < 8 is false. The last tagline is shown without its counter. The onClick wraps quoteBonus back to 1 on the next click so users never see '8/8'. Fix: change condition to `quoteBonus > 0 && quoteBonus <= BONUS_TAGLINES.length`.",
+      "title": "Workers transitioning to 'done' status get no celebration (strike 3)",
+      "description": "App.jsx line 964: activeWorkers filters on status === 'working' | 'idle' | 'error'. Workers that go working→done are excluded from activeWorkers and fall into the 'disappeared' branch (400ms fade + door depart event). The justShipped check at line 1037 only fires for working→idle. The entire WORKER_COMPLETION_LINES map is wasted for done-status workers. Fix: in the diff effect, separately detect working→done transitions and trigger the same confetti+toast+lines flow used for working→idle.",
       "effort": "small",
-      "strike": 2
+      "assigned_to": "dave"
+    },
+    {
+      "priority": "medium",
+      "category": "visual",
+      "title": "Speech bubble overflows office floor border on mobile (strike 2)",
+      "description": "Confirmed in screenshot qa-sofia-mobile.png: Bloberto's speech bubble ('my customer says we are aligned.') extends above the office-floor's cyan border and overlaps the tab navigation bar. The bubble uses `bottom: calc(100% + 8px)` relative to the character element with z-index: 30. When Bloberto is positioned near top: 4% of the floor (Office.jsx line ~1578), the bubble escapes the container. The floor uses `overflow: clip` with `overflow-clip-margin: 20px` — not enough clearance for the bubble height. Fix: add `clamp()` on the bubble's bottom offset on small viewports, or set `max(bottom, 4px)` relative to the floor top edge.",
+      "effort": "small",
+      "assigned_to": "maya"
     },
     {
       "priority": "medium",
       "category": "ux",
-      "title": "Worker cards not keyboard-navigable via Tab",
-      "description": "WorkerCard renders with tabIndex={-1} (App.jsx line 321). Cards cannot receive focus via Tab — only the info button inside them is reachable. Screen-reader and keyboard-only users can't navigate between cards, only into individual controls inside them. The card acts as an article/region and warrants a tabIndex={0} with appropriate focus styling, or at least a visible landmark heading per card.",
+      "title": "Mobile: pinged hover card has no visible dismiss control (strike 3)",
+      "description": "On touch devices, tapping a character opens a hover card that can only be dismissed by tapping elsewhere on the floor. There is no close button rendered inside the card. Touch users have no visible affordance for dismissal — especially problematic on mobile where accidental mis-taps on adjacent desk elements are common. Add a small ✕ button (or swipe-down gesture) visible only when `pinnedCard === worker.id`, rendered inside the character hover card's bottom-right corner.",
+      "effort": "small",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Character tooltips use CSS data-tooltip attribute, not screen reader accessible",
+      "description": "Office.jsx line 744-745: character tooltip text is set via `data-tooltip` attribute, rendered by Office.css as a CSS `::before` pseudo-element. This pattern is invisible to screen readers — pseudo-element content from CSS is not in the accessibility tree. Workers' task descriptions and status tooltips (the most useful info for AT users) are therefore inaccessible. Fix: add `title` attribute in addition to `data-tooltip`, or replace with an actual aria-describedby pointing to a visually-hidden span. The title attribute is already used on the desk monitor (line 1480) — apply the same approach to Character elements.",
       "effort": "medium",
-      "strike": 2
+      "assigned_to": "sofia"
     },
     {
       "priority": "medium",
       "category": "code",
-      "title": "Office.css is still 2411 lines — split into feature-scoped modules",
-      "description": "Office.css remains at exactly 2411 lines, unchanged from last review. Suggested modules: characters.css, desks.css, animations.css, widgets.css (clock, whiteboard, ficus), office-floor.css. The file mixes global variables, component scopes, keyframes, and responsive breakpoints in a single flat file. This is a maintenance liability as the feature surface grows.",
+      "title": "App.jsx has grown to 1300+ lines — still a single monolithic file (strike 3)",
+      "description": "App.jsx contains: ErrorBoundary, ActivityLogEntry, ActivityLog, ProgressBar, StatusBadge, WorkerCard, StatsBar, DeltaBadge, VibeSparkline, EmptyState, LoadingSkeleton, ShortcutToast, and the main App component — all in one file with 63KB of source. Suggested split: components/WorkerCard.jsx, components/ActivityLog.jsx, components/StatsBar.jsx, components/ShortcutToast.jsx, components/LoadingSkeleton.jsx, hooks/useWorkerSync.js (the polling logic). This has been flagged three consecutive reviews with no action.",
       "effort": "large",
-      "strike": 2
+      "assigned_to": "dave"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "Sky gradient 2h window desync — claimed fixed, still present",
-      "description": "WindowElement (Office.jsx lines 866-875): getGradient returns the sunset gradient for h >= 17 && h <= 21 (5 hours), but isGoldenHour is h >= 17 && h <= 19 (3 hours). Hours 20 and 21 display the warm sunset gradient with NO golden-hour clouds — the sky literally has a sunset glow with empty air. This was listed as fixed in the last commit but the code is unchanged. isDaytime cutoff at 16 also means 17:00 transitions sharply with no overlap handling.",
+      "category": "accessibility",
+      "title": "Footer quote button missing aria-label",
+      "description": "App.jsx line ~1469: `<button className='footer-tagline' title='tap for another thought'>` — title attribute is not reliably announced by VoiceOver/NVDA, and is completely silent for non-hover AT users. The button has no visible label text (just a sparkle icon + quote text that changes every click). Add `aria-label='Show another quote'` and update it dynamically to reflect the current quote number (e.g., `aria-label={quoteBonus > 0 ? \\`Quote ${quoteBonus} of ${BONUS_TAGLINES.length} — click for next\\` : 'Show team quote'}`). Small effort, real accessibility gain.",
       "effort": "small",
-      "strike": 1
+      "assigned_to": "sofia"
     },
     {
       "priority": "low",
       "category": "bug",
-      "title": "isTouchDevice evaluated at module load — breaks hybrid devices",
-      "description": "App.jsx line 692: `const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches` is a module-level constant. On Surface Pro / iPad keyboard users, this is evaluated once at page load and stays stale for the session. The Office.jsx Character component (line 748) already correctly uses `window.matchMedia('(hover: none)').matches` inside handleClick for dynamic evaluation. App.jsx should do the same — read the media query at call-time, not at module load.",
-      "effort": "small",
-      "strike": 2
+      "title": "Worker cards not keyboard-reachable via Tab (strike 3)",
+      "description": "WorkerCard renders with tabIndex={-1} (App.jsx line 321). Only the ℹ️ button inside each card is reachable via Tab. A keyboard-only user cannot navigate between cards, cannot trigger onTagClick, and has no way to know the worker name/status without tabbing into each card's internal control. The cards have role='article' and aria-label with full worker context — they should be focusable. Change tabIndex to 0 and add a focus style. If the large focus surface is a design concern, at minimum add a visually-hidden 'View [name] details' button as the first focusable child of each card.",
+      "effort": "medium",
+      "assigned_to": "sofia"
     },
     {
       "priority": "low",
       "category": "bug",
-      "title": "getRelativeTime returns 'just now' for future-dated timestamps",
-      "description": "time.js line 6: `if (mins < 1) return 'just now'` — diff is computed as Date.now() - timestamp. If timestamp is in the future, diff is negative, mins rounds to 0 or a negative value that still hits < 1. A future-dated activity log entry will show 'just now' indefinitely instead of surfacing the data anomaly. Fix: add a guard `if (diff < 0) return 'just now'` separately, and add a comment explaining the intended behavior.",
+      "title": "isTouchDevice evaluated at module scope — stale for hybrid devices (strike 3)",
+      "description": "App.jsx line 692: `const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches` is a module-level constant. On Surface/iPad users who attach a keyboard mid-session, this stays false for the entire session. The PAUSED pill copy ('Tap to refresh' vs 'Move mouse to refresh') becomes wrong. Character.jsx already does this correctly by reading the media query inside the event handler. Move the isTouchDevice read into the relevant render/callback path or use a hook that subscribes to mediaquery changes.",
       "effort": "small",
-      "strike": 2
-    },
-    {
-      "priority": "low",
-      "category": "ux",
-      "title": "ErrorBoundary retry button uses no design system styles",
-      "description": "App.jsx lines 17-20: the ErrorBoundary fallback UI uses raw inline styles (color: #f87171, marginLeft: 1rem). The rest of the app uses CSS classes from App.css (btn, btn-sm, btn-ghost etc.) and CSS custom properties (var(--surface2), var(--text), var(--border)). The error screen will look visually inconsistent, especially in light mode where hardcoded dark colors break. Use design system classes and variables.",
-      "effort": "small",
-      "strike": 2
+      "assigned_to": "carlos"
     },
     {
       "priority": "low",
       "category": "bug",
-      "title": "Vibe history written to localStorage on every teamVibe.key change including initial mount",
-      "description": "App.jsx lines 1113-1119: the vibe history append runs unconditionally inside `useEffect([teamVibe.key])`. The isInitialMount guard on line 1079 only protects the streak counter, not the history write. On every cold load, the current vibe is immediately pushed to history before any real vibe transition has occurred. Wrap the history push in the same `!isInitialMount` check used for streak.",
+      "title": "ErrorBoundary fallback uses hardcoded dark-mode colors (strike 3)",
+      "description": "App.jsx lines 17-20: `color: '#f87171'` is hardcoded in the ErrorBoundary render — not using CSS custom properties. In light mode, this renders low-contrast red text on a light background. The Retry button has no styling at all. Use `var(--error)` for the color and apply `className='btn btn-sm'` to the button. Two-line fix with no risk.",
       "effort": "small",
-      "strike": 2
+      "assigned_to": "maya"
     },
     {
       "priority": "low",
-      "category": "visual",
-      "title": "Bloberto speech bubble overflows tab bar on mobile",
-      "description": "Confirmed in screenshot: on 375px viewport the speech bubble positioned above Bloberto clips over the tab toggle bar ('Office' / 'Dashboard'). The bubble uses absolute positioning relative to the character element, with no viewport-aware clamping. On small screens where Bloberto is near the top of the office-floor, the bubble can escape the container bounds. Needs a max-width clamp and translateX adjustment to keep it within the office-floor boundary.",
+      "category": "performance",
+      "title": "Stats bar renders up to 7 cards with no overflow handling at mid-range widths",
+      "description": "StatsBar renders: On the Clock, Active, Idle, Sync Status, Team Vibe, and conditionally Error + Stuck. At 7 visible cards, the flex-wrap layout at ~768px creates awkward 2-row layouts with varying heights. The @media (max-width: 900px) breakpoint in App.css reduces font sizes but doesn't cap the number of visible cards or introduce a horizontal scroll. On a 13-inch laptop at ~960px, the stats bar consistently wraps to 2 rows. Consider either a horizontal scroll container (overflow-x: auto, scrollbar hidden) or collapsing error/stuck cards into the primary stat cards as icon badges at medium widths.",
+      "effort": "medium",
+      "assigned_to": "maya"
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "Vibe history pushed on initial mount — first entry is always the current vibe (strike 3)",
+      "description": "App.jsx inside the teamVibe.key useEffect: the isInitialMount guard (previousVibeKeyRef.current === null) protects the streak counter increment but NOT the history push at lines 1113-1119. Every cold page load appends the current vibe to history before any real transition has occurred. After 12 page loads, the sparkline shows 12 identical vibe dots with no real transitions — defeating its entire purpose. Wrap the history push inside `if (!isInitialMount) { ... }` just like the streak logic above it.",
       "effort": "small",
-      "strike": 1
+      "assigned_to": "carlos"
     }
   ],
   "verified_fixes": [
-    "JSON.parse on VIBE_HISTORY_KEY now wrapped in try-catch (App.jsx lines 1114-1115) — corrupted localStorage no longer throws",
-    "SVG glow filter ID in ConferenceTable now uses useId() (Office.jsx line 908) — no more hardcoded id collision risk across multiple mounted instances",
-    "ErrorBoundary contradictory message removed — fallback now shows a clean 'Something went wrong.' with a functional Retry button"
+    "quotes.js now exports VIBE_TRANSITION_QUOTES — Office.jsx line 6 imports it correctly, no runtime error on vibe transitions",
+    "Conference table SVG glow filter now uses useId() (Office.jsx line ~908) — no more hardcoded id collision risk",
+    "JSON.parse on VIBE_HISTORY_KEY wrapped in try/catch (App.jsx lines 1114-1115) — corrupted localStorage no longer throws",
+    "Full-sync and full-idle banners now have aria-live='polite' — screen readers are informed of state transitions"
   ],
   "praise": [
-    "The ping reaction system (PING_REACTIONS map + handleCharClick) is genuinely charming — every worker has 5 personality-correct one-liners and the pinged animation + speech bubble chain works cleanly",
-    "Completion celebration is properly per-worker with staggered confetti (2.6s apart), role-colored particles, and worker-specific WORKER_COMPLETION_LINES text — well above the bar for a dashboard tool",
-    "ConferenceTable now correctly uses useId() for SVG filter IDs — good catch in the last commit",
-    "The polling visibility-change handler is consolidated into a single effect with correct interval reset, title animation, and resume-on-return behavior — no more duplicate handlers",
-    "VibeSparkline with ranked y-positions and per-vibe colors is a nice touch — sparkline-legend pills with last-3 history are readable and non-intrusive",
-    "WindowElement's getHour tick is aligned to the next minute boundary, not a raw setInterval — clean approach that avoids drift",
-    "Lone survivor labels per-worker (LONE_SURVIVOR_WORKER_OVERRIDES) with vibe-specific overrides is the kind of detail that makes the app feel alive",
-    "ficus plant lifecycle (seedling → blooming → grief on streak break) with toast notification is delightful and mechanically sound"
+    "The desk away-sign (sticky note with worker name and idle duration) is a genuinely clever detail — AwaySign renders after 10 idle minutes with idleMinutes as context, and the CSS sticky-note aesthetic is pixel-perfect",
+    "Stale working detection with three tiers (fresh/stale/abandoned) and the worker-duration data-tier coloring is exactly the right level of signal density — not alarming, just informative",
+    "The ficus plant lifecycle (seedling → sapling → lush → blooming + grief toast on streak break) is the best easter egg in the app — mechanically sound, emotionally resonant",
+    "WORKER_AWAY_DESK_LABELS per-worker ('in the logs', 'sketching', 'headphones on') gives every idle character a personality without adding UI noise",
+    "The WallClock minute-hand going frantic during 'on-fire' vibe is a subtle micro-interaction that rewards attention",
+    "Conference table meeting detection (2+ workers with 'meeting' tasks) is a smart emergent behavior — no configuration needed, pure data-driven",
+    "Polling idle detection (10-min IDLE_TIMEOUT) with PAUSED pill and onResume is the correct UX pattern for a background dashboard — saves API calls and respects the user's attention",
+    "The ping feature (click any worker character → personality speech bubble) is completely undocumented and completely delightful — it's the best kind of easter egg"
   ]
 }
