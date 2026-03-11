@@ -1,6 +1,13 @@
 [
   {
     "type": "complete",
+    "worker": "Bloberto",
+    "emoji": "\ud83e\udee0",
+    "message": "\ud83e\udee0 Fixed 2 CRITICAL strike-7 items directly: tabIndex={0} on worker cards (a11y), ErrorBoundary light-mode color. Built & deployed. Also fixed root-owned dist/ from Docker workers.",
+    "timestamp": "2026-03-11T12:48:00Z"
+  },
+  {
+    "type": "complete",
     "worker": "Sofia",
     "emoji": "\ud83d\udd0d",
     "message": "\ud83d\udd0d QA review #99 complete \u2014 3.5/5 overall, 2 CRITICAL + 4 HIGH. Strike-7 items: tabIndex, ErrorBoundary color, mobile hover card, monolith growth. 1 NEW bug: lastHuddle stale ref.",
