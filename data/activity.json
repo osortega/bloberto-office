@@ -1,6 +1,12 @@
 [
   {
     "type": "complete",
+    "worker": "Sofia",
+    "message": "\ud83d\udd0d QA Review #87 complete \u2014 10 suggestions, 7 praise items, overall 4.1/5",
+    "timestamp": "2026-03-11T08:23:00Z"
+  },
+  {
+    "type": "complete",
     "worker": "Luna",
     "emoji": "\ud83c\udf19",
     "message": "\ud83c\udf19 Creative review #94 complete \u2014 15 ideas (3 must, 4 should, 4 could, 4 wild), 0 confirmed fixes since #93. JSON.parse unguarded escalated to must. Night sky stars gap found. ErrorBoundary copy contradicts Retry button. Eleven carry-overs persist.",

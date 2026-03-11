@@ -1,11 +1,10 @@
 {
   "analyst": "Sofia",
-  "review_number": 86,
-  "timestamp": "2026-03-11T07:15:00Z",
+  "review_number": 87,
+  "timestamp": "2026-03-11T08:15:00Z",
   "screenshots": {
-    "desktop": "screenshot-sofia-desktop-86.png",
-    "mobile": "screenshot-sofia-mobile-86.png",
-    "note": "Live screenshots captured via Puppeteer/Chromium from https://osortega.github.io/bloberto-office/"
+    "desktop": "screenshot-sofia-desktop-87.png",
+    "mobile": "screenshot-sofia-mobile-87.png"
   },
   "scores": {
     "visual": 5,
@@ -18,85 +17,96 @@
     "fun_factor": 5
   },
   "overall_score": 4.1,
-  "carry_over_status": {
-    "json_parse_unguarded": "STILL UNFIXED — App.jsx:1114",
-    "error_workers_invisible": "STILL UNFIXED — deskOccupants never includes error-status workers",
-    "shortcut_toast_no_dismiss": "STILL UNFIXED — no button in ShortcutToast JSX",
-    "vibe_labels_in_effect": "STILL UNFIXED — App.jsx:1102, inline const inside useEffect",
-    "footer_quote_skip": "STILL UNFIXED — App.jsx:1471, `? 1 : p + 1` never returns to 0",
-    "sub_readable_text": "STILL UNFIXED — Office.css has 0.32rem–0.48rem text on floor elements",
-    "isTouchDevice_at_load": "STILL UNFIXED — App.jsx:692, module-level snapshot"
-  },
   "suggestions": [
     {
-      "priority": "medium",
+      "priority": "high",
       "category": "bug",
-      "title": "[CARRY-OVER #2] JSON.parse on vibe history is still unguarded",
-      "description": "App.jsx line 1114: `const history = raw ? JSON.parse(raw) : []`. If localStorage key 'bloberto-vibe-history' holds corrupted or non-JSON data (e.g., from a different app version, storage migration, or manual tampering), this throws a SyntaxError. That error is NOT caught by safeRead — safeRead only wraps localStorage.getItem, not parsing. The whole vibe-streak useEffect blows up, taking the activity log synthetic event with it. Fix: wrap in try/catch: `let history = []; try { history = raw ? JSON.parse(raw) : [] } catch { history = [] }`. Two-line fix. We've talked about this for two reviews now. Come on.",
-      "effort": "small"
+      "title": "R-key refresh does not clear paused polling state",
+      "description": "The keyboard shortcut handler for 'r'/'R' calls `syncFromGitHub()` directly instead of `onResume()`. When the user is in the paused-due-to-inactivity state and presses R to refresh, the data fetches correctly but `pollingPaused` stays true, `lastActivity.current` is not reset, and the ⏸ Paused banner remains visible indefinitely. Fix: replace `syncFromGitHub()` with `onResume()` in the keydown handler branch for R/r.",
+      "effort": "small",
+      "assign_to": "Carlos"
+    },
+    {
+      "priority": "high",
+      "category": "bug",
+      "title": "Workers transitioning to 'done' status disappear silently with no celebration",
+      "description": "The `justShipped` detection only catches `working → idle` transitions. A worker whose status goes directly to 'done' is filtered out of `activeWorkers` (which only includes working/idle/error), triggering the plain fade-out animation with zero confetti or completion toast. STATUS_LABELS and STATUS_EMOJIS both define 'done', meaning it was designed to be shown, but no render path ever displays it. Either extend `activeWorkers` to include 'done' workers temporarily, or detect `working→done` the same way `working→idle` is detected and fire the celebration.",
+      "effort": "medium",
+      "assign_to": "Carlos"
     },
     {
       "priority": "medium",
-      "category": "bug",
-      "title": "[CARRY-OVER #2] Error-status workers are still invisible on the Office floor",
-      "description": "Office.jsx deskOccupants (lines 1310-1323) is built from workingWorkers (status==='working') + idleWorkers (status==='idle') + ghostRoster. Workers with status==='error' match NONE of these — they're in activeWorkers from App.jsx's filter (`working || idle || error`), so they reach Office as props, but then fall through the desk-assignment logic completely. The hasError check at line 1422 can NEVER be true because no error worker is ever in deskOccupants. All that beautiful error CSS (desk--error, desk-lamp--error, DESK_SCREEN_SVG.*_error, char--glitch, char__error-badge) is dead code in practice. Fix: add `const errorWorkers = nonMgr.filter(w => w.status === 'error')` and slot them into deskOccupants after idleWorkers.",
-      "effort": "small"
+      "category": "ux",
+      "title": "Mobile: pinned hover card on Office characters has no visible dismiss control",
+      "description": "On touch devices, tapping a character in the Office view toggles `pinnedCard` instead of navigating to dashboard (correct behavior per `window.matchMedia('(hover: none)')`). But the resulting `char-hover-card` popup has no close button — the only way to dismiss it is to tap the same character again, which is non-obvious. Add a small ✕ button or an outside-tap-to-dismiss handler (a transparent overlay or document click listener) to the pinned card path.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "ux",
+      "title": "Footer quote counter disappears on the last item in the cycle",
+      "description": "The counter `{quoteBonus}/{BONUS_TAGLINES.length}` only renders when `quoteBonus < BONUS_TAGLINES.length`. So the 8th (last) quote shows no counter, silently hiding the position indicator right when users most need to know they've reached the end. One line fix: change the condition from `quoteBonus < BONUS_TAGLINES.length` to `quoteBonus <= BONUS_TAGLINES.length`.",
+      "effort": "small",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "accessibility",
+      "title": "Worker cards are not keyboard-navigable via Tab",
+      "description": "`WorkerCard` has `tabIndex={-1}` on the outer `role=\"article\"` wrapper, meaning keyboard-only users cannot Tab between cards in the Dashboard grid. The ℹ️ flip button and task tags inside are focusable, but users must already be inside the card to reach them. Consider `tabIndex={0}` on the card wrapper, or at minimum ensure the ℹ️ button is reachable from outside the card. The current behavior means screen reader users get read-only summary only via the `aria-label` but cannot interact without a mouse.",
+      "effort": "medium",
+      "assign_to": "Maya"
+    },
+    {
+      "priority": "medium",
+      "category": "code",
+      "title": "Office.css is 2411 lines — split into feature-scoped modules",
+      "description": "Office.css has grown to 2411 lines covering desks, characters, avatars, conference table, wall clock, whiteboard, weather, plants, door, and animations. This is a maintenance liability: any targeted change risks unintended side effects and the file is hard to search. Recommend splitting into colocated CSS modules (e.g. Character.module.css, Desk.module.css, OfficeDecorations.module.css) or at minimum logical @layer sections with clear demarcation comments. App.css at 1170 lines is approaching the same problem.",
+      "effort": "large",
+      "assign_to": "Maya"
     },
     {
       "priority": "low",
       "category": "bug",
-      "title": "Bloberto speech bubble overflows office-floor container on mobile",
-      "description": "The manager Character is positioned at top: 4% inside .office-floor. The speech bubble uses `position: absolute; bottom: calc(100% + 8px)` which places it ABOVE the character — so roughly at top: -1% to 0% of the floor. On mobile (375px wide) where the office floor has reduced height, the bubble escapes the top boundary and renders in the tab-toggle area. The .office-floor has `overflow: clip; overflow-clip-margin: 20px` which allows content up to 20px outside to show, but the bubble can extend further than that. Visible in the mobile screenshot: the Bloberto speech bubble partially overlaps the tab buttons. Fix: add `overflow: hidden` or clamp the bubble's top position within the container.",
-      "effort": "small"
+      "title": "isTouchDevice evaluated at module load — breaks hybrid devices",
+      "description": "`const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches` is evaluated once when the module is imported. On hybrid laptops/tablets that support both mouse and touch, users who switch input modes mid-session will see stale messaging (e.g. the Paused banner still says 'Move mouse to refresh' after they switch to touch). Move this into a `useEffect` or `useCallback` that reads `window.matchMedia` at call time rather than at import time.",
+      "effort": "small",
+      "assign_to": "Dave"
+    },
+    {
+      "priority": "low",
+      "category": "bug",
+      "title": "getRelativeTime shows 'just now' for future-dated timestamps",
+      "description": "`getRelativeTime` in utils/time.js computes `diff = Date.now() - new Date(timestamp).getTime()`. If the activity.json server clock is ahead of the client (clock skew) or an entry has a future timestamp, diff is negative, `mins < 1` is true, and the function returns 'just now'. This could show stale or future activity as 'just now'. Add a guard: `if (diff < 0) return 'just now'` is already effectively there, but consider returning a neutral 'moments ago' or clamping to 0 explicitly so the intent is clear to future maintainers.",
+      "effort": "small",
+      "assign_to": "Carlos"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "[CARRY-OVER] ShortcutToast has no dismiss button for mouse/touch users",
-      "description": "The ShortcutToast (App.jsx lines 631-686) auto-dismisses after 7s or on any shortcut keypress. Touch users who don't use keyboard shortcuts are forced to wait the full 7 seconds. The toast is already hidden on pointer:coarse + max-width:640px, but there's no X button or tap-to-dismiss for desktop mouse users who don't trigger shortcut keys. Keyboard users get immediate dismiss. Fix: add a small close button inside the toast JSX.",
-      "effort": "small"
+      "title": "ErrorBoundary retry button uses no design system styles",
+      "description": "The ErrorBoundary's catch UI renders a plain `<button>` with only `style={{ marginLeft: '1rem', cursor: 'pointer' }}`. It completely breaks visual consistency — no background, no border-radius, no color tokens. This is a rare state but users who hit it deserve the same polish as the rest of the app. Apply `.btn btn-sm btn-ghost` or an equivalent class consistent with the retry buttons elsewhere in the app.",
+      "effort": "small",
+      "assign_to": "Maya"
     },
     {
       "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER] VIBE_LABELS constant re-declared inside useEffect on every vibe change",
-      "description": "App.jsx line 1102: `const VIBE_LABELS = { 'after-hours': 'After Hours', ... }` is declared inside the teamVibe.key useEffect. This object is identical on every run and is only used two lines later. It allocates a new object reference on every vibe transition. Extract it as a module-level constant. It's a trivially small allocation, but it's also a trivially simple fix — and leaving it here is just sloppy.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "bug",
-      "title": "[CARRY-OVER] Footer quote cycle permanently drops the vibe-reactive tagline after cycling through all bonus quotes",
-      "description": "App.jsx line 1471: `setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1)`. When the counter reaches BONUS_TAGLINES.length (8), it resets to 1 — skipping 0. But quoteBonus === 0 is the ONLY state that shows the vibe-reactive FOOTER_TAGLINES entry. After one full cycle, the user is locked out of the dynamic tagline forever. Fix: change `? 1 :` to `? 0 :` and update the counter display accordingly.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "visual",
-      "title": "[CARRY-OVER] Sub-readable text sizes persist on the office floor",
-      "description": "Office.css still has multiple floor elements at 0.32rem–0.48rem: char--idle .char__name (0.32rem), desk__nameplate (0.38rem/0.44rem at mobile breakpoints), wb-vibe-text (0.55rem at 480px), idle-duration (0.26rem). At 0.26rem on a physical mobile device this is approximately 3–4px — not even decorative, just technically visible. The very-small-text is a deliberate aesthetic choice for the isometric feel, but 0.26rem crosses from 'tiny but cute' into 'actively inaccessible'. Bump the floor to 0.5rem minimum for legible elements.",
-      "effort": "medium"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "[CARRY-OVER] isTouchDevice is a module-load snapshot, not a live media query",
-      "description": "App.jsx line 692: `const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches`. This evaluates ONCE when the module loads. Users who connect/disconnect a mouse (common on tablets, Surface devices, iPads with Magic Keyboard) will get stale results until a full page reload. Fix: either use `window.matchMedia('(pointer: coarse)').matches` inline at the point of use, or add a matchMedia change listener inside a useEffect.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "Idle bubble index is a 190-character unreadable inline expression",
-      "description": "Office.jsx line 813: the idle micro-bubble array index is computed entirely inline inside JSX — 190+ characters including a reduce-based hash of the worker ID, all on one line inside a className-bearing div. This is not unreadable because it's clever; it's unreadable because it's lazy. Extract to a named function like `getIdleBubbleIndex(workerId, bubbleArray)` at the module level. Future maintainers (and linters) will thank you.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "completionToast and plantToast use copy-pasted inline style blocks",
-      "description": "App.jsx lines 1190-1212 and Office.jsx lines 1329-1351 both implement a fixed-bottom-center toast using virtually identical inline style objects (position:fixed, bottom:2rem/5.5rem, left:50%, transform, background, border, borderRadius, padding, zIndex, whiteSpace:nowrap, animation). This pattern is duplicated across two files. Extract as a shared `.toast-overlay` CSS class — or at minimum a shared inline style constant — to avoid the two implementations drifting apart over time.",
-      "effort": "small"
+      "category": "performance",
+      "title": "Vibe history written to localStorage on every teamVibe.key change — including initial mount",
+      "description": "The vibe-history effect runs on every `teamVibe.key` change, reads the full history JSON from localStorage, appends, and writes it back. On fast polling cycles where vibe flickers (e.g. single worker toggling in/out), this could generate several localStorage writes per 30-second interval. Low risk currently with only 5 workers, but consider debouncing the write or only writing when the key genuinely changes (guard: `if (prevKey === teamVibe.key) return` before the write).",
+      "effort": "small",
+      "assign_to": "Carlos"
     }
-  ]
+  ],
+  "praise": [
+    "The 19-entry VIBE_TRANSITION_QUOTES map is absurdly thorough — every vibe-to-vibe transition has a bespoke Bloberto one-liner. This is the kind of detail that makes the app feel alive.",
+    "Worker-specific desk screen SVGs with separate error variants (carlos_error, sofia_error, etc.) are a delightful touch that most teams would never bother with.",
+    "safeSave/safeRead utility properly handles iOS private browsing and enterprise localStorage restrictions — quiet defensive coding that will save someone's sanity eventually.",
+    "The keyboard shortcut system is genuinely polished: ShortcutToast auto-dismisses, shows 'Got it ✓' confirmation, and persists dismissal in localStorage so it never nags.",
+    "PING_REACTIONS gives each worker a distinct voice (Carlos will always reference logs, Sofia will always reference edge cases). This is premium character work.",
+    "The dynamic favicon (red/green/grey canvas circle) is a small thing that shows real attention to the full browser experience, not just the viewport.",
+    "The paused polling state correctly differentiates touch vs mouse messaging — 'Tap to refresh' vs 'Move mouse to refresh' — a genuinely thoughtful UX detail."
+  ],
+  "summary": "Review #87 finds the app in excellent aesthetic shape — visual polish and fun factor remain at full marks, and the level of characterization (worker-specific SVGs, ping reactions, vibe transition quotes) continues to be genuinely impressive. The score holds steady at 4.1 overall. The one concrete bug worth immediate attention is the R-key shortcut bypassing `onResume()`, which leaves the Paused banner stuck on screen after a manual refresh — a small inconsistency that undermines the otherwise solid keyboard UX. The silent disappearance of workers who transition to 'done' (no confetti, no toast) is a missed celebration moment that the animation infrastructure already supports. Mobile users are still slightly disadvantaged: the pinned hover card has no obvious dismiss path, and at 375px the office floor text labels (0.38rem nameplates) are approaching unreadable territory. Code quality is holding but the CSS files are inching toward 'nobody wants to touch this' territory — Office.css at 2411 lines is a ticking time bomb for the next person who needs to tweak desk layout on a specific breakpoint."
 }
