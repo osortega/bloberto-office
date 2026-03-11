@@ -20,8 +20,8 @@
       "id": "maya",
       "role": "Frontend Engineer",
       "status": "working",
-      "task": "Luna #98 fixes \u2014 desk glow streaks, idle screensavers, Bloberto thought bubbles",
-      "started_at": "2026-03-11T11:03:00Z",
+      "task": "Luna #99 \u2014 nameplate glitch, clipboard btn, idle desk objects",
+      "started_at": "2026-03-11T11:38:00Z",
       "finished_at": null
     },
     {
@@ -43,5 +43,5 @@
       "updated_at": "2026-03-11T11:15:00Z"
     }
   ],
-  "updated_at": "2026-03-11T11:36:00Z"
+  "updated_at": "2026-03-11T11:38:00Z"
 }
