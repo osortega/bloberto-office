@@ -1,20 +1,21 @@
 {
   "analyst": "Sofia",
-  "review_number": 83,
-  "timestamp": "2026-03-11T05:15:44Z",
+  "review_number": 84,
+  "timestamp": "2026-03-11T05:47:00Z",
   "screenshots": {
-    "note": "Puppeteer unavailable in this environment (dbus socket missing). Visual review conducted from #81 screenshots (screenshot-sofia-desktop-81.png / screenshot-sofia-mobile-81.png). No visual regressions detected in source code since #82.",
+    "note": "Network unreachable from this environment. Visual review based on code analysis + reference screenshots from #81. No structural changes to office layout or dashboard UI detected since #81.",
     "desktop": "screenshot-sofia-desktop-81.png (reference)",
-    "mobile": "screenshot-sofia-mobile-81.png (reference)"
+    "mobile": "screenshot-sofia-mobile-81.png (reference)",
+    "dashboard": "screenshot-sofia-desktop-81.png (reference, dashboard tab)"
   },
   "carry_over_verification": {
-    "high_bare_localStorage_strike2": {
-      "status": "NOT FIXED — Strike 3",
-      "detail": "App.jsx lines 1071–1072 still call localStorage.getItem('bloberto-vibe-key') and localStorage.getItem('bloberto-vibe-streak') directly with no try/catch. safeSave/safeRead utilities were added and are now used for writes (lines 1076–1077) and for theme/shortcuts/sparkle reads throughout the file — that partial improvement is real and appreciated. But the two reads at the top of the vibe streak effect remain bare and will throw SecurityError in iOS private browsing, crashing the entire streak logic. Fix: replace lines 1071–1072 with safeRead()."
+    "high_bare_localStorage_strike3": {
+      "status": "FIXED confirmed in source",
+      "detail": "App.jsx lines 1071-1072 now call safeRead('bloberto-vibe-key') and safeRead('bloberto-vibe-streak'). Carlos shipped this. Strike counter reset. Note: fixing this incidentally removed a try/catch that was protecting JSON.parse on line 1109 -- see new MEDIUM issue below."
     },
-    "high_handleTabKeyDown_not_useCallback_strike3": {
-      "status": "NOT FIXED — Strike 4",
-      "detail": "App.jsx line 798: `const handleTabKeyDown = (e) => {` — still a plain inline function. This is recreated on every render of App, causing both tab buttons to see a new onKeyDown reference every time any state changes anywhere in App, defeating React.memo on any component that might receive it and creating unnecessary re-renders. Fix: wrap in useCallback with deps [tab]."
+    "high_handleTabKeyDown_not_useCallback_strike4": {
+      "status": "FIXED confirmed in source",
+      "detail": "App.jsx lines 798-811: handleTabKeyDown is now properly wrapped in useCallback([tab]). Tab buttons no longer receive a new function reference on every render. Strike counter reset."
     }
   },
   "scores": {
@@ -23,66 +24,66 @@
     "responsiveness": 4,
     "performance": 4,
     "accessibility": 4,
-    "code_quality": 3,
+    "code_quality": 4,
     "features": 5,
     "fun_factor": 5
   },
-  "overall_score": 4.25,
+  "overall_score": 4.4,
   "suggestions": [
     {
-      "priority": "high",
-      "category": "bug",
-      "title": "Bare localStorage.getItem in vibe streak effect — Strike 3",
-      "description": "App.jsx lines 1071–1072 call localStorage.getItem() with no try/catch wrapper. In iOS Safari private browsing, Firefox with strict privacy, and certain enterprise environments, this throws a SecurityError and the entire useEffect callback aborts — the streak is never computed, setVibeStreak is never called, and safeSave on lines 1076–1077 is never reached. The writes below are already using safeSave; the reads need the same treatment.\n\nFix (2 lines):\n  line 1071: const storedKey = safeRead('bloberto-vibe-key')\n  line 1072: const storedStreak = parseInt(safeRead('bloberto-vibe-streak') ?? '0', 10)\n\nNote: The vibe history block (lines 1108–1115) is protected by try/catch and therefore low severity despite using bare localStorage — it's inconsistent but safe. Still, for coherence it should be migrated to safeRead/safeSave too.",
-      "effort": "small"
-    },
-    {
-      "priority": "high",
-      "category": "code",
-      "title": "handleTabKeyDown not in useCallback — Strike 4",
-      "description": "App.jsx line 798 declares handleTabKeyDown as a plain arrow function inside the App component body. It closes over `tab` and `setTab` but is re-created on every render — every single state change in App (polling updates every 30s, timer ticks every 60s, isSyncing, confetti, etc.) produces a new function reference. Both tab buttons receive it via onKeyDown, meaning those buttons see prop changes on every App render even if nothing else about them changed.\n\nFix:\n  const handleTabKeyDown = useCallback((e) => {\n    const currentIdx = TABS.indexOf(tab)\n    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {\n      e.preventDefault()\n      const next = TABS[(currentIdx + 1) % TABS.length]\n      setTab(next)\n      history.replaceState(null, '', '#' + next)\n    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {\n      e.preventDefault()\n      const prev = TABS[(currentIdx - 1 + TABS.length) % TABS.length]\n      setTab(prev)\n      history.replaceState(null, '', '#' + prev)\n    }\n  }, [tab])",
-      "effort": "small"
-    },
-    {
       "priority": "medium",
-      "category": "ux",
-      "title": "ShortcutToast has no dismiss button for touch/mouse users",
-      "description": "The ShortcutToast (App.jsx ~line 611) can only be dismissed by: pressing a shortcut key, waiting 7 seconds for auto-dismiss, or it hides itself if a shortcut is used. There is no tap/click dismiss for mobile users or mouse users who can't figure out what keyboard keys to press. On mobile, the toast sits at the bottom right and can obscure content with no way to close it quickly.\n\nFrom the #81 screenshot, the toast is visible over the office floor. On mobile it overlaps the conference table area.\n\nFix: Add a small × close button inside the toast div:\n  <button className='shortcut-toast__close' onClick={() => dismiss(false)} aria-label='Dismiss keyboard shortcuts hint'>×</button>\n\nAlso consider: the toast currently says '⌨️ Shortcuts: 1 Office · 2 Dashboard · R Refresh · Esc Clear' but on touch devices where keyboard shortcuts are irrelevant, maybe suppress the toast entirely (check isTouchDevice).",
+      "category": "bug",
+      "title": "JSON.parse unguarded -- regression introduced by the #83 vibe-history fix",
+      "description": "When the #83 MEDIUM issue ('vibe history block uses bare localStorage inside try/catch') was resolved, the old try/catch wrapper was removed and safeRead/safeSave were substituted. But safeRead only guards against localStorage throwing -- it does NOT guard against malformed stored values. App.jsx line 1109:\n\n  const history = raw ? JSON.parse(raw) : []\n\nIf the stored string is corrupt (partial write on a previous crash, quota hit mid-write, or DevTools tampering), JSON.parse throws a SyntaxError and aborts the entire useEffect at line 1069 -- setVibeStreak is never called, safeSave never runs, setVibeHistory is never called. The corrupt value stays in localStorage and the effect keeps throwing on every vibe change. Vibe streak and sparkline silently break.\n\nThe previous try/catch on the vibe history block provided accidental protection for this. By removing it, the fix made the code more fragile, not less.\n\nFix:\n  const history = raw ? (() => { try { return JSON.parse(raw) } catch { return [] } })() : []\n\nOr add a safeParseJSON(key) utility in safeSave.js for consistency.",
       "effort": "small"
     },
     {
       "priority": "medium",
       "category": "bug",
-      "title": "Bloberto speech bubble overlaps tab bar on mobile",
-      "description": "Visible in the #81 mobile screenshot: Bloberto's speech bubble ('Knew all along...') renders over the tab selector row, making the Dashboard tab button partially obscured. The speech bubble uses CSS positioning relative to the character inside the office floor, but the office floor sits below the tab bar — speech bubbles that pop upward can overlap the tab bar when they grow tall enough.\n\nFix: Add a max-height or overflow:hidden on the speech bubble, or clamp the top position so it can't escape the .office-floor bounds. Alternatively, give the tab bar a z-index higher than the office floor's speech bubbles:\n  .tab-toggle { position: relative; z-index: 10; }\n  .speech-bubble { max-bottom: calc(100% of office-floor); }",
+      "title": "Error workers are invisible in the office floor",
+      "description": "Workers with status === 'error' appear correctly on the Dashboard tab with their red error badge. But in the Office tab they simply do not appear anywhere.\n\nTrace through Office.jsx:\n- workingWorkers = nonMgr.filter(w => w.status === 'working')  [error workers excluded]\n- idleWorkers    = nonMgr.filter(w => w.status === 'idle')     [error workers excluded]\n- ghostRoster    = effectiveRoster.filter(!activeIds.has(w.id)) [error workers ARE in activeIds, so excluded]\n- deskOccupants fills from workingWorkers, then idleWorkers, then ghostRoster [error workers in none]\n- idle wanderers loop filters idleWorkers [error workers excluded]\n\nResult: the office floor glows red with data-has-error and vibe switches to 'on-fire', but the worker causing the panic is completely invisible. Users see chaos with no visible cause in the office view -- they'd have to switch to Dashboard to see who's in trouble. The great char--glitch animation and WORKER_ERROR_BUBBLES system exist but never fire because error workers are never rendered.\n\nFix option A (minimal): add error workers to deskOccupants after working workers:\n  for (const w of nonMgr.filter(w => w.status === 'error')) {\n    if (i < DESKS.length) map[DESKS[i++].id] = { worker: w, ghost: false, idle: false }\n  }\n\nFix option B (fun): render them as wandering glitch characters -- they're already fully wired up for WORKER_ERROR_BUBBLES, char--glitch, and the error-state desk screen SVGs.",
       "effort": "small"
     },
     {
       "priority": "medium",
-      "category": "code",
-      "title": "Vibe history block inconsistently uses bare localStorage inside try/catch",
-      "description": "App.jsx lines 1108–1115: the vibe history block wraps raw localStorage.getItem / localStorage.setItem in a try/catch. The crash protection is there, which is why this is medium not high. However, the rest of the codebase now uses safeRead/safeSave uniformly, and this block is the only place that deviated from that pattern. It creates a confusing inconsistency when reading the code — a future developer might think the try/catch pattern is intentional and replicate it elsewhere.\n\nFix: Replace lines 1109 and 1113 with safeRead(VIBE_HISTORY_KEY) and safeSave(VIBE_HISTORY_KEY, JSON.stringify(history)) and remove the try/catch (safeSave/safeRead absorb the exception internally).",
+      "category": "ux",
+      "title": "ShortcutToast has no dismiss button -- carry-over from #83 (still not fixed)",
+      "description": "The ShortcutToast (App.jsx lines 674-682) can only be dismissed by pressing a keyboard shortcut, waiting 7 seconds for auto-dismiss, or having a shortcut trigger the 'gotit' flow. There is no tap/click dismiss for touch or mouse users. On mobile the toast overlays content with no escape.\n\nFix: add a small close button inside the toast:\n  <button style={{ marginLeft: '0.75rem', cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', opacity: 0.7 }} onClick={() => dismiss(false)} aria-label='Dismiss'>x</button>\n\nBonus: on touch-only devices the keyboard shortcuts are irrelevant. Consider suppressing the toast when isTouchDevice is true, or replacing the text with a swipe-navigation hint instead.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "code",
-      "title": "Dead comment: WORKER_CONFETTI_PIECES",
-      "description": "App.jsx around line 40: `// WORKER_CONFETTI_PIECES removed — worker confetti now uses CONFETTI_PIECES\\n// with worker color applied via CSS custom property on the container`\n\nThis is a migration-era comment that explains a change that already happened. The code it references no longer exists. It adds noise without adding value — it just explains a ghost.\n\nFix: Delete the 2-line comment.",
-      "effort": "small"
-    },
-    {
-      "priority": "low",
-      "category": "code",
-      "title": "handleCharClick useCallback deps include stable refs",
-      "description": "Office.jsx handleCharClick useCallback (around line 1279) declares deps: [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick]. setState setters (setPingedId, setPingReaction) are guaranteed stable by React and should not be in the dep array. Refs (pingTimerRef, pingReactionTimerRef) never change their identity. Including them is harmless but trips lint rules (react-hooks/exhaustive-deps can flag refs as over-specified) and is misleading about what actually gates a re-memoize.\n\nFix: Trim dep array to [onWorkerClick] — the only non-stable value.",
+      "title": "VIBE_LABELS declared inside useEffect -- should be a module-level constant",
+      "description": "App.jsx line 1097, inside the teamVibe.key useEffect:\n\n  const VIBE_LABELS = { 'after-hours': 'After Hours', 'slow-day': 'Slow Day', ... }\n\nThis is a pure static mapping with zero dependency on any variable. It is recreated on every vibe change. Move it to module scope alongside VIBE_COLORS, VIBE_RANK, and the other VIBE_* constants. This also makes it available for potential reuse in StatsBar or the VibeSparkline tooltip.",
       "effort": "small"
     },
     {
       "priority": "low",
       "category": "ux",
-      "title": "isTouchDevice computed once at module load — hybrid devices get wrong label",
-      "description": "App.jsx: `const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches` is evaluated once when the module is first imported. The polling-paused pill then shows 'Tap to refresh' vs 'Move mouse to refresh' based on this snapshot. On hybrid/convertible devices (Surface, iPad with keyboard, etc.) that switch input modes at runtime, the label will be stale if the user switches after page load.\n\nThis is low impact but easy to fix. Consider moving the detection inside the component as a `useMemo` or listening to the `change` event on the media query:\n  const isTouchDevice = useMemo(() => window.matchMedia('(pointer: coarse)').matches, [])\n\nOr for live updates: `window.matchMedia('(pointer: coarse)').addEventListener('change', handler)`",
+      "title": "Footer quote cycle strands the vibe-reactive tagline after first click",
+      "description": "App.jsx line 1438:\n  setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 1 : p + 1)\n\nWhen quoteBonus wraps, it resets to 1 -- not 0. Index 0 is the vibe-reactive FOOTER_TAGLINES entry. After the user clicks the sparkle button once, the vibe-specific tagline is permanently bypassed. If the vibe changes while you're in bonus cycle mode, you never see the new vibe's tagline.\n\nIf this is intentional 'discovery only once' behavior, add a comment. If not, change the reset to 0:\n  setQuoteBonus(p => p >= BONUS_TAGLINES.length ? 0 : p + 1)",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Touch detection: module-level snapshot in App vs. live matchMedia in Office -- inconsistency",
+      "description": "App.jsx line 689 evaluates isTouchDevice once at module load and never updates it. This drives the 'Tap to refresh' vs 'Move mouse to refresh' pill text.\n\nMeanwhile, Office.jsx Character component line 748 evaluates window.matchMedia('(hover: none)').matches live at click time -- the correct approach for hybrid/convertible devices.\n\nThe inconsistency means the office adapts to input mode changes at runtime (correct) while the header pill shows stale text. Carry-over LOW from #83; flagging again because the live detection pattern now exists in the same codebase, making the fix obvious.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "handleCharClick useCallback deps include stable refs -- carry-over from #83",
+      "description": "Office.jsx line 1257:\n  }, [setPingedId, setPingReaction, pingTimerRef, pingReactionTimerRef, onWorkerClick])\n\nsetState setters (setPingedId, setPingReaction) are guaranteed stable by React. Refs (pingTimerRef, pingReactionTimerRef) never change identity. Listing them implies they could change, misleading future readers.\n\nFix: trim to [onWorkerClick] -- the only value that actually gates a re-memoize.",
+      "effort": "small"
+    },
+    {
+      "priority": "low",
+      "category": "code",
+      "title": "Dead comment WORKER_CONFETTI_PIECES -- carry-over from #83",
+      "description": "App.jsx lines 39-40:\n  // WORKER_CONFETTI_PIECES removed -- worker confetti now uses CONFETTI_PIECES\n  // with worker color applied via CSS custom property on the container\n\nThis migration-era comment explains a change that already happened. The code it references no longer exists. Delete it.",
       "effort": "small"
     }
   ]

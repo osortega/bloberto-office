@@ -14,12 +14,12 @@
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Analyst",
-      "status": "working",
-      "task": "QA review #84 \u2014 30-minute site analysis",
-      "progress": 0,
+      "status": "idle",
+      "task": "QA review #84 complete \u2014 2 MEDIUMs, 5 LOWs",
+      "progress": 100,
       "started_at": "2026-03-11T05:45:33Z",
-      "updated_at": "2026-03-11T05:45:33Z"
+      "updated_at": "2026-03-11T05:53:36Z"
     }
   ],
-  "updated_at": "2026-03-11T05:45:33Z"
+  "updated_at": "2026-03-11T05:53:36Z"
 }
