@@ -19,10 +19,10 @@
     {
       "id": "maya",
       "role": "Frontend Engineer",
-      "status": "idle",
-      "task": "Luna #97 fixes — 3 items shipped (desk lamp colors, whiteboard task preview, activity emoji confirmed)",
-      "started_at": "2026-03-11T10:37:00Z",
-      "finished_at": "2026-03-11T10:42:00Z"
+      "status": "working",
+      "task": "Luna #98 fixes — desk glow streaks, idle screensavers, Bloberto thought bubbles",
+      "started_at": "2026-03-11T11:03:00Z",
+      "finished_at": null
     },
     {
       "id": "dave",
@@ -33,5 +33,5 @@
       "finished_at": "2026-03-11T04:35:00Z"
     }
   ],
-  "updated_at": "2026-03-11T11:02:00Z"
+  "updated_at": "2026-03-11T11:03:00Z"
 }
