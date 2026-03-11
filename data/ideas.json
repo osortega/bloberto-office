@@ -1,65 +1,65 @@
 {
   "creative_director": "Luna",
-  "review_number": 97,
-  "timestamp": "2026-03-11T10:35:00Z",
-  "theme": "The office has furniture — now give it weather, memory, and gossip.",
+  "review_number": 98,
+  "timestamp": "2026-03-11T11:00:00Z",
+  "theme": "Ambient Personality & Long-Term Memory",
   "fixed_since_last_review": [],
   "ideas": [
     {
       "priority": "should",
       "category": "office-life",
-      "title": "Conference Table Spontaneous Huddles",
-      "description": "The conference table exists in CSS (.conference-table, .char--seated, .conf-meeting-badge) but idle workers never spontaneously gather there. When 2+ workers are idle simultaneously, occasionally animate them walking to the conference table seats for a 'sync' or 'coffee chat'. Show the conf-meeting-badge with playful labels like 'quick sync' or 'vibe check'. WHY: idle workers just wander aimlessly — the conference table is a perfect set piece that's going completely unused. Meetings are a universal office experience.",
-      "effort": "medium",
+      "title": "Worker Desk Glow Streak Ring",
+      "description": "Each desk gets a subtle colored halo that intensifies on consecutive completions (warm amber) and cools to icy blue after errors. WHY: performance is currently only readable by checking stats — a persistent ambient glow lets you feel team momentum without scanning numbers.",
+      "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "should",
-      "category": "storytelling",
-      "title": "Activity Log Worker Emoji Avatars",
-      "description": "The activity log shows .activity-worker-emoji but all entries look the same. Each worker has a unique emoji (Luna 🌙, Carlos ⚙️, Maya 🎨, Dave 🔧, Sofia 🔍). Show their emoji avatar inline before their name in every log entry. WHY: scanning a wall of text for who did what is tedious. A splash of emoji makes the log scannable at a glance — same trick Slack uses with profile photos.",
-      "effort": "trivial",
-      "assigned_to": "maya"
+      "category": "office-life",
+      "title": "Idle Worker Screensaver Doodles",
+      "description": "When a worker's status is idle, their desk screen switches from the work SVG to a tiny animated screensaver (flying toasters, bouncing shapes, starfield). WHY: idle and active states look too similar right now; a distinct screensaver makes it instantly obvious who's waiting for work.",
+      "effort": "small",
+      "assigned_to": "dave"
     },
     {
       "priority": "should",
-      "category": "delight",
-      "title": "Office Window Weather Sync",
-      "description": "The office window (.office-window) shows a sky gradient with stars and clouds, but it's purely cosmetic — disconnected from any real data. Sync the window sky to Osvaldo's actual local weather via wttr.in: rain shows animated droplets on the glass, clouds drift across, clear sky shows sun/moon. WHY: this tiny detail would make people do a double-take — 'wait, is that MY weather?' It bridges the virtual office to the real world.",
+      "category": "mascot",
+      "title": "Bloberto Thought Bubble Quips",
+      "description": "Bloberto occasionally displays a small thought bubble with a reactive one-liner about the current team state (e.g., '3 errors… fine.' or 'Full squad! 🎉'). Triggered by state changes, shown briefly then fades. WHY: Bloberto is the visual anchor of the whole dashboard but currently static — giving him inner monologue makes the mascot earn his desk space.",
       "effort": "medium",
-      "assigned_to": "carlos"
+      "assigned_to": "luna"
     },
     {
-      "priority": "should",
-      "category": "visual",
-      "title": "Whiteboard Task Queue Preview",
-      "description": "The whiteboard (.office-whiteboard) shows vibe text and a progress bar, but never shows WHAT's being worked on. Add a tiny 2-3 line task preview showing the current top worker's task name, truncated. Cycle through active workers every 8s. WHY: the whiteboard is the natural place to answer 'what's the team working on?' at a glance without switching to the dashboard tab. It's currently wasted space.",
+      "priority": "could",
+      "category": "office-life",
+      "title": "Desk Plants That Grow and Wilt",
+      "description": "Each worker gets a tiny potted plant on their desk. It grows greener and taller as their success rate climbs over the session and slowly wilts if they rack up errors. WHY: long-term performance needs a visual memory — plants encode history in a warm, non-judgmental way that fits the office vibe better than graphs or numbers.",
+      "effort": "medium",
+      "assigned_to": "sofia"
+    },
+    {
+      "priority": "could",
+      "category": "ambient",
+      "title": "Corner Vibe Lava Lamp",
+      "description": "A decorative lava lamp in the office corner that changes blob rise-speed and color temperature based on the current team vibe key. Chill vibe = slow purple blobs; chaotic vibe = fast red blobs. WHY: the vibe system already drives whiteboard quotes but has no physical presence in the room — a lava lamp is ambient data viz that doesn't demand attention.",
       "effort": "small",
       "assigned_to": "maya"
     },
     {
       "priority": "could",
-      "category": "feature",
-      "title": "Worker Completion Sound Effect",
-      "description": "When a worker completes (confetti fires, checkmark appears), play a subtle chime using the Web Audio API — no audio files needed, just a synthesized 3-note ascending tone. Gate it behind a mute toggle in the header. WHY: people leave the tab open in the background. An audio cue when work finishes is genuinely useful — it's the difference between checking back manually and being notified. Every CI/CD tool has this.",
-      "effort": "small",
+      "category": "office-life",
+      "title": "Conference Table Coffee Cup Pipeline Gauge",
+      "description": "A row of coffee cups sits on the conference table. Cups fill as tasks queue up and empty as workers complete them. A stack of empty cups = team is crushing it; cups overflowing = backlog warning. WHY: pipeline pressure is invisible in the current UI — coffee cups are a playful, legible metaphor that fits the office theme perfectly.",
+      "effort": "medium",
       "assigned_to": "carlos"
-    },
-    {
-      "priority": "could",
-      "category": "delight",
-      "title": "Desk Lamp Color Personality",
-      "description": "All active desk lamps glow the same warm yellow. Tint each worker's desk lamp to their role-color (--role-color CSS variable is already set per worker). Maya's lamp glows pink-ish, Carlos's glows blue-ish, etc. The lamp becomes a signature. WHY: it's a one-line CSS change (use color-mix with --role-color) that adds surprising personality. When you look at the office, you can tell who's working by lamp color alone.",
-      "effort": "trivial",
-      "assigned_to": "maya"
     },
     {
       "priority": "wild",
-      "category": "storytelling",
-      "title": "Daily Office Newspaper",
-      "description": "Generate a tiny 'Bloberto Times' newspaper overlay accessible from the whiteboard. Auto-generated daily from activity.json: 'BREAKING: Carlos deployed 3 fixes before lunch', 'OPINION: Is Dave's uptime streak sustainable?', 'WEATHER: Vibe forecast — crushing with a chance of on-fire'. Pure satire. WHY: this transforms raw activity data into narrative. People don't remember stats, they remember stories. Plus it's hilarious.",
+      "category": "office-life",
+      "title": "End-of-Shift Countdown Wall Clock",
+      "description": "A wall clock shows a stylized countdown to a configurable 'end of shift' time. As it ticks down, the clock face color shifts from calm green to urgent orange-red. Workers subtly start gathering their things in the final minutes. WHY: the dashboard exists outside time — there's no sense of urgency or rhythm. A countdown clock gives the whole office a shared heartbeat and makes long sessions feel alive.",
       "effort": "large",
-      "assigned_to": "tbd"
+      "assigned_to": "luna"
     }
   ],
   "hire_proposals": []
