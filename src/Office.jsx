@@ -1366,6 +1366,24 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
   )
   const tagBugCount = tagCounts.find(t => t.key === 'Bug')?.count ?? 0
 
+  const FREQ_STOPWORDS = new Set(['a','the','for','of','in','to','with','on','and','at','is','it','has','was','are','be','an','or','by','from','this','that'])
+  const wordFreqPills = useMemo(() => {
+    if (workingWorkers.length === 0 || tagCounts.length > 0) return null
+    const freq = {}
+    for (const w of workingWorkers) {
+      if (!w.task) continue
+      for (const word of w.task.split(/\s+/)) {
+        const lower = word.toLowerCase().replace(/[^a-z]/g, '')
+        if (lower.length < 2 || FREQ_STOPWORDS.has(lower)) continue
+        freq[lower] = (freq[lower] || 0) + 1
+      }
+    }
+    return Object.entries(freq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([word, count]) => ({ word, count }))
+  }, [workingWorkers, tagCounts.length])
+
   const avgProgress = Math.round(
     workingWorkers.reduce((s, w) => s + (w.progress || 0), 0) / Math.max(workingWorkers.length, 1)
   )
@@ -1575,7 +1593,11 @@ export default function Office({ workers = [], roster = [], isSyncing = false, a
             {workingWorkers.length === 0
               ? <span className="sprint-tag-board__offline">● offline</span>
               : tagCounts.length === 0
-                ? <span className="sprint-tag-board__empty">no tags</span>
+                ? (wordFreqPills && wordFreqPills.length > 0
+                    ? wordFreqPills.map(({ word, count }) => (
+                        <span key={word} className="sprint-tag-board__pill" style={{ background: 'rgba(150,150,160,0.18)', color: '#a0a0b0' }}>{word} ×{count}</span>
+                      ))
+                    : <span className="sprint-tag-board__empty">no tags</span>)
                 : tagCounts.map(({ key, emoji, count }) => (
                     <span key={key} className="sprint-tag-board__pill">{emoji} {key} ×{count}</span>
                   ))

@@ -6,17 +6,60 @@ import { ROLE_EMOJIS, STATUS_LABELS, STATUS_EMOJIS, ROLE_COLORS } from './utils/
 import { getRelativeTime } from './utils/time.js'
 import { safeSave, safeRead } from './utils/safeSave.js'
 
+const ERROR_QUOTES = [
+  'Something broke... but we built different 💪',
+  'The office is on fire. This is fine. 🔥',
+  'Even blobs have bad days 🫠',
+  'Ctrl+Z the whole universe pls',
+]
+
 class ErrorBoundary extends React.Component {
-  constructor(props) { super(props); this.state = { hasError: false } }
-  static getDerivedStateFromError() { return { hasError: true } }
+  constructor(props) {
+    super(props)
+    this.state = {
+      hasError: false,
+      quote: ERROR_QUOTES[Math.floor(Math.random() * ERROR_QUOTES.length)],
+    }
+  }
+  static getDerivedStateFromError() {
+    return {
+      hasError: true,
+      quote: ERROR_QUOTES[Math.floor(Math.random() * ERROR_QUOTES.length)],
+    }
+  }
   componentDidCatch(error, info) { console.error('[Bloberto ErrorBoundary]', error, info) }
   resetError = () => this.setState({ hasError: false })
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontSize: '1.1rem', color: 'var(--text-error, #f87171)' }}>
-          Something went wrong — click Retry, or refresh if it persists.
-          <button onClick={this.resetError} style={{ marginLeft: '1rem', cursor: 'pointer' }}>Retry</button>
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          height: '100vh', gap: '1.25rem', fontFamily: 'inherit', textAlign: 'center', padding: '2rem',
+          animation: 'bloberto-error-pulse 2s ease-in-out infinite',
+          border: '3px solid #f87171', borderRadius: '1rem', boxSizing: 'border-box',
+        }}>
+          <style>{`
+            @keyframes bloberto-error-pulse {
+              0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.4); }
+              50% { box-shadow: 0 0 0 12px rgba(248,113,113,0); }
+            }
+          `}</style>
+          <span style={{ fontSize: '4rem', lineHeight: 1 }}>🫠</span>
+          <p style={{ margin: 0, fontSize: '1.15rem', color: 'var(--text-error, #f87171)', fontWeight: 600, maxWidth: '30ch' }}>
+            {this.state.quote}
+          </p>
+          <button
+            onClick={this.resetError}
+            style={{
+              cursor: 'pointer', padding: '0.55rem 1.5rem', fontSize: '0.95rem', fontWeight: 600,
+              background: '#f87171', color: '#fff', border: 'none', borderRadius: '999px',
+              boxShadow: '0 2px 8px rgba(248,113,113,0.35)', transition: 'opacity 0.15s',
+            }}
+            onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseOut={e => e.currentTarget.style.opacity = '1'}
+          >
+            Retry
+          </button>
         </div>
       )
     }
