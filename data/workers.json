@@ -4,12 +4,12 @@
       "id": "sofia",
       "name": "Sofia",
       "role": "QA Engineer",
-      "status": "idle",
-      "task": "",
-      "progress": 100,
-      "started_at": "2026-03-11T03:15:00Z",
-      "updated_at": "2026-03-11T03:45:00Z"
+      "status": "working",
+      "task": "QA review #83 — live site + codebase analysis",
+      "progress": 10,
+      "started_at": "2026-03-11T05:15:00Z",
+      "updated_at": "2026-03-11T05:15:00Z"
     }
   ],
-  "updated_at": "2026-03-11T03:45:00Z"
+  "updated_at": "2026-03-11T05:15:00Z"
 }
