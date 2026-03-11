@@ -4,9 +4,10 @@
       "id": "luna",
       "role": "Creative Director",
       "status": "working",
-      "task": "Creative review #88",
-      "started_at": "2026-03-11T01:30:00Z"
+      "task": "Creative review #89",
+      "started_at": "2026-03-11T02:00:00Z",
+      "finished_at": null
     }
   ],
-  "updated_at": "2026-03-11T01:30:00Z"
+  "updated_at": "2026-03-11T02:00:00Z"
 }
